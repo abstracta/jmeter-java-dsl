@@ -1,0 +1,144 @@
+<?xml version="1.0"?>
+<!DOCTYPE module PUBLIC "-//Puppy Crawl//DTD Check Configuration 1.3//EN"
+  "http://www.puppycrawl.com/dtds/configuration_1_3.dtd">
+<module name="Checker">
+  <property name="fileExtensions" value="java, properties, xml"/>
+
+  <module name="NewlineAtEndOfFile"/>
+  <module name="FileTabCharacter">
+    <property name="eachLine" value="true"/>
+  </module>
+
+  <module name="TreeWalker">
+
+    <module name="SuppressionCommentFilter"/>
+
+    <module name="AnnotationLocation"/>
+
+    <module name="EmptyBlock">
+      <property name="tokens"
+        value="LITERAL_TRY, LITERAL_FINALLY, LITERAL_IF, LITERAL_ELSE, LITERAL_SWITCH"/>
+    </module>
+    <module name="EmptyCatchBlock"/>
+    <module name="LeftCurly"/>
+    <module name="NeedBraces"/>
+    <module name="RightCurly"/>
+    <module name="RightCurly">
+      <property name="option" value="alone"/>
+      <property name="tokens"
+        value="CLASS_DEF, METHOD_DEF, CTOR_DEF, LITERAL_FOR, LITERAL_WHILE, LITERAL_DO, STATIC_INIT, INSTANCE_INIT"/>
+    </module>
+
+    <module name="OneTopLevelClass"/>
+
+    <module name="DeclarationOrder"/>
+    <module name="DefaultComesLast"/>
+    <module name="EmptyStatement"/>
+    <module name="EqualsAvoidNull"/>
+    <module name="EqualsHashCode"/>
+    <module name="FallThrough"/>
+    <module name="IllegalToken"/>
+    <module name="InnerAssignment"/>
+    <module name="MissingSwitchDefault"/>
+    <module name="ModifiedControlVariable"/>
+    <module name="MultipleVariableDeclarations"/>
+    <module name="NoFinalizer"/>
+    <module name="OneStatementPerLine"/>
+    <module name="OverloadMethodsDeclarationOrder"/>
+    <module name="StringLiteralEquality"/>
+
+    <module name="AvoidStarImport"/>
+    <module name="IllegalImport"/>
+    <module name="ImportOrder">
+      <property name="option" value="top"/>
+      <property name="separated" value="true"/>
+    </module>
+    <module name="RedundantImport"/>
+    <module name="UnusedImports"/>
+
+    <module name="AtclauseOrder"/>
+    <module name="JavadocStyle"/>
+    <module name="NonEmptyAtclauseDescription"/>
+    <module name="SingleLineJavadoc"/>
+
+    <module name="ArrayTypeStyle"/>
+    <module name="AvoidEscapedUnicodeCharacters">
+      <property name="allowEscapesForControlCharacters" value="true"/>
+      <property name="allowByTailComment" value="true"/>
+      <property name="allowNonPrintableEscapes" value="true"/>
+    </module>
+    <module name="CommentsIndentation"/>
+    <module name="Indentation">
+      <property name="basicOffset" value="2"/>
+      <property name="braceAdjustment" value="0"/>
+      <property name="caseIndent" value="2"/>
+      <property name="throwsIndent" value="4"/>
+      <property name="lineWrappingIndentation" value="4"/>
+      <property name="arrayInitIndent" value="2"/>
+    </module>
+    <module name="OuterTypeFilename"/>
+    <module name="UpperEll"/>
+
+    <module name="ModifierOrder"/>
+    <module name="RedundantModifier"/>
+
+    <module name="AbbreviationAsWordInName"/>
+    <module name="CatchParameterName"/>
+    <module name="ClassTypeParameterName"/>
+    <module name="ConstantName"/>
+    <module name="InterfaceTypeParameterName"/>
+    <module name="LocalFinalVariableName"/>
+    <module name="LocalVariableName">
+      <property name="allowOneCharVarInForLoop" value="true"/>
+    </module>
+    <module name="MemberName"/>
+    <module name="MethodName"/>
+    <module name="MethodTypeParameterName"/>
+    <module name="PackageName">
+      <property name="format" value="^[a-z]+(\.[a-z][a-z0-9]*)*$"/>
+    </module>
+    <module name="ParameterName"/>
+    <module name="StaticVariableName"/>
+    <module name="TypeName"/>
+
+    <module name="LineLength">
+      <property name="max" value="100"/>
+      <property name="ignorePattern"
+        value="^package.*|^import.*|a href|href|http://|https://|ftp://"/>
+    </module>
+
+    <module name="EmptyForInitializerPad"/>
+    <module name="EmptyForIteratorPad"/>
+    <module name="EmptyLineSeparator">
+      <property name="allowNoEmptyLineBetweenFields" value="true"/>
+      <property name="allowMultipleEmptyLines" value="false"/>
+      <property name="allowMultipleEmptyLinesInsideClassMembers" value="false"/>
+    </module>
+    <module name="GenericWhitespace"/>
+    <module name="MethodParamPad"/>
+    <module name="NoLineWrap"/>
+    <module name="NoWhitespaceAfter"/>
+    <module name="NoWhitespaceBefore"/>
+    <module name="OperatorWrap">
+      <property name="option" value="nl"/>
+      <property name="tokens" value="QUESTION, COLON, EQUAL, NOT_EQUAL, DIV, MINUS, STAR, MOD, SR, BSR, GE, GT, SL, LE, LT, BXOR, BOR, LOR, BAND, TYPE_EXTENSION_AND, LITERAL_INSTANCEOF"/>
+    </module>
+    <module name="ParenPad"/>
+    <module name="SeparatorWrap">
+      <property name="tokens" value="DOT"/>
+      <property name="option" value="nl"/>
+    </module>
+    <module name="SeparatorWrap">
+      <property name="tokens" value="COMMA"/>
+      <property name="option" value="EOL"/>
+    </module>
+    <module name="TypecastParenPad"/>
+    <module name="WhitespaceAfter"/>
+    <module name="WhitespaceAround">
+      <property name="allowEmptyConstructors" value="true"/>
+      <property name="allowEmptyMethods" value="true"/>
+      <property name="allowEmptyTypes" value="true"/>
+      <property name="allowEmptyLoops" value="true"/>
+    </module>
+  </module>
+</module>

@@ -1,0 +1,33 @@
+name: publish release
+on:
+  release:
+    types: [published]
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - name: Setup Java 1.8
+        uses: actions/setup-java@v1
+        with:
+          java-version: 1.8
+      - name: set maven project version
+        run: mvn --batch-mode versions:set -DnewVersion=${GITHUB_REF#refs/tags/v} --settings .github/settings.xml
+      - name: package release
+        run: mvn clean package -DskipTests --settings .github/settings.xml
+      - name: Upload release artifact
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: ./target/*.jar
+          file_glob: true
+          tag: ${{ github.ref }}
+      - name: publish to Nexus
+        run: .github/maven-central-deploy.sh
+        env:
+          GPG_SECRET_KEYS: ${{ secrets.GPG_SECRET_KEYS }}
+          GPG_OWNERTRUST: ${{ secrets.GPG_OWNERTRUST }}
+          GPG_EXECUTABLE: gpg
+          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+          SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
+          SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}

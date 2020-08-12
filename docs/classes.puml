@@ -1,0 +1,89 @@
+@startuml
+
+skinparam monochrome true
+hide empty members
+hide circle
+
+class JmeterDsl {
+  DslTestPlan testPlan(TestPlanChild[] children)
+  DslThreadGroup threadGroup(int threads, int iterations, ThreadGroupChild[] children)
+  DslThreadGroup threadGroup(String name, int threads, int iterations, ThreadGroupChild[] children)
+  DslHttpSampler httpSampler(String url)
+  DslHttpSampler httpSampler(String name, String url)
+  HttpHeaders httpHeaders()
+  JtlWriter jtlWriter(String jtlFile)
+}
+
+package core {
+
+  interface DslTestElement {
+    HashTree buildTreeUnder(HashTree parent)
+  }
+
+  abstract class BaseTestElement implements DslTestElement {
+    String name
+    TestElement buildTestElement()
+  }
+
+  abstract class TestElementContainer extends BaseTestElement {
+  }
+
+  class DslTestPlan extends TestElementContainer {
+    TestPlanStats run()
+  }
+
+  interface TestPlanChild extends DslTestElement {
+  }
+
+  class EmbeddedJmeterEngine {
+    TestPlanStats run(DslTestPlan testPlan)
+  }
+
+  class DslThreadGroup extends TestElementContainer implements TestPlanChild {
+    int threads
+    int iterations
+  }
+
+  interface ThreadGroupChild extends DslTestElement {
+  }
+
+  abstract class DslSampler extends TestElementContainer implements ThreadGroupChild {
+  }
+
+  interface SamplerChild extends DslTestElement {
+  }
+
+  class JtlWriter extends BaseTestElement implements TestPlanChild, ThreadGroupChild, SamplerChild {
+    String jtlFilePath
+  }
+
+}
+
+package http {
+
+  class DslHttpSampler extends DslSampler {
+    String url
+    HttpMethod method
+    String body
+    DslHttpSampler post(String body)
+    DslHttpSampler method(HttpMethod method)
+    DslHttpSampler body(String body)
+    DslHttpSampler header(String name, String value)
+    DslHttpSampler children(SamplerChild[] children)
+  }
+
+  class HttpHeaders extends BaseTestElement implements TestPlanChild, ThreadGroupChild, SamplerChild {
+    HttpHeaders header(String name, String value)
+  }
+
+}
+
+JmeterDsl -[hidden]- core
+TestElementContainer -up-> "*" DslTestElement
+DslTestPlan ..> TestPlanChild
+DslThreadGroup ..> ThreadGroupChild
+DslTestPlan ..> EmbeddedJmeterEngine
+DslSampler ..> SamplerChild
+DslHttpSampler --> HttpHeaders
+
+@enduml
