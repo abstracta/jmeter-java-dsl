@@ -8,7 +8,7 @@ If you use [maven](https://maven.apache.org/what-is-maven.html), just include fo
 
 ```xml
 <dependency>
-  <groupId>us.abstracta</groupId>
+  <groupId>us.abstracta.jmeter</groupId>
   <projectId>jmeter-java-dsl</projectId>
   <version>0.1</version>
 </dependency>
@@ -18,12 +18,12 @@ Here is a simple example test in [JUnit 5](https://junit.org/junit5/)+ with 2 th
 
 ```java
 import static org.assertj.core.api.Assertions.assertThat;
-import static JmeterDsl.*;
+import static us.abstracta.jmeter.javadsl.JmeterDsl.*;
 
 import java.time.Duration;
 import org.eclipse.jetty.http.MimeTypes.Type;
 import org.junit.jupiter.api.Test;
-import TestPlanStats;
+import us.abstracta.jmeter.javadsl.TestPlanStats;
 
 public class PerformanceTest {
 
