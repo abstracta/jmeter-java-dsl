@@ -50,15 +50,17 @@ When a test plan runs, the engine returns an instance of [TestPlanStats](src/mai
 
 ### I want to add support for a new protocol (e.g.: HTTP2) or feature provided by a JMeter plugin. How should I proceed?
 
-In general, you would create a new package (e.g.: us.abstracta.jmeter.javadsl.http2) containing a new class (e.g.: Http2JMeterDsl) that provides factory methods for the test elements of the protocol or plugin. 
+First, you will need to add an optional dependency to the [pom.xml](/pom.xml) to include the plugin and libraries required to support the new functionality.
 
-Additionally, you would need to create new [DslTestElement] classes to implement the logic for each of the new test elements (e.g. Http2Sampler). Check [Core classes section] and following item for some guidelines.
+After that, you need to create a new package (e.g.: us.abstracta.jmeter.javadsl.http2) containing a new class (e.g.: Http2JMeterDsl) that provides factory methods for the test elements of the protocol or plugin. 
 
-Add proper tests and some documentation so users know about the new features! 
+Additionally, you need to create new [DslTestElement] classes to implement the logic for each of the new test elements (e.g. Http2Sampler). Check [Core classes section] and following item for some guidelines.
+
+Remember adding proper tests and some documentation so users know about the new features! 
 
 ### I want to add a new JMeter standard (sampler, listener, pre/post processor, assertion, etc) test element. What should I do?
 
-When adding a new test element, a new [DslTestElement] class would be required to handle the specific attributes and construction of the JMeter test element and a new factory method in [JmeterDsl] would need to be added to instantiate this class.
+When adding a new test element, a new [DslTestElement] class is required to handle the specific attributes and construction of the JMeter test element and a new factory method in [JmeterDsl] needs to be added to instantiate this class.
 
 In general, check existing classes extending [DslTestElement] and factory methods of [JmeterDsl] looking for any similarities with required test element, and take examples from them.
 
