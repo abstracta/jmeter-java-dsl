@@ -6,13 +6,15 @@ import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalToJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.getRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static us.abstracta.jmeter.javadsl.JmeterDsl.httpSampler;
+import static org.assertj.core.api.Assertions.assertThat;
+import static us.abstracta.jmeter.javadsl.JmeterDsl.jtlWriter;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.testPlan;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.threadGroup;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
+import com.google.common.io.Resources;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
@@ -24,6 +26,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.io.TempDir;
+import org.xmlunit.assertj.XmlAssert;
 import ru.lanwen.wiremock.ext.WiremockResolver;
 import ru.lanwen.wiremock.ext.WiremockResolver.Wiremock;
 import ru.lanwen.wiremock.ext.WiremockUriResolver;
@@ -89,7 +92,7 @@ public class JmeterDslTest {
             JmeterDsl.httpSampler(SAMPLE_2_LABEL, wiremockUri)
         )
     ).run();
-    assertEquals(buildExpectedTotalCounts(), extractTotalCounts(stats));
+    assertThat(extractTotalCounts(stats)).isEqualTo(buildExpectedTotalCounts());
   }
 
   private Map<String, Long> extractTotalCounts(TestPlanStats stats) {
@@ -129,7 +132,7 @@ public class JmeterDslTest {
   private void assertResultsFileResultsCount(Path resultsFilePath, int resultsCount)
       throws IOException {
     // we add one more expected line due to headers line
-    assertEquals(resultsCount + 1, Files.readAllLines(resultsFilePath).size());
+    assertThat(Files.readAllLines(resultsFilePath).size()).isEqualTo(resultsCount + 1);
   }
 
   @Test
@@ -226,6 +229,29 @@ public class JmeterDslTest {
         )
     ).run();
     verifyHeadersSentToServer();
+  }
+
+  @Test
+  public void shouldSaveTestPlanToJmxWhenSave(@TempDir Path tempDir) throws IOException {
+    Path filePath = tempDir.resolve("output.jmx");
+    testPlan(
+        threadGroup(1, TEST_ITERATIONS,
+            JmeterDsl.httpSampler("http://localhost")
+                .post("{\"name\": \"value\"}", Type.APPLICATION_JSON),
+            JmeterDsl.httpSampler("http://localhost")
+        ),
+        jtlWriter("test.jtl")
+    ).saveAsJmx(filePath.toString());
+    XmlAssert.assertThat(getFileContents(filePath)).and(getResourceContents("/test-plan.jmx"))
+        .areIdentical();
+  }
+
+  private String getFileContents(Path filePath) throws IOException {
+    return String.join("\n", Files.readAllLines(filePath, StandardCharsets.UTF_8));
+  }
+
+  private String getResourceContents(String resourcePath) throws IOException {
+    return Resources.toString(getClass().getResource(resourcePath), StandardCharsets.UTF_8);
   }
 
 }

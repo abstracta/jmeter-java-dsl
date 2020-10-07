@@ -2,6 +2,7 @@ package us.abstracta.jmeter.javadsl.core;
 
 import org.apache.jmeter.reporters.ResultCollector;
 import org.apache.jmeter.testelement.TestElement;
+import org.apache.jmeter.visualizers.SimpleDataWriter;
 import us.abstracta.jmeter.javadsl.core.DslSampler.SamplerChild;
 import us.abstracta.jmeter.javadsl.core.DslTestPlan.TestPlanChild;
 import us.abstracta.jmeter.javadsl.core.DslThreadGroup.ThreadGroupChild;
@@ -27,7 +28,7 @@ public class JtlWriter extends BaseTestElement implements TestPlanChild, ThreadG
   private final String jtlFile;
 
   public JtlWriter(String jtlFile) {
-    super(null);
+    super("Simple Data Writer", SimpleDataWriter.class);
     this.jtlFile = jtlFile;
   }
 

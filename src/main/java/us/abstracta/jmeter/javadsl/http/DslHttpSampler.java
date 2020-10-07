@@ -1,6 +1,7 @@
 package us.abstracta.jmeter.javadsl.http;
 
 import org.apache.jmeter.config.Arguments;
+import org.apache.jmeter.protocol.http.control.gui.HttpTestSampleGui;
 import org.apache.jmeter.protocol.http.sampler.HTTPSamplerProxy;
 import org.apache.jmeter.protocol.http.util.HTTPArgument;
 import org.apache.jmeter.testelement.TestElement;
@@ -20,7 +21,7 @@ public class DslHttpSampler extends DslSampler {
   private String body;
 
   public DslHttpSampler(String name, String url) {
-    super(name, null);
+    super(name != null ? name : "HTTP Request", HttpTestSampleGui.class, null);
     this.url = url;
   }
 

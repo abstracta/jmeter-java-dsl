@@ -4,6 +4,7 @@ import java.util.List;
 import org.apache.jmeter.control.LoopController;
 import org.apache.jmeter.testelement.TestElement;
 import org.apache.jmeter.threads.ThreadGroup;
+import org.apache.jmeter.threads.gui.ThreadGroupGui;
 import us.abstracta.jmeter.javadsl.core.DslTestPlan.TestPlanChild;
 import us.abstracta.jmeter.javadsl.core.DslThreadGroup.ThreadGroupChild;
 
@@ -21,7 +22,7 @@ public class DslThreadGroup extends TestElementContainer<ThreadGroupChild> imple
 
   public DslThreadGroup(String name, int threads, int iterations,
       List<? extends ThreadGroupChild> children) {
-    super(name, children);
+    super(name != null ? name : "Thread Group", ThreadGroupGui.class, children);
     this.threads = threads;
     this.iterations = iterations;
   }

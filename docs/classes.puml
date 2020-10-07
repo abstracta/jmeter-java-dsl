@@ -22,6 +22,7 @@ package core {
 
   abstract class BaseTestElement implements DslTestElement {
     String name
+    Class guiClass
     TestElement buildTestElement()
   }
 
@@ -30,6 +31,7 @@ package core {
 
   class DslTestPlan extends TestElementContainer {
     TestPlanStats run()
+    void saveAsJmx(String filePath)
   }
 
   interface TestPlanChild extends DslTestElement {

@@ -14,7 +14,7 @@ Test elements are classes that implement [DslTestElement] interface, which basic
 
 To implement your own DslTestElement, the library already provides some base classes from where to start:
  
-* [BaseTestElement](src/main/java/us/abstracta/jmeter/javadsl/core/BaseTestElement.java): This contains the very basics of test elements, allowing to abstract the common logic of all test elements (ie: naming them and adding them to a JMeter tree). Create a subclass of this class only if the test element can't nest children, otherwise extend [TestElementContainer]. Examples: [HttpHeaders] and [JtlWriter].
+* [BaseTestElement](src/main/java/us/abstracta/jmeter/javadsl/core/BaseTestElement.java): This contains the very basics of test elements, allowing to abstract the common logic of all test elements (ie: naming them, setting common properties and adding them to a JMeter tree). Create a subclass of this class only if the test element can't nest children, otherwise extend [TestElementContainer]. Examples: [HttpHeaders] and [JtlWriter].
 * [TestElementContainer]: This represents a test element which can nest other test elements. If you need to implement a Sampler, then extend DslSampler instead. Examples: [DslTestPlan](src/main/java/us/abstracta/jmeter/javadsl/core/DslTestPlan.java), [DslThreadGroup](src/main/java/us/abstracta/jmeter/javadsl/core/DslThreadGroup.java).
 * [DslSampler]: This contains common logic for samplers, and should be the class extended in most of the cases. Examples: [DslHttpSampler](src/main/java/us/abstracta/jmeter/javadsl/http/DslHttpSampler.java)
 

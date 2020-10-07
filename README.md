@@ -78,6 +78,35 @@ Here is a table with summary of main pros and cons of each tool:
 |ruby-dsl| <ul><li>VCS friendly<li>Simple CI/CD integration<li>Unified framework for running any type of test<li>built-in support for running tests at scale<li>All details of simple test plans at a glance|<ul><li>Both Java and Ruby environments required<li>Not following same naming convention and structure as JMeter<li>Not complete support of JMeter capabilities (nor in the roadmap)<li>No integration for debugging JMeter code|
 |jmeter-java-dsl| <ul><li>VCS friendly<li>IDE friendly (auto-complete and debug)<li>Natural CI/CD integration<li>Natural code modularization and reuse<li>Existing JMeter documentation<li>Easy to add support for JMeter supported protocols and new plugins<li>Could easily interact with JMX files and take advantage of JMeter ecosystem<li>All details of simple test plans at a glance<li>Simple way to do assertions on statistics|<ul><li>Basic Java knowledge required<li>Same resources (CPU & RAM) usage as JMeter|
 
+## Additional features
+
+### Save as JMX
+
+In case you want to load a test plan in JMeter GUI, you can save it just invoking `saveAsJMX` method in the test plan as in following example:
+
+```java
+import static us.abstracta.jmeter.javadsl.JmeterDsl.*;
+
+public class SaveTestPlanAsJMX {
+  
+  public static void main(String[] args) throws IOException {
+    testPlan(
+      threadGroup(2, 10,
+        httpSampler("http://my.service")
+          .post("{\"name\": \"test\"}", Type.APPLICATION_JSON)
+      ),
+      //this is just to log details of each request stats
+      jtlWriter("test.jtl")
+    ).saveAsJmx("dsl-test-plan.jmx");
+  }
+  
+}
+```
+
+> Take into consideration that currently there is no automatic way to migrate changes done in JMX to the Java DSL.
+
+This can be helpful to share a Java DSL defined test plan with people not used to the DSL, or to use some JMeter feature (or plugin) that is not yet supported by the DSL (**but we strongly encourage you to report it as an issue**, so we can implement support for it).  
+
 ## Contributing & Requesting features
 
 Currently, the project only covers the basic, but most used, features when implementing JMeter performance tests. 

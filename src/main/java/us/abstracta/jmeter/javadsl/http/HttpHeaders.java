@@ -31,7 +31,7 @@ public class HttpHeaders extends BaseTestElement implements SamplerChild, Thread
   private final Map<String, String> headers = new HashMap<>();
 
   public HttpHeaders() {
-    super(null);
+    super("HTTP Header Manager", HeaderPanel.class);
   }
 
   public HttpHeaders header(String name, String value) {
@@ -51,8 +51,6 @@ public class HttpHeaders extends BaseTestElement implements SamplerChild, Thread
   @Override
   protected TestElement buildTestElement() {
     HeaderManager ret = new HeaderManager();
-    // setting gui class is required for JMeter properly applying the config to http samplers
-    ret.setProperty(TestElement.GUI_CLASS, HeaderPanel.class.getName());
     headers.forEach((name, value) -> ret.add(new Header(name, value)));
     return ret;
   }

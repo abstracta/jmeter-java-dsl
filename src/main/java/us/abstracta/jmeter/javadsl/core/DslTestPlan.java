@@ -2,6 +2,8 @@ package us.abstracta.jmeter.javadsl.core;
 
 import java.io.IOException;
 import java.util.List;
+import org.apache.jmeter.config.Arguments;
+import org.apache.jmeter.control.gui.TestPlanGui;
 import org.apache.jmeter.testelement.TestElement;
 import org.apache.jmeter.testelement.TestPlan;
 import us.abstracta.jmeter.javadsl.core.DslTestPlan.TestPlanChild;
@@ -13,12 +15,14 @@ import us.abstracta.jmeter.javadsl.core.DslTestPlan.TestPlanChild;
 public class DslTestPlan extends TestElementContainer<TestPlanChild> {
 
   public DslTestPlan(List<? extends TestPlanChild> children) {
-    super(null, children);
+    super("Test Plan", TestPlanGui.class, children);
   }
 
   @Override
   protected TestElement buildTestElement() {
-    return new TestPlan();
+    TestPlan ret = new TestPlan();
+    ret.setUserDefinedVariables(new Arguments());
+    return ret;
   }
 
   /**
@@ -29,6 +33,16 @@ public class DslTestPlan extends TestElementContainer<TestPlanChild> {
    */
   public TestPlanStats run() throws IOException {
     return new EmbeddedJmeterEngine().run(this);
+  }
+
+  /**
+   * Saves the given test plan as JMX, which allows it to be loaded in JMeter GUI.
+   *
+   * @param filePath specifies where to store the JMX of the test plan.
+   * @throws IOException when there is a problem saving to the file.
+   */
+  public void saveAsJmx(String filePath) throws IOException {
+    new EmbeddedJmeterEngine().saveToJmx(filePath, this);
   }
 
   /**

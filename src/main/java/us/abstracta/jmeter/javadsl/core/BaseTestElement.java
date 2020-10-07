@@ -1,5 +1,6 @@
 package us.abstracta.jmeter.javadsl.core;
 
+import org.apache.jmeter.gui.JMeterGUIComponent;
 import org.apache.jmeter.testelement.TestElement;
 import org.apache.jorphan.collections.HashTree;
 
@@ -17,15 +18,28 @@ import org.apache.jorphan.collections.HashTree;
 public abstract class BaseTestElement implements DslTestElement {
 
   private final String name;
+  private final Class<? extends JMeterGUIComponent> guiClass;
 
+  /**
+   * @deprecated use {@link #BaseTestElement(String, Class)} instead to properly support saving to
+   * valid jmx.
+   */
+  @Deprecated
   protected BaseTestElement(String name) {
+    this(name, null);
+  }
+
+  protected BaseTestElement(String name, Class<? extends JMeterGUIComponent> guiClass) {
     this.name = name;
+    this.guiClass = guiClass;
   }
 
   @Override
   public HashTree buildTreeUnder(HashTree parent) {
     TestElement testElement = buildTestElement();
     testElement.setName(name);
+    testElement.setProperty(TestElement.GUI_CLASS, guiClass.getName());
+    testElement.setProperty(TestElement.TEST_CLASS, testElement.getClass().getName());
     return parent.add(testElement);
   }
 

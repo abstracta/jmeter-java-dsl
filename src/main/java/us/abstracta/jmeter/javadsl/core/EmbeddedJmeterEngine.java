@@ -1,6 +1,8 @@
 package us.abstracta.jmeter.javadsl.core;
 
+import java.io.Closeable;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
@@ -10,9 +12,11 @@ import org.apache.jmeter.functions.EvalFunction;
 import org.apache.jmeter.reporters.ResultCollector;
 import org.apache.jmeter.reporters.Summariser;
 import org.apache.jmeter.samplers.SampleResult;
+import org.apache.jmeter.save.SaveService;
 import org.apache.jmeter.util.JMeterUtils;
 import org.apache.jmeter.visualizers.Visualizer;
 import org.apache.jorphan.collections.HashTree;
+import org.apache.jorphan.collections.ListedHashTree;
 
 /**
  * This class allows to run test plans in an embedded JMeter instance.
@@ -23,9 +27,7 @@ import org.apache.jorphan.collections.HashTree;
 public class EmbeddedJmeterEngine {
 
   public TestPlanStats run(DslTestPlan testPlan) throws IOException {
-    Path propsFilePath = Files.createTempFile("jmeter", ".properties");
-    try {
-      setupJMeterProperties(propsFilePath);
+    try (JMeterEnvironment env = new JMeterEnvironment()) {
       StandardJMeterEngine engine = new StandardJMeterEngine();
       HashTree rootTree = new HashTree();
       HashTree testPlanTree = testPlan.buildTreeUnder(rootTree);
@@ -37,26 +39,49 @@ public class EmbeddedJmeterEngine {
       engine.configure(rootTree);
       engine.run();
       return stats;
-    } finally {
+    }
+  }
+
+  private static class JMeterEnvironment implements Closeable {
+
+    private final Path propsFilePath;
+
+    private JMeterEnvironment() throws IOException {
+      propsFilePath = Files.createTempFile("jmeter", ".properties");
+      try {
+        setupJMeterProperties(propsFilePath);
+      } catch (IOException | RuntimeException e) {
+        deleteFile(propsFilePath);
+        throw e;
+      }
+    }
+
+    private void setupJMeterProperties(Path propsFilePath) throws IOException {
+      deleteFile(propsFilePath);
+      Files.copy(getClass().getResourceAsStream("/saveservice.properties"), propsFilePath);
+      JMeterUtils.loadJMeterProperties(propsFilePath.toString());
+      JMeterUtils.setProperty("search_paths", getFunctionsJarPath());
+      JMeterUtils.setProperty("saveservice_properties", propsFilePath.toString());
+    }
+
+    private void deleteFile(Path propsFilePath) {
       propsFilePath.toFile().delete();
     }
-  }
 
-  private void setupJMeterProperties(Path propsFilePath) throws IOException {
-    propsFilePath.toFile().delete();
-    Files.copy(getClass().getResourceAsStream("/jmeter.properties"), propsFilePath);
-    JMeterUtils.loadJMeterProperties(propsFilePath.toString());
-    JMeterUtils.setProperty("search_paths", getFunctionsJarPath());
-    JMeterUtils.setProperty("saveservice_properties", propsFilePath.toString());
-  }
-
-  private String getFunctionsJarPath() {
-    try {
-      return new File(EvalFunction.class.getProtectionDomain().getCodeSource().getLocation()
-          .toURI()).getPath();
-    } catch (URISyntaxException e) {
-      throw new RuntimeException(e);
+    private String getFunctionsJarPath() {
+      try {
+        return new File(EvalFunction.class.getProtectionDomain().getCodeSource().getLocation()
+            .toURI()).getPath();
+      } catch (URISyntaxException e) {
+        throw new RuntimeException(e);
+      }
     }
+
+    @Override
+    public void close() {
+      deleteFile(propsFilePath);
+    }
+
   }
 
   private void addTestStatsCollectorToTree(TestPlanStats stats, HashTree tree) {
@@ -81,6 +106,15 @@ public class EmbeddedJmeterEngine {
 
   private void addTestSummariserToTree(HashTree tree) {
     tree.add(new ResultCollector(new Summariser()));
+  }
+
+  public void saveToJmx(String filePath, DslTestPlan dslTestPlan) throws IOException {
+    try (JMeterEnvironment env = new JMeterEnvironment();
+        FileOutputStream output = new FileOutputStream(filePath)) {
+      HashTree tree = new ListedHashTree();
+      dslTestPlan.buildTreeUnder(tree);
+      SaveService.saveTree(tree, output);
+    }
   }
 
 }
