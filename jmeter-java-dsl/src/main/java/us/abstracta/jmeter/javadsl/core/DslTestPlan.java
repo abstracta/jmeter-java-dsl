@@ -2,6 +2,7 @@ package us.abstracta.jmeter.javadsl.core;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.TimeoutException;
 import org.apache.jmeter.config.Arguments;
 import org.apache.jmeter.control.gui.TestPlanGui;
 import org.apache.jmeter.testelement.TestElement;
@@ -9,8 +10,7 @@ import org.apache.jmeter.testelement.TestPlan;
 import us.abstracta.jmeter.javadsl.core.DslTestPlan.TestPlanChild;
 
 /**
- * This class represents a JMeter test plan, with associated thread groups and other children
- * elements.
+ * Represents a JMeter test plan, with associated thread groups and other children elements.
  */
 public class DslTestPlan extends TestElementContainer<TestPlanChild> {
 
@@ -26,13 +26,26 @@ public class DslTestPlan extends TestElementContainer<TestPlanChild> {
   }
 
   /**
-   * This method uses {@link EmbeddedJmeterEngine} to run the test plan.
+   * Uses {@link EmbeddedJmeterEngine} to run the test plan.
    *
    * @return {@link TestPlanStats} containing all statistics of the test plan execution.
    * @throws IOException thrown when there is some problem running the plan.
    */
   public TestPlanStats run() throws IOException {
     return new EmbeddedJmeterEngine().run(this);
+  }
+
+  /**
+   * Allows to run the test plan in a given engine.
+   *
+   * This method is just a simple method which provides fluent API to run the test plans in a given
+   * engine.
+   *
+   * @see DslJmeterEngine#run(DslTestPlan)
+   */
+  public TestPlanStats runIn(DslJmeterEngine engine)
+      throws IOException, InterruptedException, TimeoutException {
+    return engine.run(this);
   }
 
   /**
@@ -46,7 +59,7 @@ public class DslTestPlan extends TestElementContainer<TestPlanChild> {
   }
 
   /**
-   * Test elements that can be added directly as test plan children in JMeter, should implement this
+   * Test elements that can be added directly as test plan children in JMeter should implement this
    * interface.
    *
    * Check {@link DslThreadGroup} for an example.

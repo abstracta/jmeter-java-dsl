@@ -14,25 +14,25 @@ Test elements are classes that implement [DslTestElement] interface, which basic
 
 To implement your own DslTestElement, the library already provides some base classes from where to start:
  
-* [BaseTestElement](src/main/java/us/abstracta/jmeter/javadsl/core/BaseTestElement.java): This contains the very basics of test elements, allowing to abstract the common logic of all test elements (ie: naming them, setting common properties and adding them to a JMeter tree). Create a subclass of this class only if the test element can't nest children, otherwise extend [TestElementContainer]. Examples: [HttpHeaders] and [JtlWriter].
-* [TestElementContainer]: This represents a test element which can nest other test elements. If you need to implement a Sampler, then extend DslSampler instead. Examples: [DslTestPlan](src/main/java/us/abstracta/jmeter/javadsl/core/DslTestPlan.java), [DslThreadGroup](src/main/java/us/abstracta/jmeter/javadsl/core/DslThreadGroup.java).
-* [DslSampler]: This contains common logic for samplers, and should be the class extended in most of the cases. Examples: [DslHttpSampler](src/main/java/us/abstracta/jmeter/javadsl/http/DslHttpSampler.java)
+* [BaseTestElement](jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/BaseTestElement.java): This contains the very basics of test elements, allowing to abstract the common logic of all test elements (ie: naming them, setting common properties and adding them to a JMeter tree). Create a subclass of this class only if the test element can't nest children, otherwise extend [TestElementContainer]. Examples: [HttpHeaders] and [JtlWriter].
+* [TestElementContainer]: This represents a test element which can nest other test elements. If you need to implement a Sampler, then extend DslSampler instead. Examples: [DslTestPlan](jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/DslTestPlan.java), [DslThreadGroup](jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/DslThreadGroup.java).
+* [DslSampler]: This contains common logic for samplers, and should be the class extended in most of the cases. Examples: [DslHttpSampler](jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/http/DslHttpSampler.java)
 
 As previously mentioned, DslTestElement instances can be nested, and when implementing one, you should define under what other test elements this element can be nested (eg: thread groups can only be added under test plans). To do that, just implement the appropriate interface required by the associated "parent" element, currently provided interfaces are: 
 
-* [TestPlanChild](src/main/java/us/abstracta/jmeter/javadsl/core/DslTestPlan.java)
-* [ThreadGroupChild](src/main/java/us/abstracta/jmeter/javadsl/core/DslThreadGroup.java)
-* [SamplerChild](src/main/java/us/abstracta/jmeter/javadsl/core/DslSampler.java)
+* [TestPlanChild](jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/DslTestPlan.java)
+* [ThreadGroupChild](jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/DslThreadGroup.java)
+* [SamplerChild](jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/DslSampler.java)
 
-So, for example, [DslThreadGroup](src/main/java/us/abstracta/jmeter/javadsl/core/DslThreadGroup.java) implements TestPlanChild and [DslSampler] implements ThreadGroupChild. You might implement multiple interfaces if the element can be used at different levels, for example check [HttpHeaders] and [JtlWriter] implement multiple interfaces.
+So, for example, [DslThreadGroup](jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/DslThreadGroup.java) implements TestPlanChild and [DslSampler] implements ThreadGroupChild. You might implement multiple interfaces if the element can be used at different levels, for example check [HttpHeaders] and [JtlWriter] implement multiple interfaces.
 
 You might also implement a new "child" interface if you need additional hierarchy levels (like ControllerChild).
 
 ## Test runs
 
-When you want to run a test plan, it needs to run in a JMeter engine. By default, DslTestPlan uses [EmbeddedJMeterEngine](src/main/java/us/abstracta/jmeter/javadsl/core/EmbeddedJmeterEngine.java), which is the fastest and easiest way to run a test plan, but you might use EmbeddedJMeterEngine as an example and implement your own engine (for example to run tests on BlazeMeter, or in a distributed fashion). 
+When you want to run a test plan, it needs to run in a JMeter engine. By default, DslTestPlan uses [EmbeddedJMeterEngine](jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/EmbeddedJmeterEngine.java), which is the fastest and easiest way to run a test plan, but you might use EmbeddedJMeterEngine as an example and implement your own engine (for example to run tests on BlazeMeter, or in a distributed fashion). 
 
-When a test plan runs, the engine returns an instance of [TestPlanStats](src/main/java/us/abstracta/jmeter/javadsl/core/TestPlanStats.java), grouping information by test element name (aka label). This allows to check the expected statistics and verify that everything worked within expected boundaries.
+When a test plan runs, the engine returns an instance of [TestPlanStats](jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/TestPlanStats.java), grouping information by test element name (aka label). This allows to check the expected statistics and verify that everything worked within expected boundaries.
 
 ## Class diagram
 
@@ -82,12 +82,12 @@ Add proper tests and update documentation (if needed) so users know about the ne
 
 Just create an issue in the repository stating what you need and why, and we will do our best to implement what you need :).
 
-Or, check existing code. It contains embedded documentation with additional detail, and the code never lies.
+Or, check existing code. It contains embedded documentation with additional details, and the code never lies.
 
-[JmeterDsl]: src/main/java/us/abstracta/jmeter/javadsl/JmeterDsl.java
-[DslTestElement]: src/main/java/us/abstracta/jmeter/javadsl/core/DslTestElement.java
-[TestElementContainer]: src/main/java/us/abstracta/jmeter/javadsl/core/TestElementContainer.java
-[HttpHeaders]: src/main/java/us/abstracta/jmeter/javadsl/http/HttpHeaders.java
-[DslSampler]: src/main/java/us/abstracta/jmeter/javadsl/core/DslSampler.java
-[JtlWriter]: src/main/java/us/abstracta/jmeter/javadsl/core/JtlWriter.java
+[JmeterDsl]: jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/JmeterDsl.java
+[DslTestElement]: jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/DslTestElement.java
+[TestElementContainer]: jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/TestElementContainer.java
+[HttpHeaders]: jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/http/HttpHeaders.java
+[DslSampler]: jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/DslSampler.java
+[JtlWriter]: jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/JtlWriter.java
 [Core classes section]: #core-classes

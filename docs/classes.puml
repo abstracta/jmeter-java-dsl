@@ -31,14 +31,18 @@ package core {
 
   class DslTestPlan extends TestElementContainer {
     TestPlanStats run()
+    TestPlanStats runIn(DslJmeterEngine engine)
     void saveAsJmx(String filePath)
   }
 
   interface TestPlanChild extends DslTestElement {
   }
 
-  class EmbeddedJmeterEngine {
+  interface DslJmeterEngine {
     TestPlanStats run(DslTestPlan testPlan)
+  }
+
+  class EmbeddedJmeterEngine implements DslJmeterEngine {
   }
 
   class DslThreadGroup extends TestElementContainer implements TestPlanChild {

@@ -1,7 +1,7 @@
 name: publish release
 on:
   release:
-    types: [published]
+    types: [ published ]
 jobs:
   release:
     runs-on: ubuntu-latest
@@ -15,11 +15,20 @@ jobs:
         run: mvn --batch-mode versions:set -DnewVersion=${GITHUB_REF#refs/tags/v} --settings .github/settings.xml
       - name: package release
         run: mvn clean package -DskipTests --settings .github/settings.xml
-      - name: Upload release artifact
+        env:
+          BZ_TOKEN: ${{ secrets.BZ_TOKEN }}
+      - name: Upload jmeter-java-dsl.jar to release
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: ./target/*.jar
+          file: ./jmeter-java-dsl/target/*.jar
+          file_glob: true
+          tag: ${{ github.ref }}
+      - name: Upload jmeter-java-dsl-blazemeter.jar to release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: ./jmeter-java-dsl-blazemeter/target/*.jar
           file_glob: true
           tag: ${{ github.ref }}
       - name: publish to Nexus

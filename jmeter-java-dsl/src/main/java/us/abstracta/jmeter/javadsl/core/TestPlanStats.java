@@ -5,116 +5,60 @@ import java.time.Instant;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import org.apache.jmeter.report.processor.StatisticsSummaryData;
-import org.apache.jmeter.samplers.SampleResult;
 
 /**
- * This class contains all statistics collected during the execution of a test plan.
+ * Contains all statistics collected during the execution of a test plan.
  *
  * When using different samples, specify different names on them to be able to get each sampler
  * specific statistics after they run.
  */
 public class TestPlanStats {
 
-  private final StatsSummary overallStats = new StatsSummary();
-  private final Map<String, StatsSummary> labeledStats = new ConcurrentHashMap<>();
+  protected StatsSummary overallStats;
+  protected final Map<String, StatsSummary> labeledStats = new ConcurrentHashMap<>();
 
-  public static class StatsSummary {
+  public interface StatsSummary {
 
-    private final StatisticsSummaryData stats = new StatisticsSummaryData(90, 95, 99);
+    Instant firstTime();
 
-    private void addResult(SampleResult result) {
-      stats.incTotal();
-      stats.incBytes(result.getBytesAsLong());
-      stats.incSentBytes(result.getSentBytes());
-      if (!result.isSuccessful()) {
-        stats.incErrors();
-      }
-      updateElapsedTime(result.getTime());
-      stats.setFirstTime(result.getStartTime());
-      stats.setEndTime(result.getEndTime());
-    }
+    Instant endTime();
 
-    private void updateElapsedTime(long elapsedTime) {
-      stats.getPercentile1().addValue(elapsedTime);
-      stats.getPercentile2().addValue(elapsedTime);
-      stats.getPercentile3().addValue(elapsedTime);
-      stats.getMean().addValue(elapsedTime);
-      stats.setMin(elapsedTime);
-      stats.setMax(elapsedTime);
-    }
+    Duration elapsedTime();
 
-    public Instant firstTime() {
-      return Instant.ofEpochMilli(stats.getFirstTime());
-    }
+    long samplesCount();
 
-    public Instant endTime() {
-      return Instant.ofEpochMilli(stats.getEndTime());
-    }
+    double samplesPerSecond();
 
-    public Duration elapsedTime() {
-      return Duration.ofMillis(stats.getElapsedTime());
-    }
+    long errorsCount();
 
-    public long samplesCount() {
-      return stats.getTotal();
-    }
+    Duration minElapsedTime();
 
-    public double samplesPerSecond() {
-      return stats.getThroughput();
-    }
+    Duration maxElapsedTime();
 
-    public long errorsCount() {
-      return stats.getErrors();
-    }
+    Duration meanElapsedTime();
 
-    public Duration minElapsedTime() {
-      return Duration.ofMillis(stats.getMin());
-    }
+    Duration elapsedTimePercentile90();
 
-    public Duration maxElapsedTime() {
-      return Duration.ofMillis(stats.getMax());
-    }
+    Duration elapsedTimePercentile95();
 
-    public Duration meanElapsedTime() {
-      return Duration.ofMillis((long) stats.getMean().getResult());
-    }
+    Duration elapsedTimePercentile99();
 
-    public Duration elapsedTimePercentile90() {
-      return Duration.ofMillis((long) stats.getPercentile1().getResult());
-    }
+    long receivedBytes();
 
-    public Duration elapsedTimePercentile95() {
-      return Duration.ofMillis((long) stats.getPercentile2().getResult());
-    }
+    double receivedBytesPerSecond();
 
-    public Duration elapsedTimePercentile99() {
-      return Duration.ofMillis((long) stats.getPercentile3().getResult());
-    }
+    long sentBytes();
 
-    public long receivedBytes() {
-      return stats.getBytes();
-    }
-
-    public double receivedBytesPerSecond() {
-      return stats.getBytesPerSecond();
-    }
-
-    public long sentBytes() {
-      return stats.getSentBytes();
-    }
-
-    public double sentBytesPerSecond() {
-      return stats.getSentBytesPerSecond();
-    }
+    double sentBytesPerSecond();
 
   }
 
-  public void addSampleResult(SampleResult result) {
-    overallStats.addResult(result);
-    labeledStats
-        .computeIfAbsent(result.getSampleLabel(), label -> new StatsSummary())
-        .addResult(result);
+  public void setLabeledStats(String label, StatsSummary stats) {
+    labeledStats.put(label, stats);
+  }
+
+  public void setOverallStats(StatsSummary stats) {
+    overallStats = stats;
   }
 
   public StatsSummary overall() {

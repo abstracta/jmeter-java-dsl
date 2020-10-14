@@ -19,20 +19,18 @@ import org.apache.jorphan.collections.HashTree;
 import org.apache.jorphan.collections.ListedHashTree;
 
 /**
- * This class allows to run test plans in an embedded JMeter instance.
- *
- * Additional engines might be implemented in the future to allow running test plans in other ways
- * (e.g.: in BlazeMeter).
+ * Allows to run test plans in an embedded JMeter instance.
  */
-public class EmbeddedJmeterEngine {
+public class EmbeddedJmeterEngine implements DslJmeterEngine {
 
+  @Override
   public TestPlanStats run(DslTestPlan testPlan) throws IOException {
     try (JMeterEnvironment env = new JMeterEnvironment()) {
       StandardJMeterEngine engine = new StandardJMeterEngine();
       HashTree rootTree = new HashTree();
       HashTree testPlanTree = testPlan.buildTreeUnder(rootTree);
 
-      TestPlanStats stats = new TestPlanStats();
+      AggregatingTestPlanStats stats = new AggregatingTestPlanStats();
       addTestStatsCollectorToTree(stats, testPlanTree);
       addTestSummariserToTree(testPlanTree);
 
@@ -84,7 +82,7 @@ public class EmbeddedJmeterEngine {
 
   }
 
-  private void addTestStatsCollectorToTree(TestPlanStats stats, HashTree tree) {
+  private void addTestStatsCollectorToTree(AggregatingTestPlanStats stats, HashTree tree) {
     ResultCollector collector = new ResultCollector();
     Visualizer statsVisualizer = new Visualizer() {
 
