@@ -5,7 +5,7 @@ import org.apache.jmeter.testelement.TestElement;
 import org.apache.jorphan.collections.HashTree;
 
 /**
- * This class provides the basic logic for all {@link DslTestElement}.
+ * Provides the basic logic for all {@link DslTestElement}.
  *
  * In particular it currently allows to set the name of the TestElement and abstracts building of
  * the tree only requiring, from sub classes, to implement the logic to build the JMeter

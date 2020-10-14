@@ -6,9 +6,9 @@ import org.apache.jmeter.gui.JMeterGUIComponent;
 import org.apache.jorphan.collections.HashTree;
 
 /**
- * This class abstracts logic for {@link DslTestElement} that can nest other test elements.
+ * Abstracts logic for {@link DslTestElement} that can nest other test elements.
  *
- * @param <T> The type of test elements that can be nested by this class.
+ * @param <T> is type of test elements that can be nested by this class.
  *
  * Check {@link DslTestPlan} for an example.
  */

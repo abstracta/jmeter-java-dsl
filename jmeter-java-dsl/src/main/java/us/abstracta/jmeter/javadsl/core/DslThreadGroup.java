@@ -9,7 +9,7 @@ import us.abstracta.jmeter.javadsl.core.DslTestPlan.TestPlanChild;
 import us.abstracta.jmeter.javadsl.core.DslThreadGroup.ThreadGroupChild;
 
 /**
- * This class represents the standard thread group test element included by JMeter.
+ * Represents the standard thread group test element included by JMeter.
  *
  * Additional methods should be added in the future to support setting rump-up, start and end
  * scheduling.
@@ -38,8 +38,8 @@ public class DslThreadGroup extends TestElementContainer<ThreadGroupChild> imple
   }
 
   /**
-   * Test elements that can be added as direct children of a thread group in jmeter, should
-   * implement this interface.
+   * Test elements that can be added as direct children of a thread group in jmeter should implement
+   * this interface.
    */
   public interface ThreadGroupChild extends DslTestElement {
 

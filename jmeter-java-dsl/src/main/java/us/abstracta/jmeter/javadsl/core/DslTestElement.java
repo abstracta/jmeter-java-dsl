@@ -3,7 +3,7 @@ package us.abstracta.jmeter.javadsl.core;
 import org.apache.jorphan.collections.HashTree;
 
 /**
- * This is the interface to implement by all elements composing a JMeter test plan.
+ * Interface to be implemented by all elements composing a JMeter test plan.
  */
 public interface DslTestElement {
 

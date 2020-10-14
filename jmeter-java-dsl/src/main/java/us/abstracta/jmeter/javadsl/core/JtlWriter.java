@@ -8,8 +8,8 @@ import us.abstracta.jmeter.javadsl.core.DslTestPlan.TestPlanChild;
 import us.abstracta.jmeter.javadsl.core.DslThreadGroup.ThreadGroupChild;
 
 /**
- * This class allows to generate a result log file (JTL) with data for each sample for a test plan,
- * thread group or sampler, depending at what level of test plan is added.
+ * Allows to generate a result log file (JTL) with data for each sample for a test plan, thread
+ * group or sampler, depending at what level of test plan is added.
  *
  * If jtlWriter is added at testPlan level it will log information about all samples in the test
  * plan, if added at thread group level it will only log samples for samplers contained within it,

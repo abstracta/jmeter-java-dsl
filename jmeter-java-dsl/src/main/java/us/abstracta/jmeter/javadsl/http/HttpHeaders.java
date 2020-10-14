@@ -34,11 +34,27 @@ public class HttpHeaders extends BaseTestElement implements SamplerChild, Thread
     super("HTTP Header Manager", HeaderPanel.class);
   }
 
+  /**
+   * Allows to set an HTTP header to be used by HTTP samplers.
+   *
+   * To specify multiple headers just invoke this method several times with the different header
+   * names and values.
+   *
+   * @param name of the HTTP header.
+   * @param value of the HTTP header.
+   * @return the altered HttpHeaders instant to allow for fluent API usage.
+   */
   public HttpHeaders header(String name, String value) {
     headers.put(name, value);
     return this;
   }
 
+  /**
+   * Allows to easily specify the Content-Type HTTP header.
+   *
+   * @param contentType value to use as Content-Type header.
+   * @return the altered HttpHeaders to allow for fluent API usage.
+   */
   public HttpHeaders contentType(MimeTypes.Type contentType) {
     headers.put(HttpHeader.CONTENT_TYPE.toString(), contentType.toString());
     return this;
