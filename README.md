@@ -81,7 +81,7 @@ Here is a table with summary of main pros and cons of each tool:
 
 ## Additional features
 
-### Run test at scale
+### Run test at scale in [BlazeMeter](https://www.blazemeter.com/)
 
 Running a load test from one machine is not always enough, since you are limited to the machine hardware capabilities. Some times is necessary to run the test using a cluster of machines to be able to generate enough load for the system under test.
 
