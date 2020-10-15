@@ -7,6 +7,7 @@ import org.apache.jmeter.config.Arguments;
 import org.apache.jmeter.control.gui.TestPlanGui;
 import org.apache.jmeter.testelement.TestElement;
 import org.apache.jmeter.testelement.TestPlan;
+import org.apache.jorphan.collections.HashTree;
 import us.abstracta.jmeter.javadsl.core.DslTestPlan.TestPlanChild;
 
 /**
@@ -55,7 +56,32 @@ public class DslTestPlan extends TestElementContainer<TestPlanChild> {
    * @throws IOException when there is a problem saving to the file.
    */
   public void saveAsJmx(String filePath) throws IOException {
-    new EmbeddedJmeterEngine().saveToJmx(filePath, this);
+    EmbeddedJmeterEngine.saveTestPlanToJmx(this, filePath);
+  }
+
+  public static DslTestPlan fromJmx(String filePath) throws IOException {
+    return EmbeddedJmeterEngine.loadTestPlanFromJmx(filePath);
+  }
+
+  public static DslTestPlan fromTree(HashTree tree) {
+    return new JmxTestPlan(tree);
+  }
+
+  private static class JmxTestPlan extends DslTestPlan {
+
+    private final HashTree tree;
+
+    private JmxTestPlan(HashTree tree) {
+      super(null);
+      this.tree = tree;
+    }
+
+    @Override
+    public HashTree buildTreeUnder(HashTree parent) {
+      parent.putAll(tree);
+      return tree.values().iterator().next();
+    }
+
   }
 
   /**

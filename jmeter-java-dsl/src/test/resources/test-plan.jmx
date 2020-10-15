@@ -20,7 +20,7 @@
             <collectionProp name="Arguments.arguments">
               <elementProp elementType="HTTPArgument" name="">
                 <boolProp name="HTTPArgument.always_encode">false</boolProp>
-                <stringProp name="Argument.value">{"name": "value"}</stringProp>
+                <stringProp name="Argument.value">{"var":"val"}</stringProp>
                 <stringProp name="Argument.metadata">=</stringProp>
               </elementProp>
             </collectionProp>
@@ -86,7 +86,7 @@
             <connectTime>true</connectTime>
           </value>
         </objProp>
-        <stringProp name="filename">test.jtl</stringProp>
+        <stringProp name="filename">results.jtl</stringProp>
       </ResultCollector>
       <hashTree/>
     </hashTree>

@@ -1,7 +1,5 @@
 name: run tests
-on:
-  push:
-    branches: '*'
+on: push
 jobs:
   test:
     runs-on: ubuntu-latest

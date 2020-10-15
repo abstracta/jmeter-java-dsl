@@ -13,6 +13,8 @@ import static us.abstracta.jmeter.javadsl.JmeterDsl.threadGroup;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.google.common.io.Resources;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -31,6 +33,7 @@ import ru.lanwen.wiremock.ext.WiremockResolver;
 import ru.lanwen.wiremock.ext.WiremockResolver.Wiremock;
 import ru.lanwen.wiremock.ext.WiremockUriResolver;
 import ru.lanwen.wiremock.ext.WiremockUriResolver.WiremockUri;
+import us.abstracta.jmeter.javadsl.core.DslTestPlan;
 import us.abstracta.jmeter.javadsl.core.TestPlanStats;
 
 @ExtendWith({
@@ -47,6 +50,9 @@ public class JmeterDslTest {
   private static final String SAMPLE_1_LABEL = "sample1";
   private static final String SAMPLE_2_LABEL = "sample2";
   private static final String OVERALL_STATS_LABEL = "overall";
+  private static final String RESULTS_JTL = "results.jtl";
+  private static final String JSON_BODY = "{\"var\":\"val\"}";
+  private static final String TEST_PLAN_RESOURCE_PATH = "/test-plan.jmx";
 
   private String wiremockUri;
   private WireMockServer wiremockServer;
@@ -115,7 +121,7 @@ public class JmeterDslTest {
   @Test
   public void shouldWriteAllThreadGroupsResultsToFileWhenJtlWriterAtTestPlan(@TempDir Path tempDir)
       throws IOException {
-    Path resultsFilePath = tempDir.resolve("results.jtl");
+    Path resultsFilePath = tempDir.resolve(RESULTS_JTL);
     JmeterDsl.testPlan(
         threadGroup(1, TEST_ITERATIONS,
             JmeterDsl.httpSampler(wiremockUri),
@@ -138,7 +144,7 @@ public class JmeterDslTest {
   @Test
   public void shouldWriteContainingThreadGroupResultsToFileWhenJtlWriterAtThreadGroup(
       @TempDir Path tempDir) throws IOException {
-    Path resultsFilePath = tempDir.resolve("results.jtl");
+    Path resultsFilePath = tempDir.resolve(RESULTS_JTL);
     JmeterDsl.testPlan(
         threadGroup(1, TEST_ITERATIONS,
             JmeterDsl.httpSampler(wiremockUri),
@@ -155,7 +161,7 @@ public class JmeterDslTest {
   @Test
   public void shouldWriteContainingSamplerResultsToFileWhenJtlWriterAtSampler(
       @TempDir Path tempDir) throws IOException {
-    Path resultsFilePath = tempDir.resolve("results.jtl");
+    Path resultsFilePath = tempDir.resolve(RESULTS_JTL);
     testPlan(
         threadGroup(1, TEST_ITERATIONS,
             JmeterDsl.httpSampler(wiremockUri)
@@ -170,16 +176,15 @@ public class JmeterDslTest {
 
   @Test
   public void shouldSendPostWithContentTypeToServerWhenHttpSamplerWithPost() throws Exception {
-    String jsonBody = "{\"var\":\"val\"}";
     Type contentType = Type.APPLICATION_JSON;
     testPlan(
         threadGroup(1, 1,
-            JmeterDsl.httpSampler(wiremockUri).post(jsonBody, contentType)
+            JmeterDsl.httpSampler(wiremockUri).post(JSON_BODY, contentType)
         )
     ).run();
     wiremockServer.verify(postRequestedFor(anyUrl())
         .withHeader(HttpHeader.CONTENT_TYPE.toString(), equalTo(contentType.toString()))
-        .withRequestBody(equalToJson(jsonBody)));
+        .withRequestBody(equalToJson(JSON_BODY)));
   }
 
   @Test
@@ -237,12 +242,12 @@ public class JmeterDslTest {
     testPlan(
         threadGroup(1, TEST_ITERATIONS,
             JmeterDsl.httpSampler("http://localhost")
-                .post("{\"name\": \"value\"}", Type.APPLICATION_JSON),
+                .post(JSON_BODY, Type.APPLICATION_JSON),
             JmeterDsl.httpSampler("http://localhost")
         ),
-        jtlWriter("test.jtl")
+        jtlWriter(RESULTS_JTL)
     ).saveAsJmx(filePath.toString());
-    XmlAssert.assertThat(getFileContents(filePath)).and(getResourceContents("/test-plan.jmx"))
+    XmlAssert.assertThat(getFileContents(filePath)).and(getResourceContents(TEST_PLAN_RESOURCE_PATH))
         .areIdentical();
   }
 
@@ -252,6 +257,25 @@ public class JmeterDslTest {
 
   private String getResourceContents(String resourcePath) throws IOException {
     return Resources.toString(getClass().getResource(resourcePath), StandardCharsets.UTF_8);
+  }
+
+  @Test
+  public void shouldSendExpectedRequestsWhenLoadPlanFromJmx(@TempDir Path tmpDir) throws IOException {
+    File jmxFile = tmpDir.resolve("test-plan.jxm").toFile();
+    copyJmxWithDynamicFieldsTo(jmxFile);
+    DslTestPlan.fromJmx(jmxFile.getPath()).run();
+    wiremockServer.verify(postRequestedFor(anyUrl())
+        .withHeader(HttpHeader.CONTENT_TYPE.toString(), equalTo(Type.APPLICATION_JSON.asString()))
+        .withRequestBody(equalToJson(JSON_BODY)));
+  }
+
+  private void copyJmxWithDynamicFieldsTo(File jmxFile) throws IOException {
+    String jmxFileContents = getResourceContents(TEST_PLAN_RESOURCE_PATH)
+        .replace("http://localhost", wiremockUri)
+        .replace("result.jtl", new File(jmxFile.getParent(), "result.jtl").getPath());
+    try (FileWriter fw = new FileWriter(jmxFile)) {
+      fw.write(jmxFileContents);
+    }
   }
 
 }

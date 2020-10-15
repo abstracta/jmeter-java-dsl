@@ -20,6 +20,7 @@ Here is a simple example test in [JUnit 5](https://junit.org/junit5/)+ with 2 th
 import static org.assertj.core.api.Assertions.assertThat;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.*;
 
+import java.io.IOException;
 import java.time.Duration;
 import org.eclipse.jetty.http.MimeTypes.Type;
 import org.junit.jupiter.api.Test;
@@ -57,7 +58,7 @@ There are many tools to script performance/load tests, being [JMeter] and [Gatli
 
 JMeter is great for people with no programming knowledge since it provides a graphical interface to create test plans and run them. Additionally, it is the most popular tool (with a lot of supporting tools built on it) and has a big amount of supported protocols and plugins that makes it very versatile. 
 
-But, JMeter has some problems as well: sometimes might be slow to create test plans in JMeter GUI, and you can't get the full picture of the test plan unless you dig in every tree node to check its properties. Furthermore, it doesn't provide a simple programmer friendly API (you can check [here](https://www.blazemeter.com/blog/5-ways-launch-jmeter-test-without-using-jmeter-gui/) for an example on how to run jmeter programmatically without jmeter-java-dsl), nor a VCS friendly format (too verbose and hard to review). For example, for the same test plan previously showed with jmeter-java-dsl, in JMeter you would need a JMX file like [this](docs/sample.jmx), and even then, it wouldn't be as simple to do assertions on collected statistics as in provided example.
+But, JMeter has some problems as well: sometimes might be slow to create test plans in JMeter GUI, and you can't get the full picture of the test plan unless you dig in every tree node to check its properties. Furthermore, it doesn't provide a simple programmer friendly API (you can check [here](https://www.blazemeter.com/blog/5-ways-launch-jmeter-test-without-using-jmeter-gui/) for an example on how to run JMeter programmatically without jmeter-java-dsl), nor a VCS friendly format (too verbose and hard to review). For example, for the same test plan previously showed with jmeter-java-dsl, in JMeter you would need a JMX file like [this](docs/sample.jmx), and even then, it wouldn't be as simple to do assertions on collected statistics as in provided example.
  
 Gatling does provide a simple API and a VCS friendly format, but requires scala knowledge and environment. Additionally, it doesn't provide as rich environment as JMeter (protocol support, plugins, tools) and requires learning a new framework for testing (if you already use JMeter, which is the most popular tool).
 
@@ -166,7 +167,59 @@ public class SaveTestPlanAsJMX {
 
 > Take into consideration that currently there is no automatic way to migrate changes done in JMX to the Java DSL.
 
-This can be helpful to share a Java DSL defined test plan with people not used to the DSL, or to use some JMeter feature (or plugin) that is not yet supported by the DSL (**but, we strongly encourage you to report it as an issue**, so we can implement support for it).  
+This can be helpful to share a Java DSL defined test plan with people not used to the DSL, or to use some JMeter feature (or plugin) that is not yet supported by the DSL (**but, we strongly encourage you to report it as an issue**, so we can implement support for it).
+
+### Run JMX file
+
+jmeter-java-dsl also provides means to easily run a test plan from a JMX file either locally or in BlazeMeter (through previously mentioned jmeter-java-dsl-blazemeter module). Here is an example:
+
+```java
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.io.IOException;
+import java.time.Duration;
+import org.junit.jupiter.api.Test;
+import us.abstracta.jmeter.javadsl.core.DslTestPlan;
+import us.abstracta.jmeter.javadsl.core.TestPlanStats;
+
+public class RunJmxTestPlan {
+  
+  @Test
+  public void testPerformance() throws IOException {
+    TestPlanStats stats = DslTestPlan.fromJmx("test-plan.jmx").run();
+    assertThat(stats.overall().elapsedTimePercentile99()).isLessThan(Duration.ofSeconds(5));
+  }
+  
+}
+``` 
+
+This can be used to just run existing JMX files, or when DSL has no support for some JMeter functionality or plugin and you need to use JMeter GUI to build the test plan but still want to use jmeter-java-dsl to run the test plan embedded in Java test or code.
+
+> When the JMX uses some custom plugins or JMeter protocol support, you might need to add required dependencies to be able to run the test in an embedded engine. For example, when running a TN3270 JMX test plan using RTE plugin you will need to add following repository and dependencies:
+> ```xml
+> <repositories>
+>   <repository>
+>     <id>jitpack.io</id>
+>     <url>https://jitpack.io</url>
+>   </repository>
+> </repositories>
+>
+> <dependencies>
+>    ...
+>    <dependency>
+>      <groupId>com.github.Blazemeter</groupId>
+>      <artifactId>RTEPlugin</artifactId>
+>      <version>3.1</version>
+>      <scope>test</scope>
+>    </dependency>
+>    <dependency>
+>      <groupId>com.github.Blazemeter</groupId>
+>      <artifactId>dm3270</artifactId>
+>      <version>0.12.3-lib</version>
+>      <scope>test</scope>
+>    </dependency>
+> </dependencies>
+> ```     
 
 ## Contributing & Requesting features
 

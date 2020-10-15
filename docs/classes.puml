@@ -33,6 +33,7 @@ package core {
     TestPlanStats run()
     TestPlanStats runIn(DslJmeterEngine engine)
     void saveAsJmx(String filePath)
+    {static} DslTestPlan fromJmx(String filePath)
   }
 
   interface TestPlanChild extends DslTestElement {
