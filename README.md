@@ -43,7 +43,7 @@ public class PerformanceTest {
 }
 ```
 
-> This example also uses [AssertJ](https://joel-costigliola.github.io/assertj/assertj-core-quick-start.html) for assertions, but you can use whatever assertion library you chose.
+> This example also uses [AssertJ](https://joel-costigliola.github.io/assertj/assertj-core-quick-start.html) for assertions, but you can use whatever assertion library you prefer.
 
 More examples can be found in [tests](jmeter-java-dsl/src/test/java/us/abstracta/jmeter/javadsl/JmeterDslTest.java)
 
