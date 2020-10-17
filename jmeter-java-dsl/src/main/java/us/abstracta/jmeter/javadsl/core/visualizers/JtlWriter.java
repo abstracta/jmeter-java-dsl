@@ -1,8 +1,9 @@
-package us.abstracta.jmeter.javadsl.core;
+package us.abstracta.jmeter.javadsl.core.visualizers;
 
 import org.apache.jmeter.reporters.ResultCollector;
 import org.apache.jmeter.testelement.TestElement;
 import org.apache.jmeter.visualizers.SimpleDataWriter;
+import us.abstracta.jmeter.javadsl.core.BaseTestElement;
 import us.abstracta.jmeter.javadsl.core.DslSampler.SamplerChild;
 import us.abstracta.jmeter.javadsl.core.DslTestPlan.TestPlanChild;
 import us.abstracta.jmeter.javadsl.core.DslThreadGroup.ThreadGroupChild;

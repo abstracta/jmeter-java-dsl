@@ -1,0 +1,11 @@
+apiVersion: 1
+datasources:
+  - name: InfluxDB
+    type: influxdb
+    access: proxy
+    url: http://influxdb:8086
+    database: jmeter
+    user: admin
+    password: admin
+    isDefault: true
+    editable: true

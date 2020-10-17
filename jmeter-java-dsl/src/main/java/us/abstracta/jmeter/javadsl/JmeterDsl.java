@@ -6,7 +6,8 @@ import us.abstracta.jmeter.javadsl.core.DslTestPlan;
 import us.abstracta.jmeter.javadsl.core.DslTestPlan.TestPlanChild;
 import us.abstracta.jmeter.javadsl.core.DslThreadGroup;
 import us.abstracta.jmeter.javadsl.core.DslThreadGroup.ThreadGroupChild;
-import us.abstracta.jmeter.javadsl.core.JtlWriter;
+import us.abstracta.jmeter.javadsl.core.visualizers.InfluxDbBackendListener;
+import us.abstracta.jmeter.javadsl.core.visualizers.JtlWriter;
 import us.abstracta.jmeter.javadsl.http.DslHttpSampler;
 import us.abstracta.jmeter.javadsl.http.HttpHeaders;
 
@@ -55,6 +56,10 @@ public class JmeterDsl {
 
   public static JtlWriter jtlWriter(String jtlFile) {
     return new JtlWriter(jtlFile);
+  }
+
+  public static InfluxDbBackendListener influxDbListener(String influxDbUrl) {
+    return new InfluxDbBackendListener(influxDbUrl);
   }
 
 }
