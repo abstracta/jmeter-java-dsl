@@ -89,7 +89,7 @@ Currently, the project only covers the basic, but most used, features when imple
 The idea is to evaluate if the community (you) is interested in using the library, and if so, implement new features as the community request them, covering at some point most of JMeter (and plugins) features. 
 In order to accomplish this, we need you to **please create an issue for any particular feature or need that you have**.
 
-We would also really appreciate pull requests. Check the [CONTRIBUTING](CONTRIBUITING.md) guide for an explanation of main library components and how can you extend the library.
+We would also really appreciate pull requests. Check the [CONTRIBUTING](CONTRIBUTING.md) guide for an explanation of main library components and how can you extend the library.
 
 Finally, if you like this project, **please give it a star**, that helps the project to be more visible and gain relevance. 
 
