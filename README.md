@@ -46,7 +46,7 @@ public class PerformanceTest {
 
 > This example also uses [AssertJ](https://joel-costigliola.github.io/assertj/assertj-core-quick-start.html) for assertions, but you can use whatever assertion library you chose.
 
-More examples can be found in [tests](jmeter-java-dsl/src/test/java/us/abstracta/jmeter/javadsl/JmeterDslTest.java)
+More examples can be found in [tests](jmeter-java-dsl/src/test/java/us/abstracta/jmeter/javadsl)
 
 > **Tip 1:** Since JMeter uses [log4j2](https://logging.apache.org/log4j/2.x/), if you want to control logging level or output, you can use something similar to the tests included [log4j2.xml](jmeter-java-dsl/src/test/resources/log4j2.xml).
 >
