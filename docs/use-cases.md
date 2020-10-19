@@ -51,7 +51,9 @@ public class PerformanceTest {
 ```
 > This test is using `BZ_TOKEN` (a custom environment variable) to get the BlazeMeter API authentication credentials (with `<KEY_ID>:<KEY_SECRET>` format).
 
-Note that is as simple as [generating a BlazeMeter authentication token](https://guide.blazemeter.com/hc/en-us/articles/115002213289-BlazeMeter-API-keys-) and adding `.runIn(new BlazeMeterEngine(...))` to any existing `jmeter-java-dsl` test to get it running at scale in BlazeMeter (with the rest of features provided by BlazeMeter, like the nice reporting it provides and historic data tracking).
+Note that is as simple as [generating a BlazeMeter authentication token](https://guide.blazemeter.com/hc/en-us/articles/115002213289-BlazeMeter-API-keys-) and adding `.runIn(new BlazeMeterEngine(...))` to any existing `jmeter-java-dsl` test to get it running at scale in BlazeMeter (with the rest of features provided by BlazeMeter, like the nice reporting it provides and historic data tracking). Here is an example of how a test would look like in BlazMeter:
+
+![blazemeter.png](blazemeter.png) 
 
 Check [BlazeMeterEngine](../jmeter-java-dsl-blazemeter/src/main/java/us/abstracta/jmeter/javadsl/blazemeter/BlazeMeterEngine.java) for details on usage and available settings when running tests in BlazeMeter.
 
