@@ -5,8 +5,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class TestRun {
 
-  public final long id;
-  public String url;
+  private final long id;
+  private String url;
 
   @JsonCreator
   private TestRun(@JsonProperty("id") long id) {
@@ -14,7 +14,15 @@ public class TestRun {
   }
 
   public void setTest(Test test) {
-    this.url = test.project.url + "/masters/" + id;
+    this.url = test.getProject().getUrl() + "/masters/" + id;
+  }
+
+  public long getId() {
+    return id;
+  }
+
+  public String getUrl() {
+    return url;
   }
 
 }

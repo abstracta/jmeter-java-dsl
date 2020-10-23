@@ -5,18 +5,18 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class TestRunRequestStats {
 
-  public final double avgBytes;
-  public final double avgResponseTime;
-  public final double avgThroughput;
-  public final long duration;
-  public final long errorsCount;
-  public final String labelName;
-  public final long perc90;
-  public final long perc95;
-  public final long perc99;
-  public final long maxResponseTime;
-  public final long minResponseTime;
-  public final long samples;
+  private final double avgBytes;
+  private final double avgResponseTime;
+  private final double avgThroughput;
+  private final long duration;
+  private final long errorsCount;
+  private final String labelName;
+  private final long perc90;
+  private final long perc95;
+  private final long perc99;
+  private final long maxResponseTime;
+  private final long minResponseTime;
+  private final long samples;
 
   @JsonCreator
   public TestRunRequestStats(@JsonProperty("avgBytes") double avgBytes,
@@ -43,6 +43,54 @@ public class TestRunRequestStats {
     this.maxResponseTime = maxResponseTime;
     this.minResponseTime = minResponseTime;
     this.samples = samples;
+  }
+
+  public double getAvgBytes() {
+    return avgBytes;
+  }
+
+  public double getAvgResponseTime() {
+    return avgResponseTime;
+  }
+
+  public double getAvgThroughput() {
+    return avgThroughput;
+  }
+
+  public long getDuration() {
+    return duration;
+  }
+
+  public long getErrorsCount() {
+    return errorsCount;
+  }
+
+  public String getLabelName() {
+    return labelName;
+  }
+
+  public long getPerc90() {
+    return perc90;
+  }
+
+  public long getPerc95() {
+    return perc95;
+  }
+
+  public long getPerc99() {
+    return perc99;
+  }
+
+  public long getMaxResponseTime() {
+    return maxResponseTime;
+  }
+
+  public long getMinResponseTime() {
+    return minResponseTime;
+  }
+
+  public long getSamples() {
+    return samples;
   }
 
 }

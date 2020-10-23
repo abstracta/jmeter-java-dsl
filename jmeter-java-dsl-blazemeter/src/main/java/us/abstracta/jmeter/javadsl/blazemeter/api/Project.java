@@ -5,10 +5,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class Project {
 
-  public final long id;
-  public final long workspaceId;
-  public long accountId;
-  public String url;
+  private final long id;
+  private final long workspaceId;
+  private long accountId;
+  private String url;
 
   @JsonCreator
   public Project(@JsonProperty("id") long id, @JsonProperty("workspaceId") long workspaceId,
@@ -23,6 +23,22 @@ public class Project {
   public void setBaseUrl(String baseUrl) {
     url = baseUrl + String
         .format("/accounts/%d/workspaces/%d/projects/%d", accountId, workspaceId, id);
+  }
+
+  public long getId() {
+    return id;
+  }
+
+  public long getWorkspaceId() {
+    return workspaceId;
+  }
+
+  public void setAccountId(long accountId) {
+    this.accountId = accountId;
+  }
+
+  public String getUrl() {
+    return url;
   }
 
 }

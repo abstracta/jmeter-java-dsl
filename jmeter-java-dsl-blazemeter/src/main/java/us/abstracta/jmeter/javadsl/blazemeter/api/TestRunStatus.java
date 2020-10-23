@@ -9,14 +9,18 @@ public class TestRunStatus {
   public static final TestRunStatus CREATED = new TestRunStatus("CREATED", false);
   public static final TestRunStatus ENDED = new TestRunStatus("ENDED", false);
 
-  public final String status;
-  public final boolean isDataAvailable;
+  private final String status;
+  private final boolean isDataAvailable;
 
   @JsonCreator
   private TestRunStatus(@JsonProperty("status") String status,
       @JsonProperty("isDataAvailable") boolean isDataAvailable) {
     this.status = status;
     this.isDataAvailable = isDataAvailable;
+  }
+
+  public boolean isDataAvailable() {
+    return isDataAvailable;
   }
 
   @Override

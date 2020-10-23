@@ -5,23 +5,30 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class Test {
 
-  public final long id;
-  public final String name;
-  public final long projectId;
-  public Project project;
-  public String url;
+  private final long id;
+  private Project project;
+  private String url;
 
   @JsonCreator
-  private Test(@JsonProperty("id") long id, @JsonProperty("name") String name,
-      @JsonProperty("projectId") long projectId) {
+  private Test(@JsonProperty("id") long id) {
     this.id = id;
-    this.name = name;
-    this.projectId = projectId;
   }
 
   public void setProject(Project project) {
     this.project = project;
-    this.url = project.url + "/tests/" + id;
+    this.url = project.getUrl() + "/tests/" + id;
+  }
+
+  public long getId() {
+    return id;
+  }
+
+  public Project getProject() {
+    return project;
+  }
+
+  public String getUrl() {
+    return url;
   }
 
 }

@@ -129,14 +129,14 @@ public class BlazeMeterClient {
   }
 
   public Project findDefaultProject(String baseUrl) throws IOException {
-    Project ret = execApiCall(api.findUser()).defaultProject;
+    Project ret = execApiCall(api.findUser()).getDefaultProject();
     ret.setBaseUrl(baseUrl);
     return ret;
   }
 
   public Project findProjectById(Long projectId, String baseUrl) throws IOException {
     Project ret = execApiCall(api.findProject(projectId));
-    ret.accountId = execApiCall(api.findWorkspace(ret.workspaceId)).accountId;
+    ret.setAccountId(execApiCall(api.findWorkspace(ret.getWorkspaceId())).getAccountId());
     ret.setBaseUrl(baseUrl);
     return ret;
   }
@@ -146,11 +146,11 @@ public class BlazeMeterClient {
     if (!response.isSuccessful()) {
       throw new BlazeMeterException(response.code(), response.errorBody().string());
     }
-    return response.body().result;
+    return response.body().getResult();
   }
 
   public Optional<Test> findTestByName(String testName, Project project) throws IOException {
-    List<Test> tests = execApiCall(api.findTests(project.id, testName));
+    List<Test> tests = execApiCall(api.findTests(project.getId(), testName));
     if (tests.isEmpty()) {
       return Optional.empty();
     }
@@ -167,7 +167,7 @@ public class BlazeMeterClient {
   }
 
   public void updateTest(Test test, TestConfig testConfig) throws IOException {
-    execApiCall(api.updateTest(test.id, testConfig));
+    execApiCall(api.updateTest(test.getId(), testConfig));
   }
 
   public void uploadTestFile(Test test, File jmxFile) throws IOException {
@@ -175,26 +175,26 @@ public class BlazeMeterClient {
         .create(MediaType.get("application/octet-stream"), jmxFile);
     MultipartBody.Part part = MultipartBody.Part
         .createFormData("file", jmxFile.getName(), requestBody);
-    execApiCall(api.uploadTestFile(test.id, part));
+    execApiCall(api.uploadTestFile(test.getId(), part));
   }
 
   public TestRun startTest(Test test) throws IOException {
-    TestRun ret = execApiCall(api.startTest(test.id));
+    TestRun ret = execApiCall(api.startTest(test.getId()));
     ret.setTest(test);
     return ret;
   }
 
   public TestRunStatus findTestRunStatus(TestRun testRun)
       throws IOException {
-    return execApiCall(api.findTestRunStatus(testRun.id, WARNING_EVENT_LEVEL));
+    return execApiCall(api.findTestRunStatus(testRun.getId(), WARNING_EVENT_LEVEL));
   }
 
   public TestRunSummaryStats findTestRunSummaryStats(TestRun testRun) throws IOException {
-    return execApiCall(api.findTestRunSummaryStats(testRun.id));
+    return execApiCall(api.findTestRunSummaryStats(testRun.getId()));
   }
 
   public List<TestRunRequestStats> findTestRunRequestStats(TestRun testRun) throws IOException {
-    return execApiCall(api.findTestRunRequestStats(testRun.id));
+    return execApiCall(api.findTestRunRequestStats(testRun.getId()));
   }
 
 }

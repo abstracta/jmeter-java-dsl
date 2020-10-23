@@ -5,11 +5,15 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class ApiResponse<T> {
 
-  public final T result;
+  private final T result;
 
   @JsonCreator
   private ApiResponse(@JsonProperty("result") T result) {
     this.result = result;
+  }
+
+  public T getResult() {
+    return result;
   }
 
 }

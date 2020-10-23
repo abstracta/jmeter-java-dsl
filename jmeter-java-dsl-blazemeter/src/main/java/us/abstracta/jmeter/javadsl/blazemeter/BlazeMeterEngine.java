@@ -263,14 +263,14 @@ public class BlazeMeterEngine implements DslJmeterEngine {
       TestConfig testConfig = buildTestConfig(project, jmxFile);
       if (test != null) {
         client.updateTest(test, testConfig);
-        LOG.info("Updated test {}", test.url);
+        LOG.info("Updated test {}", test.getUrl());
       } else {
         test = client.createTest(testConfig, project);
-        LOG.info("Created test {}", test.url);
+        LOG.info("Created test {}", test.getUrl());
       }
       client.uploadTestFile(test, jmxFile);
       TestRun testRun = client.startTest(test);
-      LOG.info("Started test run {}", testRun.url);
+      LOG.info("Started test run {}", testRun.getUrl());
       awaitTestEnd(testRun);
       return findTestPlanStats(testRun);
     } finally {
@@ -289,7 +289,7 @@ public class BlazeMeterEngine implements DslJmeterEngine {
   private TestConfig buildTestConfig(Project project, File jmxFile) {
     return new TestConfig()
         .name(testName)
-        .projectId(project.id)
+        .projectId(project.getId())
         .jmxFile(jmxFile)
         .totalUsers(totalUsers)
         .rampUp(rampUp)
@@ -306,13 +306,13 @@ public class BlazeMeterEngine implements DslJmeterEngine {
       Thread.sleep(STATUS_POLL_PERIOD.toMillis());
       TestRunStatus newStatus = client.findTestRunStatus(testRun);
       if (!status.equals(newStatus)) {
-        LOG.debug("Test run {} status changed to: {}", testRun.url, newStatus);
+        LOG.debug("Test run {} status changed to: {}", testRun.getUrl(), newStatus);
         status = newStatus;
       }
     } while (!TestRunStatus.ENDED.equals(status) && !hasTimedOut(testStart, testTimeout));
     if (!TestRunStatus.ENDED.equals(status)) {
       throw buildTestTimeoutException(testRun);
-    } else if (!status.isDataAvailable) {
+    } else if (!status.isDataAvailable()) {
       awaitAvailableData(testRun, testStart);
     }
   }
@@ -325,7 +325,7 @@ public class BlazeMeterEngine implements DslJmeterEngine {
     return new TimeoutException(String.format(
         "Test %s didn't end after %s. "
             + "If the timeout is too short, you can change it with testTimeout() method.",
-        testRun.url, testTimeout));
+        testRun.getUrl(), testTimeout));
   }
 
   private void awaitAvailableData(TestRun testRun, Instant testStart)
@@ -335,23 +335,23 @@ public class BlazeMeterEngine implements DslJmeterEngine {
     do {
       Thread.sleep(STATUS_POLL_PERIOD.toMillis());
       status = client.findTestRunStatus(testRun);
-    } while (!status.isDataAvailable && !hasTimedOut(testStart, testTimeout) && !hasTimedOut(
+    } while (!status.isDataAvailable() && !hasTimedOut(testStart, testTimeout) && !hasTimedOut(
         dataPollStart, availableDataTimeout));
     if (hasTimedOut(testStart, testTimeout)) {
       throw buildTestTimeoutException(testRun);
-    } else if (!status.isDataAvailable) {
+    } else if (!status.isDataAvailable()) {
       throw new TimeoutException(String.format(
           "Test %s ended, but no data is available after %s. "
               + "This is usually caused by some failure in BlazeMeter. "
               + "Check bzt.log and jmeter.out, and if everything looks good you might try "
-              + "increasing this timeout with availableDataTimeout() method.", testRun.url,
+              + "increasing this timeout with availableDataTimeout() method.", testRun.getUrl(),
           availableDataTimeout));
     }
   }
 
   private TestPlanStats findTestPlanStats(TestRun testRun) throws IOException {
     TestRunLabeledSummary summary = client
-        .findTestRunSummaryStats(testRun).summary.get(0);
+        .findTestRunSummaryStats(testRun).getSummary().get(0);
     List<TestRunRequestStats> labeledStats = client
         .findTestRunRequestStats(testRun);
     return buildTestStats(summary, labeledStats);
@@ -362,10 +362,10 @@ public class BlazeMeterEngine implements DslJmeterEngine {
     TestPlanStats stats = new TestPlanStats();
     for (TestRunRequestStats labeledStat : labeledStats) {
       StatsSummary labelStatsSummary = new BlazemeterStatsSummary(labeledStat, summary);
-      if ("ALL".equals(labeledStat.labelName)) {
+      if ("ALL".equals(labeledStat.getLabelName())) {
         stats.setOverallStats(labelStatsSummary);
       } else {
-        stats.setLabeledStats(labeledStat.labelName, labelStatsSummary);
+        stats.setLabeledStats(labeledStat.getLabelName(), labelStatsSummary);
       }
     }
     return stats;
@@ -395,21 +395,21 @@ public class BlazeMeterEngine implements DslJmeterEngine {
        and calculating it from result logs would incur in significant additional time and resources
        usage.
        */
-      firstTime = summary.first;
-      endTime = summary.last;
-      elapsedTime = Duration.ofMillis(labeledStat.duration);
-      samplesCount = labeledStat.samples;
-      samplesPerSecond = labeledStat.avgThroughput;
-      errorsCount = labeledStat.errorsCount;
-      minElapsedTime = Duration.ofMillis(labeledStat.minResponseTime);
-      maxElapsedTime = Duration.ofMillis(labeledStat.maxResponseTime);
-      meanElapsedTime = Duration.ofMillis(Math.round(labeledStat.avgResponseTime));
-      elapsedTimePercentile90 = Duration.ofMillis(labeledStat.perc90);
-      elapsedTimePercentile95 = Duration.ofMillis(labeledStat.perc95);
-      elapsedTimePercentile99 = Duration.ofMillis(labeledStat.perc99);
+      firstTime = summary.getFirst();
+      endTime = summary.getLast();
+      elapsedTime = Duration.ofMillis(labeledStat.getDuration());
+      samplesCount = labeledStat.getSamples();
+      samplesPerSecond = labeledStat.getAvgThroughput();
+      errorsCount = labeledStat.getErrorsCount();
+      minElapsedTime = Duration.ofMillis(labeledStat.getMinResponseTime());
+      maxElapsedTime = Duration.ofMillis(labeledStat.getMaxResponseTime());
+      meanElapsedTime = Duration.ofMillis(Math.round(labeledStat.getAvgResponseTime()));
+      elapsedTimePercentile90 = Duration.ofMillis(labeledStat.getPerc90());
+      elapsedTimePercentile95 = Duration.ofMillis(labeledStat.getPerc95());
+      elapsedTimePercentile99 = Duration.ofMillis(labeledStat.getPerc99());
       // Similar comment as with firstTime and endTime: this is just an approximation.
-      receivedBytes = Math.round(labeledStat.avgBytes / 1000 * labeledStat.duration);
-      receivedBytesPerSecond = labeledStat.avgBytes;
+      receivedBytes = Math.round(labeledStat.getAvgBytes() / 1000 * labeledStat.getDuration());
+      receivedBytesPerSecond = labeledStat.getAvgBytes();
     }
 
     @Override

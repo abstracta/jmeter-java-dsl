@@ -7,7 +7,7 @@ import java.util.List;
 
 public class TestRunSummaryStats {
 
-  public final List<TestRunLabeledSummary> summary;
+  private final List<TestRunLabeledSummary> summary;
 
   @JsonCreator
   private TestRunSummaryStats(@JsonProperty("summary") List<TestRunLabeledSummary> summary) {
@@ -16,8 +16,8 @@ public class TestRunSummaryStats {
 
   public static class TestRunLabeledSummary {
 
-    public final Instant first;
-    public final Instant last;
+    private final Instant first;
+    private final Instant last;
 
     @JsonCreator
     private TestRunLabeledSummary(@JsonProperty("first") Instant first,
@@ -26,6 +26,18 @@ public class TestRunSummaryStats {
       this.last = last;
     }
 
+    public Instant getFirst() {
+      return first;
+    }
+
+    public Instant getLast() {
+      return last;
+    }
+
+  }
+
+  public List<TestRunLabeledSummary> getSummary() {
+    return summary;
   }
 
 }

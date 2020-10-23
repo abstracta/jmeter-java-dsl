@@ -5,11 +5,15 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class Workspace {
 
-  public final long accountId;
+  private final long accountId;
 
   @JsonCreator
   private Workspace(@JsonProperty("accountId") long accountId) {
     this.accountId = accountId;
+  }
+
+  public long getAccountId() {
+    return accountId;
   }
 
 }
