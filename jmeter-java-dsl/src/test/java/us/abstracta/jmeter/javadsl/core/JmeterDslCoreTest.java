@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 import org.eclipse.jetty.http.HttpHeader;
@@ -43,6 +44,19 @@ public class JmeterDslCoreTest extends JmeterDslTest {
 
   private void verifyRequestsSentToServer(int testIterations) {
     wiremockServer.verify(testIterations, getRequestedFor(anyUrl()));
+  }
+
+  @Test
+  public void shouldTakeExpectedDurationWhenThreadGroupWithConfiguredDuration() throws IOException {
+    Duration duration = Duration.ofSeconds(10);
+    TestPlanStats stats = testPlan(
+        threadGroup(1, duration,
+            JmeterDsl.httpSampler(wiremockUri)
+        )
+    ).run();
+    // we use some threshold in case is not exact due to delays in starting.
+    Duration threshold = Duration.ofSeconds(5);
+    assertThat(stats.overall().elapsedTime()).isGreaterThan(duration.minus(threshold));
   }
 
   @Test

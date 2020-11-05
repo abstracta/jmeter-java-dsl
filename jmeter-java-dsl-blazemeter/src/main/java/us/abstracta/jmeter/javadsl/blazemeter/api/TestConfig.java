@@ -39,7 +39,8 @@ public class TestConfig {
   }
 
   private String buildDurationMinutesString(Duration duration) {
-    return duration != null ? Math.ceil((double) duration.getSeconds() / 60) + "m" : null;
+    return duration != null ? Math.round(Math.ceil((double) duration.getSeconds() / 60)) + "m"
+        : null;
   }
 
   public TestConfig iterations(Integer iterations) {
