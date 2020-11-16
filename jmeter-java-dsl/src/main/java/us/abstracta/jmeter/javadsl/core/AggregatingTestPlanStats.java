@@ -121,7 +121,7 @@ public class AggregatingTestPlanStats extends TestPlanStats {
 
   }
 
-  public void addSampleResult(SampleResult result) {
+  public synchronized void addSampleResult(SampleResult result) {
     ((AggregatingStatsSummary) overallStats).addResult(result);
     AggregatingStatsSummary labelStats = (AggregatingStatsSummary) labeledStats
         .computeIfAbsent(result.getSampleLabel(), label -> new AggregatingStatsSummary());
