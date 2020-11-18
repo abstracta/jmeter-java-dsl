@@ -188,4 +188,39 @@ public class PerformanceTest {
 Now you can see the results of your test runs live and check past test run metrics!
 
 Check [InfluxDbBackendListener](../jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/listeners/InfluxDbBackendListener.java) for additional details and settings.
- 
+
+## Change sample result statuses with custom logic
+
+By default, JMeter marks any HTTP samples with a response code of 4xx or 5xx as failed. In general this is a good practice, and allows you to easily identify when something unusual happens. In some cases though, this might not be enough, and you might need to implement some custom logic to mark some cases as success.
+
+Take as an example the scenario where the service under test returns a 429 status code which the test plan should ignore. In such scenario you can use [JSR233PostProcessor](../jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/postprocessors/DslJsr223PostProcessor.java) to modify the result status and avoid marking the request as failure in such scenarios. Here is an example:
+
+```java
+import static org.assertj.core.api.Assertions.assertThat;
+import static us.abstracta.jmeter.javadsl.JmeterDsl.*;
+
+import java.io.IOException;
+import java.time.Duration;
+import org.junit.jupiter.api.Test;
+import us.abstracta.jmeter.javadsl.core.TestPlanStats;
+
+public class PerformanceTest {
+
+  @Test
+  public void testPerformance() throws IOException {
+    TestPlanStats stats = testPlan(
+      threadGroup(2, 10,
+        httpSampler("http://my.service")
+          .children(
+            jsr223PostProcessor("if (prev.responseCode == '429') { prev.successful = true }")
+          )
+      )
+    ).run();
+    assertThat(stats.overall().elapsedTimePercentile99()).isLessThan(Duration.ofSeconds(5));
+  }
+  
+}
+```
+
+JSR223PostProcessor is a very powerful tool, but is not the only, nor the best, alternative for many cases where JMeter already provides a better and simpler alternative (eg: asserting response bodies contain some string). Currently, jmeter-java-dsl does not support all the features JMeter provides. So, if you need something already provided by JMeter, please create an issue in GitHub requesting such a feature or submit a pull request with the required support.
+   

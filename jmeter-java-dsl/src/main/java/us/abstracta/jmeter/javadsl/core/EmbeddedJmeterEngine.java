@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Properties;
 import org.apache.commons.io.FileUtils;
 import org.apache.jmeter.engine.StandardJMeterEngine;
 import org.apache.jmeter.functions.EvalFunction;
@@ -58,11 +59,11 @@ public class EmbeddedJmeterEngine implements DslJmeterEngine {
     private void setupJMeterProperties(File propsDir) throws IOException {
       File propsFile = new File(propsDir, "jmeter.properties");
       propsFile.createNewFile();
-      JMeterUtils.loadJMeterProperties(propsFile.toString());
-      JMeterUtils.setProperty("search_paths", getFunctionsJarPath());
-      JMeterUtils.setProperty("saveservice_properties",
+      Properties props = JMeterUtils.getProperties(propsFile.toString());
+      props.setProperty("search_paths", getFunctionsJarPath());
+      props.setProperty("saveservice_properties",
           installPropertiesFile(propsDir, "saveservice.properties"));
-      JMeterUtils.setProperty("upgrade_properties",
+      props.setProperty("upgrade_properties",
           installPropertiesFile(propsDir, "upgrade.properties"));
     }
 

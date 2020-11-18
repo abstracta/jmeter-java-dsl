@@ -9,6 +9,7 @@ import us.abstracta.jmeter.javadsl.core.DslThreadGroup;
 import us.abstracta.jmeter.javadsl.core.DslThreadGroup.ThreadGroupChild;
 import us.abstracta.jmeter.javadsl.core.listeners.InfluxDbBackendListener;
 import us.abstracta.jmeter.javadsl.core.listeners.JtlWriter;
+import us.abstracta.jmeter.javadsl.core.postprocessors.DslJsr223PostProcessor;
 import us.abstracta.jmeter.javadsl.http.DslHttpSampler;
 import us.abstracta.jmeter.javadsl.http.HttpHeaders;
 
@@ -123,6 +124,22 @@ public class JmeterDsl {
    */
   public static HttpHeaders httpHeaders() {
     return new HttpHeaders();
+  }
+
+  /**
+   * Builds a JSR223 Post Processor which allows including custom logic to process sample results.
+   *
+   * This post processor is very powerful, and lets you alter sample results, jmeter context and
+   * implement any kind of custom logic that you may think.
+   *
+   * @param script contains the script to be executed by the post processor. By default this will be
+   * a groovy script, but you can change it by setting the language property in the returned post
+   * processor.
+   * @return the JSR223 Post Processor instance
+   * @see DslJsr223PostProcessor
+   */
+  public static DslJsr223PostProcessor jsr223PostProcessor(String script) {
+    return new DslJsr223PostProcessor(script);
   }
 
   /**
