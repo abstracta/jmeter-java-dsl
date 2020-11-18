@@ -1,4 +1,4 @@
-package us.abstracta.jmeter.javadsl.core.visualizers;
+package us.abstracta.jmeter.javadsl.core.listeners;
 
 import org.apache.jmeter.reporters.ResultCollector;
 import org.apache.jmeter.testelement.TestElement;

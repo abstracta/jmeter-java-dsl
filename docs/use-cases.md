@@ -187,5 +187,5 @@ public class PerformanceTest {
 
 Now you can see the results of your test runs live and check past test run metrics!
 
-Check [InfluxDbBackendListener](../jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/visualizers/InfluxDbBackendListener.java) for additional details and settings.
+Check [InfluxDbBackendListener](../jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/listeners/InfluxDbBackendListener.java) for additional details and settings.
  

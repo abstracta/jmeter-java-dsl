@@ -1,4 +1,4 @@
-package us.abstracta.jmeter.javadsl.core.visualizers;
+package us.abstracta.jmeter.javadsl.core.listeners;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.influxDbListener;

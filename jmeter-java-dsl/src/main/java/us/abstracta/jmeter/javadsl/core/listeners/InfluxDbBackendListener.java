@@ -1,4 +1,4 @@
-package us.abstracta.jmeter.javadsl.core.visualizers;
+package us.abstracta.jmeter.javadsl.core.listeners;
 
 import java.time.Instant;
 import org.apache.jmeter.config.Arguments;

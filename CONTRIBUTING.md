@@ -89,5 +89,5 @@ Or, check existing code. It contains embedded documentation with additional deta
 [TestElementContainer]: jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/TestElementContainer.java
 [HttpHeaders]: jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/http/HttpHeaders.java
 [DslSampler]: jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/DslSampler.java
-[JtlWriter]: jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/visualizers/JtlWriter.java
+[JtlWriter]: jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/listeners/JtlWriter.java
 [Core classes section]: #core-classes

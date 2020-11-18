@@ -7,8 +7,8 @@ import us.abstracta.jmeter.javadsl.core.DslTestPlan;
 import us.abstracta.jmeter.javadsl.core.DslTestPlan.TestPlanChild;
 import us.abstracta.jmeter.javadsl.core.DslThreadGroup;
 import us.abstracta.jmeter.javadsl.core.DslThreadGroup.ThreadGroupChild;
-import us.abstracta.jmeter.javadsl.core.visualizers.InfluxDbBackendListener;
-import us.abstracta.jmeter.javadsl.core.visualizers.JtlWriter;
+import us.abstracta.jmeter.javadsl.core.listeners.InfluxDbBackendListener;
+import us.abstracta.jmeter.javadsl.core.listeners.JtlWriter;
 import us.abstracta.jmeter.javadsl.http.DslHttpSampler;
 import us.abstracta.jmeter.javadsl.http.HttpHeaders;
 
