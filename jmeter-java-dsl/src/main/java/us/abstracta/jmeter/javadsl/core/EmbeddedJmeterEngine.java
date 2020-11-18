@@ -5,8 +5,11 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collections;
 import java.util.Properties;
 import org.apache.commons.io.FileUtils;
 import org.apache.jmeter.engine.StandardJMeterEngine;
@@ -44,27 +47,21 @@ public class EmbeddedJmeterEngine implements DslJmeterEngine {
 
   private static class JMeterEnvironment implements Closeable {
 
-    private final File propsDir;
+    private final File homeDir;
 
     private JMeterEnvironment() throws IOException {
-      propsDir = Files.createTempDirectory("jmeter-java-dsl").toFile();
+      homeDir = Files.createTempDirectory("jmeter-java-dsl").toFile();
       try {
-        setupJMeterProperties(propsDir);
+        JMeterUtils.setJMeterHome(homeDir.getPath());
+        File binDir = new File(homeDir, "bin");
+        installConfig(binDir);
+        Properties props = JMeterUtils
+            .getProperties(new File(binDir, "jmeter.properties").getPath());
+        props.setProperty("search_paths", getFunctionsJarPath());
       } catch (IOException | RuntimeException e) {
-        FileUtils.deleteDirectory(propsDir);
+        FileUtils.deleteDirectory(homeDir);
         throw e;
       }
-    }
-
-    private void setupJMeterProperties(File propsDir) throws IOException {
-      File propsFile = new File(propsDir, "jmeter.properties");
-      propsFile.createNewFile();
-      Properties props = JMeterUtils.getProperties(propsFile.toString());
-      props.setProperty("search_paths", getFunctionsJarPath());
-      props.setProperty("saveservice_properties",
-          installPropertiesFile(propsDir, "saveservice.properties"));
-      props.setProperty("upgrade_properties",
-          installPropertiesFile(propsDir, "upgrade.properties"));
     }
 
     private String getFunctionsJarPath() {
@@ -76,16 +73,22 @@ public class EmbeddedJmeterEngine implements DslJmeterEngine {
       }
     }
 
-    private String installPropertiesFile(File propsDir, String propsFileName)
-        throws IOException {
-      Path saveServicePropsPath = propsDir.toPath().resolve(propsFileName);
-      Files.copy(getClass().getResourceAsStream("/bin/" + propsFileName), saveServicePropsPath);
-      return saveServicePropsPath.toString();
+    private void installConfig(File binDir) throws IOException {
+      try (FileSystem fs = FileSystems
+          .newFileSystem(getClass().getResource("/bin/jmeter.properties").toURI(),
+              Collections.emptyMap())) {
+        Path configBinDir = fs.getPath("/bin");
+        for (Path p : (Iterable<Path>) Files.walk(configBinDir)::iterator) {
+          Files.copy(p, binDir.toPath().resolve(configBinDir.relativize(p).toString()));
+        }
+      } catch (URISyntaxException e) {
+        throw new RuntimeException(e);
+      }
     }
 
     @Override
     public void close() throws IOException {
-      FileUtils.deleteDirectory(propsDir);
+      FileUtils.deleteDirectory(homeDir);
     }
 
   }

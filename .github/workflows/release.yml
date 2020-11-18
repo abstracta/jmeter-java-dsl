@@ -12,9 +12,9 @@ jobs:
         with:
           java-version: 1.8
       - name: set maven project version
-        run: mvn --batch-mode versions:set -DnewVersion=${GITHUB_REF#refs/tags/v} --settings .github/settings.xml
+        run: mvn --batch-mode --no-transfer-progress versions:set -DnewVersion=${GITHUB_REF#refs/tags/v} --settings .github/settings.xml
       - name: package release
-        run: mvn clean package --settings .github/settings.xml
+        run: mvn --batch-mode --no-transfer-progress clean package --settings .github/settings.xml
         env:
           BZ_TOKEN: ${{ secrets.BZ_TOKEN }}
       - name: Upload jmeter-java-dsl.jar to release

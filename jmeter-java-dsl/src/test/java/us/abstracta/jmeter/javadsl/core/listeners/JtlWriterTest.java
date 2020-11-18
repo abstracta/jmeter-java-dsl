@@ -12,7 +12,7 @@ import org.junit.jupiter.api.io.TempDir;
 import us.abstracta.jmeter.javadsl.JmeterDsl;
 import us.abstracta.jmeter.javadsl.JmeterDslTest;
 
-public class JtlWriterTest extends JmeterDslTest  {
+public class JtlWriterTest extends JmeterDslTest {
 
   private static final String RESULTS_JTL = "results.jtl";
 

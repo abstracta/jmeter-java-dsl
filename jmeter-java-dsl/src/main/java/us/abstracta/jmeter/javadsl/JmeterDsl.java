@@ -7,6 +7,7 @@ import us.abstracta.jmeter.javadsl.core.DslTestPlan;
 import us.abstracta.jmeter.javadsl.core.DslTestPlan.TestPlanChild;
 import us.abstracta.jmeter.javadsl.core.DslThreadGroup;
 import us.abstracta.jmeter.javadsl.core.DslThreadGroup.ThreadGroupChild;
+import us.abstracta.jmeter.javadsl.core.listeners.HtmlReporter;
 import us.abstracta.jmeter.javadsl.core.listeners.InfluxDbBackendListener;
 import us.abstracta.jmeter.javadsl.core.listeners.JtlWriter;
 import us.abstracta.jmeter.javadsl.core.postprocessors.DslJsr223PostProcessor;
@@ -164,6 +165,17 @@ public class JmeterDsl {
    */
   public static InfluxDbBackendListener influxDbListener(String influxDbUrl) {
     return new InfluxDbBackendListener(influxDbUrl);
+  }
+
+  /**
+   * Builds an HTML Reporter which allows easily generating HTML reports for test plans.
+   *
+   * @param reportDirectory directory where HTML report is generated
+   * @return the HTML Reporter instance
+   * @see HtmlReporter
+   */
+  public static HtmlReporter htmlReporter(String reportDirectory) {
+    return new HtmlReporter(reportDirectory);
   }
 
 }

@@ -23,7 +23,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.*;
 
 import java.time.Duration;
-import org.eclipse.jetty.http.MimeTypes.Type;
 import org.junit.jupiter.api.Test;
 import us.abstracta.jmeter.javadsl.blazemeter.BlazeMeterEngine;
 import us.abstracta.jmeter.javadsl.core.TestPlanStats;
@@ -36,7 +35,6 @@ public class PerformanceTest {
       // number of threads and iterations are in the end overwritten by BlazeMeter engine settings 
       threadGroup(2, 10,
         httpSampler("http://my.service")
-          .post("{\"name\": \"test\"}", Type.APPLICATION_JSON)
       )
     ).runIn(new BlazeMeterEngine(System.getenv("BZ_TOKEN"))
       .testName("DSL test")
@@ -70,15 +68,12 @@ In case you want to load a test plan in JMeter GUI, you can save it just invokin
 ```java
 import static us.abstracta.jmeter.javadsl.JmeterDsl.*;
 
-import org.eclipse.jetty.http.MimeTypes.Type;
-
 public class SaveTestPlanAsJMX {
   
   public static void main(String[] args) throws Exception {
     testPlan(
       threadGroup(2, 10,
         httpSampler("http://my.service")
-          .post("{\"name\": \"test\"}", Type.APPLICATION_JSON)
       ),
       //this is just to log details of each request stats
       jtlWriter("test.jtl")
@@ -164,7 +159,6 @@ import static us.abstracta.jmeter.javadsl.JmeterDsl.*;
 
 import java.io.IOException;
 import java.time.Duration;
-import org.eclipse.jetty.http.MimeTypes.Type;
 import org.junit.jupiter.api.Test;
 import us.abstracta.jmeter.javadsl.core.TestPlanStats;
 
@@ -175,7 +169,6 @@ public class PerformanceTest {
     TestPlanStats stats = testPlan(
       threadGroup(2, 10,
         httpSampler("http://my.service")
-          .post("{\"name\": \"test\"}", Type.APPLICATION_JSON)
       ),
       influxDbListener("http://localhost:8086/write?db=jmeter")
     ).run();
@@ -188,6 +181,41 @@ public class PerformanceTest {
 Now you can see the results of your test runs live and check past test run metrics!
 
 Check [InfluxDbBackendListener](../jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/listeners/InfluxDbBackendListener.java) for additional details and settings.
+
+## Generate HTML report from test plan execution
+
+After running a test plan you would usually like to visualize the results in friendly way that eases analysis of collected information. 
+
+One, and preferred way, to do that is through previously mentioned alternative of using InfluxDb & Grafana. 
+
+Another way might just be using jtlWriter (as shown in [Readme](../README.md)) and then loading the jtl file in JMeter GUI with one of provided listeners (like view results tree, summary report, etc). 
+
+Another alternative is just generating a standalone report for the test plan execution using jmeter-java-dsl provided htmlReporter like this:
+
+```java
+import static org.assertj.core.api.Assertions.assertThat;
+import static us.abstracta.jmeter.javadsl.JmeterDsl.*;
+
+import java.io.IOException;
+import java.time.Duration;
+import org.junit.jupiter.api.Test;
+import us.abstracta.jmeter.javadsl.core.TestPlanStats;
+
+public class PerformanceTest {
+
+  @Test
+  public void testPerformance() throws IOException {
+    TestPlanStats stats = testPlan(
+      threadGroup(2, 10,
+        httpSampler("http://my.service")
+      ),
+      htmlReporter("html-report")
+    ).run();
+    assertThat(stats.overall().elapsedTimePercentile99()).isLessThan(Duration.ofSeconds(5));
+  }
+  
+}
+```
 
 ## Change sample result statuses with custom logic
 
