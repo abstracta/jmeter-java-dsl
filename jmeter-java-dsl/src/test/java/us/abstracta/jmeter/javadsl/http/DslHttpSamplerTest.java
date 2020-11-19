@@ -14,6 +14,8 @@ import org.junit.jupiter.api.Test;
 import us.abstracta.jmeter.javadsl.JmeterDsl;
 import us.abstracta.jmeter.javadsl.JmeterDslTest;
 
+import java.util.UUID;
+
 public class DslHttpSamplerTest extends JmeterDslTest {
 
   private static final String HEADER_NAME_1 = "name1";
@@ -32,6 +34,20 @@ public class DslHttpSamplerTest extends JmeterDslTest {
     wiremockServer.verify(postRequestedFor(anyUrl())
         .withHeader(HttpHeader.CONTENT_TYPE.toString(), equalTo(contentType.toString()))
         .withRequestBody(equalToJson(JSON_BODY)));
+  }
+
+  @Test
+  public void shouldSendPostWithGeneratedContentTypeToServerWhenHttpSamplerWithPost() throws Exception {
+    Type contentType = Type.TEXT_PLAIN;
+    String body =  UUID.randomUUID().toString();
+    testPlan(
+            threadGroup(1, 1,
+                    JmeterDsl.httpSampler(wiremockUri).post(() -> body, contentType)
+            )
+    ).run();
+    wiremockServer.verify(1, postRequestedFor(anyUrl())
+            .withHeader(HttpHeader.CONTENT_TYPE.toString(), equalTo(contentType.toString()))
+            .withRequestBody(equalTo(body)));
   }
 
   @Test
