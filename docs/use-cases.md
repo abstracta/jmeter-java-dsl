@@ -252,3 +252,42 @@ public class PerformanceTest {
 
 JSR223PostProcessor is a very powerful tool, but is not the only, nor the best, alternative for many cases where JMeter already provides a better and simpler alternative (eg: asserting response bodies contain some string). Currently, jmeter-java-dsl does not support all the features JMeter provides. So, if you need something already provided by JMeter, please create an issue in GitHub requesting such a feature or submit a pull request with the required support.
    
+## Provide Request Parameters Programmatically per Request
+
+With the standard DSL you can provide static values to request parameters, such as a body. However, you may also want to be able to modify your requests for each call. This is common in cases where your request creates something that must have unique values.
+
+```java
+package us.abstracta.jmeter.javadsl.core;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static us.abstracta.jmeter.javadsl.JmeterDsl.*;
+
+import java.io.IOException;
+import java.time.Duration;
+import org.junit.jupiter.api.Test;
+import us.abstracta.jmeter.javadsl.core.TestPlanStats;
+
+public class PerformanceTest {
+  Int count = 0;
+
+  @Test
+  public void testPerformance() {
+    TestPlanStats stats = testPlan(
+      threadGroup(2, 10,
+        httpSampler("http://my.service")
+          .post("${REQUEST_BODY}", contentType)
+          .children(
+            jsr223PreProcessor("us.abstracta.jmeter.javadsl.core.PerformanceTest.staticFunctionToCall(vars)")
+          )
+      )
+    ).run();
+    assertThat(stats.overall().elapsedTimePercentile99()).isLessThan(Duration.ofSeconds(5));
+  }
+  
+  public static void staticFunctionToCall(JMeterVariables vars) {
+    count++;
+    String body = someFunctionToComposeRequestBodyFromCount(count);    
+    vars.put("REQUEST_BODY", body);
+  }
+}
+```
