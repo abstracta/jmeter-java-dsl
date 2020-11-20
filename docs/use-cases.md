@@ -257,37 +257,41 @@ JSR223PostProcessor is a very powerful tool, but is not the only, nor the best, 
 With the standard DSL you can provide static values to request parameters, such as a body. However, you may also want to be able to modify your requests for each call. This is common in cases where your request creates something that must have unique values.
 
 ```java
-package us.abstracta.jmeter.javadsl.core;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.*;
 
 import java.io.IOException;
 import java.time.Duration;
+import org.apache.jmeter.threads.JMeterVariables;
+import org.eclipse.jetty.http.MimeTypes.Type;
 import org.junit.jupiter.api.Test;
-import us.abstracta.jmeter.javadsl.core.TestPlanStats;
 
 public class PerformanceTest {
-  Int count = 0;
 
   @Test
-  public void testPerformance() {
+  public void testPerformance() throws IOException {
+    String requestBodyVarName = "REQUEST_BODY";
     TestPlanStats stats = testPlan(
-      threadGroup(2, 10,
-        httpSampler("http://my.service")
-          .post("${REQUEST_BODY}", contentType)
-          .children(
-            jsr223PreProcessor("us.abstracta.jmeter.javadsl.core.PerformanceTest.staticFunctionToCall(vars)")
-          )
-      )
+        threadGroup(2, 10,
+            httpSampler("http://my.service")
+                .post("${" + requestBodyVarName + "}", Type.TEXT_PLAIN)
+                .children(
+                    jsr223PreProcessor(
+                        "vars.put('" + requestBodyVarName + "', " + getClass().getName()
+                            + ".buildRequestBody(vars))")
+                )
+        )
     ).run();
     assertThat(stats.overall().elapsedTimePercentile99()).isLessThan(Duration.ofSeconds(5));
   }
-  
-  public static void staticFunctionToCall(JMeterVariables vars) {
-    count++;
-    String body = someFunctionToComposeRequestBodyFromCount(count);    
-    vars.put("REQUEST_BODY", body);
+
+  public static String buildRequestBody(JMeterVariables vars) {
+    String countVarName = "REQUEST_COUNT";
+    Integer countVar = (Integer) vars.getObject(countVarName);
+    int count = countVar != null ? countVar + 1 : 1;
+    vars.putObject(countVarName, count);
+    return "MyBody" + count;
   }
+
 }
 ```

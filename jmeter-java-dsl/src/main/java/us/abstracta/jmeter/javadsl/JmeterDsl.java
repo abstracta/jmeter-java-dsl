@@ -147,10 +147,10 @@ public class JmeterDsl {
   /**
    * Builds a JSR223 Pre Processor which allows including custom logic to modify requests.
    *
-   * This post processor is very powerful, and lets you alter request parameters, jmeter context and
+   * This pre processor is very powerful, and lets you alter request parameters, jmeter context and
    * implement any kind of custom logic that you may think.
    *
-   * @param script contains the script to be executed by the post processor. By default this will be
+   * @param script contains the script to be executed by the pre processor. By default this will be
    * a groovy script, but you can change it by setting the language property in the returned post
    * processor.
    * @return the JSR223 Pre Processor instance

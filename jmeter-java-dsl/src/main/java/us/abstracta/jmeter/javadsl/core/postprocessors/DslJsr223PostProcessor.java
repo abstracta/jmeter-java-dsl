@@ -14,9 +14,9 @@ import us.abstracta.jmeter.javadsl.core.DslThreadGroup.ThreadGroupChild;
  * This is a very powerful and flexible component that allows you to modify sample results (like
  * changing the flag if is success or not), jmeter variables, context settings, etc.
  *
- * By default, provided script will be interpreted as groovy script, which is the most performant
- * and default setting for JMeter. If you need, you can use any of JMeter provided scripting
- * languages (beanshell, javascript, jexl, etc) by setting the {@link #language(String)} property.
+ * By default, provided script will be interpreted as groovy script, which is the default setting
+ * for JMeter. If you need, you can use any of JMeter provided scripting languages (beanshell,
+ * javascript, jexl, etc) by setting the {@link #language(String)} property.
  */
 public class DslJsr223PostProcessor extends BaseTestElement implements TestPlanChild,
     ThreadGroupChild,
