@@ -22,6 +22,7 @@ import static us.abstracta.jmeter.javadsl.JmeterDsl.*;
 
 import java.io.IOException;
 import java.time.Duration;
+import java.time.Instant;
 import org.eclipse.jetty.http.MimeTypes.Type;
 import org.junit.jupiter.api.Test;
 import us.abstracta.jmeter.javadsl.core.TestPlanStats;
@@ -36,7 +37,7 @@ public class PerformanceTest {
           .post("{\"name\": \"test\"}", Type.APPLICATION_JSON)
       ),
       //this is just to log details of each request stats
-      jtlWriter("test.jtl")
+      jtlWriter("test" + Instant.now() + ".jtl")
     ).run();
     assertThat(stats.overall().elapsedTimePercentile99()).isLessThan(Duration.ofSeconds(5));
   }

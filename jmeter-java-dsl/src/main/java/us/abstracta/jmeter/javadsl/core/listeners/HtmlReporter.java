@@ -1,6 +1,10 @@
 package us.abstracta.jmeter.javadsl.core.listeners;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.DirectoryNotEmptyException;
+import java.nio.file.FileAlreadyExistsException;
+import java.nio.file.Files;
 import org.apache.jmeter.JMeter;
 import org.apache.jmeter.report.config.ConfigurationException;
 import org.apache.jmeter.report.dashboard.GenerationException;
@@ -24,9 +28,19 @@ public class HtmlReporter extends BaseTestElement implements TestPlanChild, Thre
 
   private final File reportDirectory;
 
-  public HtmlReporter(String reportDirectory) {
+  public HtmlReporter(String reportPath) throws IOException {
     super("Simple Data Writer", SimpleDataWriter.class);
-    this.reportDirectory = new File(reportDirectory);
+    reportDirectory = new File(reportPath);
+    if (reportDirectory.isFile()) {
+      throw new FileAlreadyExistsException(reportPath);
+    }
+    if (reportDirectory.isDirectory() && !isEmptyDirectory(reportDirectory)) {
+      throw new DirectoryNotEmptyException(reportPath);
+    }
+  }
+
+  private boolean isEmptyDirectory(File reportDirectory) throws IOException {
+    return !Files.newDirectoryStream(reportDirectory.toPath()).iterator().hasNext();
   }
 
   @Override

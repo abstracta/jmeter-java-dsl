@@ -1,5 +1,7 @@
 package us.abstracta.jmeter.javadsl;
 
+import java.io.IOException;
+import java.nio.file.FileAlreadyExistsException;
 import java.time.Duration;
 import java.util.Arrays;
 import us.abstracta.jmeter.javadsl.core.DslTestElement;
@@ -165,9 +167,12 @@ public class JmeterDsl {
    *
    * @param jtlFile is the path of the JTL file where to save the results.
    * @return the JtlWriter instance.
+   * @throws FileAlreadyExistsException when a file or directory already exists with the given path.
+   * The idea of this exception is to avoid users unintentionally modifying previous collected
+   * results and don't force any particular structure on collection of reports.
    * @see JtlWriter
    */
-  public static JtlWriter jtlWriter(String jtlFile) {
+  public static JtlWriter jtlWriter(String jtlFile) throws FileAlreadyExistsException {
     return new JtlWriter(jtlFile);
   }
 
@@ -187,11 +192,14 @@ public class JmeterDsl {
   /**
    * Builds an HTML Reporter which allows easily generating HTML reports for test plans.
    *
-   * @param reportDirectory directory where HTML report is generated
+   * @param reportDirectory directory where HTML report is generated.
    * @return the HTML Reporter instance
+   * @throws IOException if reportDirectory is an existing file, or an existing non empty directory.
+   * The idea of this exception is to avoid users unintentionally overwriting previous reports and
+   * don't force any particular structure on collection of reports.
    * @see HtmlReporter
    */
-  public static HtmlReporter htmlReporter(String reportDirectory) {
+  public static HtmlReporter htmlReporter(String reportDirectory) throws IOException {
     return new HtmlReporter(reportDirectory);
   }
 

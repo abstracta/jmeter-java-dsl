@@ -1,5 +1,7 @@
 package us.abstracta.jmeter.javadsl.core.listeners;
 
+import java.io.File;
+import java.nio.file.FileAlreadyExistsException;
 import org.apache.jmeter.reporters.ResultCollector;
 import org.apache.jmeter.testelement.TestElement;
 import org.apache.jmeter.visualizers.SimpleDataWriter;
@@ -28,9 +30,12 @@ public class JtlWriter extends BaseTestElement implements TestPlanChild, ThreadG
 
   private final String jtlFile;
 
-  public JtlWriter(String jtlFile) {
+  public JtlWriter(String jtlFile) throws FileAlreadyExistsException {
     super("Simple Data Writer", SimpleDataWriter.class);
     this.jtlFile = jtlFile;
+    if (new File(jtlFile).exists()) {
+      throw new FileAlreadyExistsException(jtlFile);
+    }
   }
 
   @Override

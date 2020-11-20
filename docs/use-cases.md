@@ -74,9 +74,7 @@ public class SaveTestPlanAsJMX {
     testPlan(
       threadGroup(2, 10,
         httpSampler("http://my.service")
-      ),
-      //this is just to log details of each request stats
-      jtlWriter("test.jtl")
+      )
     ).saveAsJmx("dsl-test-plan.jmx");
   }
   
@@ -198,6 +196,7 @@ import static us.abstracta.jmeter.javadsl.JmeterDsl.*;
 
 import java.io.IOException;
 import java.time.Duration;
+import java.time.Instant;
 import org.junit.jupiter.api.Test;
 import us.abstracta.jmeter.javadsl.core.TestPlanStats;
 
@@ -209,13 +208,15 @@ public class PerformanceTest {
       threadGroup(2, 10,
         httpSampler("http://my.service")
       ),
-      htmlReporter("html-report")
+      htmlReporter("html-report-" + Instant.now())
     ).run();
     assertThat(stats.overall().elapsedTimePercentile99()).isLessThan(Duration.ofSeconds(5));
   }
   
 }
 ```
+
+> **Note:** htmlReporter will throw an exception if provided directory path is a non empty directory or file
 
 ## Change sample result statuses with custom logic
 
