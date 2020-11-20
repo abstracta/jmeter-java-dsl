@@ -1,9 +1,8 @@
 package us.abstracta.jmeter.javadsl.core.preprocessors;
 
 import org.apache.jmeter.modifiers.JSR223PreProcessor;
-import org.apache.jmeter.testbeans.gui.TestBeanGUI;
-import org.apache.jmeter.testelement.TestElement;
-import us.abstracta.jmeter.javadsl.core.BaseTestElement;
+import org.apache.jmeter.util.JSR223TestElement;
+import us.abstracta.jmeter.javadsl.core.DslJsr223TestElement;
 import us.abstracta.jmeter.javadsl.core.DslSampler.SamplerChild;
 import us.abstracta.jmeter.javadsl.core.DslTestPlan.TestPlanChild;
 import us.abstracta.jmeter.javadsl.core.DslThreadGroup.ThreadGroupChild;
@@ -19,28 +18,16 @@ import us.abstracta.jmeter.javadsl.core.DslThreadGroup.ThreadGroupChild;
  * for JMeter. If you need, you can use any of JMeter provided scripting languages (beanshell,
  * javascript, jexl, etc) by setting the {@link #language(String)} property.
  */
-public class DslJsr223PreProcessor extends BaseTestElement implements TestPlanChild,
-    ThreadGroupChild,
-    SamplerChild {
-
-  private final String script;
-  private String language = "groovy";
+public class DslJsr223PreProcessor extends DslJsr223TestElement implements TestPlanChild,
+    ThreadGroupChild, SamplerChild {
 
   public DslJsr223PreProcessor(String script) {
-    super("JSR223 PreProcessor", TestBeanGUI.class);
-    this.script = script;
-  }
-
-  public void language(String language) {
-    this.language = language;
+    super("JSR223 PreProcessor", script);
   }
 
   @Override
-  protected TestElement buildTestElement() {
-    JSR223PreProcessor ret = new JSR223PreProcessor();
-    ret.setProperty("script", script);
-    ret.setProperty("scriptLanguage", language);
-    return ret;
+  protected JSR223TestElement buildJsr223TestElement() {
+    return new JSR223PreProcessor();
   }
 
 }
