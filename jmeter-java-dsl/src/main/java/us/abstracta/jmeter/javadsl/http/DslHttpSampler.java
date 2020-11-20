@@ -10,6 +10,8 @@ import org.eclipse.jetty.http.HttpMethod;
 import org.eclipse.jetty.http.MimeTypes;
 import us.abstracta.jmeter.javadsl.core.DslSampler;
 
+import java.util.function.Supplier;
+
 /**
  * Allows to configure a JMeter HTTP sampler to make HTTP requests in a test plan.
  */
@@ -19,6 +21,7 @@ public class DslHttpSampler extends DslSampler {
   private HttpMethod method = HttpMethod.GET;
   private final HttpHeaders headers = new HttpHeaders();
   private String body;
+  private Supplier<String> bodyGenerator;
 
   public DslHttpSampler(String name, String url) {
     super(name != null ? name : "HTTP Request", HttpTestSampleGui.class, null);
@@ -111,6 +114,16 @@ public class DslHttpSampler extends DslSampler {
 
   private Arguments buildArguments() {
     Arguments args = new Arguments();
+    if (bodyGenerator != null) {
+      String body = bodyGenerator.get();
+      if (body != null) {
+        HTTPArgument arg = new HTTPArgument("", body, false);
+        arg.setAlwaysEncoded(false);
+        args.addArgument(arg);
+      }
+      return args;
+    }
+
     if (body != null) {
       HTTPArgument arg = new HTTPArgument("", body, false);
       arg.setAlwaysEncoded(false);
