@@ -13,6 +13,7 @@ import us.abstracta.jmeter.javadsl.core.listeners.HtmlReporter;
 import us.abstracta.jmeter.javadsl.core.listeners.InfluxDbBackendListener;
 import us.abstracta.jmeter.javadsl.core.listeners.JtlWriter;
 import us.abstracta.jmeter.javadsl.core.postprocessors.DslJsr223PostProcessor;
+import us.abstracta.jmeter.javadsl.core.postprocessors.DslRegexExtractor;
 import us.abstracta.jmeter.javadsl.core.preprocessors.DslJsr223PreProcessor;
 import us.abstracta.jmeter.javadsl.http.DslHttpSampler;
 import us.abstracta.jmeter.javadsl.http.HttpHeaders;
@@ -103,7 +104,8 @@ public class JmeterDsl {
    * Builds an HTTP Request sampler to sample HTTP requests.
    *
    * @param url specifies URL the HTTP Request sampler will hit.
-   * @return the HTTP Request sampler instance.
+   * @return the HTTP Request sampler instance which can be used to define additional settings for
+   * the HTTP request (like method, body, headers, pre & post processors, etc).
    * @see DslHttpSampler
    */
   public static DslHttpSampler httpSampler(String url) {
@@ -123,11 +125,33 @@ public class JmeterDsl {
    * Builds an HTTP header manager which allows setting HTTP headers to be used by HTTPRequest
    * samplers.
    *
-   * @return the HTTP header manager instance
+   * @return the HTTP header manager instance which allows specifying the particular HTTP headers to
+   * use.
    * @see HttpHeaders
    */
   public static HttpHeaders httpHeaders() {
     return new HttpHeaders();
+  }
+
+  /**
+   * Builds a Regex Extractor which allows to use regular expressions to extract different parts of
+   * a sample result (request or response).
+   *
+   * This method provides a simple default implementation with required settings, but more settings
+   * are provided by returned DslRegexExtractor.
+   *
+   * By default when regex is not matched, no variable will be created or modified. On the other
+   * hand when the regex matches it will by default store the first capturing group (part of
+   * expression between parenthesis) matched by the regular expression.
+   *
+   * @param variableName is the name of the variable to be used to store the extracted value to.
+   * @param regex regular expression used to extract part of request or response.
+   * @return the Regex Extractor which can be used to define additional settings to use when
+   * extracting (like defining match number, template, etc).
+   * @see DslRegexExtractor
+   */
+  public static DslRegexExtractor regexExtractor(String variableName, String regex) {
+    return new DslRegexExtractor(variableName, regex);
   }
 
   /**
@@ -182,7 +206,8 @@ public class JmeterDsl {
    *
    * @param influxDbUrl is the URL to connect to the InfluxDB instance where test results should be
    * sent.
-   * @return the Backend Listener instance.
+   * @return the Backend Listener instance which can be used to set additional settings like title,
+   * token & queueSize.
    * @see InfluxDbBackendListener
    */
   public static InfluxDbBackendListener influxDbListener(String influxDbUrl) {

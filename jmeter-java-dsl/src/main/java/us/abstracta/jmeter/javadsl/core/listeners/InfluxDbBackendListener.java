@@ -7,15 +7,12 @@ import org.apache.jmeter.visualizers.backend.BackendListener;
 import org.apache.jmeter.visualizers.backend.BackendListenerGui;
 import org.apache.jmeter.visualizers.backend.influxdb.InfluxdbBackendListenerClient;
 import us.abstracta.jmeter.javadsl.core.BaseTestElement;
-import us.abstracta.jmeter.javadsl.core.DslSampler.SamplerChild;
-import us.abstracta.jmeter.javadsl.core.DslTestPlan.TestPlanChild;
-import us.abstracta.jmeter.javadsl.core.DslThreadGroup.ThreadGroupChild;
+import us.abstracta.jmeter.javadsl.core.MultiScopedTestElement;
 
 /**
  * Test element which publishes all test run metrics to an InfluxDB instance.
  */
-public class InfluxDbBackendListener extends BaseTestElement implements TestPlanChild,
-    ThreadGroupChild, SamplerChild {
+public class InfluxDbBackendListener extends BaseTestElement implements MultiScopedTestElement {
 
   private final String url;
   private String title = "Test jmeter-java-dsl " + Instant.now().toString();

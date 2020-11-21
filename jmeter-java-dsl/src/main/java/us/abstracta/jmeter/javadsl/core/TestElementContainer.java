@@ -16,15 +16,6 @@ public abstract class TestElementContainer<T extends DslTestElement> extends Bas
 
   private List<? extends T> children;
 
-  /**
-   * @deprecated use {@link #TestElementContainer(String, Class, List)} instead to properly support
-   * saving to valid jmx.
-   */
-  @Deprecated
-  protected TestElementContainer(String name, List<? extends T> children) {
-    this(name, null, children);
-  }
-
   protected TestElementContainer(String name, Class<? extends JMeterGUIComponent> guiClass,
       List<? extends T> children) {
     super(name, guiClass);

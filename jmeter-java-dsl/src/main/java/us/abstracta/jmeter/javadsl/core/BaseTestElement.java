@@ -20,15 +20,6 @@ public abstract class BaseTestElement implements DslTestElement {
   private final String name;
   private final Class<? extends JMeterGUIComponent> guiClass;
 
-  /**
-   * @deprecated use {@link #BaseTestElement(String, Class)} instead to properly support saving to
-   * valid jmx.
-   */
-  @Deprecated
-  protected BaseTestElement(String name) {
-    this(name, null);
-  }
-
   protected BaseTestElement(String name, Class<? extends JMeterGUIComponent> guiClass) {
     this.name = name;
     this.guiClass = guiClass;

@@ -14,8 +14,9 @@ public abstract class DslJsr223TestElement extends BaseTestElement {
     this.script = script;
   }
 
-  public void language(String language) {
+  public DslJsr223TestElement language(String language) {
     this.language = language;
+    return this;
   }
 
   @Override

@@ -32,7 +32,7 @@ public class EmbeddedJmeterEngine implements DslJmeterEngine {
   public TestPlanStats run(DslTestPlan testPlan) throws IOException {
     try (JMeterEnvironment env = new JMeterEnvironment()) {
       StandardJMeterEngine engine = new StandardJMeterEngine();
-      HashTree rootTree = new HashTree();
+      HashTree rootTree = new ListedHashTree();
       HashTree testPlanTree = testPlan.buildTreeUnder(rootTree);
 
       AggregatingTestPlanStats stats = new AggregatingTestPlanStats();

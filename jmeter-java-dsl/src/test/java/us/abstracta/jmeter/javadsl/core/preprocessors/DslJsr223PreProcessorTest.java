@@ -18,16 +18,14 @@ public class DslJsr223PreProcessorTest extends JmeterDslTest {
 
   @Test
   public void shouldBuildBodyFromPreProcessor() throws Exception {
-    String requestBodyVarName = "REQUEST_BODY";
     testPlan(
         threadGroup(1, 1,
             JmeterDsl.
                 httpSampler(wiremockUri)
-                .post("${" + requestBodyVarName + "}", MimeTypes.Type.TEXT_PLAIN)
+                .post("${REQUEST_BODY}", MimeTypes.Type.TEXT_PLAIN)
                 .children(
                     jsr223PreProcessor(
-                        "vars.put('" + requestBodyVarName + "', " + getClass().getName()
-                            + ".buildRequestBody())")
+                        "vars.put('REQUEST_BODY', " + getClass().getName() + ".buildRequestBody())")
                 )
         )
     ).run();

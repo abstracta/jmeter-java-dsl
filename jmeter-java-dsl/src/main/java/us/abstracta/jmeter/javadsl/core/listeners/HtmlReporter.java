@@ -16,15 +16,12 @@ import org.apache.jmeter.testelement.TestElement;
 import org.apache.jmeter.util.JMeterUtils;
 import org.apache.jmeter.visualizers.SimpleDataWriter;
 import us.abstracta.jmeter.javadsl.core.BaseTestElement;
-import us.abstracta.jmeter.javadsl.core.DslSampler.SamplerChild;
-import us.abstracta.jmeter.javadsl.core.DslTestPlan.TestPlanChild;
-import us.abstracta.jmeter.javadsl.core.DslThreadGroup.ThreadGroupChild;
+import us.abstracta.jmeter.javadsl.core.MultiScopedTestElement;
 
 /**
  * Generates a nice HTML report at the end of test plan execution.
  */
-public class HtmlReporter extends BaseTestElement implements TestPlanChild, ThreadGroupChild,
-    SamplerChild {
+public class HtmlReporter extends BaseTestElement implements MultiScopedTestElement {
 
   private final File reportDirectory;
 

@@ -9,9 +9,7 @@ import org.apache.jmeter.testelement.TestElement;
 import org.eclipse.jetty.http.HttpHeader;
 import org.eclipse.jetty.http.MimeTypes;
 import us.abstracta.jmeter.javadsl.core.BaseTestElement;
-import us.abstracta.jmeter.javadsl.core.DslSampler.SamplerChild;
-import us.abstracta.jmeter.javadsl.core.DslTestPlan.TestPlanChild;
-import us.abstracta.jmeter.javadsl.core.DslThreadGroup.ThreadGroupChild;
+import us.abstracta.jmeter.javadsl.core.MultiScopedTestElement;
 
 /**
  * This class allows specifying HTTP headers (through an underlying JMeter HttpHeaderManager) to be
@@ -25,8 +23,7 @@ import us.abstracta.jmeter.javadsl.core.DslThreadGroup.ThreadGroupChild;
  * that headers specified at lower scope will overwrite ones specified at higher scope (eg: sampler
  * child headers will overwrite test plan headers).
  */
-public class HttpHeaders extends BaseTestElement implements SamplerChild, ThreadGroupChild,
-    TestPlanChild {
+public class HttpHeaders extends BaseTestElement implements MultiScopedTestElement {
 
   private final Map<String, String> headers = new HashMap<>();
 

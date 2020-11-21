@@ -12,6 +12,11 @@ class JmeterDsl {
   DslHttpSampler httpSampler(String name, String url)
   HttpHeaders httpHeaders()
   JtlWriter jtlWriter(String jtlFile)
+  HtmlReporter htmlReporter(String reportDirectory)
+  InfluxDbBackendListener influxDbListener(String url)
+  DslJsr223PostProcessor jsr223PostProcessor(String script)
+  DslJsr223PreProcessor jsr223PreProcessor(String script)
+  DslRegexExtractor regexExtractor(String variableName, String regex)
 }
 
 package core {
@@ -26,8 +31,7 @@ package core {
     TestElement buildTestElement()
   }
 
-  abstract class TestElementContainer extends BaseTestElement {
-  }
+  abstract class TestElementContainer extends BaseTestElement
 
   class DslTestPlan extends TestElementContainer {
     TestPlanStats run()
@@ -36,32 +40,103 @@ package core {
     {static} DslTestPlan fromJmx(String filePath)
   }
 
-  interface TestPlanChild extends DslTestElement {
-  }
+  interface TestPlanChild extends DslTestElement
 
   interface DslJmeterEngine {
     TestPlanStats run(DslTestPlan testPlan)
   }
 
-  class EmbeddedJmeterEngine implements DslJmeterEngine {
-  }
+  class EmbeddedJmeterEngine implements DslJmeterEngine
 
   class DslThreadGroup extends TestElementContainer implements TestPlanChild {
     int threads
     int iterations
   }
 
-  interface ThreadGroupChild extends DslTestElement {
+  interface ThreadGroupChild extends DslTestElement
+
+  abstract class DslSampler extends TestElementContainer implements ThreadGroupChild
+
+  interface SamplerChild extends DslTestElement
+
+  interface MultiScopedTestElement extends TestPlanChild, ThreadGroupChild, SamplerChild
+
+  package listeners {
+
+    class JtlWriter extends BaseTestElement implements MultiScopedTestElement {
+      String jtlFilePath
+    }
+
+    class HtmlReporter extends BaseTestElement implements MultiScopedTestElement {
+      File reportDirectory
+    }
+
+    class InfluxDbBackendListener extends BaseTestElement implements MultiScopedTestElement {
+      String url
+      String token
+      String title
+      int queueSize
+      InfluxDbBackendListener token(String token)
+      InfluxDbBackendListener title(String token)
+      InfluxDbBackendListener queueSize(int queueSize)
+    }
+
   }
 
-  abstract class DslSampler extends TestElementContainer implements ThreadGroupChild {
+  abstract class DslJsr223TestElement extends BaseTestElement {
+        String script
+        String language
+        DslJsr223TestElement language(String language)
+        abstract DslJsr223TestElement buildJsr223TestElement()
   }
 
-  interface SamplerChild extends DslTestElement {
+  package postprocessors {
+
+    class DslJsr223PostProcessor extends DslJsr223TestElement implements MultiScopedTestElement
+
+    class DslRegexExtractor extends BaseTestElement implements MultiScopedTestElement {
+      String variableName
+      String regex
+      int matchNumber
+      String template
+      String defaultValue
+      TargetField fieldToCheck
+      Scope scope
+      String scopeVariable
+      DslRegexExtractor matchNumber(int matchNumber)
+      DslRegexExtractor template(String template)
+      DslRegexExtractor defaultValue(String defaultValue)
+      DslRegexExtractor fieldToCheck(TargetField fieldToCheck)
+      DslRegexExtractor scope(Scope scope)
+      DslRegexExtractor scopeVariable(String scopeVariable)
+    }
+
+    enum DslRegexExtractor$TargetField {
+      BODY
+      BODY_UNESCAPED
+      BODY_AS_DOCUMENT
+      RESPONSE_HEADERS
+      REQUEST_HEADERS
+      URL
+      RESPONSE_CODE
+      RESPONSE_MESSAGE
+    }
+
+    enum DslRegexExtractor$Scope {
+      ALL
+      MAIN_SAMPLE
+      SUB_SAMPLES
+    }
+
+    DslRegexExtractor ..> DslRegexExtractor$TargetField
+    DslRegexExtractor ..> DslRegexExtractor$Scope
+
   }
 
-  class JtlWriter extends BaseTestElement implements TestPlanChild, ThreadGroupChild, SamplerChild {
-    String jtlFilePath
+  package preprocessors {
+
+    class DslJsr223PreProcessor extends DslJsr223TestElement implements MultiScopedTestElement
+
   }
 
 }
@@ -79,7 +154,7 @@ package http {
     DslHttpSampler children(SamplerChild[] children)
   }
 
-  class HttpHeaders extends BaseTestElement implements TestPlanChild, ThreadGroupChild, SamplerChild {
+  class HttpHeaders extends BaseTestElement implements MultiScopedTestElement {
     HttpHeaders header(String name, String value)
   }
 

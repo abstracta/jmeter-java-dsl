@@ -3,9 +3,7 @@ package us.abstracta.jmeter.javadsl.core.postprocessors;
 import org.apache.jmeter.extractor.JSR223PostProcessor;
 import org.apache.jmeter.util.JSR223TestElement;
 import us.abstracta.jmeter.javadsl.core.DslJsr223TestElement;
-import us.abstracta.jmeter.javadsl.core.DslSampler.SamplerChild;
-import us.abstracta.jmeter.javadsl.core.DslTestPlan.TestPlanChild;
-import us.abstracta.jmeter.javadsl.core.DslThreadGroup.ThreadGroupChild;
+import us.abstracta.jmeter.javadsl.core.MultiScopedTestElement;
 
 /**
  * Allows to run custom logic after getting a sample result.
@@ -17,8 +15,7 @@ import us.abstracta.jmeter.javadsl.core.DslThreadGroup.ThreadGroupChild;
  * for JMeter. If you need, you can use any of JMeter provided scripting languages (beanshell,
  * javascript, jexl, etc) by setting the {@link #language(String)} property.
  */
-public class DslJsr223PostProcessor extends DslJsr223TestElement implements TestPlanChild,
-    ThreadGroupChild, SamplerChild {
+public class DslJsr223PostProcessor extends DslJsr223TestElement implements MultiScopedTestElement {
 
   public DslJsr223PostProcessor(String script) {
     super("JSR223 PostProcessor", script);

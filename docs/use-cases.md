@@ -251,6 +251,8 @@ public class PerformanceTest {
 }
 ```
 
+> Check [DslJsr223PostProcessor](../jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/postprocessors/DslJsr223PostProcessor.java) for more details and additional options.
+
 JSR223PostProcessor is a very powerful tool, but is not the only, nor the best, alternative for many cases where JMeter already provides a better and simpler alternative (eg: asserting response bodies contain some string). Currently, jmeter-java-dsl does not support all the features JMeter provides. So, if you need something already provided by JMeter, please create an issue in GitHub requesting such a feature or submit a pull request with the required support.
    
 ## Provide Request Parameters Programmatically per Request
@@ -271,14 +273,13 @@ public class PerformanceTest {
 
   @Test
   public void testPerformance() throws IOException {
-    String requestBodyVarName = "REQUEST_BODY";
     TestPlanStats stats = testPlan(
         threadGroup(2, 10,
             httpSampler("http://my.service")
-                .post("${" + requestBodyVarName + "}", Type.TEXT_PLAIN)
+                .post("${REQUEST_BODY}", Type.TEXT_PLAIN)
                 .children(
                     jsr223PreProcessor(
-                        "vars.put('" + requestBodyVarName + "', " + getClass().getName()
+                        "vars.put('REQUEST_BODY', " + getClass().getName()
                             + ".buildRequestBody(vars))")
                 )
         )
@@ -296,3 +297,40 @@ public class PerformanceTest {
 
 }
 ```
+
+Check [DslJsr223PreProcessor](../jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/preprocessors/DslJsr223PreProcessor.java) for more details and additional options.
+
+## Use part of a response in a following request
+
+It is a usual requirement while creating a test plan for an application, to be able to use part of a response (e.g.: a generated ID, token, etc) in a subsequent request. This can be easily achieved using JMeter extractors and variables. Here is an example with jmeter-java-dsl:
+
+```java
+import static org.assertj.core.api.Assertions.assertThat;
+import static us.abstracta.jmeter.javadsl.JmeterDsl.*;
+
+import java.io.IOException;
+import java.time.Duration;
+import org.eclipse.jetty.http.MimeTypes.Type;
+import org.junit.jupiter.api.Test;
+
+public class PerformanceTest {
+
+  @Test
+  public void testPerformance() throws IOException {
+    TestPlanStats stats = testPlan(
+        threadGroup(2, 10,
+            httpSampler("http://my.service/accounts")
+                .post("{\"name\": \"John Doe\"}", Type.APPLICATION_JSON)
+                .children(
+                    regexExtractor("ACCOUNT_ID", "\"id\":\"([^\"])\"")
+                ),
+            httpSampler("http://my.service/accounts/${ACCOUNT_ID}")
+        )
+    ).run();
+    assertThat(stats.overall().elapsedTimePercentile99()).isLessThan(Duration.ofSeconds(5));
+  }
+
+}
+```
+
+Check [DslRegexExtractor](../jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/postprocessors/DslRegexExtractor.java) for more details and additional options. 

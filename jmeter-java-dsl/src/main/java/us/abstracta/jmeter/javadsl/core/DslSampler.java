@@ -16,15 +16,6 @@ import us.abstracta.jmeter.javadsl.http.DslHttpSampler;
 public abstract class DslSampler extends
     TestElementContainer<DslSampler.SamplerChild> implements ThreadGroupChild {
 
-  /**
-   * @deprecated use {@link #DslSampler(String, Class, List)} instead to properly support saving to
-   * valid jmx.
-   */
-  @Deprecated
-  protected DslSampler(String name, List<? extends DslSampler.SamplerChild> children) {
-    this(name, null, children);
-  }
-
   protected DslSampler(String name, Class<? extends JMeterGUIComponent> guiClass,
       List<? extends DslSampler.SamplerChild> children) {
     super(name, guiClass, children);
