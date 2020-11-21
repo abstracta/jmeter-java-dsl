@@ -105,7 +105,7 @@ public class JmeterDsl {
    *
    * @param url specifies URL the HTTP Request sampler will hit.
    * @return the HTTP Request sampler instance which can be used to define additional settings for
-   * the HTTP request (like method, body, headers, pre & post processors, etc).
+   * the HTTP request (like method, body, headers, pre &amp; post processors, etc).
    * @see DslHttpSampler
    */
   public static DslHttpSampler httpSampler(String url) {
@@ -207,7 +207,7 @@ public class JmeterDsl {
    * @param influxDbUrl is the URL to connect to the InfluxDB instance where test results should be
    * sent.
    * @return the Backend Listener instance which can be used to set additional settings like title,
-   * token & queueSize.
+   * token &amp; queueSize.
    * @see InfluxDbBackendListener
    */
   public static InfluxDbBackendListener influxDbListener(String influxDbUrl) {

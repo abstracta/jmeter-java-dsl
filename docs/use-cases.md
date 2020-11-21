@@ -322,7 +322,7 @@ public class PerformanceTest {
             httpSampler("http://my.service/accounts")
                 .post("{\"name\": \"John Doe\"}", Type.APPLICATION_JSON)
                 .children(
-                    regexExtractor("ACCOUNT_ID", "\"id\":\"([^\"])\"")
+                    regexExtractor("ACCOUNT_ID", "\"id\":\"([^\"]+)\"")
                 ),
             httpSampler("http://my.service/accounts/${ACCOUNT_ID}")
         )

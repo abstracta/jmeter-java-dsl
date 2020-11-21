@@ -93,7 +93,7 @@ public class DslRegexExtractor extends BaseTestElement implements MultiScopedTes
    * Regular Expression Extractor documentation</a> for more details.
    *
    * A common pattern is to specify this value to a known value (e.g.:
-   * &lt;VAR>_EXTRACTION_FAILURE) and then add some assertion on the variable to mark
+   * &lt;VAR&gt;_EXTRACTION_FAILURE) and then add some assertion on the variable to mark
    * request as failure when the match doesn't work.
    *
    * When not specified then the variable will not be set if no match is found.
