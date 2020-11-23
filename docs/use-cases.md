@@ -251,7 +251,19 @@ public class PerformanceTest {
 }
 ```
 
-> Check [DslJsr223PostProcessor](../jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/postprocessors/DslJsr223PostProcessor.java) for more details and additional options.
+You can also use a Java lambda instead of providing Groovy script, which benefits from Java type safety & IDEs code auto completion:
+
+```java
+jsr223PostProcessor(s -> { 
+  if ("429".equals(s.prev.getResponseCode())) { 
+    s.prev.setSuccessful(true); 
+  } 
+})
+```
+
+> **WARNING:** using this last approach is currently only supported when using embedded JMeter engine (no support for saving to JMX and running it in JMeter GUI, or running it with BlazeMeter).
+
+Check [DslJsr223PostProcessor](../jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/postprocessors/DslJsr223PostProcessor.java) for more details and additional options.
 
 JSR223PostProcessor is a very powerful tool, but is not the only, nor the best, alternative for many cases where JMeter already provides a better and simpler alternative (eg: asserting response bodies contain some string). Currently, jmeter-java-dsl does not support all the features JMeter provides. So, if you need something already provided by JMeter, please create an issue in GitHub requesting such a feature or submit a pull request with the required support.
    
@@ -298,6 +310,14 @@ public class PerformanceTest {
 }
 ```
 
+You can also use a Java lambda instead of providing Groovy script, which benefits from Java type safety & IDEs code auto completion:
+
+```java
+jsr223PreProcessor(s -> s.vars.put("REQUEST_BODY", buildRequestBody(s.vars)))
+```
+
+> **WARNING:** using this last approach is currently only supported when using embedded JMeter engine (no support for saving to JMX and running it in JMeter GUI, or running it with BlazeMeter).
+
 Check [DslJsr223PreProcessor](../jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/preprocessors/DslJsr223PreProcessor.java) for more details and additional options.
 
 ## Use part of a response in a following request
@@ -333,4 +353,6 @@ public class PerformanceTest {
 }
 ```
 
-Check [DslRegexExtractor](../jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/postprocessors/DslRegexExtractor.java) for more details and additional options. 
+Check [DslRegexExtractor](../jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/postprocessors/DslRegexExtractor.java) for more details and additional options.
+
+For more complex scenarios you can use [previously mentioned JSR223 Post processor](#change-sample-result-statuses-with-custom-logic).

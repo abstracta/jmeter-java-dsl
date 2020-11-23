@@ -17,7 +17,8 @@ public class DslJsr223PreProcessorTest extends JmeterDslTest {
   public static final String REQUEST_BODY = "put this in the body";
 
   @Test
-  public void shouldBuildBodyFromPreProcessor() throws Exception {
+  public void shouldUseBodyGeneratedByPreProcessorWhenTestPlanWithJsr223PreProcessor()
+      throws Exception {
     testPlan(
         threadGroup(1, 1,
             JmeterDsl.
@@ -36,5 +37,23 @@ public class DslJsr223PreProcessorTest extends JmeterDslTest {
   public static String buildRequestBody() {
     return REQUEST_BODY;
   }
+
+  @Test
+  public void shouldUseBodyGeneratedByPreProcessorWhenTestPlanWithJsr223PreProcessorWithLambdaScript()
+      throws Exception {
+    testPlan(
+        threadGroup(1, 1,
+            JmeterDsl.
+                httpSampler(wiremockUri)
+                .post("${REQUEST_BODY}", MimeTypes.Type.TEXT_PLAIN)
+                .children(
+                    jsr223PreProcessor(s -> s.vars.put("REQUEST_BODY", buildRequestBody()))
+                )
+        )
+    ).run();
+    wiremockServer.verify(postRequestedFor(anyUrl())
+        .withRequestBody(equalTo(REQUEST_BODY)));
+  }
+
 
 }

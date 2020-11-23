@@ -25,4 +25,18 @@ public class DslJsr223PostProcessorTest extends JmeterDslTest {
     assertThat(stats.overall().errorsCount()).isEqualTo(0);
   }
 
+  @Test
+  public void shouldReportNoFailureWhenJsr223PostProcessorModifiesFailedRequestWithLambdaScript()
+      throws Exception {
+    TestPlanStats stats = testPlan(
+        threadGroup(1, 1,
+            JmeterDsl.httpSampler("invalidUrl")
+                .children(
+                    jsr223PostProcessor(s -> s.prev.setSuccessful(true))
+                )
+        )
+    ).run();
+    assertThat(stats.overall().errorsCount()).isEqualTo(0);
+  }
+
 }
