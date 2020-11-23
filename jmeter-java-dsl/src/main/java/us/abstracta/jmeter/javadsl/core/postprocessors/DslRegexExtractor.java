@@ -24,7 +24,7 @@ public class DslRegexExtractor extends BaseTestElement implements MultiScopedTes
   private int matchNumber = 1;
   private String template = "$1$";
   private String defaultValue;
-  private TargetField fieldToCheck = TargetField.BODY;
+  private TargetField fieldToCheck = TargetField.RESPONSE_BODY;
   private Scope scope = Scope.MAIN_SAMPLE;
   private String scopeVariable;
 
@@ -177,16 +177,16 @@ public class DslRegexExtractor extends BaseTestElement implements MultiScopedTes
     /**
      * Applies the regular extractor to the plain string of the response body.
      */
-    BODY(RegexExtractor::useBody),
+    RESPONSE_BODY(RegexExtractor::useBody),
     /**
      * Applies the regular extractor to the response body replacing all HTML escape codes.
      */
-    BODY_UNESCAPED(RegexExtractor::useUnescapedBody),
+    RESPONSE_BODY_UNESCAPED(RegexExtractor::useUnescapedBody),
     /**
      * Applies the regular extractor to the string representation obtained from parsing the response
      * body with <a href="http://tika.apache.org/1.2/formats.html">Apache Tika</a>.
      */
-    BODY_AS_DOCUMENT(RegexExtractor::useBodyAsDocument),
+    RESPONSE_BODY_AS_DOCUMENT(RegexExtractor::useBodyAsDocument),
     /**
      * Applies the regular extractor to response headers.
      */
@@ -198,7 +198,7 @@ public class DslRegexExtractor extends BaseTestElement implements MultiScopedTes
     /**
      * Applies the regular extractor to the request URL.
      */
-    URL(RegexExtractor::useUrl),
+    REQUEST_URL(RegexExtractor::useUrl),
     /**
      * Applies the regular extractor to response code.
      */

@@ -139,12 +139,12 @@ package core {
     }
 
     enum TargetField {
-      BODY
-      BODY_UNESCAPED
-      BODY_AS_DOCUMENT
+      RESPONSE_BODY
+      RESPONSE_BODY_UNESCAPED
+      RESPONSE_BODY_AS_DOCUMENT
       RESPONSE_HEADERS
       REQUEST_HEADERS
-      URL
+      REQUEST_URL
       RESPONSE_CODE
       RESPONSE_MESSAGE
     }
