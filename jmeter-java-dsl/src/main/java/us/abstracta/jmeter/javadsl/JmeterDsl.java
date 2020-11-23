@@ -199,6 +199,9 @@ public class JmeterDsl {
    * jmeter engine (no support for saving to JMX and running it in JMeter GUI, or running it with
    * BlazeMeter).
    *
+   * Take into consideration that the provided script is invoked from as may threads as defined in
+   * thread group. So make sure that provided logic is thread safe.
+   *
    * @see Jsr223PostProcessorScript
    * @see #jsr223PostProcessor(String)
    */
@@ -213,6 +216,9 @@ public class JmeterDsl {
    * <b>WARNING:</b> Is currently only supported to run these post processors only with embedded
    * jmeter engine (no support for saving to JMX and running it in JMeter GUI, or running it with
    * BlazeMeter).
+   *
+   * Take into consideration that the provided script is invoked from as may threads as defined in
+   * thread group. So make sure that provided logic is thread safe.
    *
    * @see Jsr223PostProcessorScript
    * @see #jsr223PostProcessor(String, String)
@@ -258,6 +264,9 @@ public class JmeterDsl {
    * jmeter engine (no support for saving to JMX and running it in JMeter GUI, or running it with
    * BlazeMeter).
    *
+   * Take into consideration that the provided script is invoked from as may threads as defined in
+   * thread group. So make sure that provided logic is thread safe.
+   *
    * @see Jsr223PreProcessorScript
    * @see #jsr223PreProcessor(String)
    */
@@ -272,6 +281,9 @@ public class JmeterDsl {
    * <b>WARNING:</b> Is currently only supported to run these pre processors only with embedded
    * jmeter engine (no support for saving to JMX and running it in JMeter GUI, or running it with
    * BlazeMeter).
+   *
+   * Take into consideration that the provided script is invoked from as may threads as defined in
+   * thread group. So make sure that provided logic is thread safe.
    *
    * @see Jsr223PreProcessorScript
    * @see #jsr223PreProcessor(String)
