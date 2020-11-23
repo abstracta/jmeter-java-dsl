@@ -143,6 +143,71 @@ public class JmeterDsl {
   }
 
   /**
+   * Builds a JSR223 Pre Processor which allows including custom logic to modify requests.
+   *
+   * This pre processor is very powerful, and lets you alter request parameters, jmeter context and
+   * implement any kind of custom logic that you may think.
+   *
+   * @param script contains the script to be executed by the pre processor. By default this will be
+   * a groovy script, but you can change it by setting the language property in the returned post
+   * processor.
+   * @return the JSR223 Pre Processor instance
+   * @see DslJsr223PreProcessor
+   */
+  public static DslJsr223PreProcessor jsr223PreProcessor(String script) {
+    return new DslJsr223PreProcessor(null, script);
+  }
+
+  /**
+   * Same as {@link #jsr223PreProcessor(String)} but allowing to set a name on the pre processor.
+   *
+   * The name is used as logger name which allows configuring log level, appender, etc, for the pre
+   * processor.
+   *
+   * @see #jsr223PreProcessor(String)
+   **/
+  public static DslJsr223PreProcessor jsr223PreProcessor(String name, String script) {
+    return new DslJsr223PreProcessor(name, script);
+  }
+
+  /**
+   * Same as {@link #jsr223PreProcessor(String)} but allowing to use Java type safety and code
+   * completion when specifying the script.
+   *
+   * <b>WARNING:</b> Is currently only supported to run these pre processors only with embedded
+   * jmeter engine (no support for saving to JMX and running it in JMeter GUI, or running it with
+   * BlazeMeter).
+   *
+   * Take into consideration that the provided script is invoked from as may threads as defined in
+   * thread group. So make sure that provided logic is thread safe.
+   *
+   * @see Jsr223PreProcessorScript
+   * @see #jsr223PreProcessor(String)
+   */
+  public static DslJsr223PreProcessor jsr223PreProcessor(Jsr223PreProcessorScript script) {
+    return new DslJsr223PreProcessor(null, script);
+  }
+
+  /**
+   * Same as {@link #jsr223PreProcessor(String, String)} but allowing to use Java type safety and
+   * code completion when specifying the script.
+   *
+   * <b>WARNING:</b> Is currently only supported to run these pre processors only with embedded
+   * jmeter engine (no support for saving to JMX and running it in JMeter GUI, or running it with
+   * BlazeMeter).
+   *
+   * Take into consideration that the provided script is invoked from as may threads as defined in
+   * thread group. So make sure that provided logic is thread safe.
+   *
+   * @see Jsr223PreProcessorScript
+   * @see #jsr223PreProcessor(String)
+   */
+  public static DslJsr223PreProcessor jsr223PreProcessor(String name,
+      Jsr223PreProcessorScript script) {
+    return new DslJsr223PreProcessor(name, script);
+  }
+
+  /**
    * Builds a Regex Extractor which allows to use regular expressions to extract different parts of
    * a sample result (request or response).
    *
@@ -226,71 +291,6 @@ public class JmeterDsl {
   public static DslJsr223PostProcessor jsr223PostProcessor(String name,
       Jsr223PostProcessorScript script) {
     return new DslJsr223PostProcessor(name, script);
-  }
-
-  /**
-   * Builds a JSR223 Pre Processor which allows including custom logic to modify requests.
-   *
-   * This pre processor is very powerful, and lets you alter request parameters, jmeter context and
-   * implement any kind of custom logic that you may think.
-   *
-   * @param script contains the script to be executed by the pre processor. By default this will be
-   * a groovy script, but you can change it by setting the language property in the returned post
-   * processor.
-   * @return the JSR223 Pre Processor instance
-   * @see DslJsr223PreProcessor
-   */
-  public static DslJsr223PreProcessor jsr223PreProcessor(String script) {
-    return new DslJsr223PreProcessor(null, script);
-  }
-
-  /**
-   * Same as {@link #jsr223PreProcessor(String)} but allowing to set a name on the pre processor.
-   *
-   * The name is used as logger name which allows configuring log level, appender, etc, for the pre
-   * processor.
-   *
-   * @see #jsr223PreProcessor(String)
-   **/
-  public static DslJsr223PreProcessor jsr223PreProcessor(String name, String script) {
-    return new DslJsr223PreProcessor(name, script);
-  }
-
-  /**
-   * Same as {@link #jsr223PreProcessor(String)} but allowing to use Java type safety and code
-   * completion when specifying the script.
-   *
-   * <b>WARNING:</b> Is currently only supported to run these pre processors only with embedded
-   * jmeter engine (no support for saving to JMX and running it in JMeter GUI, or running it with
-   * BlazeMeter).
-   *
-   * Take into consideration that the provided script is invoked from as may threads as defined in
-   * thread group. So make sure that provided logic is thread safe.
-   *
-   * @see Jsr223PreProcessorScript
-   * @see #jsr223PreProcessor(String)
-   */
-  public static DslJsr223PreProcessor jsr223PreProcessor(Jsr223PreProcessorScript script) {
-    return new DslJsr223PreProcessor(null, script);
-  }
-
-  /**
-   * Same as {@link #jsr223PreProcessor(String, String)} but allowing to use Java type safety and
-   * code completion when specifying the script.
-   *
-   * <b>WARNING:</b> Is currently only supported to run these pre processors only with embedded
-   * jmeter engine (no support for saving to JMX and running it in JMeter GUI, or running it with
-   * BlazeMeter).
-   *
-   * Take into consideration that the provided script is invoked from as may threads as defined in
-   * thread group. So make sure that provided logic is thread safe.
-   *
-   * @see Jsr223PreProcessorScript
-   * @see #jsr223PreProcessor(String)
-   */
-  public static DslJsr223PreProcessor jsr223PreProcessor(String name,
-      Jsr223PreProcessorScript script) {
-    return new DslJsr223PreProcessor(name, script);
   }
 
   /**

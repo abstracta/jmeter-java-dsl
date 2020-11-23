@@ -8,15 +8,23 @@ class JmeterDsl {
   DslTestPlan testPlan(TestPlanChild[] children)
   DslThreadGroup threadGroup(int threads, int iterations, ThreadGroupChild[] children)
   DslThreadGroup threadGroup(String name, int threads, int iterations, ThreadGroupChild[] children)
+  DslThreadGroup threadGroup(int threads, Duration duration, ThreadGroupChild[] children)
+  DslThreadGroup threadGroup(String name, int threads, Duration duration, ThreadGroupChild[] children)
   DslHttpSampler httpSampler(String url)
   DslHttpSampler httpSampler(String name, String url)
   HttpHeaders httpHeaders()
-  JtlWriter jtlWriter(String jtlFile)
-  HtmlReporter htmlReporter(String reportDirectory)
-  InfluxDbBackendListener influxDbListener(String url)
-  DslJsr223PostProcessor jsr223PostProcessor(String script)
   DslJsr223PreProcessor jsr223PreProcessor(String script)
+  DslJsr223PreProcessor jsr223PreProcessor(String name, String script)
+  DslJsr223PreProcessor jsr223PreProcessor(Jsr223PreProcessorScript script)
+  DslJsr223PreProcessor jsr223PreProcessor(String name, Jsr223PreProcessorScript script)
   DslRegexExtractor regexExtractor(String variableName, String regex)
+  DslJsr223PostProcessor jsr223PostProcessor(String script)
+  DslJsr223PostProcessor jsr223PostProcessor(String name, String script)
+  DslJsr223PostProcessor jsr223PostProcessor(Jsr223PostProcessorScript script)
+  DslJsr223PostProcessor jsr223PostProcessor(String name, Jsr223PostProcessorScript script)
+  JtlWriter jtlWriter(String jtlFile)
+  InfluxDbBackendListener influxDbListener(String url)
+  HtmlReporter htmlReporter(String reportDirectory)
 }
 
 package core {
@@ -90,9 +98,28 @@ package core {
         abstract DslJsr223TestElement buildJsr223TestElement()
   }
 
+  interface Jsr223Script {
+    void run(Jsr223ScriptVars vars)
+  }
+
+  abstract class Jsr223ScriptVars {
+    JMeterContext ctx
+    JMeterVariables vars
+    Properties props
+    Sampler sampler
+    Logger log
+    String Label
+  }
+
   package postprocessors {
 
     class DslJsr223PostProcessor extends DslJsr223TestElement implements MultiScopedTestElement
+
+    interface Jsr223PostProcessorScript extends Jsr223Script
+
+    class Jsr223PostProcessorScriptVars extends Jsr223ScriptVars {
+      SampleResult prev
+    }
 
     class DslRegexExtractor extends BaseTestElement implements MultiScopedTestElement {
       String variableName
@@ -111,7 +138,7 @@ package core {
       DslRegexExtractor scopeVariable(String scopeVariable)
     }
 
-    enum DslRegexExtractor$TargetField {
+    enum TargetField {
       BODY
       BODY_UNESCAPED
       BODY_AS_DOCUMENT
@@ -122,20 +149,24 @@ package core {
       RESPONSE_MESSAGE
     }
 
-    enum DslRegexExtractor$Scope {
+    enum Scope {
       ALL
       MAIN_SAMPLE
       SUB_SAMPLES
     }
 
-    DslRegexExtractor ..> DslRegexExtractor$TargetField
-    DslRegexExtractor ..> DslRegexExtractor$Scope
+    DslRegexExtractor ..> TargetField
+    DslRegexExtractor ..> Scope
 
   }
 
   package preprocessors {
 
     class DslJsr223PreProcessor extends DslJsr223TestElement implements MultiScopedTestElement
+
+    interface Jsr223PreProcessorScript extends Jsr223Script
+
+    class Jsr223PreProcessorScriptVars extends Jsr223ScriptVars
 
   }
 

@@ -84,7 +84,7 @@ public abstract class DslJsr223TestElement extends BaseTestElement {
     void run(T scriptVars) throws Exception;
   }
 
-  protected static class Jsr223ScriptVars {
+  protected abstract static class Jsr223ScriptVars {
 
     public JMeterContext ctx;
     public JMeterVariables vars;
