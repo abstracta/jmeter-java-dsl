@@ -10,6 +10,7 @@ import us.abstracta.jmeter.javadsl.core.DslTestPlan;
 import us.abstracta.jmeter.javadsl.core.DslTestPlan.TestPlanChild;
 import us.abstracta.jmeter.javadsl.core.DslThreadGroup;
 import us.abstracta.jmeter.javadsl.core.DslThreadGroup.ThreadGroupChild;
+import us.abstracta.jmeter.javadsl.core.assertions.DslResponseAssertion;
 import us.abstracta.jmeter.javadsl.core.listeners.HtmlReporter;
 import us.abstracta.jmeter.javadsl.core.listeners.InfluxDbBackendListener;
 import us.abstracta.jmeter.javadsl.core.listeners.JtlWriter;
@@ -259,6 +260,10 @@ public class JmeterDsl {
    * expression between parenthesis) matched by the regular expression.
    *
    * @param variableName is the name of the variable to be used to store the extracted value to.
+   * Additional variables {@code <variableName>_g<groupId>} will be created for each regular
+   * expression capturing group (segment of regex between parenthesis), being group 0 the entire
+   * match of the regex. {@code <variableName>_g} variable contains the number of matched capturing
+   * groups (not counting the group 0).
    * @param regex regular expression used to extract part of request or response.
    * @return the Regex Extractor which can be used to define additional settings to use when
    * extracting (like defining match number, template, etc).
@@ -331,6 +336,43 @@ public class JmeterDsl {
   public static DslJsr223PostProcessor jsr223PostProcessor(String name,
       PostProcessorScript script) {
     return new DslJsr223PostProcessor(name, script);
+  }
+
+  /**
+   * Builds a Response Assertion to be able to check that obtained sample result is the expected
+   * one.
+   *
+   * JMeter by default uses repose codes (eg: 4xx and 5xx HTTP response codes are error codes) to
+   * determine if a request was success or not, but in some cases this might not be enough or
+   * correct. In some cases applications might not behave in this way, for example, they might
+   * return a 200 HTTP status code but with an error message in the body, or the response might be a
+   * success one, but the information contained within the response is not the expected one to
+   * continue executing the test. In such scenarios you can use response assertions to properly
+   * verify your assumptions before continuing with next request in the test plan.
+   *
+   * By default response assertion will use the response body of the main sample result (not sub
+   * samples as redirects, or embedded resources) to check the specified criteria (substring match,
+   * entire string equality, contained regex or entire regex match) against.
+   *
+   * @return the create Response Assertion which should be modified to apply the proper criteria.
+   * Check {@link DslResponseAssertion} for all available options.
+   * @see DslResponseAssertion
+   */
+  public static DslResponseAssertion responseAssertion() {
+    return new DslResponseAssertion(null);
+  }
+
+  /**
+   * Same as {@link #responseAssertion()} but allowing to set a name on the assertion, which can be
+   * later used to identify assertion results and differentiate it from other assertions.
+   *
+   * @param name is the name to be assigned to the assertion
+   * @return the create Response Assertion which should be modified to apply the proper criteria.
+   * Check {@link DslResponseAssertion} for all available options.
+   * @see #responseAssertion(String)
+   */
+  public static DslResponseAssertion responseAssertion(String name) {
+    return new DslResponseAssertion(name);
   }
 
   /**

@@ -63,6 +63,82 @@ Check [BlazeMeterEngine](../jmeter-java-dsl-blazemeter/src/main/java/us/abstract
 
 > **Warning:** If you use JSR223 Pre or Post processors with Java code (lambdas) instead of strings, or use one of the HTTP Sampler methods which receive a function as parameter, then BlazeMeter execution won't work. You can migrate them to use jsrPreProcessor with string scripts instead. Check for these methods documentation for more details.
 
+## Check for expected response
+
+By default, JMeter marks any HTTP request with a fail response code (4xx or 5xx) as failed, which allows you to easily identify when some request unexpectedly fails. But in many cases this is not enough or desirable, and you need to check for response body (or some other field) to contain (or not contain) certain string. 
+
+This is usually accomplished with the usage of Response Assertions, which provides an easy and fast way to verify that you get the proper response for each step of the test plan, marking the request as failure when such condition is not met. 
+
+Here is an example on how to specify a response assertion in jmeter-java-dsl:
+
+```java
+import static org.assertj.core.api.Assertions.assertThat;
+import static us.abstracta.jmeter.javadsl.JmeterDsl.*;
+
+import java.io.IOException;
+import java.time.Duration;
+import org.eclipse.jetty.http.MimeTypes.Type;
+import org.junit.jupiter.api.Test;
+
+public class PerformanceTest {
+
+  @Test
+  public void testPerformance() throws IOException {
+    TestPlanStats stats = testPlan(
+        threadGroup(2, 10,
+            httpSampler("http://my.service")
+                .children(
+                    responseAssertion().containsSubstrings("OK")
+                )
+        )
+    ).run();
+    assertThat(stats.overall().elapsedTimePercentile99()).isLessThan(Duration.ofSeconds(5));
+  }
+
+}
+```
+
+Check [Response Assertion](../jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/assertions/DslResponseAssertion.java) for more details and additional options
+
+For more complex scenarios you can use (for the time being) [later mentioned JSR223 Post processor](#change-sample-result-statuses-with-custom-logic).  
+
+## Use part of a response in a following request
+
+It is a usual requirement while creating a test plan for an application, to be able to use part of a response (e.g.: a generated ID, token, etc) in a subsequent request. This can be easily achieved using JMeter extractors and variables. Here is an example with jmeter-java-dsl:
+
+```java
+import static org.assertj.core.api.Assertions.assertThat;
+import static us.abstracta.jmeter.javadsl.JmeterDsl.*;
+
+import java.io.IOException;
+import java.time.Duration;
+import org.eclipse.jetty.http.MimeTypes.Type;
+import org.junit.jupiter.api.Test;
+
+public class PerformanceTest {
+
+  @Test
+  public void testPerformance() throws IOException {
+    TestPlanStats stats = testPlan(
+        threadGroup(2, 10,
+            httpSampler("http://my.service/accounts")
+                .post("{\"name\": \"John Doe\"}", Type.APPLICATION_JSON)
+                .children(
+                    regexExtractor("ACCOUNT_ID", "\"id\":\"([^\"]+)\"")
+                ),
+            httpSampler("http://my.service/accounts/${ACCOUNT_ID}")
+        )
+    ).run();
+    assertThat(stats.overall().elapsedTimePercentile99()).isLessThan(Duration.ofSeconds(5));
+  }
+
+}
+```
+
+Check [DslRegexExtractor](../jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/postprocessors/DslRegexExtractor.java) for more details and additional options.
+
+For more complex scenarios you can use [later mentioned JSR223 Post processor](#change-sample-result-statuses-with-custom-logic).
+
 ## Save as JMX
 
 In case you want to load a test plan in JMeter GUI, you can save it just invoking `saveAsJMX` method in the test plan as in following example:
@@ -142,9 +218,9 @@ This can be used to just run existing JMX files, or when DSL has no support for 
 > ```
 
 ## Publish test metrics to [InfluxDB](https://www.influxdata.com/products/influxdb-overview/) and visualizing them in [Grafana](https://grafana.com/)
- 
+
 When running tests with JMeter (and in particular with jmeter-java-dsl) a usual requirement is to be able to store such test runs in a persistent database to later on review such metrics, and compare different test runs. Additionally, jmeter-java-dsl only provides some summary data of test run in the console while it is running, but, since it doesn't provide any sort of UI, doesn't allow to easily analyze such information as it can be done in JMeter GUI.
- 
+
 To overcome these limitations you can use provided support for publishing JMeter test run metrics to InfluxDB, which allows keeping record of all run statistics and, through Grafana, get some nice dashboards like the following one:
 
 ![grafana](influxdb/grafana.png)
@@ -269,8 +345,8 @@ jsr223PostProcessor(s -> {
 
 Check [DslJsr223PostProcessor](../jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/postprocessors/DslJsr223PostProcessor.java) for more details and additional options.
 
-JSR223PostProcessor is a very powerful tool, but is not the only, nor the best, alternative for many cases where JMeter already provides a better and simpler alternative (eg: asserting response bodies contain some string). Currently, jmeter-java-dsl does not support all the features JMeter provides. So, if you need something already provided by JMeter, please create an issue in GitHub requesting such a feature or submit a pull request with the required support.
-   
+**Note:** JSR223PostProcessor is a very powerful tool, but is not the only, nor the best, alternative for many cases where JMeter already provides a better and simpler alternative. For instance, previously mentioned might be implemented with previously presented [Response Assertion](#check-for-expected-response).
+
 ## Provide Request Parameters Programmatically per Request
 
 With the standard DSL you can provide static values to request parameters, such as a body. However, you may also want to be able to modify your requests for each call. This is common in cases where your request creates something that must have unique values.
@@ -329,40 +405,3 @@ post(s -> buildRequestBody(s.vars), Type.TEXT_PLAIN)
 > **WARNING:** using java code (lambdas) will only work with embedded JMeter engine (no support for saving to JMX and running it in JMeter GUI, or running it with BlazeMeter). Use the first option to avoid such limitations.
 
 Check [DslJsr223PreProcessor](../jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/preprocessors/DslJsr223PreProcessor.java) & [DslHttpSampler](../jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/http/DslHttpSampler.java) for more details and additional options.
-
-## Use part of a response in a following request
-
-It is a usual requirement while creating a test plan for an application, to be able to use part of a response (e.g.: a generated ID, token, etc) in a subsequent request. This can be easily achieved using JMeter extractors and variables. Here is an example with jmeter-java-dsl:
-
-```java
-import static org.assertj.core.api.Assertions.assertThat;
-import static us.abstracta.jmeter.javadsl.JmeterDsl.*;
-
-import java.io.IOException;
-import java.time.Duration;
-import org.eclipse.jetty.http.MimeTypes.Type;
-import org.junit.jupiter.api.Test;
-
-public class PerformanceTest {
-
-  @Test
-  public void testPerformance() throws IOException {
-    TestPlanStats stats = testPlan(
-        threadGroup(2, 10,
-            httpSampler("http://my.service/accounts")
-                .post("{\"name\": \"John Doe\"}", Type.APPLICATION_JSON)
-                .children(
-                    regexExtractor("ACCOUNT_ID", "\"id\":\"([^\"]+)\"")
-                ),
-            httpSampler("http://my.service/accounts/${ACCOUNT_ID}")
-        )
-    ).run();
-    assertThat(stats.overall().elapsedTimePercentile99()).isLessThan(Duration.ofSeconds(5));
-  }
-
-}
-```
-
-Check [DslRegexExtractor](../jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/postprocessors/DslRegexExtractor.java) for more details and additional options.
-
-For more complex scenarios you can use [previously mentioned JSR223 Post processor](#change-sample-result-statuses-with-custom-logic).

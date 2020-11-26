@@ -8,7 +8,7 @@ import org.apache.jmeter.threads.JMeterVariables;
 import org.apache.jmeter.util.JSR223TestElement;
 import org.slf4j.Logger;
 import us.abstracta.jmeter.javadsl.core.DslJsr223TestElement;
-import us.abstracta.jmeter.javadsl.core.MultiScopedTestElement;
+import us.abstracta.jmeter.javadsl.core.MultiLevelTestElement;
 
 /**
  * Allows to run custom logic before executing a sampler.
@@ -21,7 +21,7 @@ import us.abstracta.jmeter.javadsl.core.MultiScopedTestElement;
  * for JMeter. If you need, you can use any of JMeter provided scripting languages (beanshell,
  * javascript, jexl, etc) by setting the {@link #language(String)} property.
  */
-public class DslJsr223PreProcessor extends DslJsr223TestElement implements MultiScopedTestElement {
+public class DslJsr223PreProcessor extends DslJsr223TestElement implements MultiLevelTestElement {
 
   private static final String DEFAULT_NAME = "JSR223 PreProcessor";
 

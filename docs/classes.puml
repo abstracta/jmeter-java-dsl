@@ -5,28 +5,7 @@ hide empty members
 hide circle
 
 class JmeterDsl {
-  DslTestPlan testPlan(TestPlanChild[] children)
-  DslThreadGroup threadGroup(int threads, int iterations, ThreadGroupChild[] children)
-  DslThreadGroup threadGroup(String name, int threads, int iterations, ThreadGroupChild[] children)
-  DslThreadGroup threadGroup(int threads, Duration duration, ThreadGroupChild[] children)
-  DslThreadGroup threadGroup(String name, int threads, Duration duration, ThreadGroupChild[] children)
-  DslHttpSampler httpSampler(String url)
-  DslHttpSampler httpSampler(Function<PreProcessorVars, String> urlSupplier)
-  DslHttpSampler httpSampler(String name, String url)
-  DslHttpSampler httpSampler(String name, Function<PreProcessorVars, String> urlSupplier)
-  HttpHeaders httpHeaders()
-  DslJsr223PreProcessor jsr223PreProcessor(String script)
-  DslJsr223PreProcessor jsr223PreProcessor(String name, String script)
-  DslJsr223PreProcessor jsr223PreProcessor(PreProcessorScript script)
-  DslJsr223PreProcessor jsr223PreProcessor(String name, PreProcessorScript script)
-  DslRegexExtractor regexExtractor(String variableName, String regex)
-  DslJsr223PostProcessor jsr223PostProcessor(String script)
-  DslJsr223PostProcessor jsr223PostProcessor(String name, String script)
-  DslJsr223PostProcessor jsr223PostProcessor(PostProcessorScript script)
-  DslJsr223PostProcessor jsr223PostProcessor(String name, PostProcessorScript script)
-  JtlWriter jtlWriter(String jtlFile)
-  InfluxDbBackendListener influxDbListener(String url)
-  HtmlReporter htmlReporter(String reportDirectory)
+  ..
 }
 
 package core {
@@ -63,6 +42,7 @@ package core {
   class DslThreadGroup extends TestElementContainer implements TestPlanChild {
     int threads
     int iterations
+    Duration duration
   }
 
   interface ThreadGroupChild extends DslTestElement
@@ -71,35 +51,12 @@ package core {
 
   interface SamplerChild extends DslTestElement
 
-  interface MultiScopedTestElement extends TestPlanChild, ThreadGroupChild, SamplerChild
-
-  package listeners {
-
-    class JtlWriter extends BaseTestElement implements MultiScopedTestElement {
-      String jtlFilePath
-    }
-
-    class HtmlReporter extends BaseTestElement implements MultiScopedTestElement {
-      File reportDirectory
-    }
-
-    class InfluxDbBackendListener extends BaseTestElement implements MultiScopedTestElement {
-      String url
-      String token
-      String title
-      int queueSize
-      InfluxDbBackendListener token(String token)
-      InfluxDbBackendListener title(String token)
-      InfluxDbBackendListener queueSize(int queueSize)
-    }
-
-  }
+  interface MultiLevelTestElement extends TestPlanChild, ThreadGroupChild, SamplerChild
 
   abstract class DslJsr223TestElement extends BaseTestElement {
-        String script
-        String language
-        DslJsr223TestElement language(String language)
-        abstract DslJsr223TestElement buildJsr223TestElement()
+    String script
+    String language
+    abstract DslJsr223TestElement buildJsr223TestElement()
   }
 
   interface Jsr223Script {
@@ -115,9 +72,19 @@ package core {
     String Label
   }
 
+  package preprocessors {
+
+    class DslJsr223PreProcessor extends DslJsr223TestElement implements MultiLevelTestElement
+
+    interface PreProcessorScript extends Jsr223Script
+
+    class PreProcessorVars extends Jsr223ScriptVars
+
+  }
+
   package postprocessors {
 
-    class DslJsr223PostProcessor extends DslJsr223TestElement implements MultiScopedTestElement
+    class DslJsr223PostProcessor extends DslJsr223TestElement implements MultiLevelTestElement
 
     interface PostProcessorScript extends Jsr223Script
 
@@ -125,7 +92,7 @@ package core {
       SampleResult prev
     }
 
-    class DslRegexExtractor extends BaseTestElement implements MultiScopedTestElement {
+    class DslRegexExtractor extends BaseTestElement implements MultiLevelTestElement {
       String variableName
       String regex
       int matchNumber
@@ -134,12 +101,6 @@ package core {
       TargetField fieldToCheck
       Scope scope
       String scopeVariable
-      DslRegexExtractor matchNumber(int matchNumber)
-      DslRegexExtractor template(String template)
-      DslRegexExtractor defaultValue(String defaultValue)
-      DslRegexExtractor fieldToCheck(TargetField fieldToCheck)
-      DslRegexExtractor scope(Scope scope)
-      DslRegexExtractor scopeVariable(String scopeVariable)
     }
 
     enum TargetField {
@@ -164,13 +125,52 @@ package core {
 
   }
 
-  package preprocessors {
+  package assertions {
+    class DslResponseAssertion extends BaseTestElement  implements MultiLevelTestElement {
+      TargetField fieldToTest
+      boolean ignoreStatus
+      String[] testStrings
+      TestStringStrategy testStrategy
+      boolean invertCheck
+      boolean anyMatch
+    }
 
-    class DslJsr223PreProcessor extends DslJsr223TestElement implements MultiScopedTestElement
+    enum TargetField {
+      RESPONSE_BODY
+      RESPONSE_BODY_AS_DOCUMENT
+      RESPONSE_CODE
+      RESPONSE_MESSAGE
+      RESPONSE_HEADERS
+      REQUEST_HEADERS
+      REQUEST_URL
+      REQUEST_BODY
+    }
 
-    interface PreProcessorScript extends Jsr223Script
+    enum TestStringStrategy {
+      SUBSTRING
+      EQUALS
+      CONTAINS_REGEX
+      MATCHES_REGEX
+    }
 
-    class PreProcessorVars extends Jsr223ScriptVars
+  }
+
+  package listeners {
+
+    class JtlWriter extends BaseTestElement implements MultiLevelTestElement {
+      String jtlFilePath
+    }
+
+    class HtmlReporter extends BaseTestElement implements MultiLevelTestElement {
+      File reportDirectory
+    }
+
+    class InfluxDbBackendListener extends BaseTestElement implements MultiLevelTestElement {
+      String url
+      String token
+      String title
+      int queueSize
+    }
 
   }
 
@@ -182,18 +182,10 @@ package http {
     String url
     HttpMethod method
     String body
-    DslHttpSampler post(String body, Type contentType)
-    DslHttpSampler post(Function<PreProcessorVars, String> bodySupplier, Type contentType)
-    DslHttpSampler method(HttpMethod method)
-    DslHttpSampler body(String body)
-    DslHttpSampler body(Function<PreProcessorVars, String> bodySupplier)
-    DslHttpSampler header(String name, String value)
-    DslHttpSampler header(String name, Function<PreProcessorVars, String> valueSupplier)
-    DslHttpSampler children(SamplerChild[] children)
   }
 
-  class HttpHeaders extends BaseTestElement implements MultiScopedTestElement {
-    HttpHeaders header(String name, String value)
+  class HttpHeaders extends BaseTestElement implements MultiLevelTestElement {
+    Map<String, String> headers
   }
 
 }

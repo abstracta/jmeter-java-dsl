@@ -9,7 +9,7 @@ import org.apache.jmeter.testelement.TestElement;
 import org.eclipse.jetty.http.HttpHeader;
 import org.eclipse.jetty.http.MimeTypes;
 import us.abstracta.jmeter.javadsl.core.BaseTestElement;
-import us.abstracta.jmeter.javadsl.core.MultiScopedTestElement;
+import us.abstracta.jmeter.javadsl.core.MultiLevelTestElement;
 
 /**
  * This class allows specifying HTTP headers (through an underlying JMeter HttpHeaderManager) to be
@@ -23,7 +23,7 @@ import us.abstracta.jmeter.javadsl.core.MultiScopedTestElement;
  * that headers specified at lower scope will overwrite ones specified at higher scope (eg: sampler
  * child headers will overwrite test plan headers).
  */
-public class HttpHeaders extends BaseTestElement implements MultiScopedTestElement {
+public class HttpHeaders extends BaseTestElement implements MultiLevelTestElement {
 
   private final Map<String, String> headers = new HashMap<>();
 

@@ -6,7 +6,7 @@ import org.apache.jmeter.reporters.ResultCollector;
 import org.apache.jmeter.testelement.TestElement;
 import org.apache.jmeter.visualizers.SimpleDataWriter;
 import us.abstracta.jmeter.javadsl.core.BaseTestElement;
-import us.abstracta.jmeter.javadsl.core.MultiScopedTestElement;
+import us.abstracta.jmeter.javadsl.core.MultiLevelTestElement;
 
 /**
  * Allows to generate a result log file (JTL) with data for each sample for a test plan, thread
@@ -23,7 +23,7 @@ import us.abstracta.jmeter.javadsl.core.MultiScopedTestElement;
  * See <a href="http://jmeter.apache.org/usermanual/listeners.html">JMeter listeners doc</a> for
  * more details on JTL format and settings.
  */
-public class JtlWriter extends BaseTestElement implements MultiScopedTestElement {
+public class JtlWriter extends BaseTestElement implements MultiLevelTestElement {
 
   private final String jtlFile;
 

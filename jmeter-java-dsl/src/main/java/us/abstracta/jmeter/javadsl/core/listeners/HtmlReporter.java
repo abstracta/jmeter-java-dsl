@@ -16,12 +16,12 @@ import org.apache.jmeter.testelement.TestElement;
 import org.apache.jmeter.util.JMeterUtils;
 import org.apache.jmeter.visualizers.SimpleDataWriter;
 import us.abstracta.jmeter.javadsl.core.BaseTestElement;
-import us.abstracta.jmeter.javadsl.core.MultiScopedTestElement;
+import us.abstracta.jmeter.javadsl.core.MultiLevelTestElement;
 
 /**
  * Generates a nice HTML report at the end of test plan execution.
  */
-public class HtmlReporter extends BaseTestElement implements MultiScopedTestElement {
+public class HtmlReporter extends BaseTestElement implements MultiLevelTestElement {
 
   private final File reportDirectory;
 

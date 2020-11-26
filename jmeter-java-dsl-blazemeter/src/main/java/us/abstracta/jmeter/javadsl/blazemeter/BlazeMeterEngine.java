@@ -44,9 +44,11 @@ public class BlazeMeterEngine implements DslJmeterEngine {
   private boolean useDebugRun;
 
   /**
-   * @param authToken is the authentication token to be used to access BlazeMeter API.<p> It follows
-   * the following format: &lt;Key ID&gt;:&lt;Key Secret&gt;.<p> Check <a
-   * href="https://guide.blazemeter.com/hc/en-us/articles/115002213289-BlazeMeter-API-keys-">BlazeMeter
+   * @param authToken is the authentication token to be used to access BlazeMeter API.
+   * <p>
+   * It follows the following format: &lt;Key ID&gt;:&lt;Key Secret&gt;.
+   * <p>
+   * Check <a href="https://guide.blazemeter.com/hc/en-us/articles/115002213289-BlazeMeter-API-keys-">BlazeMeter
    * API keys</a> for instructions on how to generate them.
    */
   public BlazeMeterEngine(String authToken) {

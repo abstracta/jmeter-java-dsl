@@ -3,10 +3,9 @@ package us.abstracta.jmeter.javadsl.core.postprocessors;
 import java.util.function.Consumer;
 import org.apache.jmeter.extractor.RegexExtractor;
 import org.apache.jmeter.extractor.gui.RegexExtractorGui;
-import org.apache.jmeter.testelement.AbstractScopedTestElement;
 import org.apache.jmeter.testelement.TestElement;
-import us.abstracta.jmeter.javadsl.core.BaseTestElement;
-import us.abstracta.jmeter.javadsl.core.MultiScopedTestElement;
+import us.abstracta.jmeter.javadsl.core.DslScopedTestElement;
+import us.abstracta.jmeter.javadsl.core.MultiLevelTestElement;
 
 /**
  * Allows to extract part of a request or response using regular expressions to store into a
@@ -17,7 +16,8 @@ import us.abstracta.jmeter.javadsl.core.MultiScopedTestElement;
  * of parenthesis) of the first match of the regex. If no match is found, then the variable will not
  * be created or modified.
  */
-public class DslRegexExtractor extends BaseTestElement implements MultiScopedTestElement {
+public class DslRegexExtractor extends DslScopedTestElement<DslRegexExtractor> implements
+    MultiLevelTestElement {
 
   private final String variableName;
   private final String regex;
@@ -25,8 +25,6 @@ public class DslRegexExtractor extends BaseTestElement implements MultiScopedTes
   private String template = "$1$";
   private String defaultValue;
   private TargetField fieldToCheck = TargetField.RESPONSE_BODY;
-  private Scope scope = Scope.MAIN_SAMPLE;
-  private String scopeVariable;
 
   public DslRegexExtractor(String variableName, String regex) {
     super("name", RegexExtractorGui.class);
@@ -42,11 +40,10 @@ public class DslRegexExtractor extends BaseTestElement implements MultiScopedTes
    * And you use {@code user=([^&]+)} as regular expression. First match (1) would extract {@code
    * test} and second match (2) would extract {@code tester}.
    * <p>
-   * When not specified, the first match will be used.
-   * When 0 is specified, a random match will be used.
-   * When negative, all the matches are extracted, and default value behavior changes. Check <a
-   * href="https://jmeter.apache.org/usermanual/component_reference.html#Regular_Expression_Extractor">JMeter
-   * Regular Expression Extractor documentation</a> for more details.
+   * When not specified, the first match will be used. When 0 is specified, a random match will be
+   * used. When negative, all the matches are extracted to variables with name {@code
+   * <variableName>_<matchNumber>}, the number of matches is stored in {@code
+   * <variableName>_matchNr}, and default value is assigned to {@code <variableName>}.
    *
    * @param matchNumber specifies the match number to use.
    * @return the DslRegexExtractor to allow fluent usage and setting other properties.
@@ -114,41 +111,10 @@ public class DslRegexExtractor extends BaseTestElement implements MultiScopedTes
     return this;
   }
 
-  /**
-   * Allows specifying if the extractor should be specified to main sample and/or sub samples.
-   * <p>
-   * When not specified the regular extractor will only apply to main sample.
-   *
-   * @param scope specifying to what sample result apply the regular extractor to.
-   * @return the DslRegexExtractor to allow fluent usage and setting other properties.
-   * @see Scope
-   */
-  public DslRegexExtractor scope(Scope scope) {
-    this.scope = scope;
-    return this;
-  }
-
-  /**
-   * Allows specifying that the regular extractor should be applied to the contents of a given
-   * JMeter variable.
-   * <p>
-   * This setting overrides any setting on scope and fieldToCheck.
-   *
-   * @param scopeVariable specifies the name of the variable to apply the regular extractor to.
-   * @return the DslRegexExtractor to allow fluent usage and setting other properties.
-   */
-  public DslRegexExtractor scopeVariable(String scopeVariable) {
-    this.scopeVariable = scopeVariable;
-    return this;
-  }
-
   @Override
   protected TestElement buildTestElement() {
     RegexExtractor ret = new RegexExtractor();
-    scope.applyTo(ret);
-    if (scopeVariable != null) {
-      ret.setScopeVariable(scopeVariable);
-    }
+    setScopeTo(ret);
     fieldToCheck.applyTo(ret);
     ret.setRefName(variableName);
     ret.setRegex(regex);
@@ -182,11 +148,13 @@ public class DslRegexExtractor extends BaseTestElement implements MultiScopedTes
      */
     RESPONSE_BODY_AS_DOCUMENT(RegexExtractor::useBodyAsDocument),
     /**
-     * Applies the regular extractor to response headers.
+     * Applies the regular extractor to response headers. Response headers is a string with headers
+     * separated by new lines and names and values separated by colons.
      */
     RESPONSE_HEADERS(RegexExtractor::useHeaders),
     /**
-     * Applies the regular extractor to request headers.
+     * Applies the regular extractor to request headers. Request headers is a string with headers
+     * separated by new lines and names and values separated by colons.
      */
     REQUEST_HEADERS(RegexExtractor::useRequestHeaders),
     /**
@@ -211,36 +179,6 @@ public class DslRegexExtractor extends BaseTestElement implements MultiScopedTes
     private void applyTo(RegexExtractor re) {
       applier.accept(re);
     }
-  }
-
-  /**
-   * Specifies to which samples apply the regular extractor to.
-   */
-  public enum Scope {
-    /**
-     * Applies the regular extractor to all samples (main and sub samples).
-     */
-    ALL_SAMPLES(AbstractScopedTestElement::setScopeAll),
-    /**
-     * Applies the regular extractor only to main sample (sub samples, like redirects, are not
-     * included).
-     */
-    MAIN_SAMPLE(AbstractScopedTestElement::setScopeParent),
-    /**
-     * Applies the regular extractor only to sub samples (redirects, embedded resources, etc).
-     */
-    SUB_SAMPLES(AbstractScopedTestElement::setScopeChildren);
-
-    private final Consumer<RegexExtractor> applier;
-
-    Scope(Consumer<RegexExtractor> applier) {
-      this.applier = applier;
-    }
-
-    private void applyTo(RegexExtractor re) {
-      applier.accept(re);
-    }
-
   }
 
 }
