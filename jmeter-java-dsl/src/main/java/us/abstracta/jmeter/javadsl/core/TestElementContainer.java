@@ -27,6 +27,10 @@ public abstract class TestElementContainer<T extends DslTestElement> extends Bas
     this.children = Arrays.asList(children);
   }
 
+  protected final void setChildren(List<? extends T> children) {
+    this.children = children;
+  }
+
   @Override
   public HashTree buildTreeUnder(HashTree parent) {
     HashTree ret = super.buildTreeUnder(parent);
