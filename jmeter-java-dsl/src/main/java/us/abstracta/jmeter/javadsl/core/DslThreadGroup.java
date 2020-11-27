@@ -11,7 +11,7 @@ import us.abstracta.jmeter.javadsl.core.DslThreadGroup.ThreadGroupChild;
 
 /**
  * Represents the standard thread group test element included by JMeter.
- *
+ * <p/>
  * Additional methods should be added in the future to support setting rump-up, start and end
  * scheduling.
  */
@@ -22,8 +22,7 @@ public class DslThreadGroup extends TestElementContainer<ThreadGroupChild> imple
   private final int iterations;
   private final Duration duration;
 
-  public DslThreadGroup(String name, int threads, int iterations,
-      List<? extends ThreadGroupChild> children) {
+  public DslThreadGroup(String name, int threads, int iterations, List<ThreadGroupChild> children) {
     super(name != null ? name : "Thread Group", ThreadGroupGui.class, children);
     this.threads = threads;
     this.iterations = iterations;
@@ -31,7 +30,7 @@ public class DslThreadGroup extends TestElementContainer<ThreadGroupChild> imple
   }
 
   public DslThreadGroup(String name, int threads, Duration duration,
-      List<? extends ThreadGroupChild> children) {
+      List<ThreadGroupChild> children) {
     super(name != null ? name : "Thread Group", ThreadGroupGui.class, children);
     this.threads = threads;
     this.iterations = 0;

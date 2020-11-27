@@ -61,6 +61,8 @@ Check [BlazeMeterEngine](../jmeter-java-dsl-blazemeter/src/main/java/us/abstract
 ><Logger name="okhttp3" level="DEBUG"/>
 >```
 
+> **Warning:** If you use JSR223 Pre or Post processors with Java code (lambdas) instead of strings, or use one of the HTTP Sampler methods which receive a function as parameter, then BlazeMeter execution won't work. You can migrate them to use jsrPreProcessor with string scripts instead. Check for these methods documentation for more details.
+
 ## Save as JMX
 
 In case you want to load a test plan in JMeter GUI, you can save it just invoking `saveAsJMX` method in the test plan as in following example:
@@ -84,6 +86,8 @@ public class SaveTestPlanAsJMX {
 > Take into consideration that currently there is no automatic way to migrate changes done in JMX to the Java DSL.
 
 This can be helpful to share a Java DSL defined test plan with people not used to the DSL, or to use some JMeter feature (or plugin) that is not yet supported by the DSL (**but, we strongly encourage you to report it as an issue**, so we can implement support for it).
+
+> **Warning:** If you use JSR223 Pre or Post processors with Java code (lambdas) instead of strings, or use one of the HTTP Sampler methods which receive a function as parameter, then the exported JMX will not work in JMeter GUI. You can migrate them to use jsrPreProcessor with string scripts instead. Check for these methods documentation for more details.
 
 ## Run JMX file
 
@@ -316,9 +320,15 @@ You can also use a Java lambda instead of providing Groovy script, which benefit
 jsr223PreProcessor(s -> s.vars.put("REQUEST_BODY", buildRequestBody(s.vars)))
 ```
 
-> **WARNING:** using this last approach is currently only supported when using embedded JMeter engine (no support for saving to JMX and running it in JMeter GUI, or running it with BlazeMeter).
+Or even use this short hand:
 
-Check [DslJsr223PreProcessor](../jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/preprocessors/DslJsr223PreProcessor.java) for more details and additional options.
+```java
+post(s -> buildRequestBody(s.vars), Type.TEXT_PLAIN)
+```
+
+> **WARNING:** using java code (lambdas) will only work with embedded JMeter engine (no support for saving to JMX and running it in JMeter GUI, or running it with BlazeMeter). Use the first option to avoid such limitations.
+
+Check [DslJsr223PreProcessor](../jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/preprocessors/DslJsr223PreProcessor.java) & [DslHttpSampler](../jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/http/DslHttpSampler.java) for more details and additional options.
 
 ## Use part of a response in a following request
 

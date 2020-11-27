@@ -14,7 +14,7 @@ import us.abstracta.jmeter.javadsl.core.MultiScopedTestElement;
 /**
  * This class allows specifying HTTP headers (through an underlying JMeter HttpHeaderManager) to be
  * used by HTTP samplers.
- *
+ * <p/>
  * This test element can be added at different levels (in the same way as HTTPHeaderManager) of a
  * test plan affecting all samplers in the scope were is added. For example if httpHeaders is
  * specified at test plan, then all headers will apply to http samplers; if it is specified on
@@ -33,7 +33,7 @@ public class HttpHeaders extends BaseTestElement implements MultiScopedTestEleme
 
   /**
    * Allows to set an HTTP header to be used by HTTP samplers.
-   *
+   * <p/>
    * To specify multiple headers just invoke this method several times with the different header
    * names and values.
    *

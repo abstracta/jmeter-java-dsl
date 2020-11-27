@@ -11,17 +11,19 @@ class JmeterDsl {
   DslThreadGroup threadGroup(int threads, Duration duration, ThreadGroupChild[] children)
   DslThreadGroup threadGroup(String name, int threads, Duration duration, ThreadGroupChild[] children)
   DslHttpSampler httpSampler(String url)
+  DslHttpSampler httpSampler(Function<PreProcessorVars, String> urlSupplier)
   DslHttpSampler httpSampler(String name, String url)
+  DslHttpSampler httpSampler(String name, Function<PreProcessorVars, String> urlSupplier)
   HttpHeaders httpHeaders()
   DslJsr223PreProcessor jsr223PreProcessor(String script)
   DslJsr223PreProcessor jsr223PreProcessor(String name, String script)
-  DslJsr223PreProcessor jsr223PreProcessor(Jsr223PreProcessorScript script)
-  DslJsr223PreProcessor jsr223PreProcessor(String name, Jsr223PreProcessorScript script)
+  DslJsr223PreProcessor jsr223PreProcessor(PreProcessorScript script)
+  DslJsr223PreProcessor jsr223PreProcessor(String name, PreProcessorScript script)
   DslRegexExtractor regexExtractor(String variableName, String regex)
   DslJsr223PostProcessor jsr223PostProcessor(String script)
   DslJsr223PostProcessor jsr223PostProcessor(String name, String script)
-  DslJsr223PostProcessor jsr223PostProcessor(Jsr223PostProcessorScript script)
-  DslJsr223PostProcessor jsr223PostProcessor(String name, Jsr223PostProcessorScript script)
+  DslJsr223PostProcessor jsr223PostProcessor(PostProcessorScript script)
+  DslJsr223PostProcessor jsr223PostProcessor(String name, PostProcessorScript script)
   JtlWriter jtlWriter(String jtlFile)
   InfluxDbBackendListener influxDbListener(String url)
   HtmlReporter htmlReporter(String reportDirectory)
@@ -39,7 +41,9 @@ package core {
     TestElement buildTestElement()
   }
 
-  abstract class TestElementContainer extends BaseTestElement
+  abstract class TestElementContainer extends BaseTestElement {
+    addChild(DslTestElement child)
+  }
 
   class DslTestPlan extends TestElementContainer {
     TestPlanStats run()
@@ -115,9 +119,9 @@ package core {
 
     class DslJsr223PostProcessor extends DslJsr223TestElement implements MultiScopedTestElement
 
-    interface Jsr223PostProcessorScript extends Jsr223Script
+    interface PostProcessorScript extends Jsr223Script
 
-    class Jsr223PostProcessorScriptVars extends Jsr223ScriptVars {
+    class PostProcessorVars extends Jsr223ScriptVars {
       SampleResult prev
     }
 
@@ -164,9 +168,9 @@ package core {
 
     class DslJsr223PreProcessor extends DslJsr223TestElement implements MultiScopedTestElement
 
-    interface Jsr223PreProcessorScript extends Jsr223Script
+    interface PreProcessorScript extends Jsr223Script
 
-    class Jsr223PreProcessorScriptVars extends Jsr223ScriptVars
+    class PreProcessorVars extends Jsr223ScriptVars
 
   }
 
@@ -178,10 +182,13 @@ package http {
     String url
     HttpMethod method
     String body
-    DslHttpSampler post(String body)
+    DslHttpSampler post(String body, Type contentType)
+    DslHttpSampler post(Function<PreProcessorVars, String> bodySupplier, Type contentType)
     DslHttpSampler method(HttpMethod method)
     DslHttpSampler body(String body)
+    DslHttpSampler body(Function<PreProcessorVars, String> bodySupplier)
     DslHttpSampler header(String name, String value)
+    DslHttpSampler header(String name, Function<PreProcessorVars, String> valueSupplier)
     DslHttpSampler children(SamplerChild[] children)
   }
 

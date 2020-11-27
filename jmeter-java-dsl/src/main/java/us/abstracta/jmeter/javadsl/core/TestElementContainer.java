@@ -1,6 +1,5 @@
 package us.abstracta.jmeter.javadsl.core;
 
-import java.util.Arrays;
 import java.util.List;
 import org.apache.jmeter.gui.JMeterGUIComponent;
 import org.apache.jorphan.collections.HashTree;
@@ -14,21 +13,16 @@ import org.apache.jorphan.collections.HashTree;
  */
 public abstract class TestElementContainer<T extends DslTestElement> extends BaseTestElement {
 
-  private List<? extends T> children;
+  private final List<T> children;
 
   protected TestElementContainer(String name, Class<? extends JMeterGUIComponent> guiClass,
-      List<? extends T> children) {
+      List<T> children) {
     super(name, guiClass);
     this.children = children;
   }
 
-  @SafeVarargs
-  protected final void setChildren(T... children) {
-    this.children = Arrays.asList(children);
-  }
-
-  protected final void setChildren(List<? extends T> children) {
-    this.children = children;
+  protected void addChild(T children) {
+    this.children.add(children);
   }
 
   @Override

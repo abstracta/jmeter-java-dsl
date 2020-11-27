@@ -13,10 +13,10 @@ import us.abstracta.jmeter.javadsl.core.MultiScopedTestElement;
 
 /**
  * Allows to run custom logic after getting a sample result.
- *
+ * <p/>
  * This is a very powerful and flexible component that allows you to modify sample results (like
  * changing the flag if is success or not), jmeter variables, context settings, etc.
- *
+ * <p/>
  * By default, provided script will be interpreted as groovy script, which is the default setting
  * for JMeter. If you need, you can use any of JMeter provided scripting languages (beanshell,
  * javascript, jexl, etc) by setting the {@link #language(String)} property.
@@ -29,8 +29,8 @@ public class DslJsr223PostProcessor extends DslJsr223TestElement implements Mult
     super(name, DEFAULT_NAME, script);
   }
 
-  public DslJsr223PostProcessor(String name, Jsr223PostProcessorScript script) {
-    super(name, DEFAULT_NAME, script, Jsr223PostProcessorScriptVars.class);
+  public DslJsr223PostProcessor(String name, PostProcessorScript script) {
+    super(name, DEFAULT_NAME, script, PostProcessorVars.class);
   }
 
   @Override
@@ -41,17 +41,17 @@ public class DslJsr223PostProcessor extends DslJsr223TestElement implements Mult
   /**
    * Allows to use any java code as script.
    *
-   * @see Jsr223PostProcessorScriptVars for a list of provided variables in script execution
+   * @see PostProcessorVars for a list of provided variables in script execution
    */
-  public interface Jsr223PostProcessorScript extends Jsr223Script<Jsr223PostProcessorScriptVars> {
+  public interface PostProcessorScript extends Jsr223Script<PostProcessorVars> {
 
   }
 
-  public static class Jsr223PostProcessorScriptVars extends Jsr223ScriptVars {
+  public static class PostProcessorVars extends Jsr223ScriptVars {
 
     public SampleResult prev;
 
-    public Jsr223PostProcessorScriptVars(SampleResult prev, JMeterContext ctx, JMeterVariables vars,
+    public PostProcessorVars(SampleResult prev, JMeterContext ctx, JMeterVariables vars,
         Properties props, Sampler sampler, Logger log, String label) {
       super(ctx, vars, props, sampler, log, label);
       this.prev = prev;

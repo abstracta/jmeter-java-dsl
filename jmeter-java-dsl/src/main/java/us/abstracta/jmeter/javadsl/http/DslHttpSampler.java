@@ -1,5 +1,9 @@
 package us.abstracta.jmeter.javadsl.http;
 
+import static us.abstracta.jmeter.javadsl.JmeterDsl.jsr223PreProcessor;
+
+import java.util.ArrayList;
+import java.util.function.Function;
 import org.apache.jmeter.config.Arguments;
 import org.apache.jmeter.protocol.http.control.gui.HttpTestSampleGui;
 import org.apache.jmeter.protocol.http.sampler.HTTPSamplerProxy;
@@ -8,13 +12,11 @@ import org.apache.jmeter.testelement.TestElement;
 import org.apache.jorphan.collections.HashTree;
 import org.eclipse.jetty.http.HttpMethod;
 import org.eclipse.jetty.http.MimeTypes;
+import org.eclipse.jetty.http.MimeTypes.Type;
+import us.abstracta.jmeter.javadsl.JmeterDsl;
 import us.abstracta.jmeter.javadsl.core.DslSampler;
-import us.abstracta.jmeter.javadsl.core.preprocessors.DslJsr223PreProcessor;
-
-import java.util.ArrayList;
-import java.util.function.Function;
-
-import static us.abstracta.jmeter.javadsl.JmeterDsl.jsr223PreProcessor;
+import us.abstracta.jmeter.javadsl.core.preprocessors.DslJsr223PreProcessor.PreProcessorScript;
+import us.abstracta.jmeter.javadsl.core.preprocessors.DslJsr223PreProcessor.PreProcessorVars;
 
 /**
  * Allows to configure a JMeter HTTP sampler to make HTTP requests in a test plan.
@@ -25,19 +27,22 @@ public class DslHttpSampler extends DslSampler {
   private HttpMethod method = HttpMethod.GET;
   private final HttpHeaders headers = new HttpHeaders();
   private String body;
-  private final ArrayList<SamplerChild> children = new ArrayList<>();
 
   public DslHttpSampler(String name, String url) {
-    super(name != null ? name : "HTTP Request", HttpTestSampleGui.class, null);
+    super(buildName(name), HttpTestSampleGui.class, new ArrayList<>());
     this.url = url;
   }
 
-  public DslHttpSampler(String name, Function<DslJsr223PreProcessor.Jsr223PreProcessorScriptVars, String> urlSupplier) {
-    super(name != null ? name : "HTTP Request", HttpTestSampleGui.class, null);
-    this.url = "${URL}";
-    children(jsr223PreProcessor(
-            s -> s.vars.put("URL", urlSupplier.apply(s))
+  public DslHttpSampler(String name, Function<PreProcessorVars, String> urlSupplier) {
+    super(buildName(name), HttpTestSampleGui.class, new ArrayList<>());
+    String variableName = "PRE_PROCESSOR_URL";
+    this.url = "${" + variableName + "}";
+    children(jsr223PreProcessor(s -> s.vars.put(variableName, urlSupplier.apply(s))
     ));
+  }
+
+  private static String buildName(String name) {
+    return name != null ? name : "HTTP Request";
   }
 
   /**
@@ -54,16 +59,27 @@ public class DslHttpSampler extends DslSampler {
   }
 
   /**
-   * Specifies that the sampler should send an HTTP POST to defined URL.
+   * Same as {@link #post(String, Type)} but allowing to use a dynamically calculated body.
+   * <p/>
+   * This method is just an abstraction that uses a JMeter variable as HTTP request body and
+   * calculates the variable with a jsr223PreProcessor.
+   * <p/>
+   * <b>WARNING:</b> As this method internally uses
+   * {@link JmeterDsl#jsr223PreProcessor(PreProcessorScript)}, same limitations and considerations
+   * apply. Check it's documentation. To avoid such limitations you may use {@link #post(String,
+   * Type)} with a JMeter variable instead, and dynamically set the variable with {@link
+   * JmeterDsl#jsr223PreProcessor(String)}.
    *
-   * @param bodyGenerator function to provide the body on each request.
+   * @param bodySupplier function to calculate the body on each request.
    * @param contentType to be sent as Content-Type header in HTTP POST request.
    * @return the altered sampler to allow for fluent API usage.
+   * @see #body(Function)
    */
-  public DslHttpSampler post(Function<DslJsr223PreProcessor.Jsr223PreProcessorScriptVars, String> bodyGenerator, MimeTypes.Type contentType) {
+  public DslHttpSampler post(Function<PreProcessorVars, String> bodySupplier,
+      MimeTypes.Type contentType) {
     return method(HttpMethod.POST)
-            .contentType(contentType)
-            .body(bodyGenerator);
+        .contentType(contentType)
+        .body(bodySupplier);
   }
 
   /**
@@ -79,7 +95,7 @@ public class DslHttpSampler extends DslSampler {
 
   /**
    * Specifies an HTTP header to be sent by the sampler.
-   *
+   * <p/>
    * To specify multiple headers just invoke this method several times with the different header
    * names and values.
    *
@@ -93,21 +109,28 @@ public class DslHttpSampler extends DslSampler {
   }
 
   /**
-   * Specifies an HTTP header to be sent by the sampler.
-   *
-   * To specify multiple headers just invoke this method several times with the different header
-   * names and values.
+   * Same as {@link #header(String, String)} but allows to use dynamically calculated HTTP header
+   * value.
+   * <p/>
+   * This method is just an abstraction that uses a JMeter variable as HTTP header value and
+   * calculates the variable with a jsr223PreProcessor.
+   * <p/>
+   * <b>WARNING:</b> As this method internally uses
+   * {@link JmeterDsl#jsr223PreProcessor(PreProcessorScript)}, same limitations and considerations
+   * apply. Check it's documentation. To avoid such limitations you may use {@link #header(String,
+   * String)} with a JMeter variable instead, and dynamically set the variable with {@link
+   * JmeterDsl#jsr223PreProcessor(String)}.
    *
    * @param name of the HTTP header.
    * @param valueSupplier builds the header value.
    * @return the altered sampler to allow for fluent API usage.
    */
-  public DslHttpSampler header(String name, Function<DslJsr223PreProcessor.Jsr223PreProcessorScriptVars, String> valueSupplier) {
-    headers.header(name, "${HEADER~" + name + "}");
-    children(jsr223PreProcessor(
-            s -> s.vars.put("HEADER~" + name, valueSupplier.apply(s))
-    ));
-    return this;
+  public DslHttpSampler header(String name, Function<PreProcessorVars, String> valueSupplier) {
+    String variableNamePrefix = "PRE_PROCESSOR_HEADER~";
+    headers.header(name, "${" + variableNamePrefix + name + "}");
+    return children(
+        jsr223PreProcessor(s -> s.vars.put(variableNamePrefix + name, valueSupplier.apply(s)))
+    );
   }
 
   /**
@@ -133,17 +156,24 @@ public class DslHttpSampler extends DslSampler {
   }
 
   /**
-   * Specifies the body to be sent in the HTTP request generated by the sampler.
+   * Same as {@link #body(String)} but allows to use dynamically calculated HTTP request body.
+   * <p/>
+   * This method is just an abstraction that uses a JMeter variable as HTTP request body and
+   * calculates the variable with a jsr223PreProcessor.
+   * <p/>
+   * <b>WARNING:</b> As this method internally uses
+   * {@link JmeterDsl#jsr223PreProcessor(PreProcessorScript)}, same limitations and considerations
+   * apply. Check it's documentation.  To avoid such limitations you may use {@link #body(String)}
+   * with a JMeter variable instead, and dynamically set the variable with {@link
+   * JmeterDsl#jsr223PreProcessor(String)}.
    *
-   * @param bodyGenerator function to provide the body on each request.
+   * @param bodySupplier function to calculate the body on each request.
    * @return the altered sampler to allow for fluent API usage.
    */
-  public DslHttpSampler body(Function<DslJsr223PreProcessor.Jsr223PreProcessorScriptVars, String> bodyGenerator) {
-    body("${REQUEST_BODY}");
-    children(jsr223PreProcessor(
-            s -> s.vars.put("REQUEST_BODY", bodyGenerator.apply(s))
-    ));
-    return this;
+  public DslHttpSampler body(Function<PreProcessorVars, String> bodySupplier) {
+    String variableName = "PRE_PROCESSOR_REQUEST_BODY";
+    this.body = "${" + variableName + "}";
+    return children(jsr223PreProcessor(s -> s.vars.put(variableName, bodySupplier.apply(s))));
   }
 
   /**
@@ -154,8 +184,8 @@ public class DslHttpSampler extends DslSampler {
    * @return the altered sampler to allow for fluent API usage.
    */
   public DslHttpSampler children(SamplerChild... children) {
-    for (SamplerChild child: children) {
-      this.children.add(child);
+    for (SamplerChild child : children) {
+      addChild(child);
     }
     return this;
   }
@@ -172,9 +202,7 @@ public class DslHttpSampler extends DslSampler {
   }
 
   private Arguments buildArguments() {
-    setChildren(children);
     Arguments args = new Arguments();
-
     if (body != null) {
       HTTPArgument arg = new HTTPArgument("", body, false);
       arg.setAlwaysEncoded(false);

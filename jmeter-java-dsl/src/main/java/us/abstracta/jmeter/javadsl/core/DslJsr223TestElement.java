@@ -15,6 +15,9 @@ import org.apache.jmeter.util.JMeterUtils;
 import org.apache.jmeter.util.JSR223TestElement;
 import org.slf4j.Logger;
 
+/**
+ * Abstracts common logic used by JSR223 test elements.
+ */
 public abstract class DslJsr223TestElement extends BaseTestElement {
 
   private static int scriptId = 1;

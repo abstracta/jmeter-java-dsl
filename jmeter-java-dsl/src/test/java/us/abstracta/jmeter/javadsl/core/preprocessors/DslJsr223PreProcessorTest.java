@@ -1,9 +1,12 @@
 package us.abstracta.jmeter.javadsl.core.preprocessors;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.*;
-import static us.abstracta.jmeter.javadsl.JmeterDsl.*;
+import static com.github.tomakehurst.wiremock.client.WireMock.anyUrl;
+import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
+import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
+import static us.abstracta.jmeter.javadsl.JmeterDsl.jsr223PreProcessor;
+import static us.abstracta.jmeter.javadsl.JmeterDsl.testPlan;
+import static us.abstracta.jmeter.javadsl.JmeterDsl.threadGroup;
 
-import org.eclipse.jetty.http.HttpMethod;
 import org.eclipse.jetty.http.MimeTypes;
 import org.junit.jupiter.api.Test;
 import us.abstracta.jmeter.javadsl.JmeterDsl;
@@ -31,10 +34,6 @@ public class DslJsr223PreProcessorTest extends JmeterDslTest {
         .withRequestBody(equalTo(REQUEST_BODY)));
   }
 
-  public static String buildRequestBody() {
-    return REQUEST_BODY;
-  }
-
   @Test
   public void shouldUseBodyGeneratedByPreProcessorWhenTestPlanWithJsr223PreProcessorWithLambdaScript()
       throws Exception {
@@ -52,46 +51,8 @@ public class DslJsr223PreProcessorTest extends JmeterDslTest {
         .withRequestBody(equalTo(REQUEST_BODY)));
   }
 
-  public static int bodyCount = 1;
-
-    @Test
-    public void shouldUseBodyAndHeaderGeneratedFunctionalRequest()
-            throws Exception {
-        testPlan(
-                threadGroup(1, 2,
-                        JmeterDsl.
-                                httpSampler(wiremockUri)
-                                .header("Header1", s -> "Value" + bodyCount)
-                                .header("Header2", s -> "Value" + bodyCount)
-                                .post(s -> "Body" + bodyCount, MimeTypes.Type.TEXT_PLAIN)
-                        .children(jsr223PostProcessor(s -> bodyCount++))
-                )
-        ).run();
-        wiremockServer.verify(postRequestedFor(anyUrl())
-                .withHeader("Header1", equalTo("Value1"))
-                .withHeader("Header2", equalTo("Value1"))
-                .withRequestBody(equalTo("Body1")));
-        wiremockServer.verify(postRequestedFor(anyUrl())
-                .withHeader("Header1", equalTo("Value2"))
-                .withHeader("Header2", equalTo("Value2"))
-                .withRequestBody(equalTo("Body2")));
-    }
-
-    public static int urlCount = 1;
-
-    @Test
-    public void shouldUseUrlGeneratedFunctionalRequest()
-            throws Exception {
-        testPlan(
-                threadGroup(1, 2,
-                        JmeterDsl.
-                                httpSampler(s -> wiremockUri + "/" + urlCount)
-                                .method(HttpMethod.GET)
-                                .children(jsr223PostProcessor(s -> urlCount++))
-                )
-        ).run();
-        wiremockServer.verify(getRequestedFor(urlPathEqualTo("/1")));
-        wiremockServer.verify(getRequestedFor(urlPathEqualTo("/2")));
-    }
+  public static String buildRequestBody() {
+    return REQUEST_BODY;
+  }
 
 }

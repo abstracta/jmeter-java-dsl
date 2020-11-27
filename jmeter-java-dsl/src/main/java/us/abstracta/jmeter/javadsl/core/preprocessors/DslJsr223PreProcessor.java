@@ -12,11 +12,11 @@ import us.abstracta.jmeter.javadsl.core.MultiScopedTestElement;
 
 /**
  * Allows to run custom logic before executing a sampler.
- *
+ * <p/>
  * This is a very powerful and flexible component that allows you to modify variables, sampler,
  * context, etc, before running a sampler (for example to generate dynamic requests
  * programmatically).
- *
+ * <p/>
  * By default, provided script will be interpreted as groovy script, which is the default setting
  * for JMeter. If you need, you can use any of JMeter provided scripting languages (beanshell,
  * javascript, jexl, etc) by setting the {@link #language(String)} property.
@@ -29,8 +29,8 @@ public class DslJsr223PreProcessor extends DslJsr223TestElement implements Multi
     super(name, DEFAULT_NAME, script);
   }
 
-  public DslJsr223PreProcessor(String name, Jsr223PreProcessorScript script) {
-    super(name, DEFAULT_NAME, script, Jsr223PreProcessorScriptVars.class);
+  public DslJsr223PreProcessor(String name, PreProcessorScript script) {
+    super(name, DEFAULT_NAME, script, PreProcessorVars.class);
   }
 
   @Override
@@ -41,15 +41,15 @@ public class DslJsr223PreProcessor extends DslJsr223TestElement implements Multi
   /**
    * Allows to use any java code as script.
    *
-   * @see Jsr223PreProcessorScriptVars for a list of provided variables in script execution
+   * @see PreProcessorVars for a list of provided variables in script execution
    */
-  public interface Jsr223PreProcessorScript extends Jsr223Script<Jsr223PreProcessorScriptVars> {
+  public interface PreProcessorScript extends Jsr223Script<PreProcessorVars> {
 
   }
 
-  public static class Jsr223PreProcessorScriptVars extends Jsr223ScriptVars {
+  public static class PreProcessorVars extends Jsr223ScriptVars {
 
-    public Jsr223PreProcessorScriptVars(JMeterContext ctx, JMeterVariables vars, Properties props,
+    public PreProcessorVars(JMeterContext ctx, JMeterVariables vars, Properties props,
         Sampler sampler, Logger log, String label) {
       super(ctx, vars, props, sampler, log, label);
     }

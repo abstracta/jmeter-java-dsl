@@ -36,19 +36,15 @@ public class DslRegexExtractor extends BaseTestElement implements MultiScopedTes
 
   /**
    * Sets the match number to be extracted.
-   *
+   * <p/>
    * For example, if a response looks like this:
-   *
    * <pre>{@code user=test&user=tester}</pre>
-   *
    * And you use {@code user=([^&]+)} as regular expression. First match (1) would extract {@code
    * test} and second match (2) would extract {@code tester}.
-   *
-   * When not specified then the first match will be used.
-   *
-   * When 0 is specified then a random match will be used.
-   *
-   * When negative, then all the matches are extracted, and default value behavior changes. Check <a
+   * <p/>
+   * When not specified, the first match will be used.
+   * When 0 is specified, a random match will be used.
+   * When negative, all the matches are extracted, and default value behavior changes. Check <a
    * href="https://jmeter.apache.org/usermanual/component_reference.html#Regular_Expression_Extractor">JMeter
    * Regular Expression Extractor documentation</a> for more details.
    *
@@ -62,19 +58,17 @@ public class DslRegexExtractor extends BaseTestElement implements MultiScopedTes
 
   /**
    * Specifies the final string to store in the JMeter Variable.
-   *
+   * <p/>
    * The string may contain capturing groups (regular expression segments between parenthesis)
    * references by using {@code $<groupId>$} expressions (eg: {@code $1$} for first group). Check <a
    * href="https://jmeter.apache.org/usermanual/component_reference.html#Regular_Expression_Extractor">JMeter
    * Regular Expression Extractor documentation</a> for more details.
-   *
+   * <p/>
    * For example, if a response looks like this:
-   *
    * <pre>{@code email=tester@abstracta.us}</pre>
-   *
    * And you use {@code user=([^&]+)} as regular expression. Then {@code $1$-$2$} will result in
    * storing in the specified JMeter variable the value {@code tester-abstracta}.
-   *
+   * <p/>
    * When not specified {@code $1$ will be used}.
    *
    * @param template specifies template to use for storing in the JMeter variable.
@@ -87,15 +81,15 @@ public class DslRegexExtractor extends BaseTestElement implements MultiScopedTes
 
   /**
    * Sets the default value to be stored in the JMeter variable when the regex does not match.
-   *
+   * <p/>
    * The behavior is different when match number is negative. Check <a
    * href="https://jmeter.apache.org/usermanual/component_reference.html#Regular_Expression_Extractor">JMeter
    * Regular Expression Extractor documentation</a> for more details.
-   *
+   * <p/>
    * A common pattern is to specify this value to a known value (e.g.:
-   * &lt;VAR&gt;_EXTRACTION_FAILURE) and then add some assertion on the variable to mark
-   * request as failure when the match doesn't work.
-   *
+   * &lt;VAR&gt;_EXTRACTION_FAILURE) and then add some assertion on the variable to mark request as
+   * failure when the match doesn't work.
+   * <p/>
    * When not specified then the variable will not be set if no match is found.
    *
    * @param defaultValue specifies the default value to be used.
@@ -108,7 +102,7 @@ public class DslRegexExtractor extends BaseTestElement implements MultiScopedTes
 
   /**
    * Allows specifying what part of request, response to apply the regular extractor to.
-   *
+   * <p/>
    * When not specified then the regular extractor will be applied to the response body.
    *
    * @param fieldToCheck field to apply the regular extractor to.
@@ -122,7 +116,7 @@ public class DslRegexExtractor extends BaseTestElement implements MultiScopedTes
 
   /**
    * Allows specifying if the extractor should be specified to main sample and/or sub samples.
-   *
+   * <p/>
    * When not specified the regular extractor will only apply to main sample.
    *
    * @param scope specifying to what sample result apply the regular extractor to.
@@ -137,7 +131,7 @@ public class DslRegexExtractor extends BaseTestElement implements MultiScopedTes
   /**
    * Allows specifying that the regular extractor should be applied to the contents of a given
    * JMeter variable.
-   *
+   * <p/>
    * This setting overrides any setting on scope and fieldToCheck.
    *
    * @param scopeVariable specifies the name of the variable to apply the regular extractor to.

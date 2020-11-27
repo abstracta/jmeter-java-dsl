@@ -53,12 +53,12 @@ public class BlazeMeterEngine implements DslJmeterEngine {
 
   /**
    * Sets the name of the BlazeMeter test to use.
-   *
+   * <p/>
    * BlazeMeterEngine will search for a test with the given name in the given project (Check {@link
    * #projectId(long)}) and if one exists, it will update it and use it to run the provided test
    * plan. If a test with the given name does not exist, then it will create a new one to run the
    * given test plan.
-   *
+   * <p/>
    * When not specified, the test name defaults to "jmeter-java-dsl".
    *
    * @param testName specifies the name of the test to update or create in BlazeMeter.
@@ -71,10 +71,10 @@ public class BlazeMeterEngine implements DslJmeterEngine {
 
   /**
    * Specifies the ID of the BlazeMeter project where to run the test.
-   *
+   * <p/>
    * You can get the ID of the project by selecting a given project in BlazeMeter and getting the
    * number right after "/projects" in the URL.
-   *
+   * <p/>
    * When no project ID is specified, then the default one for the user (associated to the given
    * authentication token) is used.
    *
@@ -88,17 +88,17 @@ public class BlazeMeterEngine implements DslJmeterEngine {
 
   /**
    * Specifies a timeout for the entire test execution.
-   *
+   * <p/>
    * If the timeout is reached then the test run will throw a TimeoutException.
-   *
+   * <p/>
    * It is strongly advised to set this timeout properly in each run, according to the expected test
    * execution time plus some additional margin (to consider for additional delays in BlazeMeter
    * test setup and teardown).
-   *
+   * <p/>
    * This timeout exists to avoid any potential problem with BlazeMeter execution not detected by
    * the client, and avoid keeping the test indefinitely running until is interrupted by a user.
    * This is specially annoying when running tests in automated fashion, for example in CI/CD.
-   *
+   * <p/>
    * When not specified, the default timeout will is set to 1 hour.
    *
    * @param testTimeout to be used as time limit for test execution. If execution takes more than
@@ -112,7 +112,7 @@ public class BlazeMeterEngine implements DslJmeterEngine {
 
   /**
    * Specifies a timeout for waiting for test data (metrics) to be available in BlazeMeter.
-   *
+   * <p/>
    * After a test is marked as ENDED in BlazeMeter, it may take a few seconds for the associated
    * final metrics to be available. In some cases, the test is marked as ENDED by BlazeMeter, but
    * the data is never available. This usually happens when there is some problem running the test
@@ -120,10 +120,10 @@ public class BlazeMeterEngine implements DslJmeterEngine {
    * other jmeter error). This timeout makes sure that tests properly fail (throwing a
    * TimeoutException) when they are marked as ENDED and no data is available after the given
    * timeout, and avoids unnecessary wait for test execution timeout.
-   *
+   * <p/>
    * Usually this timeout should not be necessary to change, but the API provides such method in
    * case you need to tune such setting.
-   *
+   * <p/>
    * When not specified, this value will default to 30 seconds.
    *
    * @param availableDataTimeout to wait for available data after a test ends, before throwing a
@@ -137,9 +137,9 @@ public class BlazeMeterEngine implements DslJmeterEngine {
 
   /**
    * Specifies the number of virtual users to use when running the test.
-   *
+   * <p/>
    * This value overwrites any value specified in JMeter test plans thread groups.
-   *
+   * <p/>
    * When not specified, then the last test run (with same name) value or 1 (if none has ever been
    * specified) will be used.
    *
@@ -153,18 +153,18 @@ public class BlazeMeterEngine implements DslJmeterEngine {
 
   /**
    * Sets the duration of time taken to start the specified total users.
-   *
+   * <p/>
    * For example if totalUsers is set to 10, rampUp is 1 minute and holdFor is 10 minutes, it means
    * that it will take 1 minute to start the 10 users (starting them in a linear fashion: 1 user
    * every 6 seconds), and then continue executing the test with the 10 users for 10 additional
    * minutes.
-   *
+   * <p/>
    * This value overwrites any value specified in JMeter test plans thread groups.
-   *
+   * <p/>
    * Take into consideration that BlazeMeter does not support specifying this value in units more
    * granular than minutes, so, if you use a finer grain duration, it will be rounded up to minutes
    * (eg: if you specify 61 seconds, this will be translated into 2 minutes).
-   *
+   * <p/>
    * When not specified, the last test run (with same name) value or 0 (if none has ever been
    * specified) will be used.
    *
@@ -178,13 +178,13 @@ public class BlazeMeterEngine implements DslJmeterEngine {
 
   /**
    * Specifies the number of iterations each virtual user will execute.
-   *
+   * <p/>
    * If both iterations and holdFor are specified, then iterations are ignored and only holdFor is
    * taken into consideration.
-   *
+   * <p/>
    * When neither iterations and holdFor are specified, then the last test run configuration is
    * used, or the criteria specified in the JMeter test plan if no previous test run exists.
-   *
+   * <p/>
    * When specified, this value overwrites any value specified in JMeter test plans thread groups.
    *
    * @param iterations for each virtual users to execute.
@@ -197,17 +197,17 @@ public class BlazeMeterEngine implements DslJmeterEngine {
 
   /**
    * Specifies the duration of time to keep the virtual users running, after the rampUp period.
-   *
+   * <p/>
    * If both iterations and holdFor are specified, then iterations are ignored and only holdFor is
    * taken into consideration.
-   *
+   * <p/>
    * When neither iterations and holdFor are specified, then the last test run configuration is
    * used, or the criteria specified in the JMeter test plan if no previous test run exists.
-   *
+   * <p/>
    * Take into consideration that BlazeMeter does not support specifying this value in units more
    * granular than minutes, so, if you use a finer grain duration, it will be rounded up to minutes
    * (eg: if you specify 61 seconds, this will be translated into 2 minutes).
-   *
+   * <p/>
    * When specified, this value overwrites any value specified in JMeter test plans thread groups.
    *
    * @param holdFor duration to keep virtual users running after the rampUp period.
@@ -221,22 +221,22 @@ public class BlazeMeterEngine implements DslJmeterEngine {
   /**
    * Specifies the number of threads/virtual users to use per BlazeMeter engine (host or
    * container).
-   *
+   * <p/>
    * It is always important to use as less resources (which reduces costs) as possible to generate
    * the required load for the test. Too few resources might lead to misguiding results, since the
    * instances/engines running might be saturating and not properly imposing the expected load upon
    * the system under test. Too much resources might lead to unnecessary expenses (wasted money).
-   *
+   * <p/>
    * This setting, in conjunction with totalUsers, determine the number of engines BlazeMeter will
    * use to run the test. For example, if you specify totalUsers to 500 and 100 threadsPerEngine,
    * then 5 engines will be used to run the test.
-   *
+   * <p/>
    * It is important to set this value appropriately, since different test plans may impose
    * different load in BlazeMeter engines. This in turns ends up defining different limit of number
    * of virtual users per engine that a test run requires to properly measure the performance of the
    * system under test. This process is usually referred as "calibration" and you can read more
    * about it <a href="https://guide.blazemeter.com/hc/en-us/articles/360001456978-Calibrating-a-JMeter-Test">here</a>.
-   *
+   * <p/>
    * When not specified, the value of the last test run will be used, or the default one for your
    * BlazeMeter billing plan if no previous test run exists.
    *

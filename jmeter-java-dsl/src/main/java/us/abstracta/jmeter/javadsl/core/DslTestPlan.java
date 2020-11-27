@@ -15,7 +15,7 @@ import us.abstracta.jmeter.javadsl.core.DslTestPlan.TestPlanChild;
  */
 public class DslTestPlan extends TestElementContainer<TestPlanChild> {
 
-  public DslTestPlan(List<? extends TestPlanChild> children) {
+  public DslTestPlan(List<TestPlanChild> children) {
     super("Test Plan", TestPlanGui.class, children);
   }
 
@@ -38,7 +38,7 @@ public class DslTestPlan extends TestElementContainer<TestPlanChild> {
 
   /**
    * Allows to run the test plan in a given engine.
-   *
+   * <p/>
    * This method is just a simple method which provides fluent API to run the test plans in a given
    * engine.
    *

@@ -8,7 +8,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Contains all statistics collected during the execution of a test plan.
- *
+ * <p/>
  * When using different samples, specify different names on them to be able to get each sampler
  * specific statistics after they run.
  */

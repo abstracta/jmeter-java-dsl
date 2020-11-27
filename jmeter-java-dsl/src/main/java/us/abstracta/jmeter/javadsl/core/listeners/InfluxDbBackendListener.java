@@ -27,10 +27,10 @@ public class InfluxDbBackendListener extends BaseTestElement implements MultiSco
   /**
    * Allows setting a title for the test which will be included in started and ended annotations in
    * "events" measurement.
-   *
+   * <p/>
    * Consider setting this value to something that properly describes your application and the
    * particular test run (some timestamp, some CI/CD build ID, some commit ID, etc).
-   *
+   * <p/>
    * When not specified, this will default to "jmeter-java-dsl" plus the current timestamp.
    *
    * @param title to be included in started and ended annotations.
@@ -43,7 +43,7 @@ public class InfluxDbBackendListener extends BaseTestElement implements MultiSco
 
   /**
    * Allows specifying a token for authentication with InfluxDB 2 instances.
-   *
+   * <p/>
    * Check <a href="https://docs.influxdata.com/influxdb/v2.0/security/">InfluxDB documentation</a>
    * for more details.
    *
@@ -58,11 +58,11 @@ public class InfluxDbBackendListener extends BaseTestElement implements MultiSco
   /**
    * Specifies the length of sample results queue used to asynchronously send the information to
    * InfluxDB.
-   *
+   * <p/>
    * When the queue reaches this limit, then the test plan execution will be affected since sample
    * results will get blocked until there is space in the queue, affecting the general execution of
    * the test plan and in consequence collected metrics.
-   *
+   * <p/>
    * When not specified, this value defaults to 5000.
    *
    * @param queueSize the size of the queue to use
