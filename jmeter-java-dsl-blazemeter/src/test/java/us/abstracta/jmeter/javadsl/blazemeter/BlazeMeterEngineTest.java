@@ -28,7 +28,8 @@ public class BlazeMeterEngineTest {
         .totalUsers(1)
         .iterations(TEST_ITERATIONS)
         .threadsPerEngine(1)
-        .testTimeout(Duration.ofMinutes(10)));
+        .testTimeout(Duration.ofMinutes(10))
+        .useDebugRun());
     assertThat(extractTotalCounts(stats)).isEqualTo(buildBlazemeterExpectedCounts());
   }
 

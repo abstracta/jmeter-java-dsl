@@ -35,6 +35,7 @@ import us.abstracta.jmeter.javadsl.blazemeter.api.Project;
 import us.abstracta.jmeter.javadsl.blazemeter.api.Test;
 import us.abstracta.jmeter.javadsl.blazemeter.api.TestConfig;
 import us.abstracta.jmeter.javadsl.blazemeter.api.TestRun;
+import us.abstracta.jmeter.javadsl.blazemeter.api.TestRunConfig;
 import us.abstracta.jmeter.javadsl.blazemeter.api.TestRunRequestStats;
 import us.abstracta.jmeter.javadsl.blazemeter.api.TestRunStatus;
 import us.abstracta.jmeter.javadsl.blazemeter.api.TestRunSummaryStats;
@@ -112,7 +113,8 @@ public class BlazeMeterClient {
         @Part MultipartBody.Part testFile);
 
     @POST("tests/{testId}/start")
-    Call<ApiResponse<TestRun>> startTest(@Path("testId") long testId);
+    Call<ApiResponse<TestRun>> startTest(@Path("testId") long testId,
+        @Body TestRunConfig testRunConfig);
 
     @GET("masters/{testRunId}/status")
     Call<ApiResponse<TestRunStatus>> findTestRunStatus(@Path("testRunId") long testRunId,
@@ -178,8 +180,8 @@ public class BlazeMeterClient {
     execApiCall(api.uploadTestFile(test.getId(), part));
   }
 
-  public TestRun startTest(Test test) throws IOException {
-    TestRun ret = execApiCall(api.startTest(test.getId()));
+  public TestRun startTest(Test test, TestRunConfig runConfig) throws IOException {
+    TestRun ret = execApiCall(api.startTest(test.getId(), runConfig));
     ret.setTest(test);
     return ret;
   }

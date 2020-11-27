@@ -13,6 +13,7 @@ import us.abstracta.jmeter.javadsl.blazemeter.api.Project;
 import us.abstracta.jmeter.javadsl.blazemeter.api.Test;
 import us.abstracta.jmeter.javadsl.blazemeter.api.TestConfig;
 import us.abstracta.jmeter.javadsl.blazemeter.api.TestRun;
+import us.abstracta.jmeter.javadsl.blazemeter.api.TestRunConfig;
 import us.abstracta.jmeter.javadsl.blazemeter.api.TestRunRequestStats;
 import us.abstracta.jmeter.javadsl.blazemeter.api.TestRunStatus;
 import us.abstracta.jmeter.javadsl.blazemeter.api.TestRunSummaryStats.TestRunLabeledSummary;
@@ -40,6 +41,7 @@ public class BlazeMeterEngine implements DslJmeterEngine {
   private Integer iterations;
   private Duration holdFor;
   private Integer threadsPerEngine;
+  private boolean useDebugRun;
 
   /**
    * @param authToken is the authentication token to be used to access BlazeMeter API.<p> It follows
@@ -248,6 +250,17 @@ public class BlazeMeterEngine implements DslJmeterEngine {
     return this;
   }
 
+  /**
+   * Specifies that the test run will use BlazeMeter debug run feature, not consuming credits but
+   * limited up to 10 threads and 5 mins or 100 iterations.
+   *
+   * @return the modified instance for fluent API usage.
+   */
+  public BlazeMeterEngine useDebugRun() {
+    this.useDebugRun = true;
+    return this;
+  }
+
   @Override
   public TestPlanStats run(DslTestPlan testPlan)
       throws IOException, InterruptedException, TimeoutException {
@@ -269,7 +282,7 @@ public class BlazeMeterEngine implements DslJmeterEngine {
         LOG.info("Created test {}", test.getUrl());
       }
       client.uploadTestFile(test, jmxFile);
-      TestRun testRun = client.startTest(test);
+      TestRun testRun = client.startTest(test, buildTestRunConfig());
       LOG.info("Started test run {}", testRun.getUrl());
       awaitTestEnd(testRun);
       return findTestPlanStats(testRun);
@@ -296,6 +309,14 @@ public class BlazeMeterEngine implements DslJmeterEngine {
         .iterations(iterations)
         .holdFor(holdFor)
         .threadsPerEngine(threadsPerEngine);
+  }
+
+  private TestRunConfig buildTestRunConfig() {
+    TestRunConfig ret = new TestRunConfig();
+    if (useDebugRun) {
+      ret.debugRun();
+    }
+    return ret;
   }
 
   private void awaitTestEnd(TestRun testRun)
