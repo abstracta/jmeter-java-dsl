@@ -38,7 +38,7 @@ public class DslTestPlan extends TestElementContainer<TestPlanChild> {
 
   /**
    * Allows to run the test plan in a given engine.
-   * <p/>
+   * <p>
    * This method is just a simple method which provides fluent API to run the test plans in a given
    * engine.
    *

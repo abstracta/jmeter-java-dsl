@@ -7,10 +7,10 @@ import us.abstracta.jmeter.javadsl.http.DslHttpSampler;
 
 /**
  * Hosts common logic to all samplers.
- * <p/>
+ * <p>
  * In particular it specifies that samplers are {@link ThreadGroupChild} and {@link
  * TestElementContainer} containing {@link SamplerChild}.
- * <p/>
+ * <p>
  * For an example of an implementation of a sampler check {@link DslHttpSampler}.
  */
 public abstract class DslSampler extends

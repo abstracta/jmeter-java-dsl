@@ -60,10 +60,10 @@ public class DslHttpSampler extends DslSampler {
 
   /**
    * Same as {@link #post(String, Type)} but allowing to use a dynamically calculated body.
-   * <p/>
+   * <p>
    * This method is just an abstraction that uses a JMeter variable as HTTP request body and
    * calculates the variable with a jsr223PreProcessor.
-   * <p/>
+   * <p>
    * <b>WARNING:</b> As this method internally uses
    * {@link JmeterDsl#jsr223PreProcessor(PreProcessorScript)}, same limitations and considerations
    * apply. Check it's documentation. To avoid such limitations you may use {@link #post(String,
@@ -95,7 +95,7 @@ public class DslHttpSampler extends DslSampler {
 
   /**
    * Specifies an HTTP header to be sent by the sampler.
-   * <p/>
+   * <p>
    * To specify multiple headers just invoke this method several times with the different header
    * names and values.
    *
@@ -111,10 +111,10 @@ public class DslHttpSampler extends DslSampler {
   /**
    * Same as {@link #header(String, String)} but allows to use dynamically calculated HTTP header
    * value.
-   * <p/>
+   * <p>
    * This method is just an abstraction that uses a JMeter variable as HTTP header value and
    * calculates the variable with a jsr223PreProcessor.
-   * <p/>
+   * <p>
    * <b>WARNING:</b> As this method internally uses
    * {@link JmeterDsl#jsr223PreProcessor(PreProcessorScript)}, same limitations and considerations
    * apply. Check it's documentation. To avoid such limitations you may use {@link #header(String,
@@ -157,10 +157,10 @@ public class DslHttpSampler extends DslSampler {
 
   /**
    * Same as {@link #body(String)} but allows to use dynamically calculated HTTP request body.
-   * <p/>
+   * <p>
    * This method is just an abstraction that uses a JMeter variable as HTTP request body and
    * calculates the variable with a jsr223PreProcessor.
-   * <p/>
+   * <p>
    * <b>WARNING:</b> As this method internally uses
    * {@link JmeterDsl#jsr223PreProcessor(PreProcessorScript)}, same limitations and considerations
    * apply. Check it's documentation.  To avoid such limitations you may use {@link #body(String)}

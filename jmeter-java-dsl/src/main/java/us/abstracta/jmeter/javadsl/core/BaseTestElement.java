@@ -6,12 +6,12 @@ import org.apache.jorphan.collections.HashTree;
 
 /**
  * Provides the basic logic for all {@link DslTestElement}.
- * <p/>
+ * <p>
  * In particular it currently allows to set the name of the TestElement and abstracts building of
  * the tree only requiring, from sub classes, to implement the logic to build the JMeter
  * TestElement. The test element name is particularly useful for later reporting and statistics
  * collection to differentiate metrics for each test element.
- * <p/>
+ * <p>
  * Sub classes may overwrite {@link #buildTreeUnder} if they need additional logic (e.g: {@link
  * TestElementContainer}).
  */

@@ -11,7 +11,7 @@ import us.abstracta.jmeter.javadsl.core.DslThreadGroup.ThreadGroupChild;
 
 /**
  * Represents the standard thread group test element included by JMeter.
- * <p/>
+ * <p>
  * Additional methods should be added in the future to support setting rump-up, start and end
  * scheduling.
  */
