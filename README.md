@@ -2,6 +2,8 @@
 
 Simple Java API to run performance tests, using [JMeter] as engine, in an VCS (versioning control system) and programmers friendly way.
 
+If you like this project, **please give it a star :star:!** This helps the project be more visible, gain relevance and encourages us to invest more effort in new features.
+
 ## Usage
 
 If you use [maven](https://maven.apache.org/what-is-maven.html), just include following dependency:
@@ -91,7 +93,5 @@ The idea is to evaluate if the community (you) is interested in using the librar
 In order to accomplish this, we need you to **please create an issue for any particular feature or need that you have**.
 
 We would also really appreciate pull requests. Check the [CONTRIBUTING](CONTRIBUTING.md) guide for an explanation of main library components and how can you extend the library.
-
-Finally, if you like this project, **please give it a star**, that helps the project to be more visible and gain relevance. 
 
 [JMeter]: http://jmeter.apache.org/
