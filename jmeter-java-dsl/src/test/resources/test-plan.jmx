@@ -9,6 +9,7 @@
     <hashTree>
       <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Thread Group">
         <intProp name="ThreadGroup.num_threads">1</intProp>
+        <intProp name="ThreadGroup.ramp_time">0</intProp>
         <elementProp elementType="LoopController" name="ThreadGroup.main_controller">
           <boolProp name="LoopController.continue_forever">false</boolProp>
           <intProp name="LoopController.loops">3</intProp>

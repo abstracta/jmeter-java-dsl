@@ -1,6 +1,7 @@
 package us.abstracta.jmeter.javadsl.core;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeoutException;
 import org.apache.jmeter.config.Arguments;
@@ -72,7 +73,7 @@ public class DslTestPlan extends TestElementContainer<TestPlanChild> {
     private final HashTree tree;
 
     private JmxTestPlan(HashTree tree) {
-      super(null);
+      super(Collections.emptyList());
       this.tree = tree;
     }
 

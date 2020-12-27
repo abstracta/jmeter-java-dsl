@@ -1,5 +1,7 @@
 package us.abstracta.jmeter.javadsl.core;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import org.apache.jmeter.gui.JMeterGUIComponent;
 import org.apache.jorphan.collections.HashTree;
@@ -13,24 +15,30 @@ import org.apache.jorphan.collections.HashTree;
  */
 public abstract class TestElementContainer<T extends DslTestElement> extends BaseTestElement {
 
-  private final List<T> children;
+  private final List<T> children = new ArrayList<>();
 
   protected TestElementContainer(String name, Class<? extends JMeterGUIComponent> guiClass,
       List<T> children) {
     super(name, guiClass);
-    this.children = children;
+    this.children.addAll(children);
   }
 
-  protected void addChild(T children) {
-    this.children.add(children);
+  /**
+   * Allows specifying children test elements for the sampler, which allow for example extracting
+   * information from HTTP response, alter HTTP request, assert HTTP response contents, etc.
+   *
+   * @param children list of test elements to add as children of this sampler.
+   * @return the altered sampler to allow for fluent API usage.
+   */
+  protected TestElementContainer<T> children(T... children) {
+    this.children.addAll(Arrays.asList(children));
+    return this;
   }
 
   @Override
   public HashTree buildTreeUnder(HashTree parent) {
     HashTree ret = super.buildTreeUnder(parent);
-    if (children != null) {
-      children.forEach(c -> c.buildTreeUnder(ret));
-    }
+    children.forEach(c -> c.buildTreeUnder(ret));
     return ret;
   }
 

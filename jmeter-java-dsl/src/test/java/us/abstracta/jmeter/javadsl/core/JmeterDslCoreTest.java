@@ -10,6 +10,7 @@ import static us.abstracta.jmeter.javadsl.JmeterDsl.jtlWriter;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.testPlan;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.threadGroup;
 
+import com.google.common.base.Stopwatch;
 import com.google.common.io.Resources;
 import java.io.File;
 import java.io.FileWriter;
@@ -57,6 +58,24 @@ public class JmeterDslCoreTest extends JmeterDslTest {
     // we use some threshold in case is not exact due to delays in starting.
     Duration threshold = Duration.ofSeconds(5);
     assertThat(stats.overall().elapsedTime()).isGreaterThan(duration.minus(threshold));
+  }
+
+  @Test
+  public void shouldTakeAtLeastRampUpPeriodRunningTestWhenThreadGroupWithConfiguredRampUp()
+      throws IOException {
+    Duration duration = Duration.ofSeconds(5);
+    Stopwatch time = Stopwatch.createStarted();
+    int threads = 2;
+    /*
+     we need to test with 2 threads and check with half of specified ramp-up do to existing JMeter
+     bug: https://bz.apache.org/bugzilla/show_bug.cgi?id=65031
+     */
+    testPlan(
+        threadGroup(threads, 1)
+            .rampUpPeriod(duration)
+            .children(JmeterDsl.httpSampler(wiremockUri))
+    ).run();
+    assertThat(time.elapsed()).isGreaterThan(duration.minus(duration.dividedBy(threads)));
   }
 
   @Test

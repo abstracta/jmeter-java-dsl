@@ -52,7 +52,7 @@ public class JmeterDsl {
   }
 
   /**
-   * Builds a new thread group with a given test duration.
+   * Builds a new thread group with a given number of threads &amp; iterations.
    *
    * @param threads specifies the number of threads to simulate concurrent virtual users.
    * @param iterations specifies the number of iterations that each virtual user will run of
@@ -80,12 +80,12 @@ public class JmeterDsl {
   }
 
   /**
-   * Builds a new thread group with a given test duration.
+   * Builds a new thread group with a given number of threads &amp; their duration.
    *
    * @param threads to simulate concurrent virtual users.
-   * @param duration to run the test until it stops. Take into consideration that JMeter supports
-   * specifying duration in seconds, so if you specify a smaller granularity (like milliseconds) it
-   * will be rounded up to seconds.
+   * @param duration to keep each thread running for this period of time. Take into consideration
+   * that JMeter supports specifying duration in seconds, so if you specify a smaller granularity
+   * (like milliseconds) it will be rounded up to seconds.
    * @param children contains the test elements that each thread will execute until specified
    * duration is reached.
    * @return the thread group instance.
