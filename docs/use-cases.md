@@ -288,7 +288,7 @@ public class PerformanceTest {
       threadGroup(2, 10,
         httpSampler("http://my.service")
       ),
-      htmlReporter("html-report-" + Instant.now())
+      htmlReporter("html-report-" + Instant.now().toString().replace(":", "-"))
     ).run();
     assertThat(stats.overall().elapsedTimePercentile99()).isLessThan(Duration.ofSeconds(5));
   }
