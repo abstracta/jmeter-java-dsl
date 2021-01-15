@@ -1,7 +1,6 @@
 package us.abstracta.jmeter.javadsl;
 
 import java.io.IOException;
-import java.nio.file.FileAlreadyExistsException;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.function.Function;
@@ -14,6 +13,7 @@ import us.abstracta.jmeter.javadsl.core.assertions.DslResponseAssertion;
 import us.abstracta.jmeter.javadsl.core.listeners.HtmlReporter;
 import us.abstracta.jmeter.javadsl.core.listeners.InfluxDbBackendListener;
 import us.abstracta.jmeter.javadsl.core.listeners.JtlWriter;
+import us.abstracta.jmeter.javadsl.core.listeners.ResponseFileSaver;
 import us.abstracta.jmeter.javadsl.core.postprocessors.DslJsr223PostProcessor;
 import us.abstracta.jmeter.javadsl.core.postprocessors.DslJsr223PostProcessor.PostProcessorScript;
 import us.abstracta.jmeter.javadsl.core.postprocessors.DslRegexExtractor;
@@ -380,13 +380,23 @@ public class JmeterDsl {
    *
    * @param jtlFile is the path of the JTL file where to save the results.
    * @return the JtlWriter instance.
-   * @throws FileAlreadyExistsException when a file or directory already exists with the given path.
-   * The idea of this exception is to avoid users unintentionally modifying previous collected
-   * results and don't force any particular structure on collection of reports.
    * @see JtlWriter
    */
-  public static JtlWriter jtlWriter(String jtlFile) throws FileAlreadyExistsException {
+  public static JtlWriter jtlWriter(String jtlFile) {
     return new JtlWriter(jtlFile);
+  }
+
+  /**
+   * Builds a Response File Saver to generate a file for each response of a sample.
+   *
+   * @param fileNamePrefix the prefix to be used when generating the files. This should contain the
+   * directory location where the files should be generated and can contain a file name prefix for
+   * all file names (eg: target/response-files/response-).
+   * @return the ResponseFileSaver instance.
+   * @see ResponseFileSaver
+   */
+  public static ResponseFileSaver responseFileSaver(String fileNamePrefix) {
+    return new ResponseFileSaver(fileNamePrefix);
   }
 
   /**

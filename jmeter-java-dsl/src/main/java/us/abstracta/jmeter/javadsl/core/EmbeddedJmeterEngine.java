@@ -45,11 +45,11 @@ public class EmbeddedJmeterEngine implements DslJmeterEngine {
     }
   }
 
-  private static class JMeterEnvironment implements Closeable {
+  public static class JMeterEnvironment implements Closeable {
 
     private final File homeDir;
 
-    private JMeterEnvironment() throws IOException {
+    public JMeterEnvironment() throws IOException {
       homeDir = Files.createTempDirectory("jmeter-java-dsl").toFile();
       try {
         JMeterUtils.setJMeterHome(homeDir.getPath());

@@ -6,11 +6,14 @@ import static us.abstracta.jmeter.javadsl.JmeterDsl.htmlReporter;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.testPlan;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.threadGroup;
 
+import com.google.common.io.Resources;
+import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.time.Instant;
+import org.eclipse.jetty.http.MimeTypes.Type;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import us.abstracta.jmeter.javadsl.JmeterDsl;
@@ -83,6 +86,47 @@ public class JtlWriterTest extends JmeterDslTest {
       filePath.toFile().createNewFile();
       htmlReporter(filePath.toString());
     });
+  }
+
+  @Test
+  public void shouldWriteDefaultSampleFieldsWhenJtlWithDefaultSettings(@TempDir Path tempDir)
+      throws Exception {
+    Path resultsFilePath = tempDir.resolve(RESULTS_JTL);
+    testPlan(
+        threadGroup(1, 1,
+            JmeterDsl.httpSampler(wiremockUri)
+                .post(JSON_BODY, Type.APPLICATION_JSON)
+                .children(
+                    JmeterDsl.jtlWriter(resultsFilePath.toString())
+                ),
+            JmeterDsl.httpSampler(wiremockUri)
+        )
+    ).run();
+    assertFileMatchesTemplate(resultsFilePath, "/default-jtl.template.csv");
+  }
+
+  private void assertFileMatchesTemplate(Path resultsFilePath, String templateName)
+      throws IOException, URISyntaxException {
+    FileTemplateAssert.assertThat(resultsFilePath)
+        .matches(new File(Resources.getResource(getClass(), templateName).toURI()).toPath());
+  }
+
+  @Test
+  public void shouldWriteAllSampleFieldsWhenJtlWithAllFieldsEnabled(@TempDir Path tempDir)
+      throws Exception {
+    Path resultsFilePath = tempDir.resolve(RESULTS_JTL);
+    testPlan(
+        threadGroup(1, 1,
+            JmeterDsl.httpSampler(wiremockUri)
+                .post(JSON_BODY, Type.APPLICATION_JSON)
+                .children(
+                    JmeterDsl.jtlWriter(resultsFilePath.toString())
+                        .withAllFields(true)
+                ),
+            JmeterDsl.httpSampler(wiremockUri)
+        )
+    ).run();
+    assertFileMatchesTemplate(resultsFilePath, "/complete-jtl.template.xml");
   }
 
 }

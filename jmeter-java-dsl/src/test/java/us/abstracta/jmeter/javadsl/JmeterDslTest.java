@@ -4,6 +4,11 @@ import static com.github.tomakehurst.wiremock.client.WireMock.any;
 import static com.github.tomakehurst.wiremock.client.WireMock.anyUrl;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
+import com.google.common.io.Resources;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
@@ -41,6 +46,14 @@ public abstract class JmeterDslTest {
     expectedStats.put(SAMPLE_1_LABEL, (long) TEST_ITERATIONS);
     expectedStats.put(SAMPLE_2_LABEL, (long) TEST_ITERATIONS);
     return expectedStats;
+  }
+
+  protected String getFileContents(Path filePath) throws IOException {
+    return String.join("\n", Files.readAllLines(filePath, StandardCharsets.UTF_8));
+  }
+
+  protected String getResourceContents(String resourcePath) throws IOException {
+    return Resources.toString(getClass().getResource(resourcePath), StandardCharsets.UTF_8);
   }
 
 }

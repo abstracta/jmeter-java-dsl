@@ -49,7 +49,7 @@ public class PerformanceTest {
 ```
 > This test is using `BZ_TOKEN` (a custom environment variable) to get the BlazeMeter API authentication credentials (with `<KEY_ID>:<KEY_SECRET>` format).
 
-Note that is as simple as [generating a BlazeMeter authentication token](https://guide.blazemeter.com/hc/en-us/articles/115002213289-BlazeMeter-API-keys-) and adding `.runIn(new BlazeMeterEngine(...))` to any existing `jmeter-java-dsl` test to get it running at scale in BlazeMeter (with the rest of features provided by BlazeMeter, like the nice reporting it provides and historic data tracking). Here is an example of how a test would look like in BlazMeter:
+Note that is as simple as [generating a BlazeMeter authentication token](https://guide.blazemeter.com/hc/en-us/articles/115002213289-BlazeMeter-API-keys-) and adding `.runIn(new BlazeMeterEngine(...))` to any existing jmeter-java-dsl test to get it running at scale in BlazeMeter (with the rest of features provided by BlazeMeter, like the nice reporting it provides and historic data tracking). Here is an example of how a test would look like in BlazMeter:
 
 ![blazemeter.png](blazemeter.png) 
 
@@ -62,6 +62,104 @@ Check [BlazeMeterEngine](../jmeter-java-dsl-blazemeter/src/main/java/us/abstract
 >```
 
 > **Warning:** If you use JSR223 Pre or Post processors with Java code (lambdas) instead of strings, or use one of the HTTP Sampler methods which receive a function as parameter, then BlazeMeter execution won't work. You can migrate them to use jsrPreProcessor with string scripts instead. Check for these methods documentation for more details.
+>
+
+## Log requests and responses
+
+The main mechanism provided by JMeter (and jmeter-java-dsl) to get information about generated requests, obtained responses and associated metrics is through the generation of JTL files.
+
+This can be easily achieved in jmeter-java-dsl by using provided `jtlWriter` like in this example:
+
+```java
+import static org.assertj.core.api.Assertions.assertThat;
+import static us.abstracta.jmeter.javadsl.JmeterDsl.*;
+
+import java.io.IOException;
+import java.time.Duration;
+import java.time.Instant;
+import org.eclipse.jetty.http.MimeTypes.Type;
+import org.junit.jupiter.api.Test;
+import us.abstracta.jmeter.javadsl.core.TestPlanStats;
+
+public class PerformanceTest {
+
+  @Test
+  public void testPerformance() throws IOException {
+    TestPlanStats stats = testPlan(
+      threadGroup(2, 10,
+        httpSampler("http://my.service")
+      ),
+      jtlWriter("test" + Instant.now().toString().replace(":", "-") + ".jtl")
+    ).run();
+    assertThat(stats.overall().elapsedTimePercentile99()).isLessThan(Duration.ofSeconds(5));
+  }
+  
+}
+```
+
+By default, `jtlWriter` will write most used information to evaluate performance of tested service. If you want to trace all information of each request you may use `jtlWriter` with `withAllFields(true)` option. Doing this will provide all the information at the cost of additional computation and resources usage (less resources for actual load testing). You can tune which fields to include or not with `jtlWriter` and only log what you need, check [JtlWriter](../jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/listeners/JtlWriter.java) for more details. 
+
+An additional option, specially targeted towards logging sample responses, is `responseFileSaver` which automatically generates a file for each received response. Here is an example:
+
+```java
+ import static org.assertj.core.api.Assertions.assertThat;
+ import static us.abstracta.jmeter.javadsl.JmeterDsl.*;
+ 
+ import java.io.IOException;
+ import java.time.Duration;
+ import java.time.Instant;
+ import org.eclipse.jetty.http.MimeTypes.Type;
+ import org.junit.jupiter.api.Test;
+ import us.abstracta.jmeter.javadsl.core.TestPlanStats;
+ 
+ public class PerformanceTest {
+ 
+   @Test
+   public void testPerformance() throws IOException {
+     TestPlanStats stats = testPlan(
+       threadGroup(2, 10,
+         httpSampler("http://my.service")
+       ),
+       responseFileSaver(Instant.now().toString().replace(":", "-") + "-response")
+     ).run();
+     assertThat(stats.overall().elapsedTimePercentile99()).isLessThan(Duration.ofSeconds(5));
+   }
+   
+ }
+```
+
+> Check [ResponseFileSaver](../jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/listeners/ResponseFileSaver.java) for more details.
+
+Finally, if you have more specific needs that are not covered by provided features, you can use `jsr223PostProcessor` to define you own custom logic like this:
+
+```java
+import static org.assertj.core.api.Assertions.assertThat;
+ import static us.abstracta.jmeter.javadsl.JmeterDsl.*;
+ 
+ import java.io.IOException;
+ import java.time.Duration;
+ import java.time.Instant;
+ import org.eclipse.jetty.http.MimeTypes.Type;
+ import org.junit.jupiter.api.Test;
+ import us.abstracta.jmeter.javadsl.core.TestPlanStats;
+ 
+ public class PerformanceTest {
+ 
+   @Test
+   public void testPerformance() throws IOException {
+     TestPlanStats stats = testPlan(
+       threadGroup(2, 10,
+         httpSampler("http://my.service")
+          .children(jsr223PostProcessor("new File('traceFile') << \"${prev.sampleLabel}>>${prev.responseDataAsString}\\n\""))
+       )
+     ).run();
+     assertThat(stats.overall().elapsedTimePercentile99()).isLessThan(Duration.ofSeconds(5));
+   }
+   
+ }
+```
+
+> Check [DslJsr223PostProcessor](../jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/postprocessors/DslJsr223PostProcessor.java) for more details.
 
 ## Check for expected response
 

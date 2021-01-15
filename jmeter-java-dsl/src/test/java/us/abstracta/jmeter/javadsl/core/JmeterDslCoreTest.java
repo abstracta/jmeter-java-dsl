@@ -126,14 +126,6 @@ public class JmeterDslCoreTest extends JmeterDslTest {
         .areIdentical();
   }
 
-  private String getFileContents(Path filePath) throws IOException {
-    return String.join("\n", Files.readAllLines(filePath, StandardCharsets.UTF_8));
-  }
-
-  private String getResourceContents(String resourcePath) throws IOException {
-    return Resources.toString(getClass().getResource(resourcePath), StandardCharsets.UTF_8);
-  }
-
   @Test
   public void shouldSendExpectedRequestsWhenLoadPlanFromJmx(@TempDir Path tmpDir)
       throws IOException {

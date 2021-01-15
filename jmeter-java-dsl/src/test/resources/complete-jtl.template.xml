@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testResults version="1.2">
+<httpSample t="{{\d+}}" it="0" lt="{{\d+}}" ct="{{\d+}}" ts="{{\d+}}" s="true" lb="HTTP Request" rc="200" rm="OK" tn="Thread Group 1-1" dt="" de="" by="142" sby="{{\d+}}" sc="1" ec="0" ng="1" na="1" hn="{{[\w\.-]+}}">
+  <responseHeader class="java.lang.String">HTTP/1.1 200 OK
+Matched-Stub-Id: {{\w+-\w+-\w+-\w+-\w+}}
+Vary: Accept-Encoding, User-Agent
+Transfer-Encoding: chunked
+</responseHeader>
+  <requestHeader class="java.lang.String">Connection: keep-alive
+Content-Type: application/json
+Content-Length: 13
+Host: localhost:{{\d+}}
+User-Agent: Apache-HttpClient/4.5.12 (Java/{{[\w\.]+}})
+</requestHeader>
+  <responseData class="java.lang.String">Non-TEXT response data, cannot record: ()</responseData>
+  <responseFile class="java.lang.String"></responseFile>
+  <cookies class="java.lang.String"></cookies>
+  <method class="java.lang.String">POST</method>
+  <queryString class="java.lang.String">{&quot;var&quot;:&quot;val&quot;}</queryString>
+  <java.net.URL>http://localhost:{{\d+}}</java.net.URL>
+</httpSample>
+
+</testResults>
