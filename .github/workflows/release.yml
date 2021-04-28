@@ -47,4 +47,4 @@ jobs:
           git config --local user.email "$(git log --format='%ae' HEAD^!)"
           git config --local user.name "$(git log --format='%an' HEAD^!)"
           git commit -m "[skip ci] Updated README"
-          git push origin HEAD:${GITHUB_REF}
+          git push origin HEAD:master
