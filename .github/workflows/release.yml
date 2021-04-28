@@ -5,6 +5,7 @@ on:
 jobs:
   release:
     runs-on: ubuntu-latest
+    concurrency: blazemeter_test
     steps:
       - uses: actions/checkout@v2
       - name: Setup Java 1.8
