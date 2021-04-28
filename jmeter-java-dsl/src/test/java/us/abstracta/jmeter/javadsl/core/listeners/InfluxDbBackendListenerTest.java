@@ -1,6 +1,7 @@
 package us.abstracta.jmeter.javadsl.core.listeners;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static us.abstracta.jmeter.javadsl.JmeterDsl.httpSampler;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.influxDbListener;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.testPlan;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.threadGroup;
@@ -20,7 +21,6 @@ import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.InfluxDBContainer;
 import org.testcontainers.containers.output.Slf4jLogConsumer;
 import org.testcontainers.utility.DockerImageName;
-import us.abstracta.jmeter.javadsl.JmeterDsl;
 import us.abstracta.jmeter.javadsl.JmeterDslTest;
 
 public class InfluxDbBackendListenerTest extends JmeterDslTest {
@@ -34,8 +34,8 @@ public class InfluxDbBackendListenerTest extends JmeterDslTest {
       influxDbContainer.start();
       testPlan(
           threadGroup(1, TEST_ITERATIONS,
-              JmeterDsl.httpSampler(SAMPLE_1_LABEL, wiremockUri),
-              JmeterDsl.httpSampler(SAMPLE_2_LABEL, wiremockUri)
+              httpSampler(SAMPLE_1_LABEL, wiremockUri),
+              httpSampler(SAMPLE_2_LABEL, wiremockUri)
           ),
           influxDbListener(influxDbContainer.getUrl() + "/write?db=" + INFLUXDB_DATABASE)
       ).run();

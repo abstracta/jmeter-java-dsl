@@ -6,17 +6,15 @@ import static com.github.tomakehurst.wiremock.client.WireMock.equalToJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.getRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
 import static org.assertj.core.api.Assertions.assertThat;
+import static us.abstracta.jmeter.javadsl.JmeterDsl.httpSampler;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.jtlWriter;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.testPlan;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.threadGroup;
 
 import com.google.common.base.Stopwatch;
-import com.google.common.io.Resources;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.util.HashMap;
@@ -26,7 +24,6 @@ import org.eclipse.jetty.http.MimeTypes.Type;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.xmlunit.assertj.XmlAssert;
-import us.abstracta.jmeter.javadsl.JmeterDsl;
 import us.abstracta.jmeter.javadsl.JmeterDslTest;
 
 public class JmeterDslCoreTest extends JmeterDslTest {
@@ -37,7 +34,7 @@ public class JmeterDslCoreTest extends JmeterDslTest {
   public void shouldSendRequestsToServerWhenSimpleHttpTestPlan() throws IOException {
     testPlan(
         threadGroup(1, TEST_ITERATIONS,
-            JmeterDsl.httpSampler(wiremockUri)
+            httpSampler(wiremockUri)
         )
     ).run();
     verifyRequestsSentToServer(TEST_ITERATIONS);
@@ -52,7 +49,7 @@ public class JmeterDslCoreTest extends JmeterDslTest {
     Duration duration = Duration.ofSeconds(10);
     TestPlanStats stats = testPlan(
         threadGroup(1, duration,
-            JmeterDsl.httpSampler(wiremockUri)
+            httpSampler(wiremockUri)
         )
     ).run();
     // we use some threshold in case is not exact due to delays in starting.
@@ -73,7 +70,7 @@ public class JmeterDslCoreTest extends JmeterDslTest {
     testPlan(
         threadGroup(threads, 1)
             .rampUpPeriod(duration)
-            .children(JmeterDsl.httpSampler(wiremockUri))
+            .children(httpSampler(wiremockUri))
     ).run();
     assertThat(time.elapsed()).isGreaterThan(duration.minus(duration.dividedBy(threads)));
   }
@@ -82,8 +79,8 @@ public class JmeterDslCoreTest extends JmeterDslTest {
   public void shouldSendDoubleRequestsToServerWhenTwoSamplersTestPlan() throws IOException {
     testPlan(
         threadGroup(1, TEST_ITERATIONS,
-            JmeterDsl.httpSampler(wiremockUri),
-            JmeterDsl.httpSampler(wiremockUri)
+            httpSampler(wiremockUri),
+            httpSampler(wiremockUri)
         )
     ).run();
     verifyRequestsSentToServer(TEST_ITERATIONS * 2);
@@ -94,8 +91,8 @@ public class JmeterDslCoreTest extends JmeterDslTest {
       throws IOException {
     TestPlanStats stats = testPlan(
         threadGroup(1, TEST_ITERATIONS,
-            JmeterDsl.httpSampler(SAMPLE_1_LABEL, wiremockUri),
-            JmeterDsl.httpSampler(SAMPLE_2_LABEL, wiremockUri)
+            httpSampler(SAMPLE_1_LABEL, wiremockUri),
+            httpSampler(SAMPLE_2_LABEL, wiremockUri)
         )
     ).run();
     assertThat(extractTotalCounts(stats)).isEqualTo(buildExpectedTotalCounts());
@@ -115,9 +112,9 @@ public class JmeterDslCoreTest extends JmeterDslTest {
     Path filePath = tempDir.resolve("output.jmx");
     testPlan(
         threadGroup(1, TEST_ITERATIONS,
-            JmeterDsl.httpSampler("http://localhost")
+            httpSampler("http://localhost")
                 .post(JSON_BODY, Type.APPLICATION_JSON),
-            JmeterDsl.httpSampler("http://localhost")
+            httpSampler("http://localhost")
         ),
         jtlWriter("results.jtl")
     ).saveAsJmx(filePath.toString());

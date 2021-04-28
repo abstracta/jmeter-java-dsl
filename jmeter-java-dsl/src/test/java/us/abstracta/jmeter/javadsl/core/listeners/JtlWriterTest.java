@@ -3,6 +3,8 @@ package us.abstracta.jmeter.javadsl.core.listeners;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.htmlReporter;
+import static us.abstracta.jmeter.javadsl.JmeterDsl.httpSampler;
+import static us.abstracta.jmeter.javadsl.JmeterDsl.jtlWriter;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.testPlan;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.threadGroup;
 
@@ -16,7 +18,6 @@ import java.nio.file.Path;
 import org.eclipse.jetty.http.MimeTypes.Type;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
-import us.abstracta.jmeter.javadsl.JmeterDsl;
 import us.abstracta.jmeter.javadsl.JmeterDslTest;
 
 public class JtlWriterTest extends JmeterDslTest {
@@ -27,15 +28,15 @@ public class JtlWriterTest extends JmeterDslTest {
   public void shouldWriteAllThreadGroupsResultsToFileWhenJtlWriterAtTestPlan(@TempDir Path tempDir)
       throws IOException {
     Path resultsFilePath = tempDir.resolve(RESULTS_JTL);
-    JmeterDsl.testPlan(
+    testPlan(
         threadGroup(1, TEST_ITERATIONS,
-            JmeterDsl.httpSampler(wiremockUri),
-            JmeterDsl.httpSampler(wiremockUri)
+            httpSampler(wiremockUri),
+            httpSampler(wiremockUri)
         ),
         threadGroup(1, TEST_ITERATIONS,
-            JmeterDsl.httpSampler(wiremockUri)
+            httpSampler(wiremockUri)
         ),
-        JmeterDsl.jtlWriter(resultsFilePath.toString())
+        jtlWriter(resultsFilePath.toString())
     ).run();
     assertResultsFileResultsCount(resultsFilePath, TEST_ITERATIONS * 3);
   }
@@ -50,14 +51,14 @@ public class JtlWriterTest extends JmeterDslTest {
   public void shouldWriteContainingThreadGroupResultsToFileWhenJtlWriterAtThreadGroup(
       @TempDir Path tempDir) throws IOException {
     Path resultsFilePath = tempDir.resolve(RESULTS_JTL);
-    JmeterDsl.testPlan(
+    testPlan(
         threadGroup(1, TEST_ITERATIONS,
-            JmeterDsl.httpSampler(wiremockUri),
-            JmeterDsl.httpSampler(wiremockUri),
-            JmeterDsl.jtlWriter(resultsFilePath.toString())
+            httpSampler(wiremockUri),
+            httpSampler(wiremockUri),
+            jtlWriter(resultsFilePath.toString())
         ),
         threadGroup(1, TEST_ITERATIONS,
-            JmeterDsl.httpSampler(wiremockUri)
+            httpSampler(wiremockUri)
         )
     ).run();
     assertResultsFileResultsCount(resultsFilePath, TEST_ITERATIONS * 2);
@@ -69,11 +70,11 @@ public class JtlWriterTest extends JmeterDslTest {
     Path resultsFilePath = tempDir.resolve(RESULTS_JTL);
     testPlan(
         threadGroup(1, TEST_ITERATIONS,
-            JmeterDsl.httpSampler(wiremockUri)
+            httpSampler(wiremockUri)
                 .children(
-                    JmeterDsl.jtlWriter(resultsFilePath.toString())
+                    jtlWriter(resultsFilePath.toString())
                 ),
-            JmeterDsl.httpSampler(wiremockUri)
+            httpSampler(wiremockUri)
         )
     ).run();
     assertResultsFileResultsCount(resultsFilePath, TEST_ITERATIONS);
@@ -94,12 +95,12 @@ public class JtlWriterTest extends JmeterDslTest {
     Path resultsFilePath = tempDir.resolve(RESULTS_JTL);
     testPlan(
         threadGroup(1, 1,
-            JmeterDsl.httpSampler(wiremockUri)
+            httpSampler(wiremockUri)
                 .post(JSON_BODY, Type.APPLICATION_JSON)
                 .children(
-                    JmeterDsl.jtlWriter(resultsFilePath.toString())
+                    jtlWriter(resultsFilePath.toString())
                 ),
-            JmeterDsl.httpSampler(wiremockUri)
+            httpSampler(wiremockUri)
         )
     ).run();
     assertFileMatchesTemplate(resultsFilePath, "/default-jtl.template.csv");
@@ -117,13 +118,13 @@ public class JtlWriterTest extends JmeterDslTest {
     Path resultsFilePath = tempDir.resolve(RESULTS_JTL);
     testPlan(
         threadGroup(1, 1,
-            JmeterDsl.httpSampler(wiremockUri)
+            httpSampler(wiremockUri)
                 .post(JSON_BODY, Type.APPLICATION_JSON)
                 .children(
-                    JmeterDsl.jtlWriter(resultsFilePath.toString())
+                    jtlWriter(resultsFilePath.toString())
                         .withAllFields(true)
                 ),
-            JmeterDsl.httpSampler(wiremockUri)
+            httpSampler(wiremockUri)
         )
     ).run();
     assertFileMatchesTemplate(resultsFilePath, "/complete-jtl.template.xml");

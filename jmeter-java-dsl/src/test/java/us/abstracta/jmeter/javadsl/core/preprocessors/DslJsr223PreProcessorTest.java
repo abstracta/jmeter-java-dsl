@@ -3,13 +3,13 @@ package us.abstracta.jmeter.javadsl.core.preprocessors;
 import static com.github.tomakehurst.wiremock.client.WireMock.anyUrl;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
+import static us.abstracta.jmeter.javadsl.JmeterDsl.httpSampler;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.jsr223PreProcessor;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.testPlan;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.threadGroup;
 
 import org.eclipse.jetty.http.MimeTypes;
 import org.junit.jupiter.api.Test;
-import us.abstracta.jmeter.javadsl.JmeterDsl;
 import us.abstracta.jmeter.javadsl.JmeterDslTest;
 
 public class DslJsr223PreProcessorTest extends JmeterDslTest {
@@ -21,8 +21,7 @@ public class DslJsr223PreProcessorTest extends JmeterDslTest {
       throws Exception {
     testPlan(
         threadGroup(1, 1,
-            JmeterDsl.
-                httpSampler(wiremockUri)
+            httpSampler(wiremockUri)
                 .post("${REQUEST_BODY}", MimeTypes.Type.TEXT_PLAIN)
                 .children(
                     jsr223PreProcessor(
@@ -39,8 +38,7 @@ public class DslJsr223PreProcessorTest extends JmeterDslTest {
       throws Exception {
     testPlan(
         threadGroup(1, 1,
-            JmeterDsl.
-                httpSampler(wiremockUri)
+            httpSampler(wiremockUri)
                 .post("${REQUEST_BODY}", MimeTypes.Type.TEXT_PLAIN)
                 .children(
                     jsr223PreProcessor(s -> s.vars.put("REQUEST_BODY", buildRequestBody()))

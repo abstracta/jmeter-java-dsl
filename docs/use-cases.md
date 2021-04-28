@@ -150,7 +150,7 @@ import static org.assertj.core.api.Assertions.assertThat;
      TestPlanStats stats = testPlan(
        threadGroup(2, 10,
          httpSampler("http://my.service")
-          .children(jsr223PostProcessor("new File('traceFile') << \"${prev.sampleLabel}>>${prev.responseDataAsString}\\n\""))
+           .children(jsr223PostProcessor("new File('traceFile') << \"${prev.sampleLabel}>>${prev.responseDataAsString}\\n\""))
        )
      ).run();
      assertThat(stats.overall().elapsedTimePercentile99()).isLessThan(Duration.ofSeconds(5));
@@ -183,12 +183,12 @@ public class PerformanceTest {
   @Test
   public void testPerformance() throws IOException {
     TestPlanStats stats = testPlan(
-        threadGroup(2, 10,
-            httpSampler("http://my.service")
-                .children(
-                    responseAssertion().containsSubstrings("OK")
-                )
-        )
+      threadGroup(2, 10,
+        httpSampler("http://my.service")
+          .children(
+            responseAssertion().containsSubstrings("OK")
+          )
+      )
     ).run();
     assertThat(stats.overall().elapsedTimePercentile99()).isLessThan(Duration.ofSeconds(5));
   }
@@ -218,14 +218,14 @@ public class PerformanceTest {
   @Test
   public void testPerformance() throws IOException {
     TestPlanStats stats = testPlan(
-        threadGroup(2, 10,
-            httpSampler("http://my.service/accounts")
-                .post("{\"name\": \"John Doe\"}", Type.APPLICATION_JSON)
-                .children(
-                    regexExtractor("ACCOUNT_ID", "\"id\":\"([^\"]+)\"")
-                ),
-            httpSampler("http://my.service/accounts/${ACCOUNT_ID}")
-        )
+      threadGroup(2, 10,
+        httpSampler("http://my.service/accounts")
+          .post("{\"name\": \"John Doe\"}", Type.APPLICATION_JSON)
+          .children(
+            regexExtractor("ACCOUNT_ID", "\"id\":\"([^\"]+)\"")
+          ),
+        httpSampler("http://my.service/accounts/${ACCOUNT_ID}")
+      )
     ).run();
     assertThat(stats.overall().elapsedTimePercentile99()).isLessThan(Duration.ofSeconds(5));
   }
@@ -236,6 +236,42 @@ public class PerformanceTest {
 Check [DslRegexExtractor](../jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/postprocessors/DslRegexExtractor.java) for more details and additional options.
 
 For more complex scenarios you can use [later mentioned JSR223 Post processor](#change-sample-result-statuses-with-custom-logic).
+
+## Group requests
+
+Some times is necessary to be able to group requests which constitute different steps in a test. For example, separate requests necessary to do a login, from the ones used to add items to cart, from the ones that do a purchase. JMeter (and the DSL) provide Transaction Controllers for this purpose, here is an example:
+
+```java
+import static us.abstracta.jmeter.javadsl.JmeterDsl.*;
+
+import java.io.IOException;
+import org.eclipse.jetty.http.MimeTypes.Type;
+import org.junit.jupiter.api.Test;
+
+public class SaveTestPlanAsJMX {
+
+  @Test
+  public void testTransactions() throws IOException {
+    testPlan(
+      threadGroup(2, 10,
+        transaction('login',
+          httpSampler("http://my.service"), 
+          httpSampler("http://my.service/login")
+            .post("user=test&password=test", Type.FORM_ENCODED)
+        ), 
+        transaction('addItemToCart',
+          httpSampler("http://my.service/items"),
+          httpSampler("http://my.service/cart/items")
+            .post("{\"id\": 1}", Type.APPLICATION_JSON)  
+        )
+      )
+    ).run();
+  }
+  
+}
+```
+
+This will provide additional sample results for each transaction which contain the aggregate metrics for containing requests, allowing to focus on the actual flow steps instead of each particular request.
 
 ## Save as JMX
 
@@ -464,15 +500,13 @@ public class PerformanceTest {
   @Test
   public void testPerformance() throws IOException {
     TestPlanStats stats = testPlan(
-        threadGroup(2, 10,
-            httpSampler("http://my.service")
-                .post("${REQUEST_BODY}", Type.TEXT_PLAIN)
-                .children(
-                    jsr223PreProcessor(
-                        "vars.put('REQUEST_BODY', " + getClass().getName()
-                            + ".buildRequestBody(vars))")
-                )
-        )
+      threadGroup(2, 10,
+        httpSampler("http://my.service")
+          .post("${REQUEST_BODY}", Type.TEXT_PLAIN)
+          .children(
+            jsr223PreProcessor("vars.put('REQUEST_BODY', " + getClass().getName()+ ".buildRequestBody(vars))")
+          )
+      )
     ).run();
     assertThat(stats.overall().elapsedTimePercentile99()).isLessThan(Duration.ofSeconds(5));
   }

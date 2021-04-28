@@ -72,6 +72,12 @@ package core {
     String Label
   }
 
+  package logiccontrollers {
+
+    class DslTransactionController extends TestElementContainer implements ThreadGroupChild
+
+  }
+
   package preprocessors {
 
     class DslJsr223PreProcessor extends DslJsr223TestElement implements MultiLevelTestElement

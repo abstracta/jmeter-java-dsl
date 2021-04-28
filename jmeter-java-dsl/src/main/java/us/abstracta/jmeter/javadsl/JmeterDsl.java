@@ -14,6 +14,7 @@ import us.abstracta.jmeter.javadsl.core.listeners.HtmlReporter;
 import us.abstracta.jmeter.javadsl.core.listeners.InfluxDbBackendListener;
 import us.abstracta.jmeter.javadsl.core.listeners.JtlWriter;
 import us.abstracta.jmeter.javadsl.core.listeners.ResponseFileSaver;
+import us.abstracta.jmeter.javadsl.core.logiccontrollers.DslTransactionController;
 import us.abstracta.jmeter.javadsl.core.postprocessors.DslJsr223PostProcessor;
 import us.abstracta.jmeter.javadsl.core.postprocessors.DslJsr223PostProcessor.PostProcessorScript;
 import us.abstracta.jmeter.javadsl.core.postprocessors.DslRegexExtractor;
@@ -107,6 +108,18 @@ public class JmeterDsl {
   public static DslThreadGroup threadGroup(String name, int threads, Duration duration,
       ThreadGroupChild... children) {
     return new DslThreadGroup(name, threads, duration, Arrays.asList(children));
+  }
+
+  /**
+   * Builds a new transaction controller with the given name.
+   *
+   * @param name specifies the name to identify the transaction.
+   * @param children contains the test elements that will be contained within the transaction.
+   * @return the test plan instance.
+   * @see DslTransactionController
+   */
+  public static DslTransactionController transaction(String name, ThreadGroupChild... children) {
+    return new DslTransactionController(name, Arrays.asList(children));
   }
 
   /**
