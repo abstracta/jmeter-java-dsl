@@ -23,7 +23,9 @@ public class DslTransactionController extends TestElementContainer<ThreadGroupCh
 
   @Override
   protected TestElement buildTestElement() {
-    return new TransactionController();
+    TransactionController ret = new TransactionController();
+    ret.setIncludeTimers(false);
+    return ret;
   }
 
 }
