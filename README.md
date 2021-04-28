@@ -49,11 +49,13 @@ public class PerformanceTest {
 
 > This example also uses [AssertJ](https://joel-costigliola.github.io/assertj/assertj-core-quick-start.html) for assertions, but you can use whatever assertion library you chose.
 
-More examples can be found in [tests](jmeter-java-dsl/src/test/java/us/abstracta/jmeter/javadsl)
+**More examples can be found in [tests](jmeter-java-dsl/src/test/java/us/abstracta/jmeter/javadsl)**
 
 > **Tip 1:** Since JMeter uses [log4j2](https://logging.apache.org/log4j/2.x/), if you want to control logging level or output, you can use something similar to the tests included [log4j2.xml](jmeter-java-dsl/src/test/resources/log4j2.xml).
 >
 > **Tip 2:** When working with multiple samplers in a test plan, specify their names to easily check their respective statistics.
+
+**Check [here](docs/use-cases.md) for details on some interesting use cases**, like running tests at scale in [BlazeMeter](https://www.blazemeter.com/), saving and loading test plans from JMX, publishing test metrics to [InfluxDB](https://www.influxdata.com/products/influxdb-overview/) (and visualizing them from [Grafana](https://grafana.com/)), and general usage guides.
 
 ## Why?
 
@@ -81,10 +83,6 @@ Here is a table with summary of main pros and cons of each tool:
 |Taurus| <ul><li>VCS friendly<li>Simple CI/CD integration<li>Unified framework for running any type of test<li>built-in support for running tests at scale<li>All details of simple test plans at a glance<li>Simple way to do assertions on statistics|<ul><li>Both Java and Python environments required<li>Not as simple to discover (IDE auto-complete or GUI) supported functionality<li>Not complete support of JMeter capabilities (nor in the roadmap)|
 |ruby-dsl| <ul><li>VCS friendly<li>Simple CI/CD integration<li>Unified framework for running any type of test<li>built-in support for running tests at scale<li>All details of simple test plans at a glance|<ul><li>Both Java and Ruby environments required<li>Not following same naming convention and structure as JMeter<li>Not complete support of JMeter capabilities (nor in the roadmap)<li>No integration for debugging JMeter code|
 |jmeter-java-dsl| <ul><li>VCS friendly<li>IDE friendly (auto-complete and debug)<li>Natural CI/CD integration<li>Natural code modularization and reuse<li>Existing JMeter documentation<li>Easy to add support for JMeter supported protocols and new plugins<li>Could easily interact with JMX files and take advantage of JMeter ecosystem<li>All details of simple test plans at a glance<li>Simple way to do assertions on statistics|<ul><li>Basic Java knowledge required<li>Same resources (CPU & RAM) usage as JMeter|
-
-## Use cases
-
-Check [here](docs/use-cases.md) for details on some interesting use cases like running tests at scale in [BlazeMeter](https://www.blazemeter.com/), saving and loading test plans from JMX and publishing test metrics to [InfluxDB](https://www.influxdata.com/products/influxdb-overview/) (and visualizing them from [Grafana](https://grafana.com/)).
 
 ## Contributing & Requesting features
 
