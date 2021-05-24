@@ -12,7 +12,6 @@ import org.apache.jmeter.testelement.TestElement;
 import org.apache.jorphan.collections.HashTree;
 import org.eclipse.jetty.http.HttpMethod;
 import org.eclipse.jetty.http.MimeTypes;
-import org.eclipse.jetty.http.MimeTypes.Type;
 import us.abstracta.jmeter.javadsl.JmeterDsl;
 import us.abstracta.jmeter.javadsl.core.DslSampler;
 import us.abstracta.jmeter.javadsl.core.preprocessors.DslJsr223PreProcessor.PreProcessorScript;
@@ -59,7 +58,7 @@ public class DslHttpSampler extends DslSampler {
   }
 
   /**
-   * Same as {@link #post(String, Type)} but allowing to use a dynamically calculated body.
+   * Same as {@link #post(String, MimeTypes.Type)} but allowing to use a dynamically calculated body.
    * <p>
    * This method is just an abstraction that uses a JMeter variable as HTTP request body and
    * calculates the variable with a jsr223PreProcessor.
@@ -67,7 +66,7 @@ public class DslHttpSampler extends DslSampler {
    * <b>WARNING:</b> As this method internally uses
    * {@link JmeterDsl#jsr223PreProcessor(PreProcessorScript)}, same limitations and considerations
    * apply. Check it's documentation. To avoid such limitations you may use {@link #post(String,
-   * Type)} with a JMeter variable instead, and dynamically set the variable with {@link
+   * MimeTypes.Type)} with a JMeter variable instead, and dynamically set the variable with {@link
    * JmeterDsl#jsr223PreProcessor(String)}.
    *
    * @param bodySupplier function to calculate the body on each request.
