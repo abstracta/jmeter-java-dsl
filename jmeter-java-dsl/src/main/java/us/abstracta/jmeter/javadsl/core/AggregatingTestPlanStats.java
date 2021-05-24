@@ -70,32 +70,32 @@ public class AggregatingTestPlanStats extends TestPlanStats {
     }
 
     @Override
-    public Duration minElapsedTime() {
+    public Duration minSampleTime() {
       return Duration.ofMillis(stats.getMin());
     }
 
     @Override
-    public Duration maxElapsedTime() {
+    public Duration maxSampleTime() {
       return Duration.ofMillis(stats.getMax());
     }
 
     @Override
-    public Duration meanElapsedTime() {
+    public Duration meanSampleTime() {
       return Duration.ofMillis((long) stats.getMean().getResult());
     }
 
     @Override
-    public Duration elapsedTimePercentile90() {
+    public Duration sampleTimePercentile90() {
       return Duration.ofMillis((long) stats.getPercentile1().getResult());
     }
 
     @Override
-    public Duration elapsedTimePercentile95() {
+    public Duration sampleTimePercentile95() {
       return Duration.ofMillis((long) stats.getPercentile2().getResult());
     }
 
     @Override
-    public Duration elapsedTimePercentile99() {
+    public Duration sampleTimePercentile99() {
       return Duration.ofMillis((long) stats.getPercentile3().getResult());
     }
 

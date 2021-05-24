@@ -42,7 +42,7 @@ public class PerformanceTest {
       .holdFor(Duration.ofMinutes(10))
       .threadsPerEngine(100)
       .testTimeout(Duration.ofMinutes(20)));
-    assertThat(stats.overall().elapsedTimePercentile99()).isLessThan(Duration.ofSeconds(5));
+    assertThat(stats.overall().sampleTimePercentile99()).isLessThan(Duration.ofSeconds(5));
   }
 
 }
@@ -91,7 +91,7 @@ public class PerformanceTest {
       ),
       jtlWriter("test" + Instant.now().toString().replace(":", "-") + ".jtl")
     ).run();
-    assertThat(stats.overall().elapsedTimePercentile99()).isLessThan(Duration.ofSeconds(5));
+    assertThat(stats.overall().sampleTimePercentile99()).isLessThan(Duration.ofSeconds(5));
   }
   
 }
@@ -122,7 +122,7 @@ An additional option, specially targeted towards logging sample responses, is `r
        ),
        responseFileSaver(Instant.now().toString().replace(":", "-") + "-response")
      ).run();
-     assertThat(stats.overall().elapsedTimePercentile99()).isLessThan(Duration.ofSeconds(5));
+     assertThat(stats.overall().sampleTimePercentile99()).isLessThan(Duration.ofSeconds(5));
    }
    
  }
@@ -153,7 +153,7 @@ import static org.assertj.core.api.Assertions.assertThat;
            .children(jsr223PostProcessor("new File('traceFile') << \"${prev.sampleLabel}>>${prev.responseDataAsString}\\n\""))
        )
      ).run();
-     assertThat(stats.overall().elapsedTimePercentile99()).isLessThan(Duration.ofSeconds(5));
+     assertThat(stats.overall().sampleTimePercentile99()).isLessThan(Duration.ofSeconds(5));
    }
    
  }
@@ -190,7 +190,7 @@ public class PerformanceTest {
           )
       )
     ).run();
-    assertThat(stats.overall().elapsedTimePercentile99()).isLessThan(Duration.ofSeconds(5));
+    assertThat(stats.overall().sampleTimePercentile99()).isLessThan(Duration.ofSeconds(5));
   }
 
 }
@@ -227,7 +227,7 @@ public class PerformanceTest {
         httpSampler("http://my.service/accounts/${ACCOUNT_ID}")
       )
     ).run();
-    assertThat(stats.overall().elapsedTimePercentile99()).isLessThan(Duration.ofSeconds(5));
+    assertThat(stats.overall().sampleTimePercentile99()).isLessThan(Duration.ofSeconds(5));
   }
 
 }
@@ -317,7 +317,7 @@ public class RunJmxTestPlan {
   @Test
   public void testPerformance() throws IOException {
     TestPlanStats stats = DslTestPlan.fromJmx("test-plan.jmx").run();
-    assertThat(stats.overall().elapsedTimePercentile99()).isLessThan(Duration.ofSeconds(5));
+    assertThat(stats.overall().sampleTimePercentile99()).isLessThan(Duration.ofSeconds(5));
   }
   
 }
@@ -384,7 +384,7 @@ public class PerformanceTest {
       ),
       influxDbListener("http://localhost:8086/write?db=jmeter")
     ).run();
-    assertThat(stats.overall().elapsedTimePercentile99()).isLessThan(Duration.ofSeconds(5));
+    assertThat(stats.overall().sampleTimePercentile99()).isLessThan(Duration.ofSeconds(5));
   }
   
 }
@@ -424,7 +424,7 @@ public class PerformanceTest {
       ),
       htmlReporter("html-report-" + Instant.now().toString().replace(":", "-"))
     ).run();
-    assertThat(stats.overall().elapsedTimePercentile99()).isLessThan(Duration.ofSeconds(5));
+    assertThat(stats.overall().sampleTimePercentile99()).isLessThan(Duration.ofSeconds(5));
   }
   
 }
@@ -459,7 +459,7 @@ public class PerformanceTest {
           )
       )
     ).run();
-    assertThat(stats.overall().elapsedTimePercentile99()).isLessThan(Duration.ofSeconds(5));
+    assertThat(stats.overall().sampleTimePercentile99()).isLessThan(Duration.ofSeconds(5));
   }
   
 }
@@ -508,7 +508,7 @@ public class PerformanceTest {
           )
       )
     ).run();
-    assertThat(stats.overall().elapsedTimePercentile99()).isLessThan(Duration.ofSeconds(5));
+    assertThat(stats.overall().sampleTimePercentile99()).isLessThan(Duration.ofSeconds(5));
   }
 
   public static String buildRequestBody(JMeterVariables vars) {

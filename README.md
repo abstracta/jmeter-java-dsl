@@ -41,7 +41,7 @@ public class PerformanceTest {
       //this is just to log details of each request stats
       jtlWriter("test" + Instant.now().toString().replace(":", "-") + ".jtl")
     ).run();
-    assertThat(stats.overall().elapsedTimePercentile99()).isLessThan(Duration.ofSeconds(5));
+    assertThat(stats.overall().sampleTimePercentile99()).isLessThan(Duration.ofSeconds(5));
   }
   
 }

@@ -402,12 +402,12 @@ public class BlazeMeterEngine implements DslJmeterEngine {
     private final long samplesCount;
     private final double samplesPerSecond;
     private final long errorsCount;
-    private final Duration minElapsedTime;
-    private final Duration maxElapsedTime;
-    private final Duration meanElapsedTime;
-    private final Duration elapsedTimePercentile90;
-    private final Duration elapsedTimePercentile95;
-    private final Duration elapsedTimePercentile99;
+    private final Duration minSampleTime;
+    private final Duration maxSampleTime;
+    private final Duration meanSampleTime;
+    private final Duration sampleTimePercentile90;
+    private final Duration sampleTimePercentile95;
+    private final Duration sampleTimePercentile99;
     private final long receivedBytes;
     private final double receivedBytesPerSecond;
 
@@ -424,12 +424,12 @@ public class BlazeMeterEngine implements DslJmeterEngine {
       samplesCount = labeledStat.getSamples();
       samplesPerSecond = labeledStat.getAvgThroughput();
       errorsCount = labeledStat.getErrorsCount();
-      minElapsedTime = Duration.ofMillis(labeledStat.getMinResponseTime());
-      maxElapsedTime = Duration.ofMillis(labeledStat.getMaxResponseTime());
-      meanElapsedTime = Duration.ofMillis(Math.round(labeledStat.getAvgResponseTime()));
-      elapsedTimePercentile90 = Duration.ofMillis(labeledStat.getPerc90());
-      elapsedTimePercentile95 = Duration.ofMillis(labeledStat.getPerc95());
-      elapsedTimePercentile99 = Duration.ofMillis(labeledStat.getPerc99());
+      minSampleTime = Duration.ofMillis(labeledStat.getMinResponseTime());
+      maxSampleTime = Duration.ofMillis(labeledStat.getMaxResponseTime());
+      meanSampleTime = Duration.ofMillis(Math.round(labeledStat.getAvgResponseTime()));
+      sampleTimePercentile90 = Duration.ofMillis(labeledStat.getPerc90());
+      sampleTimePercentile95 = Duration.ofMillis(labeledStat.getPerc95());
+      sampleTimePercentile99 = Duration.ofMillis(labeledStat.getPerc99());
       // Similar comment as with firstTime and endTime: this is just an approximation.
       receivedBytes = Math.round(labeledStat.getAvgBytes() / 1000 * labeledStat.getDuration());
       receivedBytesPerSecond = labeledStat.getAvgBytes();
@@ -466,33 +466,33 @@ public class BlazeMeterEngine implements DslJmeterEngine {
     }
 
     @Override
-    public Duration minElapsedTime() {
-      return minElapsedTime;
+    public Duration minSampleTime() {
+      return minSampleTime;
     }
 
     @Override
-    public Duration maxElapsedTime() {
-      return maxElapsedTime;
+    public Duration maxSampleTime() {
+      return maxSampleTime;
     }
 
     @Override
-    public Duration meanElapsedTime() {
-      return meanElapsedTime;
+    public Duration meanSampleTime() {
+      return meanSampleTime;
     }
 
     @Override
-    public Duration elapsedTimePercentile90() {
-      return elapsedTimePercentile90;
+    public Duration sampleTimePercentile90() {
+      return sampleTimePercentile90;
     }
 
     @Override
-    public Duration elapsedTimePercentile95() {
-      return elapsedTimePercentile95;
+    public Duration sampleTimePercentile95() {
+      return sampleTimePercentile95;
     }
 
     @Override
-    public Duration elapsedTimePercentile99() {
-      return elapsedTimePercentile99;
+    public Duration sampleTimePercentile99() {
+      return sampleTimePercentile99;
     }
 
     @Override
