@@ -14,9 +14,25 @@ public class AggregatingTestPlanStats extends TestPlanStats {
     setOverallStats(new AggregatingStatsSummary());
   }
 
+  public void setStart(Instant start) {
+    ((AggregatingStatsSummary)overallStats).setStart(start);
+  }
+
+  public void setEnd(Instant end) {
+    ((AggregatingStatsSummary)overallStats).setEnd(end);
+  }
+
   public static class AggregatingStatsSummary implements StatsSummary {
 
     private final StatisticsSummaryData stats = new StatisticsSummaryData(90, 95, 99);
+
+    private void setStart(Instant start) {
+      stats.setFirstTime(start.toEpochMilli());
+    }
+
+    private void setEnd(Instant end) {
+      stats.setEndTime(end.toEpochMilli());
+    }
 
     private void addResult(SampleResult result) {
       stats.incTotal();

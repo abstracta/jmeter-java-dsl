@@ -9,6 +9,7 @@ import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Instant;
 import java.util.Collections;
 import java.util.Properties;
 import org.apache.commons.io.FileUtils;
@@ -40,7 +41,16 @@ public class EmbeddedJmeterEngine implements DslJmeterEngine {
       addTestSummariserToTree(testPlanTree);
 
       engine.configure(rootTree);
+      /*
+       we register the start and end of test since calculating it from sample results may be
+       inaccurate when timers or post processors are used outside of transactions, since such time
+       is not included in sample results. Additionally, we want to provide a consistent meaning for
+       start, end and elapsed time for samplers, transactions and test plan (which would not be if
+       we only use sample results times).
+       */
+      stats.setStart(Instant.now());
       engine.run();
+      stats.setEnd(Instant.now());
       return stats;
     }
   }
