@@ -1,16 +1,17 @@
 package us.abstracta.jmeter.javadsl.core.timers;
 
-import org.apache.jmeter.timers.gui.UniformRandomTimerGui;
 import org.apache.jmeter.testelement.TestElement;
 import org.apache.jmeter.timers.UniformRandomTimer;
+import org.apache.jmeter.timers.gui.UniformRandomTimerGui;
 import us.abstracta.jmeter.javadsl.core.BaseTestElement;
 import us.abstracta.jmeter.javadsl.core.MultiLevelTestElement;
 
 /**
- * Allows specifying JMeter Uniform Random Timers which pause the thread with a
- * random time with uniform distribution
+ * Allows specifying JMeter Uniform Random Timers which pause the thread with a random time with
+ * uniform distribution.
  */
 public class DslUniformRandomTimer extends BaseTestElement implements MultiLevelTestElement {
+
   private final long minimumMillis;
   private final long maximumMillis;
 

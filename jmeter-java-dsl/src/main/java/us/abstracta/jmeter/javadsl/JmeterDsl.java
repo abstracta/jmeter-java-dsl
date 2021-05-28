@@ -21,9 +21,9 @@ import us.abstracta.jmeter.javadsl.core.postprocessors.DslRegexExtractor;
 import us.abstracta.jmeter.javadsl.core.preprocessors.DslJsr223PreProcessor;
 import us.abstracta.jmeter.javadsl.core.preprocessors.DslJsr223PreProcessor.PreProcessorScript;
 import us.abstracta.jmeter.javadsl.core.preprocessors.DslJsr223PreProcessor.PreProcessorVars;
+import us.abstracta.jmeter.javadsl.core.timers.DslUniformRandomTimer;
 import us.abstracta.jmeter.javadsl.http.DslHttpSampler;
 import us.abstracta.jmeter.javadsl.http.HttpHeaders;
-import us.abstracta.jmeter.javadsl.core.timers.DslUniformRandomTimer;
 
 /**
  * This is the main class to be imported from any code using JMeter DSL.
@@ -442,20 +442,22 @@ public class JmeterDsl {
   }
 
   /**
-   * Builds a Uniform Random Timer which pauses the thread with a random time with uniform distribution.
+   * Builds a Uniform Random Timer which pauses the thread with a random time with uniform
+   * distribution.
    *
    * <p>
    * The timer uses the minimunMillis and maximumMillis to define the range of values to be used in
-   * the uniformly distributed selected value. These values differ from the parameters used in JMeter
-   * Uniform Random Timer element to make it simpler for general users to use. The generated JMeter
-   * test element uses as "constant delay offset" the minimumMillis value, and as "maximum random
-   * delay" (maximumMillis - minimumMillis) value.
+   * the uniformly distributed selected value. These values differ from the parameters used in
+   * JMeter Uniform Random Timer element to make it simpler for general users to use. The generated
+   * JMeter test element uses as "constant delay offset" the minimumMillis value, and as "maximum
+   * random delay" (maximumMillis - minimumMillis) value.
    * </p>
    *
    * <p>
-   * EXAMPLE: wait at least 3 seconds and maximum of 10 seconds
-   * {@code uniformRandomTimer(3000,10000)}
+   * EXAMPLE: wait at least 3 seconds and maximum of 10 seconds {@code
+   * uniformRandomTimer(3000,10000)}
    * <p>
+   *
    * @param minimumMillis is used to set the constant delay of the Uniform Random Timer.
    * @param maximumMillis is used to set the maximum time the timer will be paused and will be used
    * to obtain the random delay from the result of (maximumMillis - minimumMillis).

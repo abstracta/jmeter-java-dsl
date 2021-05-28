@@ -58,7 +58,8 @@ public class DslHttpSampler extends DslSampler {
   }
 
   /**
-   * Same as {@link #post(String, MimeTypes.Type)} but allowing to use a dynamically calculated body.
+   * Same as {@link #post(String, MimeTypes.Type)} but allowing to use a dynamically calculated
+   * body.
    * <p>
    * This method is just an abstraction that uses a JMeter variable as HTTP request body and
    * calculates the variable with a jsr223PreProcessor.

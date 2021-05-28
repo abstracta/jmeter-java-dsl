@@ -15,11 +15,11 @@ public class AggregatingTestPlanStats extends TestPlanStats {
   }
 
   public void setStart(Instant start) {
-    ((AggregatingStatsSummary)overallStats).setStart(start);
+    ((AggregatingStatsSummary) overallStats).setStart(start);
   }
 
   public void setEnd(Instant end) {
-    ((AggregatingStatsSummary)overallStats).setEnd(end);
+    ((AggregatingStatsSummary) overallStats).setEnd(end);
   }
 
   public static class AggregatingStatsSummary implements StatsSummary {
