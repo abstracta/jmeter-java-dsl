@@ -3,6 +3,8 @@ on:
   push:
     tags-ignore:
       - "*"
+    branches:
+      - "**"
 jobs:
   test:
     runs-on: ubuntu-latest
