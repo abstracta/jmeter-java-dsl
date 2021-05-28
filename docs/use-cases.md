@@ -537,3 +537,38 @@ post(s -> buildRequestBody(s.vars), Type.TEXT_PLAIN)
 > **WARNING:** using java code (lambdas) will only work with embedded JMeter engine (no support for saving to JMX and running it in JMeter GUI, or running it with BlazeMeter). Use the first option to avoid such limitations.
 
 Check [DslJsr223PreProcessor](../jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/preprocessors/DslJsr223PreProcessor.java) & [DslHttpSampler](../jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/http/DslHttpSampler.java) for more details and additional options.
+
+## Emulate user delays between requests
+
+Some times is necessary to replicate users behavior on the test plan, adding a timer between requests is one of the most used practices. For example, simulate the time it will take to complete a purchase form. JMeter (and the DSL) provide Uniform Random Timer for this purpose. Here is an example that adds a delay between four and ten seconds:
+
+```java
+import static us.abstracta.jmeter.javadsl.JmeterDsl.*;
+
+import java.io.IOException;
+import org.eclipse.jetty.http.MimeTypes.Type;
+import org.junit.jupiter.api.Test;
+
+public class PerformanceTest {
+
+  @Test
+  public void testTransactions() throws IOException {
+    testPlan(
+      threadGroup(2, 10,
+        transaction('addItemToCart',
+          httpSampler("http://my.service/items"),
+          httpSampler("http://my.service/cart/items")
+            .post("{\"id\": 1}", Type.APPLICATION_JSON)  
+        ),
+        transaction('chekcout',
+          httpSampler("http://my.service/cart/chekout"),
+          uniformRandomTimer(4000, 10000),
+          httpSampler("http://my.service/cart/checkout/userinfo")
+              .post("{\"Name\": Dave, \"lastname\": Tester, \"Street\": 1483  Smith Road, \"City\": Atlanta}", Type.APPLICATION_JSON)
+        )
+      )
+    ).run();
+  }
+  
+}
+```

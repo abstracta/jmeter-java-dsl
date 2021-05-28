@@ -160,6 +160,11 @@ package core {
     }
 
   }
+  
+  package timers {
+
+    class DslUniformRandomTimer extends BaseTestElement implements MultiLevelTestElement
+  }
 
   package listeners {
 
