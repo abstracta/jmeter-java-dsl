@@ -1,6 +1,8 @@
-# Additional features
+# User guide
 
-This document lists some use cases that might be really helpful in several cases.
+This document contains some tips on how to use the DSL to tackle common use cases.
+
+In general, explore provided API (in your preferred IDE) to discover all available features.
 
 ## Run test at scale in [BlazeMeter](https://www.blazemeter.com/)
 
