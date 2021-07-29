@@ -1,4 +1,4 @@
-# jmeter-java-dsl
+![logo](/docs/logo.svg)
 
 Simple Java API to run performance tests, using [JMeter] as engine, in an VCS (versioning control system) and programmers friendly way.
 
