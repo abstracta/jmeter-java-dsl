@@ -1,6 +1,6 @@
-![logo](/docs/logo.svg)
+![logo](/docs/.vuepress/public/logo.svg)
 
-Simple Java API to run performance tests, using [JMeter] as engine, in an VCS (versioning control system) and programmers friendly way.
+Simple Java API to run performance tests, using [JMeter] as engine, in a Git and programmers friendly way.
 
 If you like this project, **please give it a star :star:!** This helps the project be more visible, gain relevance and encourages us to invest more effort in new features.
 
@@ -11,8 +11,9 @@ If you use [maven](https://maven.apache.org/what-is-maven.html), just include fo
 ```xml
 <dependency>
   <groupId>us.abstracta.jmeter</groupId>
-  <projectId>jmeter-java-dsl</projectId>
+  <artifactId>jmeter-java-dsl</artifactId>
   <version>0.16</version>
+  <scope>test</scope>
 </dependency>
 ``` 
 
@@ -55,11 +56,11 @@ More examples can be found in [tests](jmeter-java-dsl/src/test/java/us/abstracta
 >
 > **Tip 2:** When working with multiple samplers in a test plan, specify their names to easily check their respective statistics.
 
-**Check [here](docs/user-guide.md) for details on some interesting use cases**, like running tests at scale in [BlazeMeter](https://www.blazemeter.com/), saving and loading test plans from JMX, publishing test metrics to [InfluxDB](https://www.influxdata.com/products/influxdb-overview/) (and visualizing them from [Grafana](https://grafana.com/)), and general usage guides.
+**Check [here](https://abstracta.github.io/jmeter-java-dsl/) for details on some interesting use cases**, like running tests at scale in [BlazeMeter](https://www.blazemeter.com/), saving and loading test plans from JMX, publishing test metrics to [InfluxDB](https://www.influxdata.com/products/influxdb-overview/) (and visualizing them from [Grafana](https://grafana.com/)), and general usage guides.
 
 ## Why?
 
-Check more about the motivation and analysis of alternatives [here](docs/motivation.md)
+Check more about the motivation and analysis of alternatives [here](https://abstracta.github.io/jmeter-java-dsl/motivation/)
 
 ## Contributing & Requesting features
 

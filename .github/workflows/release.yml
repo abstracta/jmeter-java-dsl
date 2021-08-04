@@ -41,11 +41,9 @@ jobs:
           GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
           SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
           SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
-      - name: update Readme version
-        run: |-
-          sed -i "s/<version>.*<\/version>/<version>${GITHUB_REF#refs/tags/v}<\/version>/g" README.md
-          git add README.md
-          git config --local user.email "$(git log --format='%ae' HEAD^!)"
-          git config --local user.name "$(git log --format='%an' HEAD^!)"
-          git commit -m "[skip ci] Updated README"
-          git push origin HEAD:master
+      - name: update docs version
+        run: .github/fix-docs-version.sh ${GITHUB_REF#refs/tags/v}
+      - name: Deploy github pages
+        run: .github/vuepress-deploy.sh
+        env:
+          ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}

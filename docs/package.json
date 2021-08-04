@@ -1,0 +1,21 @@
+{
+  "name": "jmeter-java-dsl",
+  "version": "0.1",
+  "description": "Simple JMeter performance tests API",
+  "main": "index.js",
+  "repository": "abstracta/jmeter-java-dsl",
+  "scripts": {
+    "dev": "vuepress dev .",
+    "build": "vuepress build ."
+  },
+  "license": "Apache-2.0",
+  "devDependencies": {
+    "@vuepress/plugin-back-to-top": "^1.8.2",
+    "@vuepress/plugin-medium-zoom": "^1.8.2",
+    "@xiaopanda/vuepress-plugin-code-copy": "^1.0.3",
+    "markdown-it-replace-link": "^1.1.0",
+    "vuepress": "^1.5.3",
+    "vuepress-plugin-element-tabs": "^0.2.8"
+  },
+  "dependencies": {}
+}
