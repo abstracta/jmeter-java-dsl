@@ -31,7 +31,7 @@ public class DslResponseAssertionTest extends JmeterDslTest {
       throws Exception {
     TestPlanStats stats = testPlan(
         threadGroup(1, 1,
-            httpSampler("invalidurl")
+            httpSampler("invalidUrl")
                 .children(
                     responseAssertion()
                         .ignoreStatus()

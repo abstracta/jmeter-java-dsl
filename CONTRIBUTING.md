@@ -58,7 +58,7 @@ Additionally, you need to create new [DslTestElement] classes to implement the l
 
 Remember adding proper tests and some documentation so users know about the new features! 
 
-### I want to add a new JMeter standard (sampler, listener, pre/post processor, assertion, etc) test element. What should I do?
+### I want to add a new JMeter standard (sampler, listener, pre/postprocessor, assertion, etc.) test element. What should I do?
 
 When adding a new test element, a new [DslTestElement] class is required to handle the specific attributes and construction of the JMeter test element and a new factory method in [JmeterDsl] needs to be added to instantiate this class.
 
@@ -72,7 +72,7 @@ Add proper tests and some documentation so users know about the new features!
 
 Think if the attribute is an attribute that will be required in most of the cases and is required for the test element specification, or if it is an optional one. 
 
-If the attribute is a "required" one, then consider adding a new factory method to [JmeterDsl] containing the new parameter, and evaluate if makes sense to introduce a non backward compatible change to existing factory methods which don't contain the attribute. Additionally, locate the correct [DslTestElement] class and modify it to set the proper JMeter test element property. 
+If the attribute is a "required" one, then consider adding a new factory method to [JmeterDsl] containing the new parameter, and evaluate if it makes sense to introduce a non backwards compatible change to existing factory methods which don't contain the attribute. Additionally, locate the correct [DslTestElement] class and modify it to set the proper JMeter test element property. 
 
 If the attribute is optional, then locate the correct [DslTestElement] class and add to it a new method for the attribute and modify the class logic to set the associated JMeter test element property. 
 

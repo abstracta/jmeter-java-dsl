@@ -113,8 +113,8 @@ public class DslResponseAssertion extends DslScopedTestElement<DslResponseAssert
    * <p>
    * By default regular expressions evaluate in multi-line mode, which means that '.' does not match
    * new lines, '^' matches start of lines and '$' matches end of lines. To use single-line mode
-   * prefix '(?s)' to the regular expressions. Regular expressions are also by default case
-   * sensitive, which can be changed to insensitive by adding '(?i)' to the regex.
+   * prefix '(?s)' to the regular expressions. Regular expressions are also by default
+   * case-sensitive, which can be changed to insensitive by adding '(?i)' to the regex.
    *
    * @param regexes list of regular expressions to search for matches in the field to test (by
    * default response body).
@@ -135,8 +135,8 @@ public class DslResponseAssertion extends DslScopedTestElement<DslResponseAssert
    * <p>
    * By default regular expressions evaluate in multi-line mode, which means that '.' does not match
    * new lines, '^' matches start of lines and '$' matches end of lines. To use single-line mode
-   * prefix '(?s)' to the regular expressions. Regular expressions are also by default case
-   * sensitive, which can be changed to insensitive by adding '(?i)' to the regex.
+   * prefix '(?s)' to the regular expressions. Regular expressions are also by default
+   * case-sensitive, which can be changed to insensitive by adding '(?i)' to the regex.
    *
    * @param regexes list of regular expressions the field to test (by default response body) must
    * match.
@@ -147,7 +147,7 @@ public class DslResponseAssertion extends DslScopedTestElement<DslResponseAssert
   }
 
   /**
-   * Allows to invert/negate each of the checks applied by the assertion.
+   * Allows inverting/negating each of the checks applied by the assertion.
    * <p>
    * This is the same as the "Not" option in Response Assertion in JMeter GUI.
    * <p>
@@ -238,7 +238,7 @@ public class DslResponseAssertion extends DslScopedTestElement<DslResponseAssert
     RESPONSE_BODY(ResponseAssertion::setTestFieldResponseData),
     /**
      * Applies the assertion to the text obtained through <a href="http://tika.apache.org/1.2/formats.html">Apache
-     * Tika</a> from the response body (which might be a pdf, excel, etc).
+     * Tika</a> from the response body (which might be a pdf, excel, etc.).
      */
     RESPONSE_BODY_AS_DOCUMENT(ResponseAssertion::setTestFieldResponseDataAsDocument),
     /**

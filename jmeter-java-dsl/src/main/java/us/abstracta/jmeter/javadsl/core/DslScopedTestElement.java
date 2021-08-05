@@ -68,7 +68,7 @@ public abstract class DslScopedTestElement<T> extends BaseTestElement {
      */
     MAIN_SAMPLE(AbstractScopedTestElement::setScopeParent),
     /**
-     * Applies the regular extractor only to sub samples (redirects, embedded resources, etc).
+     * Applies the regular extractor only to sub samples (redirects, embedded resources, etc.).
      */
     SUB_SAMPLES(AbstractScopedTestElement::setScopeChildren);
 

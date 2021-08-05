@@ -78,9 +78,9 @@ public class DslTestPlan extends TestElementContainer<TestPlanChild> {
     }
 
     @Override
-    public HashTree buildTreeUnder(HashTree parent) {
+    public HashTree buildTreeUnder(HashTree parent, BuildTreeContext context) {
       parent.putAll(tree);
-      return tree.values().iterator().next();
+      return context.getTestPlanTree();
     }
 
   }

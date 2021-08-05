@@ -229,7 +229,7 @@ public class BlazeMeterEngine implements DslJmeterEngine {
    * It is always important to use as less resources (which reduces costs) as possible to generate
    * the required load for the test. Too few resources might lead to misguiding results, since the
    * instances/engines running might be saturating and not properly imposing the expected load upon
-   * the system under test. Too much resources might lead to unnecessary expenses (wasted money).
+   * the system under test. Too many resources might lead to unnecessary expenses (wasted money).
    * <p>
    * This setting, in conjunction with totalUsers, determine the number of engines BlazeMeter will
    * use to run the test. For example, if you specify totalUsers to 500 and 100 threadsPerEngine,
@@ -254,7 +254,7 @@ public class BlazeMeterEngine implements DslJmeterEngine {
 
   /**
    * Specifies that the test run will use BlazeMeter debug run feature, not consuming credits but
-   * limited up to 10 threads and 5 mins or 100 iterations.
+   * limited up to 10 threads and 5 minutes or 100 iterations.
    *
    * @return the modified instance for fluent API usage.
    */

@@ -25,7 +25,7 @@ import org.apache.jorphan.collections.HashTree;
 import org.apache.jorphan.collections.ListedHashTree;
 
 /**
- * Allows to run test plans in an embedded JMeter instance.
+ * Allows running test plans in an embedded JMeter instance.
  */
 public class EmbeddedJmeterEngine implements DslJmeterEngine {
 
@@ -34,7 +34,7 @@ public class EmbeddedJmeterEngine implements DslJmeterEngine {
     try (JMeterEnvironment env = new JMeterEnvironment()) {
       StandardJMeterEngine engine = new StandardJMeterEngine();
       HashTree rootTree = new ListedHashTree();
-      HashTree testPlanTree = testPlan.buildTreeUnder(rootTree);
+      HashTree testPlanTree = testPlan.buildTreeUnder(rootTree, new BuildTreeContext(rootTree));
 
       AggregatingTestPlanStats stats = new AggregatingTestPlanStats();
       addTestStatsCollectorToTree(stats, testPlanTree);
@@ -132,7 +132,7 @@ public class EmbeddedJmeterEngine implements DslJmeterEngine {
     try (JMeterEnvironment env = new JMeterEnvironment();
         FileOutputStream output = new FileOutputStream(filePath)) {
       HashTree tree = new ListedHashTree();
-      dslTestPlan.buildTreeUnder(tree);
+      dslTestPlan.buildTreeUnder(tree, new BuildTreeContext(tree));
       SaveService.saveTree(tree, output);
     }
   }

@@ -8,9 +8,9 @@ import org.apache.jorphan.collections.HashTree;
  * Provides the basic logic for all {@link DslTestElement}.
  * <p>
  * In particular it currently allows to set the name of the TestElement and abstracts building of
- * the tree only requiring, from sub classes, to implement the logic to build the JMeter
- * TestElement. The test element name is particularly useful for later reporting and statistics
- * collection to differentiate metrics for each test element.
+ * the tree only requiring, from subclasses, to implement the logic to build the JMeter TestElement.
+ * The test element name is particularly useful for later reporting and statistics collection to
+ * differentiate metrics for each test element.
  * <p>
  * Sub classes may overwrite {@link #buildTreeUnder} if they need additional logic (e.g: {@link
  * TestElementContainer}).
@@ -26,7 +26,7 @@ public abstract class BaseTestElement implements DslTestElement {
   }
 
   @Override
-  public HashTree buildTreeUnder(HashTree parent) {
+  public HashTree buildTreeUnder(HashTree parent, BuildTreeContext context) {
     TestElement testElement = buildTestElement();
     testElement.setName(name);
     testElement.setProperty(TestElement.GUI_CLASS, guiClass.getName());

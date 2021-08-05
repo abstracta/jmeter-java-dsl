@@ -36,9 +36,9 @@ public abstract class TestElementContainer<T extends DslTestElement> extends Bas
   }
 
   @Override
-  public HashTree buildTreeUnder(HashTree parent) {
-    HashTree ret = super.buildTreeUnder(parent);
-    children.forEach(c -> c.buildTreeUnder(ret));
+  public HashTree buildTreeUnder(HashTree parent, BuildTreeContext context) {
+    HashTree ret = super.buildTreeUnder(parent, context);
+    children.forEach(c -> c.buildTreeUnder(ret, context));
     return ret;
   }
 

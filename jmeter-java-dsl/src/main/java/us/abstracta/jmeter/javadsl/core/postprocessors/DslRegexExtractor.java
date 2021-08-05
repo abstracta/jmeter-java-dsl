@@ -8,10 +8,10 @@ import us.abstracta.jmeter.javadsl.core.DslScopedTestElement;
 import us.abstracta.jmeter.javadsl.core.MultiLevelTestElement;
 
 /**
- * Allows to extract part of a request or response using regular expressions to store into a
+ * Allows extracting part of a request or response using regular expressions to store into a
  * variable.
  *
- * By default the regular extractor is configured to extract from the main sample (does not include
+ * By default, the regular extractor is configured to extract from the main sample (does not include
  * sub samples) response body the first capturing group (part of regular expression that is inside
  * of parenthesis) of the first match of the regex. If no match is found, then the variable will not
  * be created or modified.

@@ -12,8 +12,8 @@ import us.abstracta.jmeter.javadsl.core.BaseTestElement;
 import us.abstracta.jmeter.javadsl.core.MultiLevelTestElement;
 
 /**
- * This class allows specifying HTTP headers (through an underlying JMeter HttpHeaderManager) to be
- * used by HTTP samplers.
+ * Allows specifying HTTP headers (through an underlying JMeter HttpHeaderManager) to be used by
+ * HTTP samplers.
  * <p>
  * This test element can be added at different levels (in the same way as HTTPHeaderManager) of a
  * test plan affecting all samplers in the scope were is added. For example if httpHeaders is
@@ -39,7 +39,7 @@ public class HttpHeaders extends BaseTestElement implements MultiLevelTestElemen
    *
    * @param name of the HTTP header.
    * @param value of the HTTP header.
-   * @return the altered HttpHeaders instant to allow for fluent API usage.
+   * @return the altered HttpHeaders to allow for fluent API usage.
    */
   public HttpHeaders header(String name, String value) {
     headers.put(name, value);

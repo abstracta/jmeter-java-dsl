@@ -29,7 +29,7 @@ public class InfluxDbBackendListener extends BaseTestElement implements MultiLev
    * "events" measurement.
    * <p>
    * Consider setting this value to something that properly describes your application and the
-   * particular test run (some timestamp, some CI/CD build ID, some commit ID, etc).
+   * particular test run (some timestamp, some CI/CD build ID, some commit ID, etc.).
    * <p>
    * When not specified, this will default to "jmeter-java-dsl" plus the current timestamp.
    *

@@ -13,6 +13,7 @@ import org.apache.jorphan.collections.HashTree;
 import org.eclipse.jetty.http.HttpMethod;
 import org.eclipse.jetty.http.MimeTypes;
 import us.abstracta.jmeter.javadsl.JmeterDsl;
+import us.abstracta.jmeter.javadsl.core.BuildTreeContext;
 import us.abstracta.jmeter.javadsl.core.DslSampler;
 import us.abstracta.jmeter.javadsl.core.preprocessors.DslJsr223PreProcessor.PreProcessorScript;
 import us.abstracta.jmeter.javadsl.core.preprocessors.DslJsr223PreProcessor.PreProcessorVars;
@@ -66,7 +67,7 @@ public class DslHttpSampler extends DslSampler {
    * <p>
    * <b>WARNING:</b> As this method internally uses
    * {@link JmeterDsl#jsr223PreProcessor(PreProcessorScript)}, same limitations and considerations
-   * apply. Check it's documentation. To avoid such limitations you may use {@link #post(String,
+   * apply. Check its documentation. To avoid such limitations you may use {@link #post(String,
    * MimeTypes.Type)} with a JMeter variable instead, and dynamically set the variable with {@link
    * JmeterDsl#jsr223PreProcessor(String)}.
    *
@@ -109,7 +110,7 @@ public class DslHttpSampler extends DslSampler {
   }
 
   /**
-   * Same as {@link #header(String, String)} but allows to use dynamically calculated HTTP header
+   * Same as {@link #header(String, String)} but allows using dynamically calculated HTTP header
    * value.
    * <p>
    * This method is just an abstraction that uses a JMeter variable as HTTP header value and
@@ -117,7 +118,7 @@ public class DslHttpSampler extends DslSampler {
    * <p>
    * <b>WARNING:</b> As this method internally uses
    * {@link JmeterDsl#jsr223PreProcessor(PreProcessorScript)}, same limitations and considerations
-   * apply. Check it's documentation. To avoid such limitations you may use {@link #header(String,
+   * apply. Check its documentation. To avoid such limitations you may use {@link #header(String,
    * String)} with a JMeter variable instead, and dynamically set the variable with {@link
    * JmeterDsl#jsr223PreProcessor(String)}.
    *
@@ -156,14 +157,14 @@ public class DslHttpSampler extends DslSampler {
   }
 
   /**
-   * Same as {@link #body(String)} but allows to use dynamically calculated HTTP request body.
+   * Same as {@link #body(String)} but allows using dynamically calculated HTTP request body.
    * <p>
    * This method is just an abstraction that uses a JMeter variable as HTTP request body and
    * calculates the variable with a jsr223PreProcessor.
    * <p>
    * <b>WARNING:</b> As this method internally uses
    * {@link JmeterDsl#jsr223PreProcessor(PreProcessorScript)}, same limitations and considerations
-   * apply. Check it's documentation.  To avoid such limitations you may use {@link #body(String)}
+   * apply. Check its documentation.  To avoid such limitations you may use {@link #body(String)}
    * with a JMeter variable instead, and dynamically set the variable with {@link
    * JmeterDsl#jsr223PreProcessor(String)}.
    *
@@ -209,11 +210,13 @@ public class DslHttpSampler extends DslSampler {
   }
 
   @Override
-  public HashTree buildTreeUnder(HashTree parent) {
-    HashTree ret = super.buildTreeUnder(parent);
+  public HashTree buildTreeUnder(HashTree parent, BuildTreeContext context) {
+    HashTree ret = super.buildTreeUnder(parent, context);
     if (!headers.isEmpty()) {
-      headers.buildTreeUnder(ret);
+      headers.buildTreeUnder(ret, context);
     }
+    new DslCookieManager().buildTreeUnder(null, context);
+    new DslCacheManager().buildTreeUnder(null, context);
     return ret;
   }
 

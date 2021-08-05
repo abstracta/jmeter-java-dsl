@@ -22,17 +22,17 @@ public class TestPlanStats {
     /**
      * Gets the instant when the first sample started.
      *
-     * When associated to a test plan or transaction it gets it's start time.
+     * When associated to a test plan or transaction it gets its start time.
      */
     Instant firstTime();
 
     /**
      * Gets the instant when the last sample ended.
      *
-     * When associated to a test plan or transaction it gets it's end time.
+     * When associated to a test plan or transaction it gets its end time.
      *
      * Take into consideration that for transactions this time takes not only into consideration the
-     * endTime of last sample, but also the time spent in timers and pre and post processors.
+     * endTime of last sample, but also the time spent in timers and pre and postprocessors.
      */
     Instant endTime();
 

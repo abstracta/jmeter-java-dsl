@@ -44,7 +44,7 @@ public class DslThreadGroup extends TestElementContainer<ThreadGroupChild> imple
    * It is usually advised to set this property when working with considerable amount of threads to
    * avoid initial load of creating the threads to affect test results.
    *
-   * JMeter will create a new thread every rampUp.seconds * 1000 / threadCount milliseconds.
+   * JMeter will create a new thread every {@code rampUp.seconds * 1000 / threadCount} milliseconds.
    *
    * If you specify a thread duration time (instead of iterations), take into consideration that
    * ramp up is not considered as part of thread duration time. For example: if you have a thread
@@ -67,7 +67,7 @@ public class DslThreadGroup extends TestElementContainer<ThreadGroupChild> imple
   }
 
   /**
-   * Allows specifying children the thread group (samplers, listeners, post processors, etc).
+   * Allows specifying children the thread group (samplers, listeners, post processors, etc.).
    *
    * This method is just an alternative to the constructor specification of children, and is handy
    * when you want to keep general thread group settings together and then specify children (instead

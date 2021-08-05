@@ -14,7 +14,7 @@ public interface DslJmeterEngine {
    * This method blocks execution until the test plan execution ends.
    *
    * @param testPlan to run in the JMeter engine.
-   * @return the metrics associated to the the run.
+   * @return the metrics associated to the run.
    * @throws IOException when there is a problem with an IO operation.
    * @throws InterruptedException when the execution thread is interrupted.
    * @throws TimeoutException when some configured time out is reached. Each engine might define a

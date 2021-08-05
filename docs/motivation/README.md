@@ -44,7 +44,7 @@ public class PerformanceTest {
 }
 ```
 
-In JMeter you would need a JMX file like [this](../../docs/motivation/sample.jmx), and even then, it wouldn't be as simple to do assertions on collected statistics as in provided example.
+In JMeter, you would need a JMX file like [this](../../docs/motivation/sample.jmx), and even then, it wouldn't be as simple to do assertions on collected statistics as in provided example.
 
 ### Gatling
 
@@ -61,7 +61,7 @@ Finally, [ruby-dsl](https://github.com/flood-io/ruby-jmeter) is also an opensour
 ### jmeter-java-dsl
 
 jmeter-java-dsl tries to get the best of these tools by providing a simple java API with Git friendly format to run JMeter tests, taking advantage of all JMeter benefits and knowledge also providing many of the benefits of Gatling scripting.
-As shown in previous example, it can be easily executed with JUnit, modularized in code and easily integrated in any CI/CD pipeline. Additionally, it makes it easy to debug the execution of test plans with usual IDE debugger tools. Finally, as with most Java libraries, you can use it not only in a Java project, but also in projects of most JVM languages (like kotlin, scala, groovy, etc).
+As shown in previous example, it can be easily executed with JUnit, modularized in code and easily integrated in any CI/CD pipeline. Additionally, it makes it easy to debug the execution of test plans with usual IDE debugger tools. Finally, as with most Java libraries, you can use it not only in a Java project, but also in projects of most JVM languages (like kotlin, scala, groovy, etc.).
 
 ## Comparison Table
 

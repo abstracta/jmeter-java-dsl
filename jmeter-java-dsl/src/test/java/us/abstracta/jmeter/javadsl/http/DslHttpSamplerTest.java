@@ -1,11 +1,15 @@
 package us.abstracta.jmeter.javadsl.http;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.anyUrl;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalToJson;
+import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.getRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
+import static us.abstracta.jmeter.javadsl.JmeterDsl.httpCache;
+import static us.abstracta.jmeter.javadsl.JmeterDsl.httpCookies;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.httpHeaders;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.httpSampler;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.jsr223PreProcessor;
@@ -127,14 +131,107 @@ public class DslHttpSamplerTest extends JmeterDslTest {
     testPlan(
         threadGroup(1, 2,
             httpSampler(s -> {
-                  String countVarName = "REQUEST_COUNT";
-                  incrementVar(countVarName, s.vars);
-                  return wiremockUri + "/" + s.vars.getObject(countVarName);
-                })
+              String countVarName = "REQUEST_COUNT";
+              incrementVar(countVarName, s.vars);
+              return wiremockUri + "/" + s.vars.getObject(countVarName);
+            })
         )
     ).run();
     wiremockServer.verify(getRequestedFor(urlPathEqualTo("/" + 1)));
     wiremockServer.verify(getRequestedFor(urlPathEqualTo("/" + 2)));
+  }
+
+  @Test
+  public void shouldKeepCookiesWhenMultipleRequests() throws Exception {
+    setupHttpResponseWithCookie();
+    testPlan(
+        threadGroup(1, 1,
+            httpSampler(wiremockUri),
+            httpSampler(wiremockUri)
+        )
+    ).run();
+    wiremockServer.verify(getRequestedFor(anyUrl()).withHeader("Cookie", equalTo("MyCookie=val")));
+  }
+
+  private void setupHttpResponseWithCookie() {
+    wiremockServer.stubFor(get(anyUrl())
+        .willReturn(aResponse().withHeader("Set-Cookie", "MyCookie=val")));
+  }
+
+  @Test
+  public void shouldResetCookiesBetweenIterationsByDefault() throws Exception {
+    setupHttpResponseWithCookie();
+    testPlan(
+        threadGroup(1, 2,
+            httpSampler(wiremockUri)
+        )
+    ).run();
+    wiremockServer.verify(getRequestedFor(anyUrl()).withoutHeader("Cookie"));
+  }
+
+  @Test
+  public void shouldUseCachedResponseWhenSameRequestAndCacheableResponse() throws Exception {
+    testPlan(
+        buildHeadersToFixHttpCaching(),
+        threadGroup(1, 1,
+            httpSampler(wiremockUri),
+            httpSampler(wiremockUri)
+        )
+    ).run();
+    wiremockServer.verify(1, getRequestedFor(anyUrl()));
+  }
+
+  /*
+   need to set header for request header to match otherwise jmeter automatically adds this
+   header while sending request and stores it in cache and when it checks in next request
+   it doesn't match since same header is not yet set at check time,
+   */
+  private HttpHeaders buildHeadersToFixHttpCaching() {
+    return httpHeaders().header("User-Agent", "jmeter-java-dsl");
+  }
+
+  private void setupCacheableHttpResponse() {
+    wiremockServer.stubFor(get(anyUrl())
+        .willReturn(aResponse().withHeader("Vary", "max-age=600")));
+  }
+
+  @Test
+  public void shouldResetCacheBetweenIterationsByDefault() throws Exception {
+    setupCacheableHttpResponse();
+    testPlan(
+        buildHeadersToFixHttpCaching(),
+        threadGroup(1, 2,
+            httpSampler(wiremockUri)
+        )
+    ).run();
+    wiremockServer.verify(2, getRequestedFor(anyUrl()));
+  }
+
+  @Test
+  public void shouldNotKeepCookiesWhenDisabled() throws Exception {
+    setupHttpResponseWithCookie();
+    testPlan(
+        httpCookies().disable(),
+        threadGroup(1, 1,
+            httpSampler(wiremockUri),
+            httpSampler(wiremockUri)
+        )
+    ).run();
+    wiremockServer.verify(2, getRequestedFor(anyUrl()).withoutHeader("Cookie"));
+  }
+
+  @Test
+  public void shouldNotUseCacheWhenDisabled() throws Exception {
+    wiremockServer.stubFor(get(anyUrl())
+        .willReturn(aResponse().withHeader("Set-Cookie", "MyCookie=val")));
+    testPlan(
+        httpCache().disable(),
+        threadGroup(1, 1,
+            httpSampler(wiremockUri),
+            httpSampler(wiremockUri)
+        )
+    ).run();
+    wiremockServer.verify(2, getRequestedFor(anyUrl()));
   }
 
 }

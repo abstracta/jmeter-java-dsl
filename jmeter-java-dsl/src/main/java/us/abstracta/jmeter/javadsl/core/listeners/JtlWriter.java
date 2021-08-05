@@ -11,13 +11,13 @@ import us.abstracta.jmeter.javadsl.core.MultiLevelTestElement;
 
 /**
  * Allows to generate a result log file (JTL) with data for each sample for a test plan, thread
- * group or sampler, depending at what level of test plan is added.
+ * group or sampler, depending on what level of test plan is added.
  *
  * If jtlWriter is added at testPlan level it will log information about all samples in the test
  * plan, if added at thread group level it will only log samples for samplers contained within it,
  * if added as a sampler child, then only that sampler samples will be logged.
  *
- * By default this writer will use JMeter default JTL format, a csv with following fields:
+ * By default, this writer will use JMeter default JTL format, a csv with following fields:
  * timeStamp,elapsed,label,responseCode,responseMessage,threadName,dataType,success,failureMessage,
  * bytes,sentBytes,grpThreads,allThreads,URL,Latency,IdleTime,Connect. You can change the format to
  * XML and specify additional (or remove existing ones) fields to store with provided methods.
@@ -160,7 +160,7 @@ public class JtlWriter extends BaseTestElement implements MultiLevelTestElement 
   /**
    * Allows specifying to use XML or CSV format for saving JTL.
    *
-   * Take into consideration that some fields (like requestHeaders, responseHeaders, etc) will only
+   * Take into consideration that some fields (like requestHeaders, responseHeaders, etc.) will only
    * be saved when XML format is used.
    *
    * @param enabled specifies whether enable XML format saving, or disable it (and use CSV).
@@ -247,7 +247,7 @@ public class JtlWriter extends BaseTestElement implements MultiLevelTestElement 
   }
 
   /**
-   * Allows setting whether or not to include the response encoding (eg: UTF-8, ISO-8859-1, etc)
+   * Allows setting whether or not to include the response encoding (eg: UTF-8, ISO-8859-1, etc.)
    * field in generated JTL.
    *
    * @param enabled specifies whether enable or disable inclusion of response encoding.
@@ -321,7 +321,7 @@ public class JtlWriter extends BaseTestElement implements MultiLevelTestElement 
    * Allows setting whether or not to include sample label (i.e.: name of the request) field in
    * generated JTL.
    *
-   * In general you should enable this field to properly identify results to associated samplers.
+   * In general, you should enable this field to properly identify results to associated samplers.
    *
    * @param enabled specifies whether enable or disable inclusion of sample labels.
    * @return the JtlWriter instance to be able to specify additional options in a fluent API way.
@@ -375,7 +375,7 @@ public class JtlWriter extends BaseTestElement implements MultiLevelTestElement 
 
   /**
    * Allows setting whether or not to include latency time (milliseconds between the sample started
-   * and it got the first byte of response) field in generated JTL.
+   * and first byte of response is received) field in generated JTL.
    *
    * This is usually helpful to identify how fast does the tested service takes to answer, taking
    * out the time spent in transferring response data.
@@ -392,9 +392,9 @@ public class JtlWriter extends BaseTestElement implements MultiLevelTestElement 
    * Allows setting whether or not to include sample counts (total and error counts) fields in
    * generated JTL.
    *
-   * In general sample count will be 1, and error count will be 0 or 1 depending if the sample
-   * succeeded or failed. But there are some scenarios where these counts might be greater, for
-   * example when controllers results are being included.
+   * In general sample count will be 1, and error count will be 0 or 1 depending on sample success
+   * or failure. But there are some scenarios where these counts might be greater, for example when
+   * controllers results are being included.
    *
    * @param enabled specifies whether enable or disable inclusion of sample counts.
    * @return the JtlWriter instance to be able to specify additional options in a fluent API way.
@@ -452,7 +452,7 @@ public class JtlWriter extends BaseTestElement implements MultiLevelTestElement 
    * Allows setting whether or not to include response codes (e.g.: 200) field in generated JTL.
    *
    * This field allows to quickly identify different reasons for failure in server (eg: bad request,
-   * service temporally unavailable, etc).
+   * service temporally unavailable, etc.).
    *
    * @param enabled specifies whether enable or disable inclusion of response codes.
    * @return the JtlWriter instance to be able to specify additional options in a fluent API way.

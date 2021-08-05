@@ -11,15 +11,15 @@ import us.abstracta.jmeter.javadsl.core.DslJsr223TestElement;
 import us.abstracta.jmeter.javadsl.core.MultiLevelTestElement;
 
 /**
- * Allows to run custom logic before executing a sampler.
+ * Allows running custom logic before executing a sampler.
  * <p>
  * This is a very powerful and flexible component that allows you to modify variables, sampler,
- * context, etc, before running a sampler (for example to generate dynamic requests
+ * context, etc., before running a sampler (for example to generate dynamic requests
  * programmatically).
  * <p>
  * By default, provided script will be interpreted as groovy script, which is the default setting
  * for JMeter. If you need, you can use any of JMeter provided scripting languages (beanshell,
- * javascript, jexl, etc) by setting the {@link #language(String)} property.
+ * javascript, jexl, etc.) by setting the {@link #language(String)} property.
  */
 public class DslJsr223PreProcessor extends DslJsr223TestElement implements MultiLevelTestElement {
 

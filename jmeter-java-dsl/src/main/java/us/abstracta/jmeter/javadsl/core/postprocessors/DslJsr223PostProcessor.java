@@ -12,14 +12,14 @@ import us.abstracta.jmeter.javadsl.core.DslJsr223TestElement;
 import us.abstracta.jmeter.javadsl.core.MultiLevelTestElement;
 
 /**
- * Allows to run custom logic after getting a sample result.
+ * Allows running custom logic after getting a sample result.
  * <p>
  * This is a very powerful and flexible component that allows you to modify sample results (like
  * changing the flag if is success or not), jmeter variables, context settings, etc.
  * <p>
  * By default, provided script will be interpreted as groovy script, which is the default setting
  * for JMeter. If you need, you can use any of JMeter provided scripting languages (beanshell,
- * javascript, jexl, etc) by setting the {@link #language(String)} property.
+ * javascript, jexl, etc.) by setting the {@link #language(String)} property.
  */
 public class DslJsr223PostProcessor extends DslJsr223TestElement implements MultiLevelTestElement {
 

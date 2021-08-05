@@ -14,7 +14,7 @@ import us.abstracta.jmeter.javadsl.core.MultiLevelTestElement;
  * generate files for samplers only in the thread group, and if you add it at sampler level it will
  * generate files only for the associated sampler.
  *
- * By default it will generate one file for each response using the given (which might include the
+ * By default, it will generate one file for each response using the given (which might include the
  * directory location) prefix to create the files and adding an incremental number to each response
  * and an extension according to the response mime type.
  */

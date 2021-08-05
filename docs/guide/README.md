@@ -47,7 +47,7 @@ To generate HTTP requests just use provided `httpSampler`.
 
 Following example uses 2 threads (concurrent users) which send 10 HTTP GET requests each to `http://my.service`. 
 
-Additionally, it logs collected statistics (response times, status codes, etc) to a timestamped file (for later analysis if needed) and checks that the response time 99 percentile is less than 5 seconds.
+Additionally, it logs collected statistics (response times, status codes, etc.) to a timestamped file (for later analysis if needed) and checks that the response time 99 percentile is less than 5 seconds.
 
 ```java
 import static org.assertj.core.api.Assertions.assertThat;
@@ -79,11 +79,27 @@ public class PerformanceTest {
 Check [JmeterDsl](../../jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/JmeterDsl.java) and [DslHttpSampler](../../jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/http/DslHttpSampler.java) for additional options.
 
 ::: tip
-Since JMeter uses [log4j2](https://logging.apache.org/log4j/2.x/), if you want to control logging level or output, you can use something similar this [log4j2.xml](../../jmeter-java-dsl/src/test/resources/log4j2.xml).
+When working with multiple samplers in a test plan, specify their names to easily check their respective statistics.
 :::
 
 ::: tip
-When working with multiple samplers in a test plan, specify their names to easily check their respective statistics.
+jmeter-java-dsl automatically adds a cookie manager and cache manager for automatic HTTP cookie and caching handling, emulating browsers behavior. If you need to disable them you can use something like this:
+
+```java
+testPlan(
+  httpCookies().disable(),
+  httpCache().disable(),
+  threadGroup(2, 10,
+    httpSampler("http://my.service")
+  )
+)
+```
+
+Cookies and cache are automatically cleared in each thread iteration.
+:::
+
+::: tip
+Since JMeter uses [log4j2](https://logging.apache.org/log4j/2.x/), if you want to control logging level or output, you can use something similar this [log4j2.xml](../../jmeter-java-dsl/src/test/resources/log4j2.xml).
 :::
 
 ## Run test at scale in BlazeMeter
@@ -160,7 +176,7 @@ In case you want to get debug logs for HTTP calls to BlazeMeter API, you can inc
 :::
 
 ::: warning
-If you use JSR223 Pre or Post processors with Java code (lambdas) instead of strings ([here](#change-sample-result-statuses-with-custom-logic) are some examples), or use one of the HTTP Sampler methods which receive a function as parameter (as in [here](#provide-request-parameters-programmatically-per-request)), then BlazeMeter execution won't work. You can migrate them to use `jsrPreProcessor` with string scripts instead. Check associated methods documentation for more details.
+If you use JSR223 Pre- or Post- processors with Java code (lambdas) instead of strings ([here](#change-sample-result-statuses-with-custom-logic) are some examples), or use one of the HTTP Sampler methods which receive a function as parameter (as in [here](#provide-request-parameters-programmatically-per-request)), then BlazeMeter execution won't work. You can migrate them to use `jsrPreProcessor` with string scripts instead. Check associated methods documentation for more details.
 :::
 
 ## Log requests and responses
@@ -305,13 +321,13 @@ Use provided `docker-compose` settings for local tests only. It uses weak creden
 
 Check [InfluxDbBackendListener](../../jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/listeners/InfluxDbBackendListener.java) for additional details and settings.
 
-## Generate HTML report from test plan execution
+## Generate HTML reports from test plan execution
 
 After running a test plan you would usually like to visualize the results in friendly way that eases analysis of collected information.
 
 One, and preferred way, to do that is through [previously mentioned alternative](#real-time-metrics-visualization-and-historic-data-storage).
 
-Another way, might just be using [previously introduced](#simple-http-test-plan) `jtlWriter` and then loading the jtl file in JMeter GUI with one of JMeter provided listeners (like view results tree, summary report, etc).
+Another way, might just be using [previously introduced](#simple-http-test-plan) `jtlWriter` and then loading the jtl file in JMeter GUI with one of JMeter provided listeners (like view results tree, summary report, etc.).
 
 Another alternative is generating a standalone report for the test plan execution using jmeter-java-dsl provided `htmlReporter` like this:
 
@@ -342,7 +358,7 @@ public class PerformanceTest {
 ```
 
 ::: warning
-`htmlReporter` will throw an exception if provided directory path is a non empty directory or file
+`htmlReporter` will throw an exception if provided directory path is a nonempty directory or file
 :::
 
 ## Check for expected response
@@ -415,7 +431,7 @@ public class PerformanceTest {
 }
 ```
 
-You can also use a Java lambda instead of providing Groovy script, which benefits from Java type safety & IDEs code auto completion:
+You can also use a Java lambda instead of providing Groovy script, which benefits from Java type safety & IDEs code auto-completion:
 
 ```java
 jsr223PostProcessor(s -> { 
@@ -437,7 +453,7 @@ JSR223PostProcessor is a very powerful tool, but is not the only, nor the best, 
 
 ## Use part of a response in a following request (aka: correlation)
 
-It is a usual requirement while creating a test plan for an application to be able to use part of a response (e.g.: a generated ID, token, etc) in a subsequent request. This can be easily achieved using JMeter extractors and variables. Here is an example with jmeter-java-dsl:
+It is a usual requirement while creating a test plan for an application to be able to use part of a response (e.g.: a generated ID, token, etc.) in a subsequent request. This can be easily achieved using JMeter extractors and variables. Here is an example with jmeter-java-dsl:
 
 ```java
 import static org.assertj.core.api.Assertions.assertThat;
@@ -511,7 +527,7 @@ public class PerformanceTest {
 }
 ```
 
-You can also use a Java lambda instead of providing Groovy script, which benefits from Java type safety & IDEs code auto completion:
+You can also use a Java lambda instead of providing Groovy script, which benefits from Java type safety & IDEs code auto-completion:
 
 ```java
 jsr223PreProcessor(s -> s.vars.put("REQUEST_BODY", buildRequestBody(s.vars)))
@@ -531,7 +547,7 @@ Check [DslJsr223PreProcessor](../../jmeter-java-dsl/src/main/java/us/abstracta/j
 
 ## Group requests
 
-Sometimes is necessary to be able to group requests which constitute different steps in a test. For example, separate requests necessary to do a login from the ones used to add items to cart, from the ones that do a purchase. JMeter (and the DSL) provide Transaction Controllers for this purpose, here is an example:
+Sometimes, is necessary to be able to group requests which constitute different steps in a test. For example, separate requests necessary to do a login from the ones used to add items to cart, from the ones that do a purchase. JMeter (and the DSL) provide Transaction Controllers for this purpose, here is an example:
 
 ```java
 import static us.abstracta.jmeter.javadsl.JmeterDsl.*;
@@ -567,7 +583,7 @@ This will provide additional sample results for each transaction, which contain 
 
 ## Emulate user delays between requests
 
-Sometimes is necessary to replicate users behavior on the test plan, adding a timer between requests is one of the most used practices. For example, simulate the time it will take to complete a purchase form. JMeter (and the DSL) provide Uniform Random Timer for this purpose. Here is an example that adds a delay between four and ten seconds:
+Sometimes, is necessary to replicate users' behavior on the test plan, adding a timer between requests is one of the most used practices. For example, simulate the time it will take to complete a purchase form. JMeter (and the DSL) provide Uniform Random Timer for this purpose. Here is an example that adds a delay between four and ten seconds:
 
 ```java
 import static us.abstracta.jmeter.javadsl.JmeterDsl.*;
@@ -627,7 +643,7 @@ Take into consideration that currently there is no automatic way to migrate chan
 :::
 
 ::: warning
-If you use JSR223 Pre or Post processors with Java code (lambdas) instead of strings, or use one of the HTTP Sampler methods which receive a function as parameter, then the exported JMX will not work in JMeter GUI. You can migrate them to use jsrPreProcessor with string scripts instead.
+If you use JSR223 Pre- or Post- processors with Java code (lambdas) instead of strings, or use one of the HTTP Sampler methods which receive a function as parameter, then the exported JMX will not work in JMeter GUI. You can migrate them to use jsrPreProcessor with string scripts instead.
 :::
 
 ## Run JMX file
@@ -654,7 +670,7 @@ public class RunJmxTestPlan {
 }
 ``` 
 
-This can be used to just run existing JMX files, or when DSL has no support for some JMeter functionality or plugin and you need to use JMeter GUI to build the test plan but still want to use jmeter-java-dsl to run the test plan embedded in Java test or code.
+This can be used to just run existing JMX files, or when DSL has no support for some JMeter functionality or plugin, and you need to use JMeter GUI to build the test plan but still want to use jmeter-java-dsl to run the test plan embedded in Java test or code.
 
 ::: tip
 When the JMX uses some custom plugin or JMeter protocol support, you might need to add required dependencies to be able to run the test in an embedded engine. For example, when running a TN3270 JMX test plan using RTE plugin you will need to add following repository and dependencies:
