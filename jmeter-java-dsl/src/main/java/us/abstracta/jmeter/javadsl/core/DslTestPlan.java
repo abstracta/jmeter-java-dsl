@@ -1,5 +1,7 @@
 package us.abstracta.jmeter.javadsl.core;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
@@ -9,7 +11,9 @@ import org.apache.jmeter.control.gui.TestPlanGui;
 import org.apache.jmeter.testelement.TestElement;
 import org.apache.jmeter.testelement.TestPlan;
 import org.apache.jorphan.collections.HashTree;
+import org.apache.jorphan.collections.ListedHashTree;
 import us.abstracta.jmeter.javadsl.core.DslTestPlan.TestPlanChild;
+import us.abstracta.jmeter.javadsl.core.EmbeddedJmeterEngine.JMeterEnvironment;
 
 /**
  * Represents a JMeter test plan, with associated thread groups and other children elements.
@@ -57,15 +61,26 @@ public class DslTestPlan extends TestElementContainer<TestPlanChild> {
    * @throws IOException when there is a problem saving to the file.
    */
   public void saveAsJmx(String filePath) throws IOException {
-    EmbeddedJmeterEngine.saveTestPlanToJmx(this, filePath);
+    try (JMeterEnvironment env = new JMeterEnvironment();
+        FileOutputStream output = new FileOutputStream(filePath)) {
+      HashTree tree = new ListedHashTree();
+      buildTreeUnder(tree, new BuildTreeContext(tree));
+      env.saveTree(tree, output);
+    }
   }
 
+  /**
+   * Loads a test plan from the given JMX to be able to run it in embedded engine.
+   *
+   * @param filePath specifies the path where the JMX file is located.
+   * @return loaded test plan.
+   * @throws IOException when there is a problem loading to the file.
+   */
   public static DslTestPlan fromJmx(String filePath) throws IOException {
-    return EmbeddedJmeterEngine.loadTestPlanFromJmx(filePath);
-  }
-
-  public static DslTestPlan fromTree(HashTree tree) {
-    return new JmxTestPlan(tree);
+    try (JMeterEnvironment env = new JMeterEnvironment()) {
+      HashTree tree = env.loadTree(new File(filePath));
+      return new JmxTestPlan(tree);
+    }
   }
 
   private static class JmxTestPlan extends DslTestPlan {

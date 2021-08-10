@@ -12,6 +12,8 @@ import us.abstracta.jmeter.javadsl.core.DslTestPlan.TestPlanChild;
  * behavior, the instance can be disabled by setting its enabled attribute to false.
  *
  * Check subclasses for examples of its usage.
+ *
+ * @since 0.17
  */
 public abstract class TestPlanSingletonChildElement extends BaseTestElement implements
     TestPlanChild {

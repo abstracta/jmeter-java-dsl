@@ -1,7 +1,7 @@
 package us.abstracta.jmeter.javadsl.http;
 
 import org.apache.jmeter.protocol.http.control.CookieManager;
-import org.apache.jmeter.protocol.http.gui.CacheManagerGui;
+import org.apache.jmeter.protocol.http.gui.CookiePanel;
 import org.apache.jmeter.testelement.TestElement;
 import us.abstracta.jmeter.javadsl.core.TestPlanSingletonChildElement;
 
@@ -13,11 +13,13 @@ import us.abstracta.jmeter.javadsl.core.TestPlanSingletonChildElement;
  * <p>
  * This element has to be added before any http sampler to be considered, and if you add multiple
  * instances of cookie manager to a test plan, only the first one will be considered.
+ *
+ * @since 0.17
  */
 public class DslCookieManager extends TestPlanSingletonChildElement {
 
   public DslCookieManager() {
-    super("HTTP Cookie Manager", CacheManagerGui.class);
+    super("HTTP Cookie Manager", CookiePanel.class);
   }
 
   /**

@@ -21,6 +21,7 @@ import org.apache.jmeter.samplers.SampleResult;
 import org.apache.jmeter.save.SaveService;
 import org.apache.jmeter.util.JMeterUtils;
 import org.apache.jmeter.visualizers.Visualizer;
+import org.apache.jmeter.visualizers.backend.BackendListenerClient;
 import org.apache.jorphan.collections.HashTree;
 import org.apache.jorphan.collections.ListedHashTree;
 
@@ -67,17 +68,22 @@ public class EmbeddedJmeterEngine implements DslJmeterEngine {
         installConfig(binDir);
         Properties props = JMeterUtils
             .getProperties(new File(binDir, "jmeter.properties").getPath());
-        props.setProperty("search_paths", getFunctionsJarPath());
+        /*
+         include functions and components jars paths so jmeter search methods can find classes in
+         such jars
+         */
+        props.setProperty("search_paths", getClassJarPath(EvalFunction.class) + ";" +
+            getClassJarPath(BackendListenerClient.class));
       } catch (IOException | RuntimeException e) {
         FileUtils.deleteDirectory(homeDir);
         throw e;
       }
     }
 
-    private String getFunctionsJarPath() {
+    private String getClassJarPath(Class<?> theClass) {
       try {
-        return new File(EvalFunction.class.getProtectionDomain().getCodeSource().getLocation()
-            .toURI()).getPath();
+        return new File(
+            theClass.getProtectionDomain().getCodeSource().getLocation().toURI()).getPath();
       } catch (URISyntaxException e) {
         throw new RuntimeException(e);
       }
@@ -94,6 +100,18 @@ public class EmbeddedJmeterEngine implements DslJmeterEngine {
       } catch (URISyntaxException e) {
         throw new RuntimeException(e);
       }
+    }
+
+    public void saveTree(HashTree tree, FileOutputStream output) throws IOException {
+      SaveService.saveTree(tree, output);
+    }
+
+    public HashTree loadTree(File file) throws IOException {
+      return SaveService.loadTree(file);
+    }
+
+    public void initLocale() {
+      JMeterUtils.initLocale();
     }
 
     @Override
@@ -125,23 +143,6 @@ public class EmbeddedJmeterEngine implements DslJmeterEngine {
 
   private void addTestSummariserToTree(HashTree tree) {
     tree.add(new ResultCollector(new Summariser()));
-  }
-
-  public static void saveTestPlanToJmx(DslTestPlan dslTestPlan, String filePath)
-      throws IOException {
-    try (JMeterEnvironment env = new JMeterEnvironment();
-        FileOutputStream output = new FileOutputStream(filePath)) {
-      HashTree tree = new ListedHashTree();
-      dslTestPlan.buildTreeUnder(tree, new BuildTreeContext(tree));
-      SaveService.saveTree(tree, output);
-    }
-  }
-
-  public static DslTestPlan loadTestPlanFromJmx(String filePath) throws IOException {
-    try (JMeterEnvironment env = new JMeterEnvironment()) {
-      HashTree tree = SaveService.loadTree(new File(filePath));
-      return DslTestPlan.fromTree(tree);
-    }
   }
 
 }

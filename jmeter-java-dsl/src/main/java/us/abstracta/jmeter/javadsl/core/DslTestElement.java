@@ -18,4 +18,13 @@ public interface DslTestElement {
    */
   HashTree buildTreeUnder(HashTree parent, BuildTreeContext context);
 
+  /**
+   * Shows the test element in it's defined GUI in a popup window.
+   *
+   * This might be handy to visualize the element as it looks in JMeter GUI.
+   *
+   * @since 0.18
+   */
+  void showInGui();
+
 }

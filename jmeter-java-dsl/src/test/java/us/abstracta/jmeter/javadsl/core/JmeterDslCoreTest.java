@@ -58,21 +58,17 @@ public class JmeterDslCoreTest extends JmeterDslTest {
   }
 
   @Test
-  public void shouldTakeAtLeastRampUpPeriodRunningTestWhenThreadGroupWithConfiguredRampUp()
+  public void shouldTakeAtLeastRampTimesRunningTestWhenThreadGroupWithRampUpAndDown()
       throws IOException {
     Duration duration = Duration.ofSeconds(5);
     Stopwatch time = Stopwatch.createStarted();
-    int threads = 2;
-    /*
-     we need to test with 2 threads and check with half of specified ramp-up do to existing JMeter
-     bug: https://bz.apache.org/bugzilla/show_bug.cgi?id=65031
-     */
     testPlan(
-        threadGroup(threads, 1)
-            .rampUpPeriod(duration)
+        threadGroup()
+            .rampTo(3, duration)
+            .rampTo(0, duration)
             .children(httpSampler(wiremockUri))
     ).run();
-    assertThat(time.elapsed()).isGreaterThan(duration.minus(duration.dividedBy(threads)));
+    assertThat(time.elapsed()).isGreaterThan(duration.multipliedBy(2));
   }
 
   @Test

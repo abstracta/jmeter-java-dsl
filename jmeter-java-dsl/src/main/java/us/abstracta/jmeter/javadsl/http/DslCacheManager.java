@@ -13,6 +13,8 @@ import us.abstracta.jmeter.javadsl.core.TestPlanSingletonChildElement;
  * <p>
  * This element has to be added before any http sampler to be considered, and if you add multiple
  * instances of cache manager to a test plan, only the first one will be considered.
+ *
+ * @since 0.17
  */
 public class DslCacheManager extends TestPlanSingletonChildElement {
 

@@ -114,6 +114,43 @@ public class JmeterDsl {
   }
 
   /**
+   * Builds a new thread group without any thread configuration.
+   *
+   * This method should be used as starting point for creating complex test thread profiles (like
+   * spike, or incremental tests) in combination with {@link DslThreadGroup#holdFor(Duration)},
+   * {@link DslThreadGroup#rampTo(int, Duration)} and {@link DslThreadGroup#rampToAndHold(int,
+   * Duration, Duration)}.
+   *
+   * Eg:
+   * <pre>{@code
+   *  threadGroup()
+   *    .rampTo(10, Duration.seconds(10))
+   *    .rampDown(5, Duration.seconds(10))
+   *    .rampToAndHold(20, Duration.seconds(5), Duration.seconds(10))
+   *    .rampTo(0, Duration.seconds(5))
+   *    .children(...)
+   * }</pre>
+   *
+   * @return the thread group instance.
+   * @since 0.18
+   */
+  public static DslThreadGroup threadGroup() {
+    return new DslThreadGroup(null);
+  }
+
+  /**
+   * Same as {@link #threadGroup()} but allowing to set a name on the thread group.
+   * <p>
+   * Setting a proper name allows to properly identify the requests generated in each thread group.
+   *
+   * @see #threadGroup()
+   * @since 0.18
+   */
+  public static DslThreadGroup threadGroup(String name) {
+    return new DslThreadGroup(name);
+  }
+
+  /**
    * Builds a new transaction controller with the given name.
    *
    * @param name specifies the name to identify the transaction.

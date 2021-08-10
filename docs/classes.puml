@@ -24,6 +24,8 @@ package core {
     addChild(DslTestElement child)
   }
 
+  abstract class TestPlanSingletonChildElement extends BaseTestElement implements TestPlanChild
+
   class DslTestPlan extends TestElementContainer {
     TestPlanStats run()
     TestPlanStats runIn(DslJmeterEngine engine)
@@ -198,6 +200,10 @@ package http {
   class HttpHeaders extends BaseTestElement implements MultiLevelTestElement {
     Map<String, String> headers
   }
+
+  class DslCacheManager extends TestPlanSingletonChildElement
+
+  class DslCookieManager extends TestPlanSingletonChildElement
 
 }
 

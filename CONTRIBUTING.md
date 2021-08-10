@@ -45,6 +45,7 @@ When a test plan runs, the engine returns an instance of [TestPlanStats](jmeter-
 * Avoid using names already taken by JMeter for classes to avoid confusion (eg: instead of using TestPlan use DslTestPlan).
 * For any changes include appropriate automated tests.
 * Update documentation if necessary.
+* Include `@since` with proper next version id for new methods and classes or changes of methods signatures  
 
 ## FAQ
 

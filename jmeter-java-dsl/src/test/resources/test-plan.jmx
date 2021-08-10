@@ -53,7 +53,7 @@
         </HTTPSamplerProxy>
         <hashTree/>
       </hashTree>
-      <CookieManager guiclass="CacheManagerGui" testclass="CookieManager" testname="HTTP Cookie Manager">
+      <CookieManager guiclass="CookiePanel" testclass="CookieManager" testname="HTTP Cookie Manager">
         <collectionProp name="CookieManager.cookies"/>
         <boolProp name="CookieManager.clearEachIteration">true</boolProp>
       </CookieManager>
