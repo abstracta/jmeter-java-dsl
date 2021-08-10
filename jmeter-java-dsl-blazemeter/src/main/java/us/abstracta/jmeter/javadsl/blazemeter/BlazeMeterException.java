@@ -4,6 +4,8 @@ import java.io.IOException;
 
 /**
  * Exception thrown when getting an unsuccessful response from BlazeMeter API.
+ *
+ * @since 0.2
  */
 public class BlazeMeterException extends IOException {
 

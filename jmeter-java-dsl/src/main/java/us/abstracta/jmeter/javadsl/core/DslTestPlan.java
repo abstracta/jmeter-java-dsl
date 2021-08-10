@@ -17,6 +17,8 @@ import us.abstracta.jmeter.javadsl.core.EmbeddedJmeterEngine.JMeterEnvironment;
 
 /**
  * Represents a JMeter test plan, with associated thread groups and other children elements.
+ *
+ * @since 0.1
  */
 public class DslTestPlan extends TestElementContainer<TestPlanChild> {
 
@@ -75,6 +77,7 @@ public class DslTestPlan extends TestElementContainer<TestPlanChild> {
    * @param filePath specifies the path where the JMX file is located.
    * @return loaded test plan.
    * @throws IOException when there is a problem loading to the file.
+   * @since 0.3
    */
   public static DslTestPlan fromJmx(String filePath) throws IOException {
     try (JMeterEnvironment env = new JMeterEnvironment()) {

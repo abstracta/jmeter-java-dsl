@@ -30,6 +30,8 @@ import us.abstracta.jmeter.javadsl.core.DslThreadGroup.ThreadGroupChild;
  * <p>
  * Additional methods should be added in the future to support setting rump-up, start and end
  * scheduling.
+ *
+ * @since 0.1
  */
 public class DslThreadGroup extends TestElementContainer<ThreadGroupChild> implements
     TestPlanChild {
@@ -238,6 +240,7 @@ public class DslThreadGroup extends TestElementContainer<ThreadGroupChild> imple
    *
    * @param children list of test elements to add as children of the thread group.
    * @return the altered thread group to allow for fluent API usage.
+   * @since 0.12
    */
   public DslThreadGroup children(ThreadGroupChild... children) {
     return (DslThreadGroup) super.children(children);

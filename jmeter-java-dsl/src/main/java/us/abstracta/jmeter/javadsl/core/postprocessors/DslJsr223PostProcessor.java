@@ -20,6 +20,8 @@ import us.abstracta.jmeter.javadsl.core.MultiLevelTestElement;
  * By default, provided script will be interpreted as groovy script, which is the default setting
  * for JMeter. If you need, you can use any of JMeter provided scripting languages (beanshell,
  * javascript, jexl, etc.) by setting the {@link #language(String)} property.
+ *
+ * @since 0.6
  */
 public class DslJsr223PostProcessor extends DslJsr223TestElement implements MultiLevelTestElement {
 
@@ -42,6 +44,7 @@ public class DslJsr223PostProcessor extends DslJsr223TestElement implements Mult
    * Allows to use any java code as script.
    *
    * @see PostProcessorVars for a list of provided variables in script execution
+   * @since 0.10
    */
   public interface PostProcessorScript extends Jsr223Script<PostProcessorVars> {
 

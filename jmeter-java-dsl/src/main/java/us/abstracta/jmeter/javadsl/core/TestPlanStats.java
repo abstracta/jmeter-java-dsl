@@ -11,6 +11,8 @@ import java.util.concurrent.ConcurrentHashMap;
  * <p>
  * When using different samples, specify different names on them to be able to get each sampler
  * specific statistics after they run.
+ *
+ * @since 0.1
  */
 public class TestPlanStats {
 
@@ -64,16 +66,22 @@ public class TestPlanStats {
 
     /**
      * Gets the minimum time spent in a sample.
+     *
+     * @since 0.15
      */
     Duration minSampleTime();
 
     /**
      * Gets the maximum time spent in a sample.
+     *
+     * @since 0.15
      */
     Duration maxSampleTime();
 
     /**
      * Gets the mean value of samples times.
+     *
+     * @since 0.15
      */
     Duration meanSampleTime();
 
@@ -81,6 +89,8 @@ public class TestPlanStats {
      * Gets the 90 percentile of samples times.
      *
      * 90% of samples took less or equal to the returned value.
+     *
+     * @since 0.15
      */
     Duration sampleTimePercentile90();
 
@@ -88,6 +98,8 @@ public class TestPlanStats {
      * Gets the 95 percentile of samples times.
      *
      * 95% of samples took less or equal to the returned value.
+     *
+     * @since 0.15
      */
     Duration sampleTimePercentile95();
 
@@ -95,6 +107,8 @@ public class TestPlanStats {
      * Gets the 99 percentile of samples times.
      *
      * 99% of samples took less or equal to the returned value.
+     *
+     * @since 0.15
      */
     Duration sampleTimePercentile99();
 

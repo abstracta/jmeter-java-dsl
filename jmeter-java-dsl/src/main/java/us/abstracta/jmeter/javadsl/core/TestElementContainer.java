@@ -12,6 +12,8 @@ import org.apache.jorphan.collections.HashTree;
  * @param <T> is type of test elements that can be nested by this class.
  *
  * Check {@link DslTestPlan} for an example.
+ *
+ * @since 0.1
  */
 public abstract class TestElementContainer<T extends DslTestElement> extends BaseTestElement {
 
@@ -29,6 +31,7 @@ public abstract class TestElementContainer<T extends DslTestElement> extends Bas
    *
    * @param children list of test elements to add as children of this sampler.
    * @return the altered sampler to allow for fluent API usage.
+   * @since 0.12
    */
   protected TestElementContainer<T> children(T... children) {
     this.children.addAll(Arrays.asList(children));

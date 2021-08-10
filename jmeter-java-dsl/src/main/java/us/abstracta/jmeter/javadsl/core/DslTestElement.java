@@ -4,6 +4,8 @@ import org.apache.jorphan.collections.HashTree;
 
 /**
  * Interface to be implemented by all elements composing a JMeter test plan.
+ *
+ * @since 0.1
  */
 public interface DslTestElement {
 
@@ -15,6 +17,7 @@ public interface DslTestElement {
    * the test plan tree (eg: adding additional items to test plan when a particular protocol element
    * is added).
    * @return The tree created under the parent node.
+   * @since 0.17
    */
   HashTree buildTreeUnder(HashTree parent, BuildTreeContext context);
 

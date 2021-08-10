@@ -41,6 +41,8 @@ import us.abstracta.jmeter.javadsl.http.HttpHeaders;
  * test elements (the ones that makes sense to specify in most of the cases). For the rest of
  * parameters (the optional ones), prefer them to be specified as methods of the implemented {@link
  * DslTestElement} for such case, in a similar fashion as Builder Pattern.
+ *
+ * @since 0.1
  */
 public class JmeterDsl {
 
@@ -94,6 +96,7 @@ public class JmeterDsl {
    * duration is reached.
    * @return the thread group instance.
    * @see ThreadGroup
+   * @since 0.5
    */
   public static DslThreadGroup threadGroup(int threads, Duration duration,
       ThreadGroupChild... children) {
@@ -107,6 +110,7 @@ public class JmeterDsl {
    * Setting a proper name allows to properly identify the requests generated in each thread group.
    *
    * @see #threadGroup(int, Duration, ThreadGroupChild...)
+   * @since 0.5
    */
   public static DslThreadGroup threadGroup(String name, int threads, Duration duration,
       ThreadGroupChild... children) {
@@ -157,6 +161,7 @@ public class JmeterDsl {
    * @param children contains the test elements that will be contained within the transaction.
    * @return the test plan instance.
    * @see DslTransactionController
+   * @since 0.14
    */
   public static DslTransactionController transaction(String name, ThreadGroupChild... children) {
     return new DslTransactionController(name, Arrays.asList(children));
@@ -190,6 +195,7 @@ public class JmeterDsl {
    * the HTTP request (like method, body, headers, pre &amp; post processors, etc.).
    * @see DslHttpSampler
    * @see #jsr223PreProcessor(PreProcessorScript)
+   * @since 0.10
    */
   public static DslHttpSampler httpSampler(Function<PreProcessorVars, String> urlSupplier) {
     return httpSampler(null, urlSupplier);
@@ -219,6 +225,7 @@ public class JmeterDsl {
    * {@link #jsr223PreProcessor(String)} to dynamically set the variable.
    *
    * @see #httpSampler(Function)
+   * @since 0.10
    */
   public static DslHttpSampler httpSampler(String name,
       Function<PreProcessorVars, String> urlSupplier) {
@@ -243,6 +250,7 @@ public class JmeterDsl {
    *
    * @return the Cookie manager instance which allows configuring cookies settings.
    * @see DslCookieManager
+   * @since 0.17
    */
   public static DslCookieManager httpCookies() {
     return new DslCookieManager();
@@ -254,6 +262,7 @@ public class JmeterDsl {
    *
    * @return the Cache manager instance which allows configuring caching settings.
    * @see DslCacheManager
+   * @since 0.17
    */
   public static DslCacheManager httpCache() {
     return new DslCacheManager();
@@ -270,6 +279,7 @@ public class JmeterDsl {
    * processor.
    * @return the JSR223 Pre Processor instance
    * @see DslJsr223PreProcessor
+   * @since 0.7
    */
   public static DslJsr223PreProcessor jsr223PreProcessor(String script) {
     return new DslJsr223PreProcessor(null, script);
@@ -282,6 +292,7 @@ public class JmeterDsl {
    * preprocessor.
    *
    * @see #jsr223PreProcessor(String)
+   * @since 0.9
    **/
   public static DslJsr223PreProcessor jsr223PreProcessor(String name, String script) {
     return new DslJsr223PreProcessor(name, script);
@@ -300,6 +311,7 @@ public class JmeterDsl {
    *
    * @see PreProcessorScript
    * @see #jsr223PreProcessor(String)
+   * @since 0.10
    */
   public static DslJsr223PreProcessor jsr223PreProcessor(PreProcessorScript script) {
     return new DslJsr223PreProcessor(null, script);
@@ -318,6 +330,7 @@ public class JmeterDsl {
    *
    * @see PreProcessorScript
    * @see #jsr223PreProcessor(String)
+   * @since 0.10
    */
   public static DslJsr223PreProcessor jsr223PreProcessor(String name, PreProcessorScript script) {
     return new DslJsr223PreProcessor(name, script);
@@ -343,6 +356,7 @@ public class JmeterDsl {
    * @return the Regex Extractor which can be used to define additional settings to use when
    * extracting (like defining match number, template, etc.).
    * @see DslRegexExtractor
+   * @since 0.8
    */
   public static DslRegexExtractor regexExtractor(String variableName, String regex) {
     return new DslRegexExtractor(variableName, regex);
@@ -359,6 +373,7 @@ public class JmeterDsl {
    * processor.
    * @return the JSR223 Post Processor instance
    * @see DslJsr223PostProcessor
+   * @since 0.6
    */
   public static DslJsr223PostProcessor jsr223PostProcessor(String script) {
     return new DslJsr223PostProcessor(null, script);
@@ -371,6 +386,7 @@ public class JmeterDsl {
    * post processor.
    *
    * @see #jsr223PostProcessor(String)
+   * @since 0.9
    */
   public static DslJsr223PostProcessor jsr223PostProcessor(String name, String script) {
     return new DslJsr223PostProcessor(name, script);
@@ -389,6 +405,7 @@ public class JmeterDsl {
    *
    * @see PostProcessorScript
    * @see #jsr223PostProcessor(String)
+   * @since 0.10
    */
   public static DslJsr223PostProcessor jsr223PostProcessor(PostProcessorScript script) {
     return new DslJsr223PostProcessor(null, script);
@@ -407,6 +424,7 @@ public class JmeterDsl {
    *
    * @see PostProcessorScript
    * @see #jsr223PostProcessor(String, String)
+   * @since 0.10
    */
   public static DslJsr223PostProcessor jsr223PostProcessor(String name,
       PostProcessorScript script) {
@@ -432,6 +450,7 @@ public class JmeterDsl {
    * @return the created Response Assertion which should be modified to apply the proper criteria.
    * Check {@link DslResponseAssertion} for all available options.
    * @see DslResponseAssertion
+   * @since 0.11
    */
   public static DslResponseAssertion responseAssertion() {
     return new DslResponseAssertion(null);
@@ -445,6 +464,7 @@ public class JmeterDsl {
    * @return the created Response Assertion which should be modified to apply the proper criteria.
    * Check {@link DslResponseAssertion} for all available options.
    * @see #responseAssertion(String)
+   * @since 0.11
    */
   public static DslResponseAssertion responseAssertion(String name) {
     return new DslResponseAssertion(name);
@@ -469,6 +489,7 @@ public class JmeterDsl {
    * all file names (eg: target/response-files/response-).
    * @return the ResponseFileSaver instance.
    * @see ResponseFileSaver
+   * @since 0.13
    */
   public static ResponseFileSaver responseFileSaver(String fileNamePrefix) {
     return new ResponseFileSaver(fileNamePrefix);
@@ -483,6 +504,7 @@ public class JmeterDsl {
    * @return the Backend Listener instance which can be used to set additional settings like title,
    * token &amp; queueSize.
    * @see InfluxDbBackendListener
+   * @since 0.4
    */
   public static InfluxDbBackendListener influxDbListener(String influxDbUrl) {
     return new InfluxDbBackendListener(influxDbUrl);
@@ -497,6 +519,7 @@ public class JmeterDsl {
    * The idea of this exception is to avoid users unintentionally overwriting previous reports and
    * don't force any particular structure on collection of reports.
    * @see HtmlReporter
+   * @since 0.6
    */
   public static HtmlReporter htmlReporter(String reportDirectory) throws IOException {
     return new HtmlReporter(reportDirectory);
@@ -524,8 +547,8 @@ public class JmeterDsl {
    * to obtain the random delay from the result of (maximumMillis - minimumMillis).
    * @return The Uniform Random Timer instance
    * @see DslUniformRandomTimer
+   * @since 0.16
    */
-
   public static DslUniformRandomTimer uniformRandomTimer(long minimumMillis, long maximumMillis) {
     return new DslUniformRandomTimer(minimumMillis, maximumMillis);
   }

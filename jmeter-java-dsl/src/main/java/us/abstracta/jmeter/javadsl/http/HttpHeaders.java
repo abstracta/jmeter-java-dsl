@@ -22,6 +22,8 @@ import us.abstracta.jmeter.javadsl.core.MultiLevelTestElement;
  * of a sampler, only the particular sampler will include such headers. Also take into consideration
  * that headers specified at lower scope will overwrite ones specified at higher scope (eg: sampler
  * child headers will overwrite test plan headers).
+ *
+ * @since 0.1
  */
 public class HttpHeaders extends BaseTestElement implements MultiLevelTestElement {
 

@@ -8,6 +8,8 @@ import org.apache.jorphan.collections.HashTree;
  * Contains information shared by elements while building the test plan tree.
  * <p>
  * Eg: adding additional items to test plan when a particular protocol element is added.
+ *
+ * @since 0.17
  */
 public class BuildTreeContext {
 

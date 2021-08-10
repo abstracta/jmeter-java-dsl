@@ -5,6 +5,8 @@ import java.util.concurrent.TimeoutException;
 
 /**
  * Interface to be implemented by classes allowing to run a DslTestPlan in different engines.
+ *
+ * @since 0.2
  */
 public interface DslJmeterEngine {
 

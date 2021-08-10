@@ -15,6 +15,8 @@ import us.abstracta.jmeter.javadsl.core.MultiLevelTestElement;
  * sub samples) response body the first capturing group (part of regular expression that is inside
  * of parenthesis) of the first match of the regex. If no match is found, then the variable will not
  * be created or modified.
+ *
+ * @since 0.8
  */
 public class DslRegexExtractor extends DslScopedTestElement<DslRegexExtractor> implements
     MultiLevelTestElement {
@@ -136,15 +138,21 @@ public class DslRegexExtractor extends DslScopedTestElement<DslRegexExtractor> i
   public enum TargetField {
     /**
      * Applies the regular extractor to the plain string of the response body.
+     *
+     * @since 0.10
      */
     RESPONSE_BODY(RegexExtractor::useBody),
     /**
      * Applies the regular extractor to the response body replacing all HTML escape codes.
+     *
+     * @since 0.10
      */
     RESPONSE_BODY_UNESCAPED(RegexExtractor::useUnescapedBody),
     /**
      * Applies the regular extractor to the string representation obtained from parsing the response
      * body with <a href="http://tika.apache.org/1.2/formats.html">Apache Tika</a>.
+     *
+     * @since 0.10
      */
     RESPONSE_BODY_AS_DOCUMENT(RegexExtractor::useBodyAsDocument),
     /**
@@ -159,6 +167,8 @@ public class DslRegexExtractor extends DslScopedTestElement<DslRegexExtractor> i
     REQUEST_HEADERS(RegexExtractor::useRequestHeaders),
     /**
      * Applies the regular extractor to the request URL.
+     *
+     * @since 0.10
      */
     REQUEST_URL(RegexExtractor::useUrl),
     /**

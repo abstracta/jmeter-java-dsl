@@ -20,6 +20,8 @@ import us.abstracta.jmeter.javadsl.core.preprocessors.DslJsr223PreProcessor.PreP
 
 /**
  * Allows to configure a JMeter HTTP sampler to make HTTP requests in a test plan.
+ *
+ * @since 0.1
  */
 public class DslHttpSampler extends DslSampler {
 
@@ -75,6 +77,7 @@ public class DslHttpSampler extends DslSampler {
    * @param contentType to be sent as Content-Type header in HTTP POST request.
    * @return the altered sampler to allow for fluent API usage.
    * @see #body(Function)
+   * @since 0.10
    */
   public DslHttpSampler post(Function<PreProcessorVars, String> bodySupplier,
       MimeTypes.Type contentType) {
@@ -125,6 +128,7 @@ public class DslHttpSampler extends DslSampler {
    * @param name of the HTTP header.
    * @param valueSupplier builds the header value.
    * @return the altered sampler to allow for fluent API usage.
+   * @since 0.10
    */
   public DslHttpSampler header(String name, Function<PreProcessorVars, String> valueSupplier) {
     String variableNamePrefix = "PRE_PROCESSOR_HEADER~";
@@ -170,6 +174,7 @@ public class DslHttpSampler extends DslSampler {
    *
    * @param bodySupplier function to calculate the body on each request.
    * @return the altered sampler to allow for fluent API usage.
+   * @since 0.10
    */
   public DslHttpSampler body(Function<PreProcessorVars, String> bodySupplier) {
     String variableName = "PRE_PROCESSOR_REQUEST_BODY";

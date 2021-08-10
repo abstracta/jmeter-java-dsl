@@ -13,6 +13,8 @@ import us.abstracta.jmeter.javadsl.core.TestElementContainer;
  *
  * This is usually used when grouping different steps of a flow, for example group requests of login
  * flow, adding item to cart, purchase, etc. It provides aggregate metrics of all it's samples.
+ *
+ * @since 0.14
  */
 public class DslTransactionController extends TestElementContainer<ThreadGroupChild> implements
     ThreadGroupChild {

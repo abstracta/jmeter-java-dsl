@@ -12,6 +12,8 @@ import us.abstracta.jmeter.javadsl.http.DslHttpSampler;
  * TestElementContainer} containing {@link SamplerChild}.
  * <p>
  * For an example of an implementation of a sampler check {@link DslHttpSampler}.
+ *
+ * @since 0.1
  */
 public abstract class DslSampler extends
     TestElementContainer<DslSampler.SamplerChild> implements ThreadGroupChild {

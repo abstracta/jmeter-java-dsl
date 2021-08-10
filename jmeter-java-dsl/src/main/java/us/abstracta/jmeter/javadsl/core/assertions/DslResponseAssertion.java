@@ -10,6 +10,11 @@ import org.apache.jmeter.testelement.TestElement;
 import us.abstracta.jmeter.javadsl.core.DslScopedTestElement;
 import us.abstracta.jmeter.javadsl.core.MultiLevelTestElement;
 
+/**
+ * Allows marking a request result as success or failure by a specific result field value.
+ *
+ * @since 0.11
+ */
 public class DslResponseAssertion extends DslScopedTestElement<DslResponseAssertion> implements
     MultiLevelTestElement {
 

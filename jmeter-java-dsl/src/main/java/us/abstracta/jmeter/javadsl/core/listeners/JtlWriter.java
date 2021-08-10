@@ -24,6 +24,8 @@ import us.abstracta.jmeter.javadsl.core.MultiLevelTestElement;
  *
  * See <a href="http://jmeter.apache.org/usermanual/listeners.html">JMeter listeners doc</a> for
  * more details on JTL format and settings.
+ *
+ * @since 0.1
  */
 public class JtlWriter extends BaseTestElement implements MultiLevelTestElement {
 
@@ -124,6 +126,7 @@ public class JtlWriter extends BaseTestElement implements MultiLevelTestElement 
    *
    * @param enabled specifies whether enable or disable all fields.
    * @return the JtlWriter instance to be able to specify additional options in a fluent API way.
+   * @since 0.13
    */
   public JtlWriter withAllFields(boolean enabled) {
     saveAsXml = enabled;
@@ -165,6 +168,7 @@ public class JtlWriter extends BaseTestElement implements MultiLevelTestElement 
    *
    * @param enabled specifies whether enable XML format saving, or disable it (and use CSV).
    * @return the JtlWriter instance to be able to specify additional options in a fluent API way.
+   * @since 0.13
    */
   public JtlWriter saveAsXml(boolean enabled) {
     this.saveAsXml = enabled;
@@ -180,6 +184,7 @@ public class JtlWriter extends BaseTestElement implements MultiLevelTestElement 
    *
    * @param enabled specifies whether enable or disable inclusion of elapsed time.
    * @return the JtlWriter instance to be able to specify additional options in a fluent API way.
+   * @since 0.13
    */
   public JtlWriter withElapsedTime(boolean enabled) {
     this.saveElapsedTime = enabled;
@@ -195,6 +200,7 @@ public class JtlWriter extends BaseTestElement implements MultiLevelTestElement 
    *
    * @param enabled specifies whether enable or disable inclusion of response message.
    * @return the JtlWriter instance to be able to specify additional options in a fluent API way.
+   * @since 0.13
    */
   public JtlWriter withResponseMessage(boolean enabled) {
     this.saveResponseMessage = enabled;
@@ -210,6 +216,7 @@ public class JtlWriter extends BaseTestElement implements MultiLevelTestElement 
    *
    * @param enabled specifies whether enable or disable inclusion of success field.
    * @return the JtlWriter instance to be able to specify additional options in a fluent API way.
+   * @since 0.13
    */
   public JtlWriter withSuccess(boolean enabled) {
     this.saveSuccess = enabled;
@@ -225,6 +232,7 @@ public class JtlWriter extends BaseTestElement implements MultiLevelTestElement 
    *
    * @param enabled specifies whether enable or disable inclusion of sent bytes count.
    * @return the JtlWriter instance to be able to specify additional options in a fluent API way.
+   * @since 0.13
    */
   public JtlWriter withSentByteCount(boolean enabled) {
     this.saveSentByteCount = enabled;
@@ -240,6 +248,7 @@ public class JtlWriter extends BaseTestElement implements MultiLevelTestElement 
    *
    * @param enabled specifies whether enable or disable inclusion of response file name.
    * @return the JtlWriter instance to be able to specify additional options in a fluent API way.
+   * @since 0.13
    */
   public JtlWriter withResponseFilename(boolean enabled) {
     this.saveResponseFilename = enabled;
@@ -252,6 +261,7 @@ public class JtlWriter extends BaseTestElement implements MultiLevelTestElement 
    *
    * @param enabled specifies whether enable or disable inclusion of response encoding.
    * @return the JtlWriter instance to be able to specify additional options in a fluent API way.
+   * @since 0.13
    */
   public JtlWriter withEncoding(boolean enabled) {
     this.saveEncoding = enabled;
@@ -264,6 +274,7 @@ public class JtlWriter extends BaseTestElement implements MultiLevelTestElement 
    *
    * @param enabled specifies whether enable or disable inclusion of idle time.
    * @return the JtlWriter instance to be able to specify additional options in a fluent API way.
+   * @since 0.13
    */
   public JtlWriter withIdleTime(boolean enabled) {
     this.saveIdleTime = enabled;
@@ -279,6 +290,7 @@ public class JtlWriter extends BaseTestElement implements MultiLevelTestElement 
    *
    * @param enabled specifies whether enable or disable inclusion of response headers.
    * @return the JtlWriter instance to be able to specify additional options in a fluent API way.
+   * @since 0.13
    */
   public JtlWriter withResponseHeaders(boolean enabled) {
     this.saveResponseHeaders = enabled;
@@ -296,6 +308,7 @@ public class JtlWriter extends BaseTestElement implements MultiLevelTestElement 
    *
    * @param enabled specifies whether enable or disable inclusion of assertion results.
    * @return the JtlWriter instance to be able to specify additional options in a fluent API way.
+   * @since 0.13
    */
   public JtlWriter withAssertionResults(boolean enabled) {
     this.saveAssertionResults = enabled;
@@ -311,6 +324,7 @@ public class JtlWriter extends BaseTestElement implements MultiLevelTestElement 
    *
    * @param enabled specifies whether enable or disable inclusion of assertion results.
    * @return the JtlWriter instance to be able to specify additional options in a fluent API way.
+   * @since 0.13
    */
   public JtlWriter withFieldNames(boolean enabled) {
     this.saveFieldNames = enabled;
@@ -325,6 +339,7 @@ public class JtlWriter extends BaseTestElement implements MultiLevelTestElement 
    *
    * @param enabled specifies whether enable or disable inclusion of sample labels.
    * @return the JtlWriter instance to be able to specify additional options in a fluent API way.
+   * @since 0.13
    */
   public JtlWriter withLabel(boolean enabled) {
     this.saveLabel = enabled;
@@ -339,6 +354,7 @@ public class JtlWriter extends BaseTestElement implements MultiLevelTestElement 
    *
    * @param enabled specifies whether enable or disable inclusion of thread name.
    * @return the JtlWriter instance to be able to specify additional options in a fluent API way.
+   * @since 0.13
    */
   public JtlWriter withThreadName(boolean enabled) {
     this.saveThreadName = enabled;
@@ -352,6 +368,7 @@ public class JtlWriter extends BaseTestElement implements MultiLevelTestElement 
    *
    * @param enabled specifies whether enable or disable inclusion of assertion failure message.
    * @return the JtlWriter instance to be able to specify additional options in a fluent API way.
+   * @since 0.13
    */
   public JtlWriter withAssertionFailureMessage(boolean enabled) {
     this.saveAssertionFailureMessage = enabled;
@@ -367,6 +384,7 @@ public class JtlWriter extends BaseTestElement implements MultiLevelTestElement 
    *
    * @param enabled specifies whether enable or disable inclusion of active thread counts.
    * @return the JtlWriter instance to be able to specify additional options in a fluent API way.
+   * @since 0.13
    */
   public JtlWriter withActiveThreadCounts(boolean enabled) {
     this.saveActiveThreadCounts = enabled;
@@ -382,6 +400,7 @@ public class JtlWriter extends BaseTestElement implements MultiLevelTestElement 
    *
    * @param enabled specifies whether enable or disable inclusion of latency time.
    * @return the JtlWriter instance to be able to specify additional options in a fluent API way.
+   * @since 0.13
    */
   public JtlWriter withLatency(boolean enabled) {
     this.saveLatency = enabled;
@@ -398,6 +417,7 @@ public class JtlWriter extends BaseTestElement implements MultiLevelTestElement 
    *
    * @param enabled specifies whether enable or disable inclusion of sample counts.
    * @return the JtlWriter instance to be able to specify additional options in a fluent API way.
+   * @since 0.13
    */
   public JtlWriter withSampleAndErrorCounts(boolean enabled) {
     this.saveSampleAndErrorCounts = enabled;
@@ -413,6 +433,7 @@ public class JtlWriter extends BaseTestElement implements MultiLevelTestElement 
    *
    * @param enabled specifies whether enable or disable inclusion of request headers.
    * @return the JtlWriter instance to be able to specify additional options in a fluent API way.
+   * @since 0.13
    */
   public JtlWriter withRequestHeaders(boolean enabled) {
     this.saveRequestHeaders = enabled;
@@ -430,6 +451,7 @@ public class JtlWriter extends BaseTestElement implements MultiLevelTestElement 
    *
    * @param enabled specifies whether enable or disable inclusion of response body.
    * @return the JtlWriter instance to be able to specify additional options in a fluent API way.
+   * @since 0.13
    */
   public JtlWriter withResponseData(boolean enabled) {
     this.saveResponseData = enabled;
@@ -442,6 +464,7 @@ public class JtlWriter extends BaseTestElement implements MultiLevelTestElement 
    *
    * @param enabled specifies whether enable or disable inclusion of timestamps.
    * @return the JtlWriter instance to be able to specify additional options in a fluent API way.
+   * @since 0.13
    */
   public JtlWriter withTimeStamp(boolean enabled) {
     this.saveTimeStamp = enabled;
@@ -456,6 +479,7 @@ public class JtlWriter extends BaseTestElement implements MultiLevelTestElement 
    *
    * @param enabled specifies whether enable or disable inclusion of response codes.
    * @return the JtlWriter instance to be able to specify additional options in a fluent API way.
+   * @since 0.13
    */
   public JtlWriter withResponseCode(boolean enabled) {
     this.saveResponseCode = enabled;
@@ -468,6 +492,7 @@ public class JtlWriter extends BaseTestElement implements MultiLevelTestElement 
    *
    * @param enabled specifies whether enable or disable inclusion of response data types.
    * @return the JtlWriter instance to be able to specify additional options in a fluent API way.
+   * @since 0.13
    */
   public JtlWriter withDataType(boolean enabled) {
     this.saveDataType = enabled;
@@ -483,6 +508,7 @@ public class JtlWriter extends BaseTestElement implements MultiLevelTestElement 
    *
    * @param enabled specifies whether enable or disable inclusion of received bytes counts.
    * @return the JtlWriter instance to be able to specify additional options in a fluent API way.
+   * @since 0.13
    */
   public JtlWriter withReceivedByteCount(boolean enabled) {
     this.saveReceivedByteCount = enabled;
@@ -497,6 +523,7 @@ public class JtlWriter extends BaseTestElement implements MultiLevelTestElement 
    *
    * @param enabled specifies whether enable or disable inclusion of urls.
    * @return the JtlWriter instance to be able to specify additional options in a fluent API way.
+   * @since 0.13
    */
   public JtlWriter withUrl(boolean enabled) {
     this.saveUrl = enabled;
@@ -512,6 +539,7 @@ public class JtlWriter extends BaseTestElement implements MultiLevelTestElement 
    *
    * @param enabled specifies whether enable or disable inclusion of connect time.
    * @return the JtlWriter instance to be able to specify additional options in a fluent API way.
+   * @since 0.13
    */
   public JtlWriter withConnectTime(boolean enabled) {
     this.saveConnectTime = enabled;
@@ -527,6 +555,7 @@ public class JtlWriter extends BaseTestElement implements MultiLevelTestElement 
    *
    * @param enabled specifies whether enable or disable inclusion of host names.
    * @return the JtlWriter instance to be able to specify additional options in a fluent API way.
+   * @since 0.13
    */
   public JtlWriter withHostname(boolean enabled) {
     this.saveHostname = enabled;
@@ -542,6 +571,7 @@ public class JtlWriter extends BaseTestElement implements MultiLevelTestElement 
    *
    * @param enabled specifies whether enable or disable inclusion of sample data.
    * @return the JtlWriter instance to be able to specify additional options in a fluent API way.
+   * @since 0.13
    */
   public JtlWriter withSamplerData(boolean enabled) {
     this.saveSamplerData = enabled;
@@ -554,6 +584,7 @@ public class JtlWriter extends BaseTestElement implements MultiLevelTestElement 
    *
    * @param enabled specifies whether enable or disable inclusion of sub results.
    * @return the JtlWriter instance to be able to specify additional options in a fluent API way.
+   * @since 0.13
    */
   public JtlWriter withSubResults(boolean enabled) {
     this.saveSubResults = enabled;
@@ -565,6 +596,7 @@ public class JtlWriter extends BaseTestElement implements MultiLevelTestElement 
    * avoid default generated exception).
    *
    * @return the JtlWriter instance to be able to specify additional options in a fluent API way.
+   * @since 0.13
    */
   public JtlWriter overwriteJtl() {
     this.overwriteJtl = true;

@@ -9,6 +9,8 @@ import us.abstracta.jmeter.javadsl.core.MultiLevelTestElement;
 /**
  * Allows specifying JMeter Uniform Random Timers which pause the thread with a random time with
  * uniform distribution.
+ *
+ * @since 0.16
  */
 public class DslUniformRandomTimer extends BaseTestElement implements MultiLevelTestElement {
 

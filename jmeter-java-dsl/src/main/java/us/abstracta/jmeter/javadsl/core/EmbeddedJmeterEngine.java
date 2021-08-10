@@ -27,6 +27,8 @@ import org.apache.jorphan.collections.ListedHashTree;
 
 /**
  * Allows running test plans in an embedded JMeter instance.
+ *
+ * @since 0.1
  */
 public class EmbeddedJmeterEngine implements DslJmeterEngine {
 

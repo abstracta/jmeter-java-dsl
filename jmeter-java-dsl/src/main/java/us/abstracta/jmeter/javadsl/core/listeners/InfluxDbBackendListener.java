@@ -11,6 +11,8 @@ import us.abstracta.jmeter.javadsl.core.MultiLevelTestElement;
 
 /**
  * Test element which publishes all test run metrics to an InfluxDB instance.
+ *
+ * @since 0.4
  */
 public class InfluxDbBackendListener extends BaseTestElement implements MultiLevelTestElement {
 

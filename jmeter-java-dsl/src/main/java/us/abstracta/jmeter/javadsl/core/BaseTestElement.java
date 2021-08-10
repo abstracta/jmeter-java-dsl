@@ -20,6 +20,8 @@ import us.abstracta.jmeter.javadsl.core.EmbeddedJmeterEngine.JMeterEnvironment;
  * <p>
  * Sub classes may overwrite {@link #buildTreeUnder} if they need additional logic (e.g: {@link
  * TestElementContainer}).
+ *
+ * @since 0.1
  */
 public abstract class BaseTestElement implements DslTestElement {
 

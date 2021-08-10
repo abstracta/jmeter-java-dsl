@@ -24,6 +24,8 @@ import us.abstracta.jmeter.javadsl.core.TestPlanStats.StatsSummary;
 
 /**
  * A {@link DslJmeterEngine} which allows running DslTestPlan in BlazeMeter.
+ *
+ * @since 0.2
  */
 public class BlazeMeterEngine implements DslJmeterEngine {
 

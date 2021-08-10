@@ -20,6 +20,8 @@ import us.abstracta.jmeter.javadsl.core.MultiLevelTestElement;
 
 /**
  * Generates a nice HTML report at the end of test plan execution.
+ *
+ * @since 0.6
  */
 public class HtmlReporter extends BaseTestElement implements MultiLevelTestElement {
 

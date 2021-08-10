@@ -9,6 +9,7 @@ import org.apache.jmeter.testelement.AbstractScopedTestElement;
  *
  * @param <T> is the type of the test element that extends this class (to properly inherit fluent
  * API methods).
+ * @since 0.11
  */
 public abstract class DslScopedTestElement<T> extends BaseTestElement {
 

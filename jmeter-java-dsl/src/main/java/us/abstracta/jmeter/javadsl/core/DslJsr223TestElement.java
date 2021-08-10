@@ -17,6 +17,8 @@ import org.slf4j.Logger;
 
 /**
  * Abstracts common logic used by JSR223 test elements.
+ *
+ * @since 0.8
  */
 public abstract class DslJsr223TestElement extends BaseTestElement {
 

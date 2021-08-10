@@ -17,6 +17,8 @@ import us.abstracta.jmeter.javadsl.core.MultiLevelTestElement;
  * By default, it will generate one file for each response using the given (which might include the
  * directory location) prefix to create the files and adding an incremental number to each response
  * and an extension according to the response mime type.
+ *
+ * @since 0.13
  */
 public class ResponseFileSaver extends BaseTestElement implements MultiLevelTestElement {
 
