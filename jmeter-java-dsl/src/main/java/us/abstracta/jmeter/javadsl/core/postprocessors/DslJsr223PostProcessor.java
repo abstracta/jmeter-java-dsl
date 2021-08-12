@@ -1,7 +1,12 @@
 package us.abstracta.jmeter.javadsl.core.postprocessors;
 
+import java.time.Instant;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Properties;
 import org.apache.jmeter.extractor.JSR223PostProcessor;
+import org.apache.jmeter.protocol.http.sampler.HTTPSampleResult;
+import org.apache.jmeter.protocol.http.util.HTTPConstants;
 import org.apache.jmeter.samplers.SampleResult;
 import org.apache.jmeter.samplers.Sampler;
 import org.apache.jmeter.threads.JMeterContext;
@@ -58,6 +63,91 @@ public class DslJsr223PostProcessor extends DslJsr223TestElement implements Mult
         Properties props, Sampler sampler, Logger log, String label) {
       super(ctx, vars, props, sampler, log, label);
       this.prev = prev;
+    }
+
+    /**
+     * Builds a map from last sample result to ease visualization and debugging.
+     *
+     * @return map from last sample result.
+     * @since 0.19
+     */
+    public Map<String, Object> prevMap() {
+      Map<String, Object> ret = prevMetadata();
+      ret.putAll(prevMetrics());
+      ret.put("request", prevRequest());
+      ret.put("response", prevResponse());
+      return ret;
+    }
+
+    /**
+     * Builds a map from last sample result including most significant metadata to ease
+     * visualization and debugging.
+     *
+     * @return map of last sample result most significant metadata.
+     * @since 0.19
+     */
+    public Map<String, Object> prevMetadata() {
+      Map<String, Object> ret = new LinkedHashMap<>();
+      ret.put("label", prev.getSampleLabel());
+      ret.put("timestamp", Instant.ofEpochMilli(prev.getTimeStamp()));
+      SampleResult parent = prev.getParent();
+      if (parent != null) {
+        ret.put("parent", parent.getSampleLabel());
+      }
+      ret.put("successful", prev.isSuccessful());
+      ret.put("threadName", prev.getThreadName());
+      ret.put("threadsCount", prev.getAllThreads());
+      ret.put("threadGroupSize", prev.getGroupThreads());
+      return ret;
+    }
+
+    /**
+     * Builds a map from last sample result collected metrics to ease visualization and debugging.
+     *
+     * @return map of last sample collected metrics.
+     * @since 0.19
+     */
+    public Map<String, Object> prevMetrics() {
+      Map<String, Object> ret = new LinkedHashMap<>();
+      ret.put("sampleMillis", prev.getTime());
+      ret.put("connectionMillis", prev.getConnectTime());
+      ret.put("latencyMillis", prev.getLatency());
+      ret.put("sentBytes", prev.getSentBytes());
+      ret.put("receivedBytes", prev.getBytesAsLong());
+      return ret;
+    }
+
+    /**
+     * Builds a string from last sample result request to ease visualization and debugging.
+     *
+     * @return string representing last sample request.
+     * @since 0.19
+     */
+    public String prevRequest() {
+      return prev instanceof HTTPSampleResult ? httpRequestString((HTTPSampleResult) prev)
+          : prev.getRequestHeaders() + "\n" + prev.getSamplerData();
+    }
+
+    private String httpRequestString(HTTPSampleResult result) {
+      String cookiesHeader = result.getCookies();
+      if (cookiesHeader != null && !cookiesHeader.isEmpty()) {
+        cookiesHeader = HTTPConstants.HEADER_COOKIE + ": " + cookiesHeader + "\n";
+      }
+      return result.getHTTPMethod() + " " + result.getUrlAsString() + "\n"
+          + result.getRequestHeaders() + cookiesHeader + "\n"
+          + result.getQueryString();
+    }
+
+    /**
+     * Builds a string from last sample result response to ease visualization and debugging.
+     *
+     * @return string representing last sample response.
+     * @since 0.19
+     */
+    public String prevResponse() {
+      String statusLine = prev instanceof HTTPSampleResult ? ""
+          : prev.getResponseCode() + " " + prev.getResponseMessage() + "\n";
+      return statusLine + prev.getResponseHeaders() + "\n" + prev.getResponseDataAsString();
     }
 
   }

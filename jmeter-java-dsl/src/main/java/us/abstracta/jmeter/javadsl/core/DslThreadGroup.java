@@ -446,7 +446,7 @@ public class DslThreadGroup extends TestElementContainer<ThreadGroupChild> imple
    * @since 0.18
    */
   public void showThreadsTimeline() {
-    showFrameWith(buildGraphPanel(), 800, 300);
+    showFrameWith(buildGraphPanel(), name + " threads timeline", 800, 300, null);
   }
 
   private Component buildGraphPanel() {

@@ -163,7 +163,7 @@ Note that is as simple as [generating a BlazeMeter authentication token](https:/
 
 BlazeMeter will not only allow you to run the test at scale but also provides additional features like the nice real time reporting, historic data tracking, etc. Here is an example of how a test would look like in BlazMeter:
 
-![blazemeter.png](./blazemeter.png) 
+![blazemeter.png](./images/blazemeter.png) 
 
 Check [BlazeMeterEngine](../../jmeter-java-dsl-blazemeter/src/main/java/us/abstracta/jmeter/javadsl/blazemeter/BlazeMeterEngine.java) for details on usage and available settings when running tests in BlazeMeter.
 
@@ -178,6 +178,84 @@ In case you want to get debug logs for HTTP calls to BlazeMeter API, you can inc
 ::: warning
 If you use JSR223 Pre- or Post- processors with Java code (lambdas) instead of strings ([here](#change-sample-result-statuses-with-custom-logic) are some examples), or use one of the HTTP Sampler methods which receive a function as parameter (as in [here](#provide-request-parameters-programmatically-per-request)), then BlazeMeter execution won't work. You can migrate them to use `jsrPreProcessor` with string scripts instead. Check associated methods documentation for more details.
 :::
+
+## Test plan debugging
+
+A usual requirement while building a test plan is to be able to debug for potential issues in configuration or behavior of service under test. With jmeter-java-dsl you have several options for this purpose.
+
+### View Results Tree
+
+One option is using provided `resultsTreeVisualizer()` like in following example:
+
+```java
+import static us.abstracta.jmeter.javadsl.JmeterDsl.*;
+
+import java.io.IOException;
+import org.junit.jupiter.api.Test;
+
+public class PerformanceTest {
+
+  @Test
+  public void testPerformance() throws IOException {
+    testPlan(
+      threadGroup(1, 1,
+        httpSampler("http://my.service")
+      ),
+      resultsTreeVisualizer() 
+    ).run();
+  }
+
+}
+```
+
+This will display the JMeter built-in View Results Tree element, which allows you to review request and response contents in addition to collected metrics (spent time, sent & received bytes, etc.) for each request sent to server, in a window like this one:
+
+![View Results Tree](./images/view-results-tree.png)
+
+::: tip
+To debug test plans use few iterations and threads to reduce the execution time and ease tracing by having less information to analyze.
+:::
+
+::: tip
+When adding `resultsTreeVisualizer()` as child of a thread group, it will only display sample results of that thread group. When added as child of a sampler, it will only show sample results for that sampler. You can use this to only review certain sample results in your test plan. 
+:::
+
+::: tip
+Remove `resultsTreeVisualizer()` from test plans when are no longer needed (when debugging is finished). Leaving them might interfere with unattended test plan execution due to test plan execution not finishing until all visualizers windows are closed.
+:::
+
+::: warning
+By default, View Results Tree only display last 500 sample results. If you need to display more elements, use provided `resultsLimit(int)` method which allows changing this value. Take into consideration that the more results are shown, the more memory that will require. So use this setting with care.
+:::
+
+### Post processor breakpoints
+
+Another alternative is using IDE builtin debugger by adding a `jsr223PostProcessor` with java code and adding a breakpoint to the post processor code. This does not only allow checking sample result information but also JMeter variables and properties values and sampler properties. 
+
+Here is an example screenshot using this approach while debugging with an IDE:
+
+![Post Processor Debugging](./images/post-processor-debugging.png)
+
+::: tip
+DSL provides following methods to ease results and variables visualization and debugging: `varsMap()`, `prevMap()`, `prevMetadata()`, `prevMetrics()`, `prevRequest()`, `prevResponse()`. Check [PostProcessorVars](../../jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/postprocessors/DslJsr223PostProcessor.java) and [Jsr223ScriptVars](../../jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/DslJsr223TestElement.java) for more details. 
+:::
+
+::: tip
+Remove such post processors when no longer needed (when debugging is finished). Leaving them would generate errors when loading generated JMX test plan or running test plan in BlazeMeter, in addition to unnecessary processing time and resource usage.  
+:::
+
+### Debug JMeter code
+
+You can even add break points to JMeter code in your IDE and debug the code line by line providing the greatest possible detail.
+
+Here is an example screenshot debugging HTTP Sampler:
+
+![JMeter HTTP Sampler Debugging](./images/jmeter-http-sampler-debugging.png)
+
+::: tip
+JMeter class in charge of executing threads logic is `org.apache.jmeter.threads.JMeterThread`. You can check classes used by each DSL provided test element by checking the DSL code.
+:::
+
 
 ## Flexible threads configuration
 
@@ -215,9 +293,9 @@ threadGroup()
     .rampTo(0, Duration.ofSeconds(5))
 ```
 
-Which would translate in the following threads timeline:
+Which would translate in the following threads' timeline:
 
-![ThreadGroup Chart](./complex-thread-group-chart.png)
+![ThreadGroup Chart](./images/complex-thread-group-chart.png)
 
 Check [DslThreadGroup](../../jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/DslThreadGroup.java) for more details.
 
@@ -230,7 +308,7 @@ If you are a JMeter GUI user, you may even be interested in using provided `Test
 
 For example, for above test plan you would get a window like the following one:
 
-![UltimateThreadGroup GUI](./ultimate-thread-group-gui.png)
+![UltimateThreadGroup GUI](./images/ultimate-thread-group-gui.png)
 :::
 
 ::: tip

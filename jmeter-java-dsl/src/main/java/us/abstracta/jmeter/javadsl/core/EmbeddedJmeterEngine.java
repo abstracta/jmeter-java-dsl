@@ -37,7 +37,8 @@ public class EmbeddedJmeterEngine implements DslJmeterEngine {
     try (JMeterEnvironment env = new JMeterEnvironment()) {
       StandardJMeterEngine engine = new StandardJMeterEngine();
       HashTree rootTree = new ListedHashTree();
-      HashTree testPlanTree = testPlan.buildTreeUnder(rootTree, new BuildTreeContext(rootTree));
+      BuildTreeContext buildContext = new BuildTreeContext(rootTree);
+      HashTree testPlanTree = testPlan.buildTreeUnder(rootTree, buildContext);
 
       AggregatingTestPlanStats stats = new AggregatingTestPlanStats();
       addTestStatsCollectorToTree(stats, testPlanTree);
@@ -54,6 +55,7 @@ public class EmbeddedJmeterEngine implements DslJmeterEngine {
       stats.setStart(Instant.now());
       engine.run();
       stats.setEnd(Instant.now());
+      buildContext.awaitAllVisualizersClosed();
       return stats;
     }
   }

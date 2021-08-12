@@ -10,6 +10,7 @@ import us.abstracta.jmeter.javadsl.core.DslTestPlan.TestPlanChild;
 import us.abstracta.jmeter.javadsl.core.DslThreadGroup;
 import us.abstracta.jmeter.javadsl.core.DslThreadGroup.ThreadGroupChild;
 import us.abstracta.jmeter.javadsl.core.assertions.DslResponseAssertion;
+import us.abstracta.jmeter.javadsl.core.listeners.DslViewResultsTree;
 import us.abstracta.jmeter.javadsl.core.listeners.HtmlReporter;
 import us.abstracta.jmeter.javadsl.core.listeners.InfluxDbBackendListener;
 import us.abstracta.jmeter.javadsl.core.listeners.JtlWriter;
@@ -523,6 +524,21 @@ public class JmeterDsl {
    */
   public static HtmlReporter htmlReporter(String reportDirectory) throws IOException {
     return new HtmlReporter(reportDirectory);
+  }
+
+  /**
+   * Builds a View Results Tree element to show live results in a pop-up window while the test
+   * runs.
+   *
+   * This element is helpful when debugging a test plan to verify each sample result, and general
+   * structure of results.
+   *
+   * @return the View Results Tree element.
+   * @see DslViewResultsTree
+   * @since 0.19
+   */
+  public static DslViewResultsTree resultsTreeVisualizer() {
+    return new DslViewResultsTree();
   }
 
   /**

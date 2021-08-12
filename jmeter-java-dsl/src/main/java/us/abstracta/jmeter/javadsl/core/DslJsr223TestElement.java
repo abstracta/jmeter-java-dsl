@@ -4,6 +4,7 @@ import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.stream.Collectors;
 import org.apache.jmeter.samplers.Sampler;
@@ -44,7 +45,6 @@ public abstract class DslJsr223TestElement extends BaseTestElement {
     String buildScriptId = buildScriptId();
     jmeterProps.put(buildScriptId, script);
     this.script = buildScriptString(buildScriptId, varsClass);
-    System.out.println(this.script);
   }
 
   private static String buildScriptId() {
@@ -107,6 +107,17 @@ public abstract class DslJsr223TestElement extends BaseTestElement {
       this.sampler = sampler;
       this.log = log;
       this.Label = label;
+    }
+
+    /**
+     * Gets a map from current JMeter variables, making them easier to visualize, mainly while
+     * debugging.
+     *
+     * @return map created from JMeter variables.
+     * @since 0.19
+     */
+    public Map<String, Object> varsMap() {
+      return vars.entrySet().stream().collect(Collectors.toMap(Entry::getKey, Entry::getValue));
     }
 
   }

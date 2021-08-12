@@ -1,6 +1,8 @@
 package us.abstracta.jmeter.javadsl.core;
 
 import java.awt.Component;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.IOException;
 import javax.swing.JFrame;
 import javax.swing.WindowConstants;
@@ -35,39 +37,57 @@ public abstract class BaseTestElement implements DslTestElement {
 
   @Override
   public HashTree buildTreeUnder(HashTree parent, BuildTreeContext context) {
-    TestElement testElement = buildTestElement();
-    testElement.setName(name);
-    testElement.setProperty(TestElement.GUI_CLASS, guiClass.getName());
-    testElement.setProperty(TestElement.TEST_CLASS, testElement.getClass().getName());
-    return parent.add(testElement);
+    return parent.add(buildConfiguredTestElement());
   }
+
+  protected TestElement buildConfiguredTestElement() {
+    TestElement ret = buildTestElement();
+    ret.setName(name);
+    ret.setProperty(TestElement.GUI_CLASS, guiClass.getName());
+    ret.setProperty(TestElement.TEST_CLASS, ret.getClass().getName());
+    return ret;
+  }
+
+  protected abstract TestElement buildTestElement();
 
   @Override
   public void showInGui() {
+    showTestElementInGui(buildConfiguredTestElement(), null);
+  }
+
+  protected void showTestElementInGui(TestElement testElement, Runnable closeListener) {
     try (JMeterEnvironment env = new JMeterEnvironment()) {
       // this is required for proper visualization of labels and messages from resources bundle
       env.initLocale();
-      TestElement testElement = buildTestElement();
-      testElement.setName(name);
       JMeterGUIComponent gui =
           guiClass == TestBeanGUI.class ? new TestBeanGUI(testElement.getClass())
               : guiClass.newInstance();
+      gui.clearGui();
       gui.configure(testElement);
-      showFrameWith((Component) gui, 800, 600);
+      gui.modifyTestElement(testElement);
+      showFrameWith((Component) gui, name, 800, 600, closeListener);
     } catch (InstantiationException | IllegalAccessException | IOException e) {
       throw new RuntimeException(e);
     }
   }
 
-  protected void showFrameWith(Component content, int width, int height) {
-    JFrame frame = new JFrame();
+  protected void showFrameWith(Component content, String title, int width, int height,
+      Runnable closeListener) {
+    JFrame frame = new JFrame(title);
     frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+    if (closeListener != null) {
+      frame.addWindowListener(new WindowAdapter() {
+        @Override
+        public void windowClosed(WindowEvent e) {
+          super.windowClosed(e);
+          closeListener.run();
+        }
+      });
+    }
     frame.setLocation(200, 200);
     frame.setSize(width, height);
     frame.add(content);
     frame.setVisible(true);
   }
-
-  protected abstract TestElement buildTestElement();
 
 }
