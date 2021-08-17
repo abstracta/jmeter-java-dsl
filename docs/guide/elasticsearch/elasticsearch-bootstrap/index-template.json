@@ -1,0 +1,127 @@
+{
+  "index_patterns": "jmeter",
+  "template": {
+    "mappings": {
+      "properties": {
+        "ContentType": {
+          "type": "text",
+          "index": false
+        },
+        "IdleTime": {
+          "type": "long"
+        },
+        "ElapsedTime": {
+          "type": "date",
+          "format": "epoch_millis"
+        },
+        "ErrorCount": {
+          "type": "long"
+        },
+        "Timestamp": {
+          "type": "date",
+          "format": "epoch_millis"
+        },
+        "URL": {
+          "type": "keyword"
+        },
+        "SampleStartTime": {
+          "type": "date",
+          "format": "date_time"
+        },
+        "Success": {
+          "type": "boolean"
+        },
+        "Bytes": {
+          "type": "long"
+        },
+        "SentBytes": {
+          "type": "long"
+        },
+        "AllThreads": {
+          "type": "long"
+        },
+        "TestElement.name": {
+          "type": "text",
+          "index": false
+        },
+        "DataType": {
+          "type": "text",
+          "index": false
+        },
+        "ResponseTime": {
+          "type": "long"
+        },
+        "SampleCount": {
+          "type": "long"
+        },
+        "FailureMessage": {
+          "type": "text",
+          "index": false
+        },
+        "ConnectTime": {
+          "type": "long",
+          "index": false
+        },
+        "ResponseCode": {
+          "type": "text"
+        },
+        "TestStartTime": {
+          "type": "date",
+          "format": "epoch_millis",
+          "index": false
+        },
+        "AssertionResults": {
+          "properties": {
+            "failure": {
+              "type": "boolean"
+            },
+            "failureMessage": {
+              "type": "text",
+              "index": false
+            },
+            "name": {
+              "type": "text",
+              "index": false
+            }
+          }
+        },
+        "Latency": {
+          "type": "long"
+        },
+        "InjectorHostname": {
+          "type": "text",
+          "index": false
+        },
+        "GrpThreads": {
+          "type": "long",
+          "index": false
+        },
+        "SampleEndTime": {
+          "type": "date",
+          "format": "date_time"
+        },
+        "BodySize": {
+          "type": "long"
+        },
+        "ThreadName": {
+          "type": "keyword",
+          "index": false
+        },
+        "SampleLabel": {
+          "type": "keyword"
+        },
+        "ResponseMessage": {
+          "type": "text",
+          "index": false
+        },
+        "BuildNumber": {
+          "type": "long"
+        }
+      }
+    },
+    "settings": {
+      "number_of_shards": 1,
+      "number_of_replicas": 0
+    }
+  }
+}

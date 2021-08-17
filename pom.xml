@@ -47,18 +47,33 @@
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
+    <testcontainers.version>1.15.3</testcontainers.version>
+    <!-- can't use newer version, probably due to issues with wiremock-junit5 or some dependency
+    conflict -->
+    <wiremock.version>2.27.2</wiremock.version>
   </properties>
 
   <modules>
     <module>jmeter-java-dsl</module>
     <module>jmeter-java-dsl-blazemeter</module>
+    <module>jmeter-java-dsl-elasticsearch-listener</module>
   </modules>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>ru.lanwen.wiremock</groupId>
+        <artifactId>wiremock-junit5</artifactId>
+        <version>1.3.1</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
 
   <dependencies>
     <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter-engine</artifactId>
-      <version>5.7.0</version>
+      <version>5.7.2</version>
       <scope>test</scope>
     </dependency>
     <dependency>

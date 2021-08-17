@@ -1,0 +1,6 @@
+apiVersion: 1
+providers:
+  - name: JMeter Dashboards
+    allowUiUpdates: true
+    options:
+      path: /etc/grafana/provisioning/dashboards

@@ -4,11 +4,12 @@ import static com.github.tomakehurst.wiremock.client.WireMock.any;
 import static com.github.tomakehurst.wiremock.client.WireMock.anyUrl;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
-import com.google.common.io.Resources;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
@@ -53,7 +54,12 @@ public abstract class JmeterDslTest {
   }
 
   protected String getResourceContents(String resourcePath) throws IOException {
-    return Resources.toString(getClass().getResource(resourcePath), StandardCharsets.UTF_8);
+    try {
+      return new String(Files.readAllBytes(Paths.get(getClass().getResource(resourcePath).toURI())),
+          StandardCharsets.UTF_8);
+    } catch (URISyntaxException e) {
+      throw new RuntimeException(e);
+    }
   }
 
 }

@@ -178,7 +178,9 @@ package core {
       File reportDirectory
     }
 
-    class InfluxDbBackendListener extends BaseTestElement implements MultiLevelTestElement {
+    class DslBackendListener extends BaseTestElement implements MultiLevelTestElement
+
+    class InfluxDbBackendListener extends DslBackendListener {
       String url
       String token
       String title

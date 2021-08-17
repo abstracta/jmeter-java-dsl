@@ -1,15 +1,17 @@
 version: '3'
 services:
-  influxdb:
-    image: influxdb:1.8
+  es-bootstrap:
+    build: ./elasticsearch-bootstrap
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.14.0
     ports:
-      - '8086:8086'
+      - '9200:9200'
+      - '9300:9300'
     volumes:
-      - influxdb-data:/var/lib/influxdb
+      - elasticsearch-data:/usr/share/elasticsearch/data
     environment:
-      - INFLUXDB_DB=jmeter
-      - INFLUXDB_ADMIN_USER=admin
-      - INFLUXDB_ADMIN_PASSWORD=admin
+      - discovery.type=single-node
   grafana:
     image: grafana/grafana:8.1.1
     ports:
@@ -18,11 +20,11 @@ services:
       - grafana-data:/var/lib/grafana
       - ./grafana-provisioning/:/etc/grafana/provisioning
     depends_on:
-      - influxdb
+      - elasticsearch
     environment:
       - GF_SECURITY_ADMIN_USER=admin
       - GF_SECURITY_ADMIN_PASSWORD=1234
       - GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH=/etc/grafana/provisioning/dashboards/jmeter.json
 volumes:
-  influxdb-data:
+  elasticsearch-data:
   grafana-data:
