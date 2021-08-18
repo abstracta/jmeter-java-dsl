@@ -19,6 +19,7 @@ import static us.abstracta.jmeter.javadsl.JmeterDsl.threadGroup;
 import org.apache.jmeter.threads.JMeterVariables;
 import org.eclipse.jetty.http.HttpHeader;
 import org.eclipse.jetty.http.HttpMethod;
+import org.eclipse.jetty.http.HttpStatus;
 import org.eclipse.jetty.http.MimeTypes;
 import org.eclipse.jetty.http.MimeTypes.Type;
 import org.junit.jupiter.api.Test;
@@ -30,6 +31,7 @@ public class DslHttpSamplerTest extends JmeterDslTest {
   private static final String HEADER_VALUE_1 = "value1";
   private static final String HEADER_NAME_2 = "name2";
   private static final String HEADER_VALUE_2 = "value2";
+  private static final String REDIRECT_PATH = "/redirect";
 
   @Test
   public void shouldSendPostWithContentTypeToServerWhenHttpSamplerWithPost() throws Exception {
@@ -42,6 +44,35 @@ public class DslHttpSamplerTest extends JmeterDslTest {
     wiremockServer.verify(postRequestedFor(anyUrl())
         .withHeader(HttpHeader.CONTENT_TYPE.toString(), equalTo(contentType.toString()))
         .withRequestBody(equalToJson(JSON_BODY)));
+  }
+
+  @Test
+  public void shouldFollowRedirectsByDefaultWhenHttpSampler() throws Exception {
+    setupMockedRedirectionTo(REDIRECT_PATH);
+    testPlan(
+        threadGroup(1, 1,
+            httpSampler(wiremockUri)
+        )
+    ).run();
+    wiremockServer.verify(getRequestedFor(urlPathEqualTo(REDIRECT_PATH)));
+  }
+
+  private void setupMockedRedirectionTo(String redirectPath) {
+    wiremockServer.stubFor(get("/").willReturn(
+        aResponse().withStatus(HttpStatus.MOVED_PERMANENTLY_301)
+            .withHeader("Location", wiremockUri + redirectPath)));
+  }
+
+  @Test
+  public void shouldNotFollowRedirectsWhenHttpSamplerWithDisabledFollowRedirects() throws Exception {
+    setupMockedRedirectionTo(REDIRECT_PATH);
+    testPlan(
+        threadGroup(1, 1,
+            httpSampler(wiremockUri)
+                .followRedirects(false)
+        )
+    ).run();
+    wiremockServer.verify(0, getRequestedFor(urlPathEqualTo(REDIRECT_PATH)));
   }
 
   @Test

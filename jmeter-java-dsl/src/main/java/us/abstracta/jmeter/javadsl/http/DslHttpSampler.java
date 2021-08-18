@@ -29,6 +29,7 @@ public class DslHttpSampler extends DslSampler {
   private HttpMethod method = HttpMethod.GET;
   private final HttpHeaders headers = new HttpHeaders();
   private String body;
+  private boolean followRedirects = true;
 
   public DslHttpSampler(String name, String url) {
     super(buildName(name), HttpTestSampleGui.class, new ArrayList<>());
@@ -183,6 +184,23 @@ public class DslHttpSampler extends DslSampler {
   }
 
   /**
+   * Allows enabling/disabling automatic request for redirects.
+   *
+   * When a response is a redirection response (3xx status code with a Location header), JMeter
+   * automatically generates a new request to the redirected destination registering the redirect
+   * request as a sub sample. This method allows enabling/disabling such behavior.
+   *
+   * @param followRedirects sets either to enable or disable automatic redirects. By default,
+   * redirects are automatically followed.
+   * @return the altered sampler to allow for fluent API usage.
+   * @since 0.21
+   */
+  public DslHttpSampler followRedirects(boolean followRedirects) {
+    this.followRedirects = followRedirects;
+    return this;
+  }
+
+  /**
    * Allows specifying children test elements for the sampler, which allow for example extracting
    * information from HTTP response, alter HTTP request, assert HTTP response contents, etc.
    *
@@ -196,7 +214,7 @@ public class DslHttpSampler extends DslSampler {
   @Override
   public TestElement buildTestElement() {
     HTTPSamplerProxy ret = new HTTPSamplerProxy();
-    ret.setFollowRedirects(true);
+    ret.setFollowRedirects(followRedirects);
     ret.setUseKeepAlive(true);
     ret.setPath(url);
     ret.setMethod(method.name());
