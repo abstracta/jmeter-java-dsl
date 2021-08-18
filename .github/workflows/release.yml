@@ -12,8 +12,11 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 1.8
+      - name: Get version
+        id: version
+        run: echo "dsl_version=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
       - name: set maven project version
-        run: mvn --batch-mode --no-transfer-progress versions:set -DnewVersion=${GITHUB_REF#refs/tags/v} --settings .github/settings.xml
+        run: mvn --batch-mode --no-transfer-progress versions:set -DnewVersion=${{ env.dsl_version }} --settings .github/settings.xml
       - name: package release
         run: mvn --batch-mode --no-transfer-progress clean package --settings .github/settings.xml
         env:
@@ -22,14 +25,21 @@ jobs:
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: ./jmeter-java-dsl/target/*.jar
+          file: ./jmeter-java-dsl/target/jmeter-java-dsl-${{ env.dsl_version }}.jar
           file_glob: true
           tag: ${{ github.ref }}
       - name: Upload jmeter-java-dsl-blazemeter.jar to release
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: ./jmeter-java-dsl-blazemeter/target/*.jar
+          file: ./jmeter-java-dsl-blazemeter/target/jmeter-java-dsl-blazemeter-${{ env.dsl_version }}.jar
+          file_glob: true
+          tag: ${{ github.ref }}
+      - name: Upload jmeter-java-dsl-elasticsearch-listener.jar to release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: ./jmeter-java-dsl-elasticsearch-listener/target/jmeter-java-dsl-elasticsearch-listener-${{ env.dsl_version }}.jar
           file_glob: true
           tag: ${{ github.ref }}
       - name: publish to Nexus
@@ -42,7 +52,7 @@ jobs:
           SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
           SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
       - name: update docs version
-        run: .github/fix-docs-version.sh ${GITHUB_REF#refs/tags/v}
+        run: .github/fix-docs-version.sh ${{ env.dsl_version }}
       - name: Deploy github pages
         run: .github/vuepress-deploy.sh
         env:
