@@ -99,7 +99,7 @@ Cookies and cache are automatically cleared in each thread iteration.
 :::
 
 ::: tip
-Since JMeter uses [log4j2](https://logging.apache.org/log4j/2.x/), if you want to control logging level or output, you can use something similar this [log4j2.xml](../../jmeter-java-dsl/src/test/resources/log4j2.xml).
+Since JMeter uses [log4j2](https://logging.apache.org/log4j/2.x/), if you want to control logging level or output, you can use something similar to this [log4j2.xml](../../jmeter-java-dsl/src/test/resources/log4j2.xml).
 :::
 
 ## Run test at scale in BlazeMeter
@@ -161,7 +161,7 @@ public class PerformanceTest {
 
 Note that is as simple as [generating a BlazeMeter authentication token](https://guide.blazemeter.com/hc/en-us/articles/115002213289-BlazeMeter-API-keys-) and adding `.runIn(new BlazeMeterEngine(...))` to any existing jmeter-java-dsl test to get it running at scale in BlazeMeter. 
 
-BlazeMeter will not only allow you to run the test at scale but also provides additional features like the nice real time reporting, historic data tracking, etc. Here is an example of how a test would look like in BlazMeter:
+BlazeMeter will not only allow you to run the test at scale but also provides additional features like the nice real time reporting, historic data tracking, etc. Here is an example of how a test would look like in BlazeMeter:
 
 ![blazemeter.png](./images/blazemeter.png) 
 
@@ -282,7 +282,7 @@ threadGroup().rampTo(10, Duration.ofSeconds(5)).holdIterating(20) // ramp to 10 
 threadGroup().rampToAndHold(10, Duration.ofSeconds(5), Duration.ofSeconds(20)) //similar as above but after ramping up holding execution for 20 seconds
 ```
 
-Additionally, you can use and combine these same methods to configure more complex scenarios (incremental, peak, and any other types of tests) like following one:
+Additionally, you can use and combine these same methods to configure more complex scenarios (incremental, peak, and any other types of tests) like the following one:
 
 ```java
 threadGroup()
@@ -348,7 +348,7 @@ public class PerformanceTest {
 }
 ```
 
-By default, `jtlWriter` will write most used information to evaluate performance of tested service. If you want to trace all information of each request you may use `jtlWriter` with `withAllFields(true)` option. Doing this will provide all the information at the cost of additional computation and resources usage (less resources for actual load testing). You can tune which fields to include or not with `jtlWriter` and only log what you need, check [JtlWriter](../../jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/listeners/JtlWriter.java) for more details. 
+By default, `jtlWriter` will write most used information to evaluate performance of tested service. If you want to trace all the information of each request you may use `jtlWriter` with `withAllFields(true)` option. Doing this will provide all the information at the cost of additional computation and resources usage (less resources for actual load testing). You can tune which fields to include or not with `jtlWriter` and only log what you need, check [JtlWriter](../../jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/listeners/JtlWriter.java) for more details. 
 
 An additional option, specially targeted towards logging sample responses, is `responseFileSaver` which automatically generates a file for each received response. Here is an example:
 
@@ -416,7 +416,7 @@ Check [DslJsr223PostProcessor](../../jmeter-java-dsl/src/main/java/us/abstracta/
 
 When running tests with JMeter (and in particular with jmeter-java-dsl) a usual requirement is to be able to store such test runs in a persistent database to later on review such metrics, and compare different test runs. Additionally, jmeter-java-dsl only provides some summary data of test run in the console while it is running, but, since it doesn't provide any sort of UI, doesn't allow to easily analyze such information as it can be done in JMeter GUI.
 
-To overcome these limitations you can use provided support for publishing JMeter test run metrics to [InfluxDB](https://www.influxdata.com/products/influxdb-overview/) or [Elasticsearch](https://www.elastic.co/what-is/elasticsearch), which allow keeping record of all run statistics and, through [Grafana](https://grafana.com/), get some nice dashboards like the following one:
+To overcome these limitations you can use provided support for publishing JMeter test run metrics to [InfluxDB](https://www.influxdata.com/products/influxdb-overview/) or [Elasticsearch](https://www.elastic.co/what-is/elasticsearch), which allows keeping record of all run statistics and, through [Grafana](https://grafana.com/), get some nice dashboards like the following one:
 
 ![grafana](./influxdb/grafana.png)
 
@@ -567,7 +567,7 @@ public class PerformanceTest {
 
 By default, JMeter marks any HTTP request with a fail response code (4xx or 5xx) as failed, which allows you to easily identify when some request unexpectedly fails. But in many cases this is not enough or desirable, and you need to check for response body (or some other field) to contain (or not) certain string. 
 
-This is usually accomplished in JMeter with the usage of Response Assertions, which provide an easy and fast way to verify that you get the proper response for each step of the test plan, marking the request as failure when specified condition is not met. 
+This is usually accomplished in JMeter with the usage of Response Assertions, which provides an easy and fast way to verify that you get the proper response for each step of the test plan, marking the request as failure when specified condition is not met. 
 
 Here is an example on how to specify a response assertion in jmeter-java-dsl:
 
@@ -749,7 +749,7 @@ Check [DslJsr223PreProcessor](../../jmeter-java-dsl/src/main/java/us/abstracta/j
 
 ## Group requests
 
-Sometimes, is necessary to be able to group requests which constitute different steps in a test. For example, separate requests necessary to do a login from the ones used to add items to cart, from the ones that do a purchase. JMeter (and the DSL) provide Transaction Controllers for this purpose, here is an example:
+Sometimes, is necessary to be able to group requests which constitute different steps in a test. For example, to separate necessary requests to do a login from the ones used to add items to the cart and the ones to do a purchase. JMeter (and the DSL) provide Transaction Controllers for this purpose, here is an example:
 
 ```java
 import static us.abstracta.jmeter.javadsl.JmeterDsl.*;
@@ -820,7 +820,7 @@ public class PerformanceTest {
 
 ## Save as JMX
 
-In case you want to load a test plan in JMeter GUI, you can save it just invoking `saveAsJMX` method in the test plan as in following example:
+In case you want to load a test plan in JMeter GUI, you can save it just invoking `saveAsJMX` method in the test plan as in the following example:
 
 ```java
 import static us.abstracta.jmeter.javadsl.JmeterDsl.*;
@@ -875,7 +875,7 @@ public class RunJmxTestPlan {
 This can be used to just run existing JMX files, or when DSL has no support for some JMeter functionality or plugin, and you need to use JMeter GUI to build the test plan but still want to use jmeter-java-dsl to run the test plan embedded in Java test or code.
 
 ::: tip
-When the JMX uses some custom plugin or JMeter protocol support, you might need to add required dependencies to be able to run the test in an embedded engine. For example, when running a TN3270 JMX test plan using RTE plugin you will need to add following repository and dependencies:
+When the JMX uses some custom plugin or JMeter protocol support, you might need to add required dependencies to be able to run the test in an embedded engine. For example, when running a TN3270 JMX test plan using RTE plugin you will need to add the following repository and dependencies:
 ```xml
 <repositories>
   <repository>
