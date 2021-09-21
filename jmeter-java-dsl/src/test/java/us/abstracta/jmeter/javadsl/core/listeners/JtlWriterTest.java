@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.htmlReporter;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.httpSampler;
+import static us.abstracta.jmeter.javadsl.JmeterDsl.jsr223PostProcessor;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.jtlWriter;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.testPlan;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.threadGroup;
@@ -128,6 +129,22 @@ public class JtlWriterTest extends JmeterDslTest {
         )
     ).run();
     assertFileMatchesTemplate(resultsFilePath, "/complete-jtl.template.xml");
+  }
+
+  @Test
+  public void shouldJtlIncludeCustomVariableWhenJtlWithCustomVariableDefined(@TempDir Path tempDir)
+      throws Exception {
+    Path resultsFilePath = tempDir.resolve(RESULTS_JTL);
+    testPlan(
+        threadGroup(1, 1,
+            httpSampler(wiremockUri)
+                .children(
+                    jsr223PostProcessor("vars.put('my_var', 'my_val')"),
+                    jtlWriter(resultsFilePath.toString()).withVariables("my_var")
+                )
+        )
+    ).run();
+    assertFileMatchesTemplate(resultsFilePath, "/jtl-with-custom-variable.template.csv");
   }
 
 }

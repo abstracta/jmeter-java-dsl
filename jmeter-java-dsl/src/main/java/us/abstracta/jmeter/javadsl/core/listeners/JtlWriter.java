@@ -2,11 +2,17 @@ package us.abstracta.jmeter.javadsl.core.listeners;
 
 import java.io.File;
 import java.nio.file.FileAlreadyExistsException;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import org.apache.jmeter.reporters.ResultCollector;
 import org.apache.jmeter.samplers.SampleSaveConfiguration;
 import org.apache.jmeter.testelement.TestElement;
+import org.apache.jmeter.util.JMeterUtils;
 import org.apache.jmeter.visualizers.SimpleDataWriter;
+import org.apache.jorphan.collections.HashTree;
 import us.abstracta.jmeter.javadsl.core.BaseTestElement;
+import us.abstracta.jmeter.javadsl.core.BuildTreeContext;
 import us.abstracta.jmeter.javadsl.core.MultiLevelTestElement;
 
 /**
@@ -59,6 +65,7 @@ public class JtlWriter extends BaseTestElement implements MultiLevelTestElement 
   private boolean saveSamplerData;
   private boolean saveSubResults = true;
   private boolean overwriteJtl = false;
+  private List<String> sampleVariables = Collections.emptyList();
 
   public JtlWriter(String jtlFile) {
     super("Simple Data Writer", SimpleDataWriter.class);
@@ -106,6 +113,9 @@ public class JtlWriter extends BaseTestElement implements MultiLevelTestElement 
     config.setHostname(saveHostname);
     config.setSamplerData(saveSamplerData);
     config.setSubresults(saveSubResults);
+    if (!sampleVariables.isEmpty()) {
+      JMeterUtils.setProperty("sample_variables", String.join(",", sampleVariables));
+    }
     return logger;
   }
 
@@ -592,7 +602,7 @@ public class JtlWriter extends BaseTestElement implements MultiLevelTestElement 
   }
 
   /**
-   * Allows to specify that if a JTL with provided name exists, then it should be overwritten (and
+   * Allows specifying that if a JTL with provided name exists, then it should be overwritten (and
    * avoid default generated exception).
    *
    * @return the JtlWriter instance to be able to specify additional options in a fluent API way.
@@ -600,6 +610,22 @@ public class JtlWriter extends BaseTestElement implements MultiLevelTestElement 
    */
   public JtlWriter overwriteJtl() {
     this.overwriteJtl = true;
+    return this;
+  }
+
+  /**
+   * Allows specifying JMeter variables to include in generated jtl file.
+   *
+   * <b>Warning:</b> variables to sample are test plan wide. This means that if you set them in one
+   * jtl writer, they will appear in all jtl writers used in the test plan. Moreover, if you set
+   * them in different jtl writers, only variables set on latest one will be considered.
+   *
+   * @param variables names of JMeter variables to include in jtl file.
+   * @return the JtlWriter instance to be able to specify additional options in a fluent API way.
+   * @since 0.22
+   */
+  public JtlWriter withVariables(String... variables) {
+    this.sampleVariables = Arrays.asList(variables);
     return this;
   }
 
