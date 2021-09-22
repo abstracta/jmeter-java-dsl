@@ -26,7 +26,7 @@ public abstract class TestElementContainer<T extends DslTestElement> extends Bas
   }
 
   /**
-   * Allows specifying children test elements for the sampler, which allow for example extracting
+   * Allows specifying children test elements for the sampler, which allows for example extracting
    * information from HTTP response, alter HTTP request, assert HTTP response contents, etc.
    *
    * @param children list of test elements to add as children of this sampler.

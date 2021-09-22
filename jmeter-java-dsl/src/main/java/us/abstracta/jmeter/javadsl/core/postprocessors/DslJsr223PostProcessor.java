@@ -1,6 +1,7 @@
 package us.abstracta.jmeter.javadsl.core.postprocessors;
 
 import java.time.Instant;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -37,7 +38,7 @@ public class DslJsr223PostProcessor extends DslJsr223TestElement implements Mult
   }
 
   public DslJsr223PostProcessor(String name, PostProcessorScript script) {
-    super(name, DEFAULT_NAME, script, PostProcessorVars.class);
+    super(name, DEFAULT_NAME, script, PostProcessorVars.class, Collections.emptyMap());
   }
 
   @Override
@@ -57,7 +58,7 @@ public class DslJsr223PostProcessor extends DslJsr223TestElement implements Mult
 
   public static class PostProcessorVars extends Jsr223ScriptVars {
 
-    public SampleResult prev;
+    public final SampleResult prev;
 
     public PostProcessorVars(SampleResult prev, JMeterContext ctx, JMeterVariables vars,
         Properties props, Sampler sampler, Logger log, String label) {

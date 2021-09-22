@@ -9,10 +9,7 @@ import static us.abstracta.jmeter.javadsl.JmeterDsl.jtlWriter;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.testPlan;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.threadGroup;
 
-import com.google.common.io.Resources;
-import java.io.File;
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -20,6 +17,7 @@ import org.eclipse.jetty.http.MimeTypes.Type;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import us.abstracta.jmeter.javadsl.JmeterDslTest;
+import us.abstracta.jmeter.javadsl.TestResource;
 
 public class JtlWriterTest extends JmeterDslTest {
 
@@ -108,9 +106,9 @@ public class JtlWriterTest extends JmeterDslTest {
   }
 
   private void assertFileMatchesTemplate(Path resultsFilePath, String templateName)
-      throws IOException, URISyntaxException {
+      throws IOException {
     FileTemplateAssert.assertThat(resultsFilePath)
-        .matches(new File(Resources.getResource(getClass(), templateName).toURI()).toPath());
+        .matches(new TestResource(templateName).getFile().toPath());
   }
 
   @Test

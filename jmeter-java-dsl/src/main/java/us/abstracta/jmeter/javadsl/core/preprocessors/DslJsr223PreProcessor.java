@@ -1,5 +1,6 @@
 package us.abstracta.jmeter.javadsl.core.preprocessors;
 
+import java.util.Collections;
 import java.util.Properties;
 import org.apache.jmeter.modifiers.JSR223PreProcessor;
 import org.apache.jmeter.samplers.Sampler;
@@ -32,7 +33,7 @@ public class DslJsr223PreProcessor extends DslJsr223TestElement implements Multi
   }
 
   public DslJsr223PreProcessor(String name, PreProcessorScript script) {
-    super(name, DEFAULT_NAME, script, PreProcessorVars.class);
+    super(name, DEFAULT_NAME, script, PreProcessorVars.class, Collections.emptyMap());
   }
 
   @Override

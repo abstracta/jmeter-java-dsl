@@ -43,6 +43,11 @@
       <version>${jmeter.version}</version>
     </dependency>
     <dependency>
+      <groupId>org.apache.jmeter</groupId>
+      <artifactId>ApacheJMeter_java</artifactId>
+      <version>${jmeter.version}</version>
+    </dependency>
+    <dependency>
       <groupId>kg.apc</groupId>
       <artifactId>jmeter-plugins-casutg</artifactId>
       <version>2.9</version>

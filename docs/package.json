@@ -1,6 +1,6 @@
 {
   "name": "jmeter-java-dsl",
-  "version": "0.1",
+  "version": "0.1.0",
   "description": "Simple JMeter performance tests API",
   "main": "index.js",
   "repository": "abstracta/jmeter-java-dsl",

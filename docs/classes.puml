@@ -211,12 +211,17 @@ package http {
 
 }
 
+package java {
+  class DslJsr223Sampler extends DslJsr223TestElement implements ThreadGroupChild
+}
+
 JmeterDsl -[hidden]- core
 TestElementContainer -up-> "*" DslTestElement
 DslTestPlan ..> TestPlanChild
 DslThreadGroup ..> ThreadGroupChild
 DslTestPlan ..> EmbeddedJmeterEngine
 DslSampler ..> SamplerChild
+DslJsr223Sampler ..> SamplerChild
 DslHttpSampler --> HttpHeaders
 
 @enduml

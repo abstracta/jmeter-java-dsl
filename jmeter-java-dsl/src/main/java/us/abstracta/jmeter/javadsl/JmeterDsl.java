@@ -27,6 +27,8 @@ import us.abstracta.jmeter.javadsl.http.DslCacheManager;
 import us.abstracta.jmeter.javadsl.http.DslCookieManager;
 import us.abstracta.jmeter.javadsl.http.DslHttpSampler;
 import us.abstracta.jmeter.javadsl.http.HttpHeaders;
+import us.abstracta.jmeter.javadsl.java.DslJsr223Sampler;
+import us.abstracta.jmeter.javadsl.java.DslJsr223Sampler.SamplerScript;
 
 /**
  * This is the main class to be imported from any code using JMeter DSL.
@@ -267,6 +269,71 @@ public class JmeterDsl {
    */
   public static DslCacheManager httpCache() {
     return new DslCacheManager();
+  }
+
+  /**
+   * Builds a JSR223 Sampler which allows sampling any Java API or custom logic.
+   * <p>
+   *
+   * @param script contains the script to be use while sampling. By default, this will be a groovy
+   * script, but you can change it by setting the language property in the returned post processor.
+   * @return the JSR223 Sampler instance
+   * @see DslJsr223Sampler
+   * @since 0.22
+   */
+  public static DslJsr223Sampler jsr223Sampler(String script) {
+    return new DslJsr223Sampler(null, script);
+  }
+
+  /**
+   * Same as {@link #jsr223Sampler(String)} but allowing to set a name on the sampler.
+   * <p>
+   * The name is used in collected samples to easily identify their results and as logger name which
+   * allows configuring log level, appender, etc., for the sampler.
+   *
+   * @see #jsr223Sampler(String)
+   * @since 0.22
+   **/
+  public static DslJsr223Sampler jsr223Sampler(String name, String script) {
+    return new DslJsr223Sampler(name, script);
+  }
+
+  /**
+   * Same as {@link #jsr223Sampler(String)} but allowing to use Java type safety and code
+   * completion when specifying the script.
+   * <p>
+   * <b>WARNING:</b> This only works when using embedded jmeter engine (no support for saving to
+   * JMX and running it in JMeter GUI, or running it with BlazeMeter). If you need such support
+   * consider using {@link #jsr223Sampler(String)} instead.
+   * <p>
+   * Take into consideration that the provided script is invoked from as may threads as defined in
+   * thread group. So make sure that provided logic is thread safe.
+   *
+   * @see SamplerScript
+   * @see #jsr223Sampler(String)
+   * @since 0.22
+   */
+  public static DslJsr223Sampler jsr223Sampler(SamplerScript script) {
+    return new DslJsr223Sampler(null, script);
+  }
+
+  /**
+   * Same as {@link #jsr223Sampler(String, String)} but allowing to use Java type safety and
+   * code completion when specifying the script.
+   * <p>
+   * <b>WARNING:</b> This only works when using embedded jmeter engine (no support for saving to
+   * JMX and running it in JMeter GUI, or running it with BlazeMeter). If you need such support
+   * consider using {@link #jsr223Sampler(String)} instead.
+   * <p>
+   * Take into consideration that the provided script is invoked from as may threads as defined in
+   * thread group. So make sure that provided logic is thread safe.
+   *
+   * @see SamplerScript
+   * @see #jsr223Sampler(String)
+   * @since 0.22
+   */
+  public static DslJsr223Sampler jsr223Sampler(String name, SamplerScript script) {
+    return new DslJsr223Sampler(name, script);
   }
 
   /**

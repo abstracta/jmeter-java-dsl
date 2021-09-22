@@ -40,29 +40,32 @@ public abstract class DslJsr223TestElement extends BaseTestElement {
   }
 
   public DslJsr223TestElement(String name, String defaultName, Jsr223Script<?> script,
-      Class<?> varsClass) {
+      Class<?> varsClass, Map<String, String> varsNameMapping) {
     super(name != null ? name : defaultName, TestBeanGUI.class);
     String buildScriptId = buildScriptId();
     jmeterProps.put(buildScriptId, script);
-    this.script = buildScriptString(buildScriptId, varsClass);
+    this.script = buildScriptString(buildScriptId, varsClass, varsNameMapping);
   }
 
   private static String buildScriptId() {
     return "Jsr223Script" + scriptId++;
   }
 
-  private static String buildScriptString(String scriptId, Class<?> varsClass) {
+  private static String buildScriptString(String scriptId, Class<?> varsClass,
+      Map<String, String> varsNameMapping) {
     return
         "// It is currently not supported to run scripts defined in Java code in JMeter GUI or"
             + " non Embedded Engine (eg: BlazeMeter).\n"
             + "def script = (" + Jsr223Script.class.getName() + ") props.get('" + scriptId + "')\n"
             + "script.run(new " + varsClass.getName()
-            + "(" + buildConstructorParameters(varsClass) + "))";
+            + "(" + buildConstructorParameters(varsClass, varsNameMapping) + "))";
   }
 
-  private static String buildConstructorParameters(Class<?> varsClass) {
+  private static String buildConstructorParameters(Class<?> varsClass,
+      Map<String, String> varsNameMapping) {
     return Arrays.stream(varsClass.getFields())
         .map(Field::getName)
+        .map(f -> varsNameMapping.getOrDefault(f, f))
         .collect(Collectors.joining(","));
   }
 
