@@ -22,14 +22,14 @@ Add dependency to your project:
 <dependency>
   <groupId>us.abstracta.jmeter</groupId>
   <artifactId>jmeter-java-dsl</artifactId>
-  <version>0.21</version>
+  <version>0.22</version>
   <scope>test</scope>
 </dependency>
 ```
 :::
 ::: tab Gradle
 ```groovy
-testImplementation 'us.abstracta.jmeter:jmeter-java-dsl:0.21'
+testImplementation 'us.abstracta.jmeter:jmeter-java-dsl:0.22'
 ```
 ::::
 
