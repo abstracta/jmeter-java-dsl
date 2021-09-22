@@ -41,7 +41,8 @@ public class DslJsr223Sampler extends DslJsr223TestElement implements ThreadGrou
   }
 
   public DslJsr223Sampler(String name, SamplerScript script) {
-    super(name, DEFAULT_NAME, script, SamplerVars.class, Collections.singletonMap("sampleResult", "SampleResult"));
+    super(name, DEFAULT_NAME, script, SamplerVars.class,
+        Collections.singletonMap("sampleResult", "SampleResult"));
   }
 
   /**

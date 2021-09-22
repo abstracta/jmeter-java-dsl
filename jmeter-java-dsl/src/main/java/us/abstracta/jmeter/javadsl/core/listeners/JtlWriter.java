@@ -10,9 +10,7 @@ import org.apache.jmeter.samplers.SampleSaveConfiguration;
 import org.apache.jmeter.testelement.TestElement;
 import org.apache.jmeter.util.JMeterUtils;
 import org.apache.jmeter.visualizers.SimpleDataWriter;
-import org.apache.jorphan.collections.HashTree;
 import us.abstracta.jmeter.javadsl.core.BaseTestElement;
-import us.abstracta.jmeter.javadsl.core.BuildTreeContext;
 import us.abstracta.jmeter.javadsl.core.MultiLevelTestElement;
 
 /**
