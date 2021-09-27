@@ -29,7 +29,7 @@ public class DslRegexExtractor extends DslScopedTestElement<DslRegexExtractor> i
   private TargetField fieldToCheck = TargetField.RESPONSE_BODY;
 
   public DslRegexExtractor(String variableName, String regex) {
-    super("name", RegexExtractorGui.class);
+    super("Regular Expression Extractor", RegexExtractorGui.class);
     this.variableName = variableName;
     this.regex = regex;
   }
