@@ -33,7 +33,8 @@ public abstract class TestElementContainer<T extends DslTestElement> extends Bas
    * @return the altered sampler to allow for fluent API usage.
    * @since 0.12
    */
-  protected TestElementContainer<T> children(T... children) {
+  @SafeVarargs
+  protected final TestElementContainer<T> addChildren(T... children) {
     this.children.addAll(Arrays.asList(children));
     return this;
   }

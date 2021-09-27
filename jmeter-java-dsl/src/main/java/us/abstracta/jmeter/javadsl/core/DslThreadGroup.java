@@ -81,14 +81,14 @@ public class DslThreadGroup extends TestElementContainer<ThreadGroupChild> imple
     super(solveName(name), null, Collections.emptyList());
   }
 
+  private static String solveName(String name) {
+    return name != null ? name : "Thread Group";
+  }
+
   private void checkThreadCount(int threads) {
     if (threads <= 0) {
       throw new IllegalArgumentException("Threads count must be >=1");
     }
-  }
-
-  private static String solveName(String name) {
-    return name != null ? name : "Thread Group";
   }
 
   /**
@@ -243,7 +243,7 @@ public class DslThreadGroup extends TestElementContainer<ThreadGroupChild> imple
    * @since 0.12
    */
   public DslThreadGroup children(ThreadGroupChild... children) {
-    return (DslThreadGroup) super.children(children);
+    return (DslThreadGroup) addChildren(children);
   }
 
   @Override
@@ -378,16 +378,8 @@ public class DslThreadGroup extends TestElementContainer<ThreadGroupChild> imple
       threads = s.threadCount;
       delay = delay.plus(s.duration);
     }
-    if (!stack.isEmpty()) {
-      ret.add(curr);
-      while (!stack.isEmpty()) {
-        ret.add(stack.pop());
-      }
-      /*
-       last added segment is the first segment which should be ignored since is covered by next
-       (considering timeline order) segment delay.
-       */
-      ret.remove(ret.size() - 1);
+    while (!stack.isEmpty()) {
+      curr = completeCurrentSchedule(curr, ret, stack);
     }
     ret.sort(Comparator.comparing(r -> r.delay.toMillis()));
     return ret;

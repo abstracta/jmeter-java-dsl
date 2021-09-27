@@ -16,7 +16,7 @@ import org.apache.jmeter.testelement.TestElement;
 import org.apache.jmeter.testelement.property.JMeterProperty;
 import org.apache.jmeter.threads.ThreadGroup;
 import org.assertj.core.api.AbstractAssert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class DslThreadGroupTest {
 
@@ -46,8 +46,12 @@ public class DslThreadGroupTest {
     } else {
       loopController.setLoops(iterations);
     }
-    ret.setDelay(delaySecs);
-    ret.setScheduler(durationSecs != 0 || delaySecs != 0);
+    if (delaySecs != 0) {
+      ret.setDelay(delaySecs);
+    }
+    if (durationSecs != 0 || delaySecs != 0) {
+      ret.setScheduler(true);
+    }
     return ret;
   }
 
@@ -233,6 +237,10 @@ public class DslThreadGroupTest {
     }
     ret.setData(JMeterPluginsUtils.tableModelRowsToCollectionProperty(table,
         UltimateThreadGroup.DATA_PROPERTY));
+    LoopController loopController = new LoopController();
+    loopController.setLoops(-1);
+    loopController.setContinueForever(true);
+    ret.setSamplerController(loopController);
     return ret;
   }
 
@@ -250,14 +258,13 @@ public class DslThreadGroupTest {
         .rampTo(1, d);
     assertThat(threadGroup.buildTestElement())
         .isEqualTo(buildUltimateThreadGroup(new int[][]{
-            {1, 10, 4, 127, 0},
-            {1, 14, 4, 121, 3},
+            {1, 10, 4, 107, 0},
+            {1, 14, 4, 101, 3},
             {1, 17, 4, 10, 10},
-            {1, 50, 4, 82, 3},
+            {1, 50, 4, 62, 3},
             {2, 54, 7, 0, 10},
-            {2, 70, 7, 54, 5},
-            {1, 77, 4, 35, 5},
-            {1, 90, 10, 10, 5}
+            {2, 70, 5, 35, 5},
+            {2, 75, 5, 10, 10}
         }));
   }
 

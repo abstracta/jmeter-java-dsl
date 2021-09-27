@@ -208,7 +208,7 @@ public class DslHttpSampler extends DslSampler {
    * @return the altered sampler to allow for fluent API usage.
    */
   public DslHttpSampler children(SamplerChild... children) {
-    return (DslHttpSampler) super.children(children);
+    return (DslHttpSampler) addChildren(children);
   }
 
   @Override
