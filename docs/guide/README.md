@@ -76,8 +76,6 @@ public class PerformanceTest {
 }
 ```
 
-Check [JmeterDsl](../../jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/JmeterDsl.java) and [DslHttpSampler](../../jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/http/DslHttpSampler.java) for additional options.
-
 ::: tip
 When working with multiple samplers in a test plan, specify their names to easily check their respective statistics.
 :::
@@ -101,6 +99,8 @@ Cookies and cache are automatically cleared in each thread iteration.
 ::: tip
 Since JMeter uses [log4j2](https://logging.apache.org/log4j/2.x/), if you want to control logging level or output, you can use something similar to this [log4j2.xml](../../jmeter-java-dsl/src/test/resources/log4j2.xml).
 :::
+
+Check [JmeterDsl](../../jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/JmeterDsl.java) and [DslHttpSampler](../../jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/http/DslHttpSampler.java) for additional options (like setting headers, other HTTP verbs, disabling following redirects, etc.).
 
 ## Run test at scale in BlazeMeter
 
@@ -817,6 +817,12 @@ public class PerformanceTest {
   
 }
 ```
+
+::: warning
+`uniformRandomTimer` `minimumMillis` and `maximumMillis` parameters differ from the ones used by JMeter Uniform Random Timer element, to make it simpler to users with no JMeter background. 
+
+The generated JMeter test element uses as `Constant Delay Offset` the `minimumMillis` value, and as `Maximum random delay` `(maximumMillis - minimumMillis)` value.
+:::
 
 ## Save as JMX
 
