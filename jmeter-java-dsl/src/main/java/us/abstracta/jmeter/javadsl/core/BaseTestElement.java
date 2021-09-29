@@ -59,14 +59,24 @@ public abstract class BaseTestElement implements DslTestElement {
     try (JMeterEnvironment env = new JMeterEnvironment()) {
       // this is required for proper visualization of labels and messages from resources bundle
       env.initLocale();
+      showFrameWith(buildTestElementGui(testElement), name, 800, 600, closeListener);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  protected Component buildTestElementGui(TestElement testElement) {
+    try {
+      Class<? extends JMeterGUIComponent> guiClass = (Class<? extends JMeterGUIComponent>)
+          Class.forName(testElement.getPropertyAsString(TestElement.GUI_CLASS));
       JMeterGUIComponent gui =
           guiClass == TestBeanGUI.class ? new TestBeanGUI(testElement.getClass())
               : guiClass.newInstance();
       gui.clearGui();
       gui.configure(testElement);
       gui.modifyTestElement(testElement);
-      showFrameWith((Component) gui, name, 800, 600, closeListener);
-    } catch (InstantiationException | IllegalAccessException | IOException e) {
+      return (Component) gui;
+    } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
       throw new RuntimeException(e);
     }
   }
@@ -74,7 +84,7 @@ public abstract class BaseTestElement implements DslTestElement {
   protected void showFrameWith(Component content, String title, int width, int height,
       Runnable closeListener) {
     JFrame frame = new JFrame(title);
-    frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+    frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
     if (closeListener != null) {
       frame.addWindowListener(new WindowAdapter() {
         @Override

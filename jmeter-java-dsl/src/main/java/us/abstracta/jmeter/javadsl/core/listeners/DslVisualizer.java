@@ -1,0 +1,50 @@
+package us.abstracta.jmeter.javadsl.core.listeners;
+
+import java.awt.GraphicsEnvironment;
+import java.util.concurrent.CompletableFuture;
+import org.apache.jmeter.gui.JMeterGUIComponent;
+import org.apache.jmeter.testelement.TestElement;
+import org.apache.jorphan.collections.HashTree;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import us.abstracta.jmeter.javadsl.core.BaseTestElement;
+import us.abstracta.jmeter.javadsl.core.BuildTreeContext;
+import us.abstracta.jmeter.javadsl.core.MultiLevelTestElement;
+
+/**
+ * Provides general logic for listeners which show some live information in Swing window.
+ *
+ * @since 0.23
+ */
+public abstract class DslVisualizer extends BaseTestElement implements MultiLevelTestElement {
+
+  private static final Logger LOG = LoggerFactory.getLogger(DslVisualizer.class);
+
+  public DslVisualizer(String name, Class<? extends JMeterGUIComponent> guiClass) {
+    super(name, guiClass);
+  }
+
+  @Override
+  public HashTree buildTreeUnder(HashTree parent, BuildTreeContext context) {
+    if (GraphicsEnvironment.isHeadless()) {
+      logNonGuiExecutionWarning();
+      return parent;
+    }
+    TestElement testElement = buildConfiguredTestElement();
+    showTestElementInGui(testElement, context);
+    return parent.add(testElement);
+  }
+
+  protected void logNonGuiExecutionWarning() {
+    LOG.warn("The test plan contains a {} which is of no use in non GUI executions (like this one)."
+        + " Ignoring it for this execution. Remember removing them once your test plan is ready "
+        + "for load testing execution.", getClass().getSimpleName());
+  }
+
+  protected void showTestElementInGui(TestElement testElement, BuildTreeContext context) {
+    CompletableFuture<Void> closeFuture = new CompletableFuture<>();
+    context.addVisualizerCloseFuture(closeFuture);
+    showTestElementInGui(testElement, () -> closeFuture.complete(null));
+  }
+
+}

@@ -57,6 +57,7 @@
     <module>jmeter-java-dsl</module>
     <module>jmeter-java-dsl-blazemeter</module>
     <module>jmeter-java-dsl-elasticsearch-listener</module>
+    <module>jmeter-java-dsl-dashboard</module>
   </modules>
 
   <dependencyManagement>
@@ -65,6 +66,16 @@
         <groupId>ru.lanwen.wiremock</groupId>
         <artifactId>wiremock-junit5</artifactId>
         <version>1.3.1</version>
+      </dependency>
+      <dependency>
+        <groupId>org.assertj</groupId>
+        <artifactId>assertj-swing-junit</artifactId>
+        <version>3.9.2</version>
+      </dependency>
+      <dependency>
+        <groupId>net.java.openjdk.cacio</groupId>
+        <artifactId>cacio-tta</artifactId>
+        <version>1.9</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -80,6 +91,12 @@
       <groupId>org.assertj</groupId>
       <artifactId>assertj-core</artifactId>
       <version>3.21.0</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>net.java.openjdk.cacio</groupId>
+      <artifactId>cacio-tta</artifactId>
+      <version>1.9</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
@@ -114,6 +131,21 @@
             </goals>
           </execution>
         </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>2.22.2</version>
+        <configuration>
+          <!-- use cacio-tta to avoid GUI in swing tests -->
+          <systemPropertyVariables>
+            <java.awt.headless>false</java.awt.headless>
+            <awt.toolkit>net.java.openjdk.cacio.ctc.CTCToolkit</awt.toolkit>
+            <java.awt.graphicsenv>net.java.openjdk.cacio.ctc.CTCGraphicsEnvironment
+            </java.awt.graphicsenv>
+            <cacio.managed.screensize>1280x800</cacio.managed.screensize>
+          </systemPropertyVariables>
+        </configuration>
       </plugin>
     </plugins>
   </build>

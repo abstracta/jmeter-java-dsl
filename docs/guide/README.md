@@ -221,7 +221,7 @@ When adding `resultsTreeVisualizer()` as child of a thread group, it will only d
 :::
 
 ::: tip
-Remove `resultsTreeVisualizer()` from test plans when are no longer needed (when debugging is finished). Leaving them might interfere with unattended test plan execution due to test plan execution not finishing until all visualizers windows are closed.
+**Remove `resultsTreeVisualizer()` from test plans when are no longer needed** (when debugging is finished). Leaving them might interfere with unattended test plan execution due to test plan execution not finishing until all visualizers windows are closed.
 :::
 
 ::: warning
@@ -315,7 +315,11 @@ For example, for above test plan you would get a window like the following one:
 When using multiple thread groups in a test plan, consider setting a name on them to properly identify associated requests in statistics & jtl results.
 :::
 
-## Log requests and responses
+## Reporting
+
+Once you have a test plan you would usually want to be able to analyze collected information. In this section we show you several ways to achieve this.
+
+### Log requests and responses
 
 The main mechanism provided by JMeter (and jmeter-java-dsl) to get information about generated requests, responses and associated metrics is through the generation of JTL files.
 
@@ -412,7 +416,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 Check [DslJsr223PostProcessor](../../jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/postprocessors/DslJsr223PostProcessor.java) for more details.
 
-## Real-time metrics visualization and historic data storage
+### Real-time metrics visualization and historic data storage
 
 When running tests with JMeter (and in particular with jmeter-java-dsl) a usual requirement is to be able to store such test runs in a persistent database to later on review such metrics, and compare different test runs. Additionally, jmeter-java-dsl only provides some summary data of test run in the console while it is running, but, since it doesn't provide any sort of UI, doesn't allow to easily analyze such information as it can be done in JMeter GUI.
 
@@ -420,7 +424,7 @@ To overcome these limitations you can use provided support for publishing JMeter
 
 ![grafana](./influxdb/grafana.png)
 
-### InfluxDB
+#### InfluxDB
 
 This can be easily done using `influxDbListener`, an existing InfluxDB & Grafana server and using a dashboard like [this one](https://grafana.com/grafana/dashboards/4026).
 
@@ -459,7 +463,7 @@ Use provided `docker-compose` settings for local tests only. It uses weak creden
 
 Check [InfluxDbBackendListener](../../jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/listeners/InfluxDbBackendListener.java) for additional details and settings.
 
-### Elasticsearch
+#### Elasticsearch
 
 Another alternative is using provided `jmeter-java-dsl-elasticsearch-listener` module with Elasticsearch and Grafana servers using a dashboard like [this one](../../docs/guide/elasticsearch/grafana-provisioning/dashboards/jmeter.json).
 
@@ -523,7 +527,7 @@ Use provided `docker-compose` settings for local tests only. It uses weak or no 
 
 Check [ElasticsearchBackendListener](../../jmeter-java-dsl-elasticsearch-listener/src/main/java/us/abstracta/jmeter/javadsl/elasticsearch/listener/ElasticsearchBackendListener.java) for additional details and settings.
 
-## Generate HTML reports from test plan execution
+### Generate HTML reports from test plan execution
 
 After running a test plan you would usually like to visualize the results in friendly way that eases analysis of collected information.
 
@@ -561,6 +565,87 @@ public class PerformanceTest {
 
 ::: warning
 `htmlReporter` will throw an exception if provided directory path is a nonempty directory or file
+:::
+
+### Live built-in graphs and stats
+
+Sometimes you want to get live statistics on the test plan and don't want to install additional tools, and are not concerned about keeping historic data. 
+
+You can use `dashboardVisualizer` to get live charts and stats for quick review. 
+
+To use it, you need to add following dependency:
+
+:::: tabs type:card
+::: tab Maven
+```xml
+<dependency>
+  <groupId>us.abstracta.jmeter</groupId>
+  <artifactId>jmeter-java-dsl-dashboard</artifactId>
+  <version>0.22</version>
+  <scope>test</scope>
+</dependency>
+```
+:::
+::: tab Gradle
+```groovy
+testImplementation 'us.abstracta.jmeter:jmeter-java-dsl-dashboard:0.22'
+```
+:::
+::::
+
+And use it as you would with any of previously mentioned listeners (like `influxDbListener` and `jtlWriter`). 
+
+Here is an example:
+
+```java
+import static org.assertj.core.api.Assertions.assertThat;
+import static us.abstracta.jmeter.javadsl.JmeterDsl.*;
+import static us.abstracta.jmeter.javadsl.dashboard.DashboardVisualizer.*;
+
+import java.io.IOException;
+import java.time.Duration;
+import org.junit.jupiter.api.Test;
+import us.abstracta.jmeter.javadsl.core.TestPlanStats;
+
+public class PerformanceTest {
+
+  @Test
+  public void testPerformance() throws IOException {
+    TestPlanStats stats = testPlan(
+        threadGroup("Group1")
+          .rampToAndHold(10, Duration.ofSeconds(10), Duration.ofSeconds(10))
+          .children(
+            httpSampler("Sample 1", "http://my.service")
+          ),
+        threadGroup("Group2")
+          .rampToAndHold(20, Duration.ofSeconds(10), Duration.ofSeconds(20))
+          .children(
+            httpSampler("Sample 2", "http://my.service/get")
+          ),
+        dashboardVisualizer()
+    ).run();
+    assertThat(stats.overall().sampleTimePercentile99()).isLessThan(Duration.ofSeconds(5));
+  }
+
+}
+```
+
+The `dashboardVisualizer` will pop up a window like the following one, which you can use to trace statistics while the test plan runs:
+
+![dashboard](./images/dashboard.png)
+
+::: warning
+The dashboard imposes additional resources (CPU & RAM) consumption on the machine generating the load test, which may affect the test plan execution and reduce the number of concurrent threads you may reach in your machine. In general, prefer using one of previously mentioned methods and use the dashboard just for local testing and quick feedback. 
+
+**Remember removing it when is no longer needed in the test plan**
+:::
+
+::: warning
+The test will not end until you close all pop up windows. This allows you to see the final charts and statistics of the plan before ending the test.
+:::
+
+::: tip
+As with `jtlWriter` and `influxDbListener`, you can place `dashboardVisualizer` at different levels of test plan (at test plan level, at thread group level, as child of sampler, etc), to only capture statistics of that particular part of the test plan.
 :::
 
 ## Check for expected response
