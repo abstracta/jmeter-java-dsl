@@ -1,5 +1,6 @@
 package us.abstracta.jmeter.javadsl.core;
 
+import java.awt.Component;
 import java.io.Closeable;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -11,7 +12,14 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Instant;
 import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
 import org.apache.commons.io.FileUtils;
 import org.apache.jmeter.engine.StandardJMeterEngine;
 import org.apache.jmeter.functions.EvalFunction;
@@ -24,6 +32,9 @@ import org.apache.jmeter.visualizers.Visualizer;
 import org.apache.jmeter.visualizers.backend.BackendListenerClient;
 import org.apache.jorphan.collections.HashTree;
 import org.apache.jorphan.collections.ListedHashTree;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import us.abstracta.jmeter.javadsl.core.listeners.DslVisualizer;
 
 /**
  * Allows running test plans in an embedded JMeter instance.
@@ -31,6 +42,8 @@ import org.apache.jorphan.collections.ListedHashTree;
  * @since 0.1
  */
 public class EmbeddedJmeterEngine implements DslJmeterEngine {
+
+  private static final Logger LOG = LoggerFactory.getLogger(EmbeddedJmeterEngine.class);
 
   @Override
   public TestPlanStats run(DslTestPlan testPlan) throws IOException {
@@ -45,6 +58,12 @@ public class EmbeddedJmeterEngine implements DslJmeterEngine {
       addTestSummariserToTree(testPlanTree);
 
       engine.configure(rootTree);
+      List<Future<Void>> closedVisualizers = Collections.emptyList();
+      if (!buildContext.getVisualizers().isEmpty()) {
+        // this is required for proper visualization of labels and messages from resources bundle
+        env.initLocale();
+        closedVisualizers = showVisualizers(buildContext.getVisualizers());
+      }
       /*
        we register the start and end of test since calculating it from sample results may be
        inaccurate when timers or post processors are used outside of transactions, since such time
@@ -55,8 +74,33 @@ public class EmbeddedJmeterEngine implements DslJmeterEngine {
       stats.setStart(Instant.now());
       engine.run();
       stats.setEnd(Instant.now());
-      buildContext.awaitAllVisualizersClosed();
+      awaitAllClosedVisualizers(closedVisualizers);
       return stats;
+    }
+  }
+
+  private List<Future<Void>> showVisualizers(Map<DslVisualizer, Supplier<Component>> visualizers) {
+    return visualizers.entrySet().stream()
+        .map(e -> {
+          CompletableFuture<Void> closedVisualizer = new CompletableFuture<>();
+          e.getKey().showTestElementGui(e.getValue(), () -> closedVisualizer.complete(null));
+          return closedVisualizer;
+        })
+        .collect(Collectors.toList());
+  }
+
+  public void awaitAllClosedVisualizers(List<Future<Void>> closedVisualizers) {
+    try {
+      for (Future<Void> closedVisualizer : closedVisualizers) {
+        try {
+          closedVisualizer.get();
+        } catch (ExecutionException e) {
+          LOG.warn("Problem waiting for a visualizer to close", e);
+        }
+      }
+    } catch (InterruptedException e) {
+      //just stop waiting for visualizers and reset interrupted flag
+      Thread.interrupted();
     }
   }
 
@@ -99,7 +143,8 @@ public class EmbeddedJmeterEngine implements DslJmeterEngine {
               Collections.emptyMap())) {
         Path configBinDir = fs.getPath("/bin");
         for (Path p : (Iterable<Path>) Files.walk(configBinDir)::iterator) {
-          Files.copy(p, binDir.toPath().resolve(configBinDir.relativize(p).toString()));
+          Path targetPath = binDir.toPath().resolve(configBinDir.relativize(p).toString());
+          Files.copy(p, targetPath);
         }
       } catch (URISyntaxException e) {
         throw new RuntimeException(e);

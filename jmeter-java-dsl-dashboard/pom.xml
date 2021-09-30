@@ -16,7 +16,7 @@
   <artifactId>jmeter-java-dsl-dashboard</artifactId>
 
   <name>${project.artifactId}</name>
-  <description>Module which includes listener for showing live dashboard window with grahps and stats.</description>
+  <description>Module which includes listener for showing live dashboard window with graphs and stats.</description>
 
   <dependencies>
     <dependency>

@@ -645,7 +645,7 @@ The test will not end until you close all pop up windows. This allows you to see
 :::
 
 ::: tip
-As with `jtlWriter` and `influxDbListener`, you can place `dashboardVisualizer` at different levels of test plan (at test plan level, at thread group level, as child of sampler, etc), to only capture statistics of that particular part of the test plan.
+As with `jtlWriter` and `influxDbListener`, you can place `dashboardVisualizer` at different levels of test plan (at test plan level, at thread group level, as child of sampler, etc.), to only capture statistics of that particular part of the test plan.
 :::
 
 ## Check for expected response

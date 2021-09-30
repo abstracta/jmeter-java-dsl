@@ -1,7 +1,6 @@
 package us.abstracta.jmeter.javadsl.core.listeners;
 
 import java.awt.GraphicsEnvironment;
-import java.util.concurrent.CompletableFuture;
 import org.apache.jmeter.gui.JMeterGUIComponent;
 import org.apache.jmeter.testelement.TestElement;
 import org.apache.jorphan.collections.HashTree;
@@ -31,20 +30,15 @@ public abstract class DslVisualizer extends BaseTestElement implements MultiLeve
       return parent;
     }
     TestElement testElement = buildConfiguredTestElement();
-    showTestElementInGui(testElement, context);
-    return parent.add(testElement);
+    HashTree ret = parent.add(testElement);
+    context.addVisualizer(this, () -> buildTestElementGui(testElement));
+    return ret;
   }
 
   protected void logNonGuiExecutionWarning() {
     LOG.warn("The test plan contains a {} which is of no use in non GUI executions (like this one)."
         + " Ignoring it for this execution. Remember removing them once your test plan is ready "
         + "for load testing execution.", getClass().getSimpleName());
-  }
-
-  protected void showTestElementInGui(TestElement testElement, BuildTreeContext context) {
-    CompletableFuture<Void> closeFuture = new CompletableFuture<>();
-    context.addVisualizerCloseFuture(closeFuture);
-    showTestElementInGui(testElement, () -> closeFuture.complete(null));
   }
 
 }

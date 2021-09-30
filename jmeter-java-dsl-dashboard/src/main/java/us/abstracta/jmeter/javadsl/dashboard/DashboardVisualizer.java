@@ -8,8 +8,8 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import kg.apc.charting.GraphPanelChart;
@@ -20,7 +20,6 @@ import kg.apc.jmeter.vizualizers.ResponseTimesOverTimeGui;
 import kg.apc.jmeter.vizualizers.ThreadsStateOverTimeGui;
 import kg.apc.jmeter.vizualizers.TransactionsPerSecondGui;
 import org.apache.jmeter.reporters.AbstractListenerElement;
-import org.apache.jmeter.reporters.ResultCollector;
 import org.apache.jmeter.samplers.SampleResult;
 import org.apache.jmeter.testelement.TestElement;
 import org.apache.jmeter.visualizers.SummaryReport;
@@ -57,41 +56,24 @@ public class DashboardVisualizer extends DslVisualizer {
       logNonGuiExecutionWarning();
       return parent;
     }
-    Component graphsPanel = buildGraphsPanel(parent, context);
-    Component visualizerPanel = buildVisualizersPanel(parent, context, graphsPanel);
-    CompletableFuture<Void> closeFuture = new CompletableFuture<>();
-    context.addVisualizerCloseFuture(closeFuture);
-    showFrameWith(visualizerPanel, "Dashboard", 1080, 600, () -> closeFuture.complete(null));
+    List<AbstractOverTimeVisualizer> graphs = Arrays.asList(new ThreadsStateOverTimeGui(),
+        new ResponseTimesOverTimeGui(),
+        new TransactionsPerSecondGui(), new ResponseCodesPerSecondGui());
+    graphs.forEach(g -> parent.add(buildGraphTestElement(g, context)));
+    SummaryReport summary = new SummaryReport();
+    parent.add(buildVisualizerTestElement(summary, v -> v.getComponent(1), 0, context));
+    context.addVisualizer(this, () -> buildGui(graphs, summary));
     return parent;
   }
 
-  private Component buildVisualizersPanel(HashTree parent, BuildTreeContext context,
-      Component graphsPanel) {
-    Component summaryReportPanel = addVisualizer(new SummaryReport(), v -> v.getComponent(1), 0,
-        parent, context);
-    summaryReportPanel.setPreferredSize(new Dimension(0, 80));
-    return new JSplitPane(JSplitPane.VERTICAL_SPLIT, graphsPanel, summaryReportPanel);
-  }
-
-  private JPanel buildGraphsPanel(HashTree parent, BuildTreeContext context) {
-    JPanel graphsPanel = new JPanel();
-    graphsPanel.setPreferredSize(new Dimension(0, 470));
-    graphsPanel.setLayout(new GridLayout(0, 2));
-    Arrays.asList(new ThreadsStateOverTimeGui(), new ResponseTimesOverTimeGui(),
-            new TransactionsPerSecondGui(), new ResponseCodesPerSecondGui())
-        .forEach(g -> graphsPanel.add(addGraph(g, parent, context)));
-    return graphsPanel;
-  }
-
-  private Component addGraph(AbstractOverTimeVisualizer graph, HashTree parent,
-      BuildTreeContext context) {
+  private TestElement buildGraphTestElement(AbstractOverTimeVisualizer graph,
+      BuildTreeContext buildContext) {
     GraphPanelChart graphPanelChart = graph.getGraphPanelChart();
     graphPanelChart.setxAxisLabelRenderer(new RelativeMinutesTimeRenderer());
     // we set this to false to avoid AbstractOverTimeVisualizer overwriting our custom renderer
     graphPanelChart.getChartSettings().setUseRelativeTime(false);
-    return addVisualizer(graph, v -> ((AbstractGraphPanelVisualizer) v).getGraphPanelChart(), 500,
-        parent,
-        context);
+    return buildVisualizerTestElement(graph,
+        v -> ((AbstractGraphPanelVisualizer) v).getGraphPanelChart(), 500, buildContext);
   }
 
   private static final class RelativeMinutesTimeRenderer extends NumberRenderer {
@@ -118,9 +100,9 @@ public class DashboardVisualizer extends DslVisualizer {
 
   }
 
-  public Component addVisualizer(AbstractVisualizer visualizer,
+  public TestElement buildVisualizerTestElement(AbstractVisualizer visualizer,
       Function<AbstractVisualizer, Component> subComponentLocator, int repaintIntervalMillis,
-      HashTree parent, BuildTreeContext context) {
+      BuildTreeContext context) {
     AbstractListenerElement testElement = (AbstractListenerElement) visualizer.createTestElement();
     visualizer.configure(testElement);
     Component subComponent = subComponentLocator.apply(visualizer);
@@ -132,8 +114,7 @@ public class DashboardVisualizer extends DslVisualizer {
     weak reference of test element listeners
     */
     getRePainters(context).add(rePainter);
-    parent.add(testElement);
-    return subComponent;
+    return testElement;
   }
 
   private Visualizer buildSubComponentRePainter(AbstractVisualizer delegate,
@@ -175,7 +156,30 @@ public class DashboardVisualizer extends DslVisualizer {
 
   @Override
   protected TestElement buildTestElement() {
-    return new ResultCollector();
+    return null;
   }
 
+  protected Component buildGui(List<AbstractOverTimeVisualizer> graphs, SummaryReport summary) {
+    return new JSplitPane(JSplitPane.VERTICAL_SPLIT, buildGraphsPanel(graphs),
+        buildSummaryPanel(summary));
+  }
+
+  private JPanel buildGraphsPanel(List<AbstractOverTimeVisualizer> graphs) {
+    JPanel graphsPanel = new JPanel();
+    graphsPanel.setPreferredSize(new Dimension(0, 470));
+    graphsPanel.setLayout(new GridLayout(0, 2));
+    graphs.forEach(g -> graphsPanel.add(g.getGraphPanelChart()));
+    return graphsPanel;
+  }
+
+  private Component buildSummaryPanel(SummaryReport summary) {
+    Component summaryReportPanel = summary.getComponent(1);
+    summaryReportPanel.setPreferredSize(new Dimension(0, 80));
+    return summaryReportPanel;
+  }
+
+  @Override
+  protected void showTestElementGui(Supplier<Component> guiBuilder, Runnable closeListener) {
+    showFrameWith(guiBuilder.get(), "Dashboard", 1080, 600, closeListener);
+  }
 }

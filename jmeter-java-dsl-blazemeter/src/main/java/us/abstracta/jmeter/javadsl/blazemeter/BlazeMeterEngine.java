@@ -1,12 +1,15 @@
 package us.abstracta.jmeter.javadsl.blazemeter;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 import java.util.concurrent.TimeoutException;
+import org.apache.jorphan.collections.HashTree;
+import org.apache.jorphan.collections.ListedHashTree;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import us.abstracta.jmeter.javadsl.blazemeter.api.Project;
@@ -17,8 +20,10 @@ import us.abstracta.jmeter.javadsl.blazemeter.api.TestRunConfig;
 import us.abstracta.jmeter.javadsl.blazemeter.api.TestRunRequestStats;
 import us.abstracta.jmeter.javadsl.blazemeter.api.TestRunStatus;
 import us.abstracta.jmeter.javadsl.blazemeter.api.TestRunSummaryStats.TestRunLabeledSummary;
+import us.abstracta.jmeter.javadsl.core.BuildTreeContext;
 import us.abstracta.jmeter.javadsl.core.DslJmeterEngine;
 import us.abstracta.jmeter.javadsl.core.DslTestPlan;
+import us.abstracta.jmeter.javadsl.core.EmbeddedJmeterEngine.JMeterEnvironment;
 import us.abstracta.jmeter.javadsl.core.TestPlanStats;
 import us.abstracta.jmeter.javadsl.core.TestPlanStats.StatsSummary;
 
@@ -275,7 +280,7 @@ public class BlazeMeterEngine implements DslJmeterEngine {
      */
     File jmxFile = Files.createTempDirectory("jmeter-dsl").resolve("test.jmx").toFile();
     try {
-      testPlan.saveAsJmx(jmxFile.getPath());
+      saveTestPlanTo(testPlan, jmxFile);
       Test test = client.findTestByName(testName, project).orElse(null);
       TestConfig testConfig = buildTestConfig(project, jmxFile);
       if (test != null) {
@@ -301,6 +306,21 @@ public class BlazeMeterEngine implements DslJmeterEngine {
     String appBaseUrl = BASE_URL + "/app/#";
     return projectId == null ? client.findDefaultProject(appBaseUrl)
         : client.findProjectById(this.projectId, appBaseUrl);
+  }
+
+  private void saveTestPlanTo(DslTestPlan testPlan, File jmxFile) throws IOException {
+    try (JMeterEnvironment env = new JMeterEnvironment();
+        FileOutputStream output = new FileOutputStream(jmxFile.getPath())) {
+      HashTree tree = new ListedHashTree();
+      BuildTreeContext context = new BuildTreeContext(tree);
+      testPlan.buildTreeUnder(tree, context);
+      env.saveTree(tree, output);
+      context.getVisualizers().forEach((v, e) ->
+          LOG.warn(
+              "BlazeMeterEngine does not currently support displaying visualizers. Ignoring {}.",
+              v.getClass().getSimpleName())
+      );
+    }
   }
 
   private TestConfig buildTestConfig(Project project, File jmxFile) {

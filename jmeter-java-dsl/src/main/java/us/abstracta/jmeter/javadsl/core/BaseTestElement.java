@@ -4,6 +4,7 @@ import java.awt.Component;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
+import java.util.function.Supplier;
 import javax.swing.JFrame;
 import javax.swing.WindowConstants;
 import org.apache.jmeter.gui.JMeterGUIComponent;
@@ -52,14 +53,10 @@ public abstract class BaseTestElement implements DslTestElement {
 
   @Override
   public void showInGui() {
-    showTestElementInGui(buildConfiguredTestElement(), null);
-  }
-
-  protected void showTestElementInGui(TestElement testElement, Runnable closeListener) {
     try (JMeterEnvironment env = new JMeterEnvironment()) {
       // this is required for proper visualization of labels and messages from resources bundle
       env.initLocale();
-      showFrameWith(buildTestElementGui(testElement), name, 800, 600, closeListener);
+      showTestElementGui(() -> buildTestElementGui(buildConfiguredTestElement()), null);
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
@@ -81,10 +78,15 @@ public abstract class BaseTestElement implements DslTestElement {
     }
   }
 
+  protected void showTestElementGui(Supplier<Component> guiBuilder, Runnable closeListener) {
+    showFrameWith(guiBuilder.get(), name, 800, 600, closeListener);
+  }
+
   protected void showFrameWith(Component content, String title, int width, int height,
       Runnable closeListener) {
     JFrame frame = new JFrame(title);
-    frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+    frame.setDefaultCloseOperation(
+        closeListener != null ? WindowConstants.DISPOSE_ON_CLOSE : WindowConstants.EXIT_ON_CLOSE);
     if (closeListener != null) {
       frame.addWindowListener(new WindowAdapter() {
         @Override

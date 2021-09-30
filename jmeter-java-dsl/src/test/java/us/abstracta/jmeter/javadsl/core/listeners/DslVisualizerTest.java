@@ -12,7 +12,6 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import javax.swing.JFrame;
 import org.apache.commons.io.FileUtils;
-import org.assertj.core.util.Files;
 import org.assertj.swing.core.BasicRobot;
 import org.assertj.swing.core.Robot;
 import org.assertj.swing.edt.GuiActionRunner;
