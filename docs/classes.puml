@@ -187,7 +187,9 @@ package core {
       int queueSize
     }
 
-    class DslViewResultsTree extends BaseTestElement implements MultiLevelTestElement
+    class DslViewResultsTree extends DslVisualizer
+
+    abstract class DslVisualizer extends BaseTestElement implements MultiLevelTestElement
 
   }
 
