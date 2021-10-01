@@ -30,6 +30,7 @@ public class DslHttpSampler extends DslSampler {
   private final HttpHeaders headers = new HttpHeaders();
   private String body;
   private boolean followRedirects = true;
+  private boolean downloadEmbeddedResources;
 
   public DslHttpSampler(String name, String url) {
     super(buildName(name), HttpTestSampleGui.class, new ArrayList<>());
@@ -201,6 +202,27 @@ public class DslHttpSampler extends DslSampler {
   }
 
   /**
+   * Allows enabling automatic download of HTML embedded resources (images, iframes, etc).
+   *
+   * When enabled JMeter will automatically parse HTMLs and download any found embedded resources
+   * adding their information as sub samples of the original request.
+   *
+   * Additionally, and in contrast to JMeter, this will download embedded resources in parallel by
+   * default (with up to 6 parallel downloads). The DSL enables this behavior by default since it is
+   * the most common way to use it to properly emulate browsers behavior.
+   *
+   * Check <a href="https://jmeter.apache.org/usermanual/component_reference.html#HTTP_Request">JMeter
+   * HTTP Request documentation</a> for additional details on embedded resources download.
+   *
+   * @return the altered sampler to allow for fluent API usage.
+   * @since 0.24
+   */
+  public DslHttpSampler downloadEmbeddedResources() {
+    this.downloadEmbeddedResources = true;
+    return this;
+  }
+
+  /**
    * Allows specifying children test elements for the sampler, which allow for example extracting
    * information from HTTP response, alter HTTP request, assert HTTP response contents, etc.
    *
@@ -219,6 +241,10 @@ public class DslHttpSampler extends DslSampler {
     ret.setPath(url);
     ret.setMethod(method.name());
     ret.setArguments(buildArguments());
+    if (downloadEmbeddedResources) {
+      ret.setImageParser(true);
+      ret.setConcurrentDwn(true);
+    }
     return ret;
   }
 

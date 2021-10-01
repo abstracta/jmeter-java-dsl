@@ -14,6 +14,7 @@ module.exports = {
 
   markdown: {
     lineNumbers: true,
+    extractHeaders: [ 'h2', 'h3', 'h4' ],
     extendMarkdown: md => {
       // rewrite relative urls to point to the github repository
       md.use(require('markdown-it-replace-link'), {

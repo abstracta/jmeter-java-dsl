@@ -8,6 +8,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.getRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
+import static org.assertj.core.api.Assertions.assertThat;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.httpCache;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.httpCookies;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.httpHeaders;
@@ -16,6 +17,10 @@ import static us.abstracta.jmeter.javadsl.JmeterDsl.jsr223PreProcessor;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.testPlan;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.threadGroup;
 
+import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
+import java.time.Duration;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 import org.apache.jmeter.threads.JMeterVariables;
 import org.eclipse.jetty.http.HttpHeader;
 import org.eclipse.jetty.http.HttpMethod;
@@ -24,6 +29,7 @@ import org.eclipse.jetty.http.MimeTypes;
 import org.eclipse.jetty.http.MimeTypes.Type;
 import org.junit.jupiter.api.Test;
 import us.abstracta.jmeter.javadsl.JmeterDslTest;
+import us.abstracta.jmeter.javadsl.core.TestPlanStats;
 
 public class DslHttpSamplerTest extends JmeterDslTest {
 
@@ -64,7 +70,8 @@ public class DslHttpSamplerTest extends JmeterDslTest {
   }
 
   @Test
-  public void shouldNotFollowRedirectsWhenHttpSamplerWithDisabledFollowRedirects() throws Exception {
+  public void shouldNotFollowRedirectsWhenHttpSamplerWithDisabledFollowRedirects()
+      throws Exception {
     setupMockedRedirectionTo(REDIRECT_PATH);
     testPlan(
         threadGroup(1, 1,
@@ -263,6 +270,51 @@ public class DslHttpSamplerTest extends JmeterDslTest {
         )
     ).run();
     wiremockServer.verify(2, getRequestedFor(anyUrl()));
+  }
+
+  @Test
+  public void shouldDownloadEmbeddedResourceWhenEnabled() throws Exception {
+    String primaryUrl = "/primary";
+    String resourceUrl = "/resource";
+    wiremockServer.stubFor(get(primaryUrl)
+        .willReturn(buildEmbeddedResourcesResponse(resourceUrl)));
+    testPlan(
+        threadGroup(1, 1,
+            httpSampler(wiremockUri + primaryUrl)
+                .downloadEmbeddedResources()
+        )
+    ).run();
+    wiremockServer.verify(getRequestedFor(urlPathEqualTo(resourceUrl)));
+  }
+
+  private ResponseDefinitionBuilder buildEmbeddedResourcesResponse(String... resourcesUrls) {
+    return aResponse()
+        .withHeader(HttpHeader.CONTENT_TYPE.toString(), Type.TEXT_HTML.toString())
+        .withBody("<html>" +
+            Arrays.stream(resourcesUrls)
+                .map(r -> "<img src=\"" + r + "\"/>")
+                .collect(Collectors.joining())
+            + "</html>");
+  }
+
+  @Test
+  public void shouldDownloadEmbeddedResourcesInParallelWhenEnabled() throws Exception {
+    int responsesDelayMillis = 3000;
+    wiremockServer.stubFor(get(anyUrl())
+        .willReturn(aResponse().withFixedDelay(responsesDelayMillis)));
+    String primaryUrl = "/primary";
+    wiremockServer.stubFor(get(primaryUrl)
+        .willReturn(buildEmbeddedResourcesResponse("/resource1", "/resource2")
+            .withFixedDelay(responsesDelayMillis)));
+    String sampleLabel = "sample";
+    TestPlanStats stats = testPlan(
+        threadGroup(1, 1,
+            httpSampler(sampleLabel, wiremockUri + primaryUrl)
+                .downloadEmbeddedResources()
+        )
+    ).run();
+    assertThat(stats.byLabel(sampleLabel).elapsedTime()).isLessThan(
+        Duration.ofMillis(responsesDelayMillis * 3));
   }
 
 }
