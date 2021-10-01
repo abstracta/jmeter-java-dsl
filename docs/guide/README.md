@@ -904,6 +904,17 @@ public class PerformanceTest {
 ```
 
 ::: warning
+Timers apply to all samplers in their scope, adding a pause after pre-processors executions and before the actual sampling. For example, in previous example pauses would be added before checkout and also before user info (two pauses). 
+
+If you want to apply a timer only to one sampler, add it as child of the given sampler. Like in this example:
+
+```java
+httpSampler("http://my.service/cart/chekout")
+    .children(uniformRandomTimer(4000, 10000))
+```
+:::
+
+::: warning
 `uniformRandomTimer` `minimumMillis` and `maximumMillis` parameters differ from the ones used by JMeter Uniform Random Timer element, to make it simpler to users with no JMeter background. 
 
 The generated JMeter test element uses as `Constant Delay Offset` the `minimumMillis` value, and as `Maximum random delay` `(maximumMillis - minimumMillis)` value.

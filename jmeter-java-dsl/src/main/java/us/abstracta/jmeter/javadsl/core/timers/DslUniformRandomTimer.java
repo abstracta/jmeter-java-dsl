@@ -10,6 +10,14 @@ import us.abstracta.jmeter.javadsl.core.MultiLevelTestElement;
  * Allows specifying JMeter Uniform Random Timers which pause the thread with a random time with
  * uniform distribution.
  *
+ * The pause calculated by the timer will be applied after samplers pre-processors execution and
+ * before actual sampling.
+ *
+ * Take into consideration that timers applies to all samplers in their scope: if added at test plan
+ * level, it will apply to all samplers in test plan; if added at thread group level, it will apply
+ * only to samples in such thread group; if added as child of a sampler, it will only apply to that
+ * sampler.
+ *
  * @since 0.16
  */
 public class DslUniformRandomTimer extends BaseTestElement implements MultiLevelTestElement {
