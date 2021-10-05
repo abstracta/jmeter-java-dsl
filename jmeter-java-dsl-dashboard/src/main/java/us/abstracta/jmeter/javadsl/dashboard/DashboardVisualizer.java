@@ -182,4 +182,5 @@ public class DashboardVisualizer extends DslVisualizer {
   protected void showTestElementGui(Supplier<Component> guiBuilder, Runnable closeListener) {
     showFrameWith(guiBuilder.get(), "Dashboard", 1080, 600, closeListener);
   }
+
 }
