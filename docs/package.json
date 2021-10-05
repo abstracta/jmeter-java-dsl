@@ -14,7 +14,7 @@
     "@vuepress/plugin-medium-zoom": "^1.8.2",
     "@xiaopanda/vuepress-plugin-code-copy": "^1.0.3",
     "markdown-it-replace-link": "^1.1.0",
-    "vuepress": "^1.5.3",
+    "vuepress": "^1.8.2",
     "vuepress-plugin-element-tabs": "^0.2.8"
   },
   "dependencies": {}
