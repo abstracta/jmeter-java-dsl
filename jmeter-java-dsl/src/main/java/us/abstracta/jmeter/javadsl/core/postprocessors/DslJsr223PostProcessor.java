@@ -6,12 +6,14 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Properties;
 import org.apache.jmeter.extractor.JSR223PostProcessor;
+import org.apache.jmeter.extractor.JSR223PostProcessorBeanInfo;
 import org.apache.jmeter.protocol.http.sampler.HTTPSampleResult;
 import org.apache.jmeter.protocol.http.util.HTTPConstants;
 import org.apache.jmeter.samplers.SampleResult;
 import org.apache.jmeter.samplers.Sampler;
 import org.apache.jmeter.threads.JMeterContext;
 import org.apache.jmeter.threads.JMeterVariables;
+import org.apache.jmeter.util.JSR223BeanInfoSupport;
 import org.apache.jmeter.util.JSR223TestElement;
 import org.slf4j.Logger;
 import us.abstracta.jmeter.javadsl.core.DslJsr223TestElement;
@@ -44,6 +46,11 @@ public class DslJsr223PostProcessor extends DslJsr223TestElement implements Mult
   @Override
   protected JSR223TestElement buildJsr223TestElement() {
     return new JSR223PostProcessor();
+  }
+
+  @Override
+  protected JSR223BeanInfoSupport getJsr223BeanInfo() {
+    return new JSR223PostProcessorBeanInfo();
   }
 
   /**

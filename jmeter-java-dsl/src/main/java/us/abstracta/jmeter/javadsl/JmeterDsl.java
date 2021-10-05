@@ -10,6 +10,7 @@ import us.abstracta.jmeter.javadsl.core.DslTestPlan.TestPlanChild;
 import us.abstracta.jmeter.javadsl.core.DslThreadGroup;
 import us.abstracta.jmeter.javadsl.core.DslThreadGroup.ThreadGroupChild;
 import us.abstracta.jmeter.javadsl.core.assertions.DslResponseAssertion;
+import us.abstracta.jmeter.javadsl.core.configs.DslCsvDataSet;
 import us.abstracta.jmeter.javadsl.core.listeners.DslViewResultsTree;
 import us.abstracta.jmeter.javadsl.core.listeners.HtmlReporter;
 import us.abstracta.jmeter.javadsl.core.listeners.InfluxDbBackendListener;
@@ -299,8 +300,8 @@ public class JmeterDsl {
   }
 
   /**
-   * Same as {@link #jsr223Sampler(String)} but allowing to use Java type safety and code
-   * completion when specifying the script.
+   * Same as {@link #jsr223Sampler(String)} but allowing to use Java type safety and code completion
+   * when specifying the script.
    * <p>
    * <b>WARNING:</b> This only works when using embedded jmeter engine (no support for saving to
    * JMX and running it in JMeter GUI, or running it with BlazeMeter). If you need such support
@@ -318,8 +319,8 @@ public class JmeterDsl {
   }
 
   /**
-   * Same as {@link #jsr223Sampler(String, String)} but allowing to use Java type safety and
-   * code completion when specifying the script.
+   * Same as {@link #jsr223Sampler(String, String)} but allowing to use Java type safety and code
+   * completion when specifying the script.
    * <p>
    * <b>WARNING:</b> This only works when using embedded jmeter engine (no support for saving to
    * JMX and running it in JMeter GUI, or running it with BlazeMeter). If you need such support
@@ -634,6 +635,36 @@ public class JmeterDsl {
    */
   public static DslUniformRandomTimer uniformRandomTimer(long minimumMillis, long maximumMillis) {
     return new DslUniformRandomTimer(minimumMillis, maximumMillis);
+  }
+
+  /**
+   * Builds a CSV Data Set which allows loading from a CSV file variables to be used in test plan.
+   *
+   * This allows to store for example in a CSV file one line for each user credentials, and then in
+   * the test plan be able to use all the credentials to test with different users.
+   *
+   * By default, the CSV data set will read comma separated values, use first row as name of the
+   * generated variables, restart from beginning when csv entries are exhausted and will read a new
+   * line of CSV for each thread and iteration.
+   *
+   * E.g: If you have a csv with 2 entries and a test plan with two threads, iterating 2 times each,
+   * you might get (since threads run in parallel, the assignment is not deterministic) following
+   * assignment of rows:
+   *
+   * <pre>
+   * thread 1, row 1
+   * thread 2, row 2
+   * thread 2, row 1
+   * thread 1, row 2
+   * </pre>
+   *
+   * @param csvFile path to the CSV file to read the data from.
+   * @return the CSV Data Set instance for further configuration and usage.
+   * @see DslCsvDataSet
+   * @since 0.24
+   */
+  public static DslCsvDataSet csvDataSet(String csvFile) {
+    return new DslCsvDataSet(csvFile);
   }
 
 }

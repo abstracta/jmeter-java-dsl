@@ -74,6 +74,12 @@ package core {
     String Label
   }
 
+  package configs {
+
+    class DslCsvDataSet extends BaseTestElement implements MultiLevelTestElement
+
+  }
+
   package logiccontrollers {
 
     class DslTransactionController extends TestElementContainer implements ThreadGroupChild

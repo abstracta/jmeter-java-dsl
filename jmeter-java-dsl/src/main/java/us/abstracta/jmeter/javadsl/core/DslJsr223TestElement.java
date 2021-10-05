@@ -7,12 +7,15 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.stream.Collectors;
+import org.apache.jmeter.extractor.JSR223PostProcessorBeanInfo;
 import org.apache.jmeter.samplers.Sampler;
+import org.apache.jmeter.testbeans.BeanInfoSupport;
 import org.apache.jmeter.testbeans.gui.TestBeanGUI;
 import org.apache.jmeter.testelement.TestElement;
 import org.apache.jmeter.threads.JMeterContext;
 import org.apache.jmeter.threads.JMeterVariables;
 import org.apache.jmeter.util.JMeterUtils;
+import org.apache.jmeter.util.JSR223BeanInfoSupport;
 import org.apache.jmeter.util.JSR223TestElement;
 import org.slf4j.Logger;
 
@@ -80,12 +83,19 @@ public abstract class DslJsr223TestElement extends BaseTestElement {
       JMeterUtils.getJMeterProperties().putAll(jmeterProps);
     }
     JSR223TestElement ret = buildJsr223TestElement();
-    ret.setProperty("script", script);
-    ret.setProperty("scriptLanguage", language);
+    ret.setScriptLanguage(language);
+    ret.setScript(script);
     return ret;
   }
 
   protected abstract JSR223TestElement buildJsr223TestElement();
+
+  @Override
+  protected BeanInfoSupport getBeanInfo() {
+    return getJsr223BeanInfo();
+  }
+
+  protected abstract JSR223BeanInfoSupport getJsr223BeanInfo();
 
   protected interface Jsr223Script<T extends Jsr223ScriptVars> {
 

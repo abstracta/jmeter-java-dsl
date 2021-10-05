@@ -3,14 +3,22 @@ package us.abstracta.jmeter.javadsl.core;
 import java.awt.Component;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.beans.PropertyDescriptor;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.function.Supplier;
 import javax.swing.JFrame;
 import javax.swing.WindowConstants;
 import org.apache.jmeter.gui.JMeterGUIComponent;
+import org.apache.jmeter.testbeans.BeanInfoSupport;
+import org.apache.jmeter.testbeans.TestBeanHelper;
 import org.apache.jmeter.testbeans.gui.TestBeanGUI;
 import org.apache.jmeter.testelement.TestElement;
+import org.apache.jmeter.testelement.property.AbstractProperty;
+import org.apache.jmeter.testelement.property.JMeterProperty;
 import org.apache.jorphan.collections.HashTree;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import us.abstracta.jmeter.javadsl.core.EmbeddedJmeterEngine.JMeterEnvironment;
 
 /**
@@ -27,6 +35,8 @@ import us.abstracta.jmeter.javadsl.core.EmbeddedJmeterEngine.JMeterEnvironment;
  * @since 0.1
  */
 public abstract class BaseTestElement implements DslTestElement {
+
+  private static final Logger LOG = LoggerFactory.getLogger(BaseTestElement.class);
 
   protected final String name;
   protected Class<? extends JMeterGUIComponent> guiClass;
@@ -46,10 +56,33 @@ public abstract class BaseTestElement implements DslTestElement {
     ret.setName(name);
     ret.setProperty(TestElement.GUI_CLASS, guiClass.getName());
     ret.setProperty(TestElement.TEST_CLASS, ret.getClass().getName());
+    BeanInfoSupport beanInfo = getBeanInfo();
+    if (beanInfo != null) {
+      loadBeanProperties(ret, beanInfo);
+    }
     return ret;
   }
 
   protected abstract TestElement buildTestElement();
+
+  protected BeanInfoSupport getBeanInfo() {
+    return null;
+  }
+
+  private void loadBeanProperties(TestElement bean, BeanInfoSupport beanInfo) {
+    for (PropertyDescriptor prop : beanInfo.getPropertyDescriptors()) {
+      if (TestBeanHelper.isDescriptorIgnored(prop)) {
+        continue;
+      }
+      try {
+        JMeterProperty jprop = AbstractProperty.createProperty(prop.getReadMethod().invoke(bean));
+        jprop.setName(prop.getName());
+        bean.setProperty(jprop);
+      } catch (IllegalAccessException | InvocationTargetException e) {
+        LOG.error("Could not set property {} for bean {}", prop.getName(), bean);
+      }
+    }
+  }
 
   @Override
   public void showInGui() {
