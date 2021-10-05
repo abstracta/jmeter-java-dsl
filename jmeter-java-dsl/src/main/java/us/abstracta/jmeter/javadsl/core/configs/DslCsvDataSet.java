@@ -19,8 +19,8 @@ import us.abstracta.jmeter.javadsl.core.MultiLevelTestElement;
  *
  * By default, it consumes comma separated variables, which names are included in first line of CSV,
  * automatically resets to the beginning of the file when the end is reached and the consumption of
- * the file is shared by all threads & thread groups in the test plan (ie: any iteration on a thread
- * will consume a line from the file, and advance to following line).
+ * the file is shared by all threads and thread groups in the test plan (ie: any iteration on a
+ * thread will consume a line from the file, and advance to following line).
  *
  * Additionally, this element sets by default the "quoted data" flag on JMeter CSV Data Set
  * element.
@@ -43,7 +43,7 @@ public class DslCsvDataSet extends BaseTestElement implements MultiLevelTestElem
   }
 
   /**
-   * Specifies the delimiter used by the file to separate variable values
+   * Specifies the delimiter used by the file to separate variable values.
    *
    * @param delimiter specifies the delimiter. By default, it uses commas (,) as delimiters. If you
    * need to use tabs, then specify "\\t".
