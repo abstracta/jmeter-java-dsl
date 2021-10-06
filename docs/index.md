@@ -16,8 +16,6 @@ features:
 
 Add dependency to your project:
 
-:::: tabs type:card
-::: tab Maven
 ```xml
 <dependency>
   <groupId>us.abstracta.jmeter</groupId>
@@ -26,12 +24,6 @@ Add dependency to your project:
   <scope>test</scope>
 </dependency>
 ```
-:::
-::: tab Gradle
-```groovy
-testImplementation 'us.abstracta.jmeter:jmeter-java-dsl:0.24'
-```
-::::
 
 Create performance test:
 

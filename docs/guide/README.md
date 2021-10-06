@@ -36,7 +36,32 @@ To use the DSL just include it in your project:
 :::
 ::: tab Gradle
 ```groovy
-testImplementation 'us.abstracta.jmeter:jmeter-java-dsl:0.24'
+// this is required due to JMeter open issue: https://bz.apache.org/bugzilla/show_bug.cgi?id=64465
+@CacheableRule
+class JMeterRule implements ComponentMetadataRule {
+    void execute(ComponentMetadataContext context) {
+        context.details.allVariants {
+            withDependencies {
+                removeAll { it.group == "org.apache.jmeter" && it.name == "bom" }
+            }
+        }
+    }
+}
+
+dependencies {
+    ...
+    testImplementation 'us.abstracta.jmeter:jmeter-java-dsl:0.24'
+    components {
+        withModule("org.apache.jmeter:ApacheJMeter_core", JMeterRule)
+        withModule("org.apache.jmeter:ApacheJMeter_java", JMeterRule)
+        withModule("org.apache.jmeter:ApacheJMeter", JMeterRule)
+        withModule("org.apache.jmeter:ApacheJMeter_http", JMeterRule)
+        withModule("org.apache.jmeter:ApacheJMeter_functions", JMeterRule)
+        withModule("org.apache.jmeter:ApacheJMeter_components", JMeterRule)
+        withModule("org.apache.jmeter:ApacheJMeter_config", JMeterRule)
+        withModule("org.apache.jmeter:jorphan", JMeterRule)
+    }
+}
 ```
 :::
 ::::
@@ -465,9 +490,16 @@ To use the module, you will need to include following dependency in your project
 ```
 :::
 ::: tab Gradle
+Add this repository:
+```groovy
+maven { url 'https://jitpack.io' }
+```
+
+And the dependency:
 ```groovy
 testImplementation 'us.abstracta.jmeter:jmeter-java-dsl-elasticsearch-listener:0.24'
 ```
+
 :::
 ::::
 
