@@ -1,11 +1,10 @@
-package us.abstracta.jmeter.javadsl.core.logiccontrollers;
+package us.abstracta.jmeter.javadsl.core.controllers;
 
 import java.util.List;
 import org.apache.jmeter.control.TransactionController;
 import org.apache.jmeter.control.gui.TransactionControllerGui;
 import org.apache.jmeter.testelement.TestElement;
 import us.abstracta.jmeter.javadsl.core.DslThreadGroup.ThreadGroupChild;
-import us.abstracta.jmeter.javadsl.core.TestElementContainer;
 
 /**
  * Allows specifying JMeter transaction controllers which group different samples associated to same
@@ -16,8 +15,7 @@ import us.abstracta.jmeter.javadsl.core.TestElementContainer;
  *
  * @since 0.14
  */
-public class DslTransactionController extends TestElementContainer<ThreadGroupChild> implements
-    ThreadGroupChild {
+public class DslTransactionController extends DslController {
 
   public DslTransactionController(String name, List<ThreadGroupChild> children) {
     super(name, TransactionControllerGui.class, children);

@@ -11,20 +11,30 @@ class JmeterDsl {
 package core {
 
   interface DslTestElement {
-    HashTree buildTreeUnder(HashTree parent)
+    HashTree buildTreeUnder(HashTree parent, BuildTreeContext context)
+    void showInGui()
+  }
+
+  class BuildTreeContext {
+    HashTree root
+    Map<String, Object> entries
+    Map<DslVisualizer, Supplier<Component>> visualizers
   }
 
   abstract class BaseTestElement implements DslTestElement {
     String name
     Class guiClass
     TestElement buildTestElement()
+    BeanInfoSupport getBeanInfo()
   }
 
   abstract class TestElementContainer extends BaseTestElement {
-    addChild(DslTestElement child)
+    void addChildren(DslTestElement[] children)
   }
 
-  abstract class TestPlanSingletonChildElement extends BaseTestElement implements TestPlanChild
+  abstract class TestPlanSingletonChildElement extends BaseTestElement implements TestPlanChild {
+    boolean enabled
+  }
 
   class DslTestPlan extends TestElementContainer {
     TestPlanStats run()
@@ -41,11 +51,21 @@ package core {
 
   class EmbeddedJmeterEngine implements DslJmeterEngine
 
-  class DslThreadGroup extends TestElementContainer implements TestPlanChild {
-    int threads
-    int iterations
-    Duration duration
+  class JMeterEnvironment {
+    File homeDir
   }
+
+  EmbeddedJmeterEngine ..> JMeterEnvironment
+
+  class DslThreadGroup extends TestElementContainer implements TestPlanChild
+
+  class Stage {
+      int threads
+      int iterations
+      Duration duration
+  }
+
+  DslThreadGroup -> "*" Stage
 
   interface ThreadGroupChild extends DslTestElement
 
@@ -76,13 +96,35 @@ package core {
 
   package configs {
 
-    class DslCsvDataSet extends BaseTestElement implements MultiLevelTestElement
+    class DslCsvDataSet extends BaseTestElement implements MultiLevelTestElement {
+      String file
+      String delimiter
+      String encoding
+      String[] variableNames
+      boolean ignoreFirstLine
+      boolean stopThread
+      Sharing shareMode
+    }
+
+    enum Sharing {
+      ALL_THREADS
+      THREAD_GROUP
+      THREAD
+    }
+
+    DslCsvDataSet ..> Sharing
 
   }
 
-  package logiccontrollers {
+  package controllers {
 
-    class DslTransactionController extends TestElementContainer implements ThreadGroupChild
+    abstract class DslController extends TestElementContainer implements ThreadGroupChild
+
+    class DslTransactionController extends LogicController
+
+    class PercentController extends LogicController {
+      float percent
+    }
 
   }
 
@@ -167,11 +209,18 @@ package core {
       MATCHES_REGEX
     }
 
+    DslResponseAssertion ..> TargetField
+    DslResponseAssertion ..> TestStringStrategy
+
   }
   
   package timers {
 
-    class DslUniformRandomTimer extends BaseTestElement implements MultiLevelTestElement
+    class DslUniformRandomTimer extends BaseTestElement implements MultiLevelTestElement {
+      long minimumMillis
+      long maximumMillis
+    }
+
   }
 
   package listeners {
@@ -180,20 +229,29 @@ package core {
       String jtlFilePath
     }
 
+    class ResponseFileSaver extends BaseTestElement implements MultiLevelTestElement {
+      String fileNamePrefix
+    }
+
     class HtmlReporter extends BaseTestElement implements MultiLevelTestElement {
       File reportDirectory
     }
 
-    class DslBackendListener extends BaseTestElement implements MultiLevelTestElement
-
-    class InfluxDbBackendListener extends DslBackendListener {
+    abstract class DslBackendListener extends BaseTestElement implements MultiLevelTestElement {
       String url
-      String token
-      String title
+      Class listenerClass
       int queueSize
+      Arguments buildListenerArguments()
     }
 
-    class DslViewResultsTree extends DslVisualizer
+    class InfluxDbBackendListener extends DslBackendListener {
+      String token
+      String title
+    }
+
+    class DslViewResultsTree extends DslVisualizer {
+      int resultsLimit
+    }
 
     abstract class DslVisualizer extends BaseTestElement implements MultiLevelTestElement
 

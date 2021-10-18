@@ -1,4 +1,4 @@
-package us.abstracta.jmeter.javadsl.core.logiccontrollers;
+package us.abstracta.jmeter.javadsl.core.controllers;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.httpSampler;

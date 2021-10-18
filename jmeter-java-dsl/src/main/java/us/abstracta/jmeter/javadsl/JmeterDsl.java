@@ -11,12 +11,13 @@ import us.abstracta.jmeter.javadsl.core.DslThreadGroup;
 import us.abstracta.jmeter.javadsl.core.DslThreadGroup.ThreadGroupChild;
 import us.abstracta.jmeter.javadsl.core.assertions.DslResponseAssertion;
 import us.abstracta.jmeter.javadsl.core.configs.DslCsvDataSet;
+import us.abstracta.jmeter.javadsl.core.controllers.DslTransactionController;
+import us.abstracta.jmeter.javadsl.core.controllers.PercentController;
 import us.abstracta.jmeter.javadsl.core.listeners.DslViewResultsTree;
 import us.abstracta.jmeter.javadsl.core.listeners.HtmlReporter;
 import us.abstracta.jmeter.javadsl.core.listeners.InfluxDbBackendListener;
 import us.abstracta.jmeter.javadsl.core.listeners.JtlWriter;
 import us.abstracta.jmeter.javadsl.core.listeners.ResponseFileSaver;
-import us.abstracta.jmeter.javadsl.core.logiccontrollers.DslTransactionController;
 import us.abstracta.jmeter.javadsl.core.postprocessors.DslJsr223PostProcessor;
 import us.abstracta.jmeter.javadsl.core.postprocessors.DslJsr223PostProcessor.PostProcessorScript;
 import us.abstracta.jmeter.javadsl.core.postprocessors.DslRegexExtractor;
@@ -665,6 +666,22 @@ public class JmeterDsl {
    */
   public static DslCsvDataSet csvDataSet(String csvFile) {
     return new DslCsvDataSet(csvFile);
+  }
+
+  /**
+   * Builds a Percent Controller to execute children only a given percent of times.
+   *
+   * Internally, this uses a JMeter Throughput Controller with executions percentage configuration.
+   *
+   * @param percent defines a number between 0 and 100 that defines the percentage of times to
+   * execute given children elements.
+   * @param children holds test plan elements to execute when for the given percent of times.
+   * @return the controller instance for further configuration and usage.
+   * @see PercentController
+   * @since 0.25
+   */
+  public static PercentController percentController(float percent, ThreadGroupChild... children) {
+    return new PercentController(percent, Arrays.asList(children));
   }
 
 }
