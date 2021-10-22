@@ -202,7 +202,9 @@ threadGroup(10, 20) // 10 threads for 20 iterations each
 threadGroup(10, Duration.ofSeconds(20)) // 10 threads for 20 seconds each
 ```
 
-But, these options are not good when working with many threads or when trying to configure some complex test scenarios (like when doing incremental or peak tests).
+But these options are not good when working with many threads or when trying to configure some complex test scenarios (like when doing incremental or peak tests).
+
+### Thread ramps and holds
 
 When working with many threads, it is advisable to configure a ramp up period, to avoid starting all threads at once affecting performance metrics and generation.
 
@@ -217,21 +219,24 @@ Additionally, you can use and combine these same methods to configure more compl
 
 ```java
 threadGroup()
-    .rampToAndHold(10, Duration.ofSeconds(5), Duration.ofSeconds(20))
-    .rampToAndHold(100, Duration.ofSeconds(10), Duration.ofSeconds(30))
-    .rampTo(200, Duration.ofSeconds(10))
-    .rampToAndHold(100, Duration.ofSeconds(10), Duration.ofSeconds(30))
-    .rampTo(0, Duration.ofSeconds(5))
+  .rampToAndHold(10, Duration.ofSeconds(5), Duration.ofSeconds(20))
+  .rampToAndHold(100, Duration.ofSeconds(10), Duration.ofSeconds(30))
+  .rampTo(200, Duration.ofSeconds(10))
+  .rampToAndHold(100, Duration.ofSeconds(10), Duration.ofSeconds(30))
+  .rampTo(0, Duration.ofSeconds(5))
+  .children(
+    httpSampler("http://my.service")
+  )
 ```
 
 Which would translate in the following threads' timeline:
 
-![ThreadGroup Chart](./images/complex-thread-group-chart.png)
+![Thread Group Timeline](./images/ultimate-thread-group-timeline.png)
 
 Check [DslThreadGroup](../../jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/DslThreadGroup.java) for more details.
 
 ::: tip
-To visualize threads timeline, for complex thread group configurations like previous one, you can get a chart like previous one by using provided `DslThreadGroup.showThreadsTimeline()` method.
+To visualize threads timeline, for complex thread group configurations like previous one, you can get a chart like previous one by using provided `DslThreadGroup.showTimeline()` method.
 :::
 
 ::: tip
@@ -245,6 +250,42 @@ For example, for above test plan you would get a window like the following one:
 ::: tip
 When using multiple thread groups in a test plan, consider setting a name on them to properly identify associated requests in statistics & jtl results.
 :::
+
+### Throughput based thread group
+
+Sometimes you want to focus just on the number of requests per second to generate and don't want to be concerned about how many concurrent threads/users, and pauses between requests, are needed. For these scenarios you can use `rpsThreadGroup` like in following example:
+
+```java
+rpsThreadGroup()
+  .maxThreads(500)
+  .rampTo(20, Duration.ofSeconds(10))
+  .rampTo(10, Duration.ofSeconds(10))
+  .rampToAndHold(1000, Duration.ofSeconds(5), Duration.ofSeconds(10))
+  .children(
+    httpSampler("http://my.service")
+  )
+```
+
+This will internally use JMeter [Concurrency Thread Group](https://jmeter-plugins.org/wiki/ConcurrencyThreadGroup/) element in combination with [Throughput
+Shaping Time](https://jmeter-plugins.org/wiki/ThroughputShapingTimer/).
+
+::: tip
+`rpsThreadGroup` will dynamically create and remove threads and add delays between requests to match the traffic to the expected RPS. You can also specify to control iterations per second (number of times the flow in the thread group runs per second) instead of threads by using `.counting(RpsThreadGroup.EventType.ITERATIONS)`.
+:::
+
+::: warning
+When no `maxThreads` are specified, `rpsThreadGroup` will use as many threads as needed. In such scenarios, you might end with unexpected number of threads with associated CPU and Memory requirements, which may affect the performance test metrics. **You should always set maximum threads to use** to avoid such scenarios.
+
+You can use following formula to calculate a value for `maxThreads`: `T*R`, being `T` the maximum RPS that you want to achieve and `R` the maximum expected response time (or iteration time if you use `.counting(RpsThreadGroup.EventType.ITERATIONS)`) in seconds.
+:::
+
+::: tip
+As with default thread group, with `rpsThreadGroup` you can use `showTimeline` to get a chart of configured RPS profile for easy visualization. An example chart:
+
+![RPS Thread Group Timeline](./images/rps-thread-group-timeline.png)
+:::
+
+Check [RpsThreadGroup](../../jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/threadgroups/RpsThreadGroup.java) for more details.
 
 ## Test plan debugging
 

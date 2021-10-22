@@ -11,6 +11,7 @@ import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Instant;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -20,6 +21,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
+import kg.apc.jmeter.timers.functions.TSTFeedback;
 import org.apache.commons.io.FileUtils;
 import org.apache.jmeter.engine.StandardJMeterEngine;
 import org.apache.jmeter.functions.EvalFunction;
@@ -120,12 +122,19 @@ public class EmbeddedJmeterEngine implements DslJmeterEngine {
          include functions and components jars paths so jmeter search methods can find classes in
          such jars
          */
-        props.setProperty("search_paths", getClassJarPath(EvalFunction.class) + ";" +
-            getClassJarPath(BackendListenerClient.class));
+        props.setProperty("search_paths",
+            buildJarPathsFromClasses(EvalFunction.class, BackendListenerClient.class,
+                TSTFeedback.class));
       } catch (IOException | RuntimeException e) {
         FileUtils.deleteDirectory(homeDir);
         throw e;
       }
+    }
+
+    private String buildJarPathsFromClasses(Class<?>... classes) {
+      return Arrays.stream(classes)
+          .map(this::getClassJarPath)
+          .collect(Collectors.joining(";"));
     }
 
     private String getClassJarPath(Class<?> theClass) {

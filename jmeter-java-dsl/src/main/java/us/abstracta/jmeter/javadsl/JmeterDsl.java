@@ -24,6 +24,7 @@ import us.abstracta.jmeter.javadsl.core.postprocessors.DslRegexExtractor;
 import us.abstracta.jmeter.javadsl.core.preprocessors.DslJsr223PreProcessor;
 import us.abstracta.jmeter.javadsl.core.preprocessors.DslJsr223PreProcessor.PreProcessorScript;
 import us.abstracta.jmeter.javadsl.core.preprocessors.DslJsr223PreProcessor.PreProcessorVars;
+import us.abstracta.jmeter.javadsl.core.threadgroups.RpsThreadGroup;
 import us.abstracta.jmeter.javadsl.core.timers.DslUniformRandomTimer;
 import us.abstracta.jmeter.javadsl.http.DslCacheManager;
 import us.abstracta.jmeter.javadsl.http.DslCookieManager;
@@ -133,10 +134,10 @@ public class JmeterDsl {
    * Eg:
    * <pre>{@code
    *  threadGroup()
-   *    .rampTo(10, Duration.seconds(10))
-   *    .rampDown(5, Duration.seconds(10))
-   *    .rampToAndHold(20, Duration.seconds(5), Duration.seconds(10))
-   *    .rampTo(0, Duration.seconds(5))
+   *    .rampTo(10, Duration.ofSeconds(10))
+   *    .rampTo(5, Duration.ofSeconds(10))
+   *    .rampToAndHold(20, Duration.ofSeconds(5), Duration.ofSeconds(10))
+   *    .rampTo(0, Duration.ofSeconds(5))
    *    .children(...)
    * }</pre>
    *
@@ -157,6 +158,45 @@ public class JmeterDsl {
    */
   public static DslThreadGroup threadGroup(String name) {
     return new DslThreadGroup(name);
+  }
+
+  /**
+   * Builds a thread group that dynamically adapts thread count and pauses to match a given RPS.
+   *
+   * Internally this element uses
+   * <a href="https://jmeter-plugins.org/wiki/ConcurrencyThreadGroup/">Concurrency Thread Group</a>
+   * in combination with <a href="https://jmeter-plugins.org/wiki/ThroughputShapingTimer/">Throughput
+   * Shaping Timer</a>.
+   *
+   * Eg:
+   * <pre>{@code
+   *  rpsThreadGroup()
+   *    .maxThreads(500)
+   *    .rampTo(20, Duration.ofSeconds(10))
+   *    .rampTo(10, Duration.ofSeconds(10))
+   *    .rampToAndHold(1000, Duration.ofSeconds(5), Duration.ofSeconds(10))
+   *    .rampTo(0, Duration.ofSeconds(5))
+   *    .children(...)
+   * }</pre>
+   *
+   * @return the thread group instance.
+   * @see RpsThreadGroup
+   * @since 0.26
+   */
+  public static RpsThreadGroup rpsThreadGroup() {
+    return new RpsThreadGroup(null);
+  }
+
+  /**
+   * Same as {@link #rpsThreadGroup()} but allowing to set a name on the thread group.
+   * <p>
+   * Setting a proper name allows to properly identify the requests generated in each thread group.
+   *
+   * @see #rpsThreadGroup()
+   * @since 0.26
+   */
+  public static RpsThreadGroup rpsThreadGroup(String name) {
+    return new RpsThreadGroup(name);
   }
 
   /**

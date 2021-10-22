@@ -183,4 +183,9 @@ public class DashboardVisualizer extends DslVisualizer {
     showFrameWith(guiBuilder.get(), "Dashboard", 1080, 600, closeListener);
   }
 
+  @Override
+  public void showInGui() {
+    throw new UnsupportedOperationException("Dashboard has no built-in JMeter GUI");
+  }
+
 }

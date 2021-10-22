@@ -1,19 +1,11 @@
 package us.abstracta.jmeter.javadsl.core;
 
-import java.awt.Color;
-import java.awt.Component;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
-import javax.swing.BorderFactory;
-import kg.apc.charting.AbstractGraphRow;
-import kg.apc.charting.DateTimeRenderer;
-import kg.apc.charting.GraphPanelChart;
-import kg.apc.charting.rows.GraphRowSimple;
 import kg.apc.jmeter.JMeterPluginsUtils;
 import kg.apc.jmeter.threads.UltimateThreadGroup;
 import kg.apc.jmeter.threads.UltimateThreadGroupGui;
@@ -27,9 +19,6 @@ import us.abstracta.jmeter.javadsl.core.DslThreadGroup.ThreadGroupChild;
 
 /**
  * Represents the standard thread group test element included by JMeter.
- * <p>
- * Additional methods should be added in the future to support setting rump-up, start and end
- * scheduling.
  *
  * @since 0.1
  */
@@ -42,7 +31,7 @@ public class DslThreadGroup extends TestElementContainer<ThreadGroupChild> imple
   private static class Stage {
 
     private final int threadCount;
-    private Duration duration;
+    private final Duration duration;
     private final int iterations;
 
     private Stage(int threadCount, Duration duration) {
@@ -92,25 +81,6 @@ public class DslThreadGroup extends TestElementContainer<ThreadGroupChild> imple
   }
 
   /**
-   * Specifies the time taken to create the initial number of threads.
-   *
-   * @param rampUpPeriod the period to use as ramp up. Since JMeter supports specifying ramp up in
-   * seconds, if you specify a smaller granularity (like milliseconds) it will be rounded up to
-   * seconds.
-   * @return the DslThreadGroup instance to use fluent API to set additional options.
-   * @deprecated as of 0.18, use {@link #rampTo(int, Duration)} instead.
-   */
-  @Deprecated
-  public DslThreadGroup rampUpPeriod(Duration rampUpPeriod) {
-    if (stages.isEmpty()) {
-      throw new IllegalStateException(
-          "To use rampUpPeriod you need to specify threads in threadGroup");
-    }
-    stages.get(0).duration = rampUpPeriod;
-    return this;
-  }
-
-  /**
    * Allows ramping up or down threads with a given duration.
    *
    * It is usually advised to use this method when working with considerable amount of threads to
@@ -132,10 +102,10 @@ public class DslThreadGroup extends TestElementContainer<ThreadGroupChild> imple
    * Eg:
    * <pre>{@code
    *  threadGroup()
-   *    .rampTo(10, Duration.seconds(10))
-   *    .rampDown(5, Duration.seconds(10))
-   *    .rampToAndHold(20, Duration.seconds(5), Duration.seconds(10))
-   *    .rampTo(0, Duration.seconds(5))
+   *    .rampTo(10, Duration.ofSeconds(10))
+   *    .rampTo(5, Duration.ofSeconds(10))
+   *    .rampToAndHold(20, Duration.ofSeconds(5), Duration.ofSeconds(10))
+   *    .rampTo(0, Duration.ofSeconds(5))
    *    .children(...)
    * }</pre>
    *
@@ -231,7 +201,7 @@ public class DslThreadGroup extends TestElementContainer<ThreadGroupChild> imple
   }
 
   /**
-   * Allows specifying children the thread group (samplers, listeners, post processors, etc.).
+   * Allows specifying thread group children elements (samplers, listeners, post processors, etc.).
    *
    * This method is just an alternative to the constructor specification of children, and is handy
    * when you want to keep general thread group settings together and then specify children (instead
@@ -299,26 +269,22 @@ public class DslThreadGroup extends TestElementContainer<ThreadGroupChild> imple
     ThreadGroup ret = new ThreadGroup();
     ret.setNumThreads(Math.max(threads, 1));
     ret.setRampUp(
-        (int) extractDurationSeconds(rampUpPeriod == null ? Duration.ZERO : rampUpPeriod));
+        (int) durationToSeconds(rampUpPeriod == null ? Duration.ZERO : rampUpPeriod));
     LoopController loopController = new LoopController();
     ret.setSamplerController(loopController);
     if (duration != null) {
       loopController.setLoops(-1);
-      ret.setDuration(extractDurationSeconds(duration));
+      ret.setDuration(durationToSeconds(duration));
     } else {
       loopController.setLoops(iterations);
     }
     if (delay != null) {
-      ret.setDelay(extractDurationSeconds(delay));
+      ret.setDelay(durationToSeconds(delay));
     }
     if (duration != null || delay != null) {
       ret.setScheduler(true);
     }
     return ret;
-  }
-
-  private static long extractDurationSeconds(Duration duration) {
-    return Math.round(Math.ceil((double) duration.toMillis() / 1000));
   }
 
   private TestElement buildUltimateThreadGroup() {
@@ -404,10 +370,10 @@ public class DslThreadGroup extends TestElementContainer<ThreadGroupChild> imple
 
     public Object[] buildTableRow() {
       return new Object[]{String.valueOf(threadCount),
-          String.valueOf(extractDurationSeconds(delay)),
-          String.valueOf(extractDurationSeconds(startup)),
-          String.valueOf(extractDurationSeconds(hold)),
-          String.valueOf(extractDurationSeconds(shutdown))};
+          String.valueOf(durationToSeconds(delay)),
+          String.valueOf(durationToSeconds(startup)),
+          String.valueOf(durationToSeconds(hold)),
+          String.valueOf(durationToSeconds(shutdown))};
     }
 
   }
@@ -430,43 +396,29 @@ public class DslThreadGroup extends TestElementContainer<ThreadGroupChild> imple
   /**
    * Shows a graph with a timeline of planned threads count execution for this test plan.
    *
+   * @since 0.18
+   * @deprecated as of 0.26, use {@link #showTimeline()} instead.
+   */
+  @Deprecated
+  public void showThreadsTimeline() {
+    showTimeline();
+  }
+
+  /**
+   * Shows a graph with a timeline of planned threads count execution for this test plan.
+   *
    * The graph will be displayed in a popup window.
    *
    * This method is provided mainly to ease test plan designing when working with complex thread
    * group profiles (several stages with ramps and holds).
    *
-   * @since 0.18
+   * @since 0.26
    */
-  public void showThreadsTimeline() {
-    showFrameWith(buildGraphPanel(), name + " threads timeline", 800, 300, null);
-  }
-
-  private Component buildGraphPanel() {
-    GraphPanelChart ret = new GraphPanelChart(false, true);
-    ret.getChartSettings().setDrawFinalZeroingLines(true);
-    ret.setxAxisLabel("Time");
-    ret.setYAxisLabel("Threads");
-    ret.setxAxisLabelRenderer(new DateTimeRenderer(DateTimeRenderer.HHMMSS, 0));
-    ret.setBorder(BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.LOWERED));
-    ret.setForcedMinX(0);
-    HashMap<String, AbstractGraphRow> model = new HashMap<>();
-    model.put("Threads", buildThreadsSeries());
-    ret.setRows(model);
-    return ret;
-  }
-
-  private GraphRowSimple buildThreadsSeries() {
-    GraphRowSimple ret = new GraphRowSimple();
-    ret.setColor(Color.RED);
-    ret.setDrawLine(true);
-    ret.setMarkerSize(AbstractGraphRow.MARKER_SIZE_NONE);
-    ret.add(0, 0);
-    long delayMillis = 0;
-    for (Stage s : stages) {
-      delayMillis += s.duration.toMillis();
-      ret.add(delayMillis, s.threadCount);
-    }
-    return ret;
+  public void showTimeline() {
+    SingleSeriesTimelinePanel chart = new SingleSeriesTimelinePanel("Threads");
+    chart.add(0, 0);
+    stages.forEach(s -> chart.add(s.duration.toMillis(), s.threadCount));
+    showFrameWith(chart, name + " threads timeline", 800, 300, null);
   }
 
   /**

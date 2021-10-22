@@ -57,15 +57,15 @@ package core {
 
   EmbeddedJmeterEngine ..> JMeterEnvironment
 
-  class DslThreadGroup extends TestElementContainer implements TestPlanChild
+  class DslThreadGroup extends TestElementContainer implements TestPlanChild {
+    List<Stage> stages
+  }
 
   class Stage {
       int threads
       int iterations
       Duration duration
   }
-
-  DslThreadGroup -> "*" Stage
 
   interface ThreadGroupChild extends DslTestElement
 
@@ -92,6 +92,29 @@ package core {
     Sampler sampler
     Logger log
     String Label
+  }
+
+  package threadgroups {
+
+    class RpsThreadGroup extends TestElementContainer implements TestPlanChild {
+      List<TimerSchedule> schedules
+      EventType counting
+      int initThreads
+      int maxThreads
+      double spareThreads
+    }
+
+    class TimerSchedule {
+      double fromRps
+      double toRps
+      Duration duration
+    }
+
+    enum EventType {
+      REQUESTS
+      ITERATIONS
+    }
+
   }
 
   package configs {

@@ -6,6 +6,7 @@ import java.awt.event.WindowEvent;
 import java.beans.PropertyDescriptor;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.time.Duration;
 import java.util.function.Supplier;
 import javax.swing.JFrame;
 import javax.swing.WindowConstants;
@@ -53,10 +54,14 @@ public abstract class BaseTestElement implements DslTestElement {
 
   protected TestElement buildConfiguredTestElement() {
     TestElement ret = buildTestElement();
+    return configureTestElement(ret, name, guiClass, getBeanInfo());
+  }
+
+  protected static TestElement configureTestElement(TestElement ret, String name,
+      Class<? extends JMeterGUIComponent> guiClass, BeanInfoSupport beanInfo) {
     ret.setName(name);
     ret.setProperty(TestElement.GUI_CLASS, guiClass.getName());
     ret.setProperty(TestElement.TEST_CLASS, ret.getClass().getName());
-    BeanInfoSupport beanInfo = getBeanInfo();
     if (beanInfo != null) {
       loadBeanProperties(ret, beanInfo);
     }
@@ -69,7 +74,7 @@ public abstract class BaseTestElement implements DslTestElement {
     return null;
   }
 
-  private void loadBeanProperties(TestElement bean, BeanInfoSupport beanInfo) {
+  private static void loadBeanProperties(TestElement bean, BeanInfoSupport beanInfo) {
     for (PropertyDescriptor prop : beanInfo.getPropertyDescriptors()) {
       if (TestBeanHelper.isDescriptorIgnored(prop)) {
         continue;
@@ -133,6 +138,10 @@ public abstract class BaseTestElement implements DslTestElement {
     frame.setSize(width, height);
     frame.add(content);
     frame.setVisible(true);
+  }
+
+  protected static long durationToSeconds(Duration duration) {
+    return Math.round(Math.ceil((double) duration.toMillis() / 1000));
   }
 
 }
