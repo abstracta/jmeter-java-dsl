@@ -91,16 +91,7 @@ public class JmeterDslCoreTest extends JmeterDslTest {
             httpSampler(SAMPLE_2_LABEL, wiremockUri)
         )
     ).run();
-    assertThat(extractTotalCounts(stats)).isEqualTo(buildExpectedTotalCounts());
-  }
-
-  private Map<String, Long> extractTotalCounts(TestPlanStats stats) {
-    Map<String, Long> actualStats = new HashMap<>();
-    actualStats.put(OVERALL_STATS_LABEL, stats.overall().samplesCount());
-    for (String label : stats.labels()) {
-      actualStats.put(label, stats.byLabel(label).samplesCount());
-    }
-    return actualStats;
+    assertThat(extractCounts(stats)).isEqualTo(buildExpectedTotalCounts());
   }
 
   @Test

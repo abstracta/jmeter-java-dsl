@@ -11,6 +11,8 @@ import us.abstracta.jmeter.javadsl.core.DslThreadGroup;
 import us.abstracta.jmeter.javadsl.core.DslThreadGroup.ThreadGroupChild;
 import us.abstracta.jmeter.javadsl.core.assertions.DslResponseAssertion;
 import us.abstracta.jmeter.javadsl.core.configs.DslCsvDataSet;
+import us.abstracta.jmeter.javadsl.core.controllers.DslIfController;
+import us.abstracta.jmeter.javadsl.core.controllers.DslIfController.ConditionScript;
 import us.abstracta.jmeter.javadsl.core.controllers.DslTransactionController;
 import us.abstracta.jmeter.javadsl.core.controllers.PercentController;
 import us.abstracta.jmeter.javadsl.core.listeners.DslViewResultsTree;
@@ -210,6 +212,56 @@ public class JmeterDsl {
    */
   public static DslTransactionController transaction(String name, ThreadGroupChild... children) {
     return new DslTransactionController(name, Arrays.asList(children));
+  }
+
+  /**
+   * Builds an If Controller that allows to conditionally run specified children.
+   *
+   * @param condition contains an expression that when evaluated to true tells the controller to run
+   * specified children.
+   * @param children contains the test plan elements to execute when the condition is true.
+   * @return the controller instance for further configuration and usage.
+   * @see DslIfController
+   * @since 0.27
+   */
+  public static DslIfController ifController(String condition, ThreadGroupChild... children) {
+    return new DslIfController(condition, Arrays.asList(children));
+  }
+
+  /**
+   * Same as {@link #ifController(String, ThreadGroupChild...)} but allowing to use Java type safety
+   * and code completion when specifying the condition.
+   * <p>
+   * <b>WARNING:</b> This only works when using embedded jmeter engine (no support for saving to
+   * JMX and running it in JMeter GUI, or running it with BlazeMeter). If you need such support
+   * consider using {@link #ifController(String, ThreadGroupChild...)} instead.
+   * <p>
+   * Take into consideration that the provided script is invoked from as may threads as defined in
+   * thread group. So make sure that provided logic is thread safe.
+   *
+   * @see ConditionScript
+   * @see #ifController(String, ThreadGroupChild...)
+   * @since 0.27
+   */
+  public static DslIfController ifController(ConditionScript condition,
+      ThreadGroupChild... children) {
+    return new DslIfController(condition, Arrays.asList(children));
+  }
+
+  /**
+   * Builds a Percent Controller to execute children only a given percent of times.
+   *
+   * Internally, this uses a JMeter Throughput Controller with executions percentage configuration.
+   *
+   * @param percent defines a number between 0 and 100 that defines the percentage of times to
+   * execute given children elements.
+   * @param children holds test plan elements to execute when for the given percent of times.
+   * @return the controller instance for further configuration and usage.
+   * @see PercentController
+   * @since 0.25
+   */
+  public static PercentController percentController(float percent, ThreadGroupChild... children) {
+    return new PercentController(percent, Arrays.asList(children));
   }
 
   /**
@@ -706,22 +758,6 @@ public class JmeterDsl {
    */
   public static DslCsvDataSet csvDataSet(String csvFile) {
     return new DslCsvDataSet(csvFile);
-  }
-
-  /**
-   * Builds a Percent Controller to execute children only a given percent of times.
-   *
-   * Internally, this uses a JMeter Throughput Controller with executions percentage configuration.
-   *
-   * @param percent defines a number between 0 and 100 that defines the percentage of times to
-   * execute given children elements.
-   * @param children holds test plan elements to execute when for the given percent of times.
-   * @return the controller instance for further configuration and usage.
-   * @see PercentController
-   * @since 0.25
-   */
-  public static PercentController percentController(float percent, ThreadGroupChild... children) {
-    return new PercentController(percent, Arrays.asList(children));
   }
 
 }

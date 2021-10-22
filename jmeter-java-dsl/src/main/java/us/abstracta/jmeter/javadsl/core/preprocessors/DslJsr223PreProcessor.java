@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.Properties;
 import org.apache.jmeter.modifiers.JSR223PreProcessor;
 import org.apache.jmeter.modifiers.JSR223PreProcessorBeanInfo;
+import org.apache.jmeter.samplers.SampleResult;
 import org.apache.jmeter.samplers.Sampler;
 import org.apache.jmeter.threads.JMeterContext;
 import org.apache.jmeter.threads.JMeterVariables;
@@ -60,9 +61,9 @@ public class DslJsr223PreProcessor extends DslJsr223TestElement implements Multi
 
   public static class PreProcessorVars extends Jsr223ScriptVars {
 
-    public PreProcessorVars(JMeterContext ctx, JMeterVariables vars, Properties props,
-        Sampler sampler, Logger log, String label) {
-      super(ctx, vars, props, sampler, log, label);
+    public PreProcessorVars(String label, SampleResult prev, JMeterContext ctx,
+        JMeterVariables vars, Properties props, Sampler sampler, Logger log) {
+      super(label, prev, ctx, vars, props, sampler, log);
     }
 
   }

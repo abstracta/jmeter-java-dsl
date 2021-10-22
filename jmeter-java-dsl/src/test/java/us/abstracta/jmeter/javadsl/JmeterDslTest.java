@@ -18,6 +18,7 @@ import ru.lanwen.wiremock.ext.WiremockResolver;
 import ru.lanwen.wiremock.ext.WiremockResolver.Wiremock;
 import ru.lanwen.wiremock.ext.WiremockUriResolver;
 import ru.lanwen.wiremock.ext.WiremockUriResolver.WiremockUri;
+import us.abstracta.jmeter.javadsl.core.TestPlanStats;
 
 @ExtendWith({
     WiremockResolver.class,
@@ -60,6 +61,15 @@ public abstract class JmeterDslTest {
     } catch (URISyntaxException e) {
       throw new RuntimeException(e);
     }
+  }
+
+  protected Map<String, Long> extractCounts(TestPlanStats stats) {
+    Map<String, Long> actualStats = new HashMap<>();
+    actualStats.put(OVERALL_STATS_LABEL, stats.overall().samplesCount());
+    for (String label : stats.labels()) {
+      actualStats.put(label, stats.byLabel(label).samplesCount());
+    }
+    return actualStats;
   }
 
 }

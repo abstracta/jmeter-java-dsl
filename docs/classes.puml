@@ -76,21 +76,38 @@ package core {
   interface MultiLevelTestElement extends TestPlanChild, ThreadGroupChild, SamplerChild
 
   abstract class DslJsr223TestElement extends BaseTestElement {
-    String script
     String language
     abstract DslJsr223TestElement buildJsr223TestElement()
   }
 
-  interface Jsr223Script {
-    void run(Jsr223ScriptVars vars)
+  class DslScriptBuilder {
+    int scriptId
+    DslScript script
+    Class varsClass
+    Map<String, String> varsNameMapping
+    String scriptString
+    String build()
+    String buildAsProperty()
   }
 
-  abstract class Jsr223ScriptVars {
+  interface DslScript {
+    Object run(DslScriptVars vars)
+  }
+
+  abstract class DslScriptVars {
+    SampleResult prev
     JMeterContext ctx
     JMeterVariables vars
     Properties props
     Sampler sampler
     Logger log
+  }
+
+  interface Jsr223Script extends DslScript {
+    void run(Jsr223ScriptVars vars)
+  }
+
+  abstract class Jsr223ScriptVars extends DslScriptVars {
     String Label
   }
 
@@ -143,11 +160,19 @@ package core {
 
     abstract class DslController extends TestElementContainer implements ThreadGroupChild
 
-    class DslTransactionController extends LogicController
+    class DslTransactionController extends DslController
 
-    class PercentController extends LogicController {
+    class PercentController extends DslController {
       float percent
     }
+
+    class DslIfController extends DslController
+
+    interface ConditionScript extends DslScript
+
+    class ConditionScriptVars extends DslScriptVars
+
+    DslIfController --> DslScriptBuilder
 
   }
 
@@ -167,9 +192,7 @@ package core {
 
     interface PostProcessorScript extends Jsr223Script
 
-    class PostProcessorVars extends Jsr223ScriptVars {
-      SampleResult prev
-    }
+    class PostProcessorVars extends Jsr223ScriptVars
 
     class DslRegexExtractor extends BaseTestElement implements MultiLevelTestElement {
       String variableName
@@ -309,6 +332,7 @@ TestElementContainer -up-> "*" DslTestElement
 DslTestPlan ..> TestPlanChild
 DslThreadGroup ..> ThreadGroupChild
 DslTestPlan ..> EmbeddedJmeterEngine
+DslJsr223TestElement --> DslScriptBuilder
 DslSampler ..> SamplerChild
 DslJsr223Sampler ..> SamplerChild
 DslHttpSampler --> HttpHeaders

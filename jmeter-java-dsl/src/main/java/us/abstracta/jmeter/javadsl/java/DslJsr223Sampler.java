@@ -89,9 +89,9 @@ public class DslJsr223Sampler extends DslJsr223TestElement implements ThreadGrou
 
     public final SampleResult sampleResult;
 
-    public SamplerVars(SampleResult sampleResult, JMeterContext ctx, JMeterVariables vars,
-        Properties props, Sampler sampler, Logger log, String label) {
-      super(ctx, vars, props, sampler, log, label);
+    public SamplerVars(SampleResult sampleResult, String label, SampleResult prev,
+        JMeterContext ctx, JMeterVariables vars, Properties props, Sampler sampler, Logger log) {
+      super(label, prev, ctx, vars, props, sampler, log);
       this.sampleResult = sampleResult;
     }
 

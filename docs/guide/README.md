@@ -836,6 +836,56 @@ Check [DslRegexExtractor](../../jmeter-java-dsl/src/main/java/us/abstracta/jmete
 
 ## Requests generation
 
+### Conditionals
+
+At some point, you will need to execute part of a test plan according to certain condition (eg: a value extracted from previous request). When you reach such point, you can use `ifController` like in following example:
+
+```java
+import static org.assertj.core.api.Assertions.assertThat;
+import static us.abstracta.jmeter.javadsl.JmeterDsl.*;
+
+import java.io.IOException;
+import java.time.Duration;
+import org.eclipse.jetty.http.MimeTypes.Type;
+import org.junit.jupiter.api.Test;
+import us.abstracta.jmeter.javadsl.core.TestPlanStats;
+
+public class PerformanceTest {
+
+  @Test
+  public void testPerformance() throws IOException {
+    TestPlanStats stats = testPlan(
+      threadGroup(2, 10,
+        httpSampler("http://my.service/accounts")
+          .post("{\"name\": \"John Doe\"}", Type.APPLICATION_JSON)
+          .children(
+            regexExtractor("ACCOUNT_ID", "\"id\":\"([^\"]+)\"")
+          ),
+        ifController("${__groovy(vars['ACCOUNT_ID'] != null)}", 
+          httpSampler("http://my.service/accounts/${ACCOUNT_ID}")
+        )
+      )
+    ).run();
+    assertThat(stats.overall().sampleTimePercentile99()).isLessThan(Duration.ofSeconds(5));
+  }
+
+}
+```
+
+You can also use a Java lambda instead of providing JMeter expression, which benefits from Java type safety & IDEs code auto-completion:
+
+```java
+ifController(s -> s.vars.get("ACCOUNT_ID") != null,
+    httpSampler("http://my.service/accounts/${ACCOUNT_ID}")
+)
+```
+
+::: warning
+Using java code (lambdas) will only work with embedded JMeter engine (no support for saving to JMX and running it in JMeter GUI, or running it with BlazeMeter). Use the first option to avoid such limitations.
+:::
+
+Check [DslIfController](../../jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/controllers/DslIfController.java) for more details.
+
 ### Provide Request Parameters Programmatically per Request
 
 With the standard DSL you can provide static values to request parameters, such as a body. However, you may also want to be able to modify your requests for each call. This is common in cases where your request creates something that must have unique values.
