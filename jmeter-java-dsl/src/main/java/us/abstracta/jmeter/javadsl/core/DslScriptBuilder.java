@@ -33,11 +33,11 @@ import org.slf4j.Logger;
 public class DslScriptBuilder {
 
   private static int currentScriptId = 1;
+  protected final String scriptString;
   private final int scriptId;
   private final DslScript<?, ?> script;
   private final Class<?> varsClass;
   private final Map<String, String> varsNameMapping;
-  private final String scriptString;
 
   public DslScriptBuilder(DslScript<?, ?> script, Class<?> varsClass,
       Map<String, String> varsNameMapping) {
@@ -82,12 +82,6 @@ public class DslScriptBuilder {
         .map(Field::getName)
         .map(f -> varsNameMapping.getOrDefault(f, f))
         .collect(Collectors.joining(","));
-  }
-
-  public String buildAsProperty() {
-    return scriptString != null ? scriptString
-        : "${__groovy(" + buildScriptString(registerScriptProperty(), varsClass,
-            varsNameMapping).replace(",", "\\,") + ")}";
   }
 
   public interface DslScript<P extends DslScriptVars, R> {

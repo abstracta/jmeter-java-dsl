@@ -15,7 +15,8 @@ import us.abstracta.jmeter.javadsl.core.TestPlanStats;
 public class DslIfControllerTest extends JmeterDslTest {
 
   @Test
-  public void shouldExecuteOnlyTrueControllersWhenIfControllersWithVariable() throws Exception {
+  public void shouldExecuteOnlyTrueControllersWhenIfControllersWithGroovyExpression()
+      throws Exception {
     TestPlanStats stats = testPlan(
         threadGroup(1, 1,
             ifController("${__groovy(true)}", httpSampler(SAMPLE_1_LABEL, wiremockUri)),

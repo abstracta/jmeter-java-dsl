@@ -886,6 +886,76 @@ Using java code (lambdas) will only work with embedded JMeter engine (no support
 
 Check [DslIfController](../../jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/controllers/DslIfController.java) for more details.
 
+### Loops
+
+If at any time you want to execute a given part of a test plan, inside a thread iteration, while a condition is met, then you can use `whileController` like in following example:
+
+```java
+import static org.assertj.core.api.Assertions.assertThat;
+import static us.abstracta.jmeter.javadsl.JmeterDsl.*;
+
+import java.io.IOException;
+import java.time.Duration;
+import org.eclipse.jetty.http.MimeTypes.Type;
+import org.junit.jupiter.api.Test;
+import us.abstracta.jmeter.javadsl.core.TestPlanStats;
+
+public class PerformanceTest {
+
+  @Test
+  public void testPerformance() throws IOException {
+    TestPlanStats stats = testPlan(
+      threadGroup(2, 10, 
+        whileController("${__groovy(vars['ACCOUNT_ID'] == null)}",
+            httpSampler("http://my.service/accounts")
+              .post("{\"name\": \"John Doe\"}", Type.APPLICATION_JSON)
+              .children(
+                regexExtractor("ACCOUNT_ID", "\"id\":\"([^\"]+)\"")
+              )
+        )
+      )
+    ).run();
+    assertThat(stats.overall().sampleTimePercentile99()).isLessThan(Duration.ofSeconds(5));
+  }
+
+}
+```
+
+As with `ifController`, you can also use Java lambdas to benefit from IDE auto-completion and type safety. Eg:
+
+```java
+whileController(s -> s.vars.get("ACCOUNT_ID") == null,
+    httpSampler("http://my.service/accounts")
+      .post("{\"name\": \"John Doe\"}", Type.APPLICATION_JSON)
+      .children(
+        regexExtractor("ACCOUNT_ID", "\"id\":\"([^\"]+)\"")
+      )
+)
+```
+
+::: warning
+Using java code (lambdas) will only work with embedded JMeter engine (no support for saving to JMX and running it in JMeter GUI, or running it with BlazeMeter). Use the first option to avoid such limitations.
+:::
+
+::: warning
+JMeter evaluates while conditions before entering each iteration, and after exiting each iteration. Take this into consideration if the condition has side effects (eg: incrementing counters, altering some other state, etc).
+:::
+
+::: tip
+JMeter automatically generates a variable `__jm__<loopName>__idx` with the current index of while iteration (starting with 0). Example:
+
+```java
+whileController("items", "${__groovy(vars.getObject('__jm__items__idx') < 4)}",
+    httpSampler("http://my.service/items")
+      .post("{\"name\": \"My Item\"}", Type.APPLICATION_JSON)
+)
+```
+
+Default name for while controller, when not specified, is `while`.
+:::
+
+Check [DslWhileController](../../jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/controllers/DslWhileController.java) for more details.
+
 ### Provide Request Parameters Programmatically per Request
 
 With the standard DSL you can provide static values to request parameters, such as a body. However, you may also want to be able to modify your requests for each call. This is common in cases where your request creates something that must have unique values.
@@ -998,16 +1068,16 @@ If you want to change this (to only share file per thread group, or using one fi
 ```java
 import us.abstracta.jmeter.javadsl.core.configs.DslCsvDataSet.Sharing;
 ...
-TestPlanStats stats = testPlan(
-  csvDataSet("users.csv")
+    TestPlanStats stats=testPlan(
+    csvDataSet("users.csv")
     .sharedIn(Sharing.THREAD),
-  threadGroup(5, 10,
+    threadGroup(5,10,
     httpSampler("http://my.service/login")
-      .post("{\"${USER}\": \"${PASS}\"", Type.APPLICATION_JSON),
+    .post("{\"${USER}\": \"${PASS}\"",Type.APPLICATION_JSON),
     httpSampler("http://my.service/logout")
-      .method(HttpMethod.POST)
-  )
-)
+    .method(HttpMethod.POST)
+    )
+    )
 ```
 :::
 

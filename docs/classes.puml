@@ -103,6 +103,12 @@ package core {
     Logger log
   }
 
+  class PropertyScriptBuilder extends DslScriptBuilder
+
+  interface PropertyScript extends DslScript
+
+  class PropertyScriptVars extends DslScriptVars
+
   interface Jsr223Script extends DslScript {
     void run(Jsr223ScriptVars vars)
   }
@@ -168,11 +174,10 @@ package core {
 
     class DslIfController extends DslController
 
-    interface ConditionScript extends DslScript
+    class DslWhileController extends DslController
 
-    class ConditionScriptVars extends DslScriptVars
-
-    DslIfController --> DslScriptBuilder
+    DslIfController --> PropertyScriptBuilder
+    DslWhileController --> PropertyScriptBuilder
 
   }
 
