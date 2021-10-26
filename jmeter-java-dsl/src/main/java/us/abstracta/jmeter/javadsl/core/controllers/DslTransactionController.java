@@ -17,14 +17,28 @@ import us.abstracta.jmeter.javadsl.core.DslThreadGroup.ThreadGroupChild;
  */
 public class DslTransactionController extends DslController {
 
+  private boolean includeTimers = false;
+  private boolean generateParentSample = false;
+
   public DslTransactionController(String name, List<ThreadGroupChild> children) {
     super(name, TransactionControllerGui.class, children);
+  }
+
+  public DslTransactionController includeTimers(boolean includeTimers) {
+    this.includeTimers = includeTimers;
+    return this;
+  }
+
+  public DslTransactionController generateParentSample(boolean generateParentSample) {
+    this.generateParentSample = generateParentSample;
+    return this;
   }
 
   @Override
   protected TestElement buildTestElement() {
     TransactionController ret = new TransactionController();
-    ret.setIncludeTimers(false);
+    ret.setIncludeTimers(includeTimers);
+    ret.setGenerateParentSample(generateParentSample);
     return ret;
   }
 
