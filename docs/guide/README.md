@@ -800,7 +800,11 @@ JSR223PostProcessor is a very powerful tool, but is not the only, nor the best, 
 
 ### Use part of a response in a following request (aka: correlation)
 
-It is a usual requirement while creating a test plan for an application to be able to use part of a response (e.g.: a generated ID, token, etc.) in a subsequent request. This can be easily achieved using JMeter extractors and variables. Here is an example with jmeter-java-dsl:
+It is a usual requirement while creating a test plan for an application to be able to use part of a response (e.g.: a generated ID, token, etc.) in a subsequent request. This can be easily achieved using JMeter extractors and variables. 
+
+#### Regular Expression Extractor
+
+Here is an example with jmeter-java-dsl using regular expressions:
 
 ```java
 import static org.assertj.core.api.Assertions.assertThat;
@@ -833,6 +837,42 @@ public class PerformanceTest {
 ```
 
 Check [DslRegexExtractor](../../jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/postprocessors/DslRegexExtractor.java) for more details and additional options.
+
+#### Boundary Extractors
+
+Regular expressions are quite powerful and flexible, but also are complex and performance might not be optimal in some scenarios. When you know that desired extraction is always surrounded by some specific text that never varies, then you can use `boundaryExtractor` which is simpler and in many cases more performant:
+
+```java
+import static org.assertj.core.api.Assertions.assertThat;
+import static us.abstracta.jmeter.javadsl.JmeterDsl.*;
+
+import java.io.IOException;
+import java.time.Duration;
+import org.eclipse.jetty.http.MimeTypes.Type;
+import org.junit.jupiter.api.Test;
+import us.abstracta.jmeter.javadsl.core.TestPlanStats;
+
+public class PerformanceTest {
+
+  @Test
+  public void testPerformance() throws IOException {
+    TestPlanStats stats = testPlan(
+      threadGroup(2, 10,
+        httpSampler("http://my.service/accounts")
+          .post("{\"name\": \"John Doe\"}", Type.APPLICATION_JSON)
+          .children(
+            boundaryExtractor("ACCOUNT_ID", "\"id\":\"", "\"")
+          ),
+        httpSampler("http://my.service/accounts/${ACCOUNT_ID}")
+      )
+    ).run();
+    assertThat(stats.overall().sampleTimePercentile99()).isLessThan(Duration.ofSeconds(5));
+  }
+
+}
+```
+
+Check [DslBoundaryExtractor](../../jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/postprocessors/DslBoundaryExtractor.java) for more details and additional options.
 
 ## Requests generation
 

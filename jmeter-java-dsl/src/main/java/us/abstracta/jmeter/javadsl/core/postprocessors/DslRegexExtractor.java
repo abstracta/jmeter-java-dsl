@@ -39,7 +39,7 @@ public class DslRegexExtractor extends DslScopedTestElement<DslRegexExtractor> i
    * <p>
    * For example, if a response looks like this:
    * <pre>{@code user=test&user=tester}</pre>
-   * And you use {@code user=([^&]+)} as regular expression. First match (1) would extract {@code
+   * and you use {@code user=([^&]+)} as regular expression, first match (1) would extract {@code
    * test} and second match (2) would extract {@code tester}.
    * <p>
    * When not specified, the first match will be used. When 0 is specified, a random match will be
@@ -81,9 +81,7 @@ public class DslRegexExtractor extends DslScopedTestElement<DslRegexExtractor> i
   /**
    * Sets the default value to be stored in the JMeter variable when the regex does not match.
    * <p>
-   * The behavior is different when match number is negative. Check <a
-   * href="https://jmeter.apache.org/usermanual/component_reference.html#Regular_Expression_Extractor">JMeter
-   * Regular Expression Extractor documentation</a> for more details.
+   * When match number is negative then the value is always assigned to the variable name.
    * <p>
    * A common pattern is to specify this value to a known value (e.g.:
    * &lt;VAR&gt;_EXTRACTION_FAILURE) and then add some assertion on the variable to mark request as
@@ -100,7 +98,7 @@ public class DslRegexExtractor extends DslScopedTestElement<DslRegexExtractor> i
   }
 
   /**
-   * Allows specifying what part of request, response to apply the regular extractor to.
+   * Allows specifying what part of request or response to apply the regular extractor to.
    * <p>
    * When not specified then the regular extractor will be applied to the response body.
    *
