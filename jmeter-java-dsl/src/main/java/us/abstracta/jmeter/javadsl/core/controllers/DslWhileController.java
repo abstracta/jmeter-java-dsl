@@ -4,8 +4,8 @@ import java.util.List;
 import org.apache.jmeter.control.WhileController;
 import org.apache.jmeter.control.gui.WhileControllerGui;
 import org.apache.jmeter.testelement.TestElement;
-import us.abstracta.jmeter.javadsl.core.DslThreadGroup.ThreadGroupChild;
 import us.abstracta.jmeter.javadsl.core.DslScriptBuilder;
+import us.abstracta.jmeter.javadsl.core.DslThreadGroup.ThreadGroupChild;
 import us.abstracta.jmeter.javadsl.core.PropertyScriptBuilder;
 import us.abstracta.jmeter.javadsl.core.PropertyScriptBuilder.PropertyScript;
 
@@ -29,13 +29,13 @@ public class DslWhileController extends DslController {
     this.conditionBuilder = new PropertyScriptBuilder(condition);
   }
 
-  private static String solveName(String name) {
-    return name != null ? name : "while";
-  }
-
   public DslWhileController(String name, PropertyScript script, List<ThreadGroupChild> children) {
     super(solveName(name), WhileControllerGui.class, children);
     this.conditionBuilder = new PropertyScriptBuilder(script);
+  }
+
+  private static String solveName(String name) {
+    return name != null ? name : "while";
   }
 
   @Override

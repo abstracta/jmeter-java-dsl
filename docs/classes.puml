@@ -176,6 +176,10 @@ package core {
 
     class DslWhileController extends DslController
 
+    class ForLoopController extends DslController {
+      int count
+    }
+
     DslIfController --> PropertyScriptBuilder
     DslWhileController --> PropertyScriptBuilder
 

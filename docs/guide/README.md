@@ -884,11 +884,13 @@ ifController(s -> s.vars.get("ACCOUNT_ID") != null,
 Using java code (lambdas) will only work with embedded JMeter engine (no support for saving to JMX and running it in JMeter GUI, or running it with BlazeMeter). Use the first option to avoid such limitations.
 :::
 
-Check [DslIfController](../../jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/controllers/DslIfController.java) for more details.
+Check [DslIfController](../../jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/controllers/DslIfController.java) and [JMeter Component documentation](https://jmeter.apache.org/usermanual/component_reference.html#If_Controller) for more details.
 
 ### Loops
 
-If at any time you want to execute a given part of a test plan, inside a thread iteration, while a condition is met, then you can use `whileController` like in following example:
+#### While Controller
+
+If at any time you want to execute a given part of a test plan, inside a thread iteration, while a condition is met, then you can use `whileController` (internally using [JMeter While Controller](https://jmeter.apache.org/usermanual/component_reference.html#While_Controller)) like in following example:
 
 ```java
 import static org.assertj.core.api.Assertions.assertThat;
@@ -955,6 +957,44 @@ Default name for while controller, when not specified, is `while`.
 :::
 
 Check [DslWhileController](../../jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/controllers/DslWhileController.java) for more details.
+
+#### For Loop Controller
+
+In simple scenarios where you just want to execute a fixed number of times, within a thread group iteration, a given part of the test plan, you can just use `forLoopController` (which uses [JMeter Loop Controller component](https://jmeter.apache.org/usermanual/component_reference.html#Loop_Controller)) as in following example:
+
+```java
+import static org.assertj.core.api.Assertions.assertThat;
+import static us.abstracta.jmeter.javadsl.JmeterDsl.*;
+
+import java.io.IOException;
+import java.time.Duration;
+import org.junit.jupiter.api.Test;
+import us.abstracta.jmeter.javadsl.core.TestPlanStats;
+
+public class PerformanceTest {
+
+  @Test
+  public void testPerformance() throws IOException {
+    TestPlanStats stats = testPlan(
+      threadGroup(2, 10, 
+        forLoopController(5,
+            httpSampler("http://my.service/accounts")
+        )
+      )
+    ).run();
+    assertThat(stats.overall().sampleTimePercentile99()).isLessThan(Duration.ofSeconds(5));
+  }
+
+}
+```
+
+This will result in 10 * 5 = 50 requests to the given URL for each thread in the thread group.
+
+::: tip
+JMeter automatically generates a variable `__jm__<loopName>__idx` with the current index of while iteration (starting with 0) which you can use in children elements.
+:::
+
+Check [ForLoopController](../../jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/controllers/ForLoopController.java) for more details.
 
 ### Provide Request Parameters Programmatically per Request
 
