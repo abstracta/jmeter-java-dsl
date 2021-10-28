@@ -117,6 +117,19 @@ package core {
     String Label
   }
 
+  abstract class DslScopedTestElement extends BaseTestElement {
+    Scope scope;
+    String scopeVariable
+  }
+
+  enum Scope {
+    ALL
+    MAIN_SAMPLE
+    SUB_SAMPLES
+  }
+
+  DslScopedTestElement ..> Scope
+
   package threadgroups {
 
     class RpsThreadGroup extends TestElementContainer implements TestPlanChild {
@@ -203,15 +216,16 @@ package core {
 
     class PostProcessorVars extends Jsr223ScriptVars
 
-    class DslRegexExtractor extends BaseTestElement implements MultiLevelTestElement {
-      String variableName
-      String regex
+    abstract class DslVariableExtractor extends DslScopedTestElement implements MultiLevelTestElement {
+      String varName
       int matchNumber
-      String template
       String defaultValue
+    }
+
+    class DslRegexExtractor extends DslVariableExtractor {
+      String regex
+      String template
       TargetField fieldToCheck
-      Scope scope
-      String scopeVariable
     }
 
     enum TargetField {
@@ -225,19 +239,23 @@ package core {
       RESPONSE_MESSAGE
     }
 
-    enum Scope {
-      ALL
-      MAIN_SAMPLE
-      SUB_SAMPLES
+    class DslBoundaryExtractor extends DslVariableExtractor {
+      String leftBoundary
+      String rightBoundary
+      TargetField fieldToCheck
     }
 
     DslRegexExtractor ..> TargetField
-    DslRegexExtractor ..> Scope
+    DslBoundaryExtractor ..> TargetField
+
+    class DslJsonExtractor extends DslVariableExtractor {
+      String jmesPath
+    }
 
   }
 
   package assertions {
-    class DslResponseAssertion extends BaseTestElement  implements MultiLevelTestElement {
+    class DslResponseAssertion extends DslScopedTestElement {
       TargetField fieldToTest
       boolean ignoreStatus
       String[] testStrings

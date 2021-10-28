@@ -874,6 +874,44 @@ public class PerformanceTest {
 
 Check [DslBoundaryExtractor](../../jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/postprocessors/DslBoundaryExtractor.java) for more details and additional options.
 
+#### JSON Extractor
+
+When the response of a request is JSON, then you can use `jsonExtractor` by using [JMESPath query](https://jmespath.org/) like in following example:
+
+```java
+import static org.assertj.core.api.Assertions.assertThat;
+import static us.abstracta.jmeter.javadsl.JmeterDsl.*;
+
+import java.io.IOException;
+import java.time.Duration;
+import org.eclipse.jetty.http.MimeTypes.Type;
+import org.junit.jupiter.api.Test;
+import us.abstracta.jmeter.javadsl.core.TestPlanStats;
+
+public class PerformanceTest {
+
+  @Test
+  public void testPerformance() throws IOException {
+    TestPlanStats stats = testPlan(
+      threadGroup(2, 10,
+        httpSampler("http://my.service/accounts")
+          .post("{\"name\": \"John Doe\"}", Type.APPLICATION_JSON)
+          .children(
+            jsonExtractor("ACCOUNT_ID", "id")
+          ),
+        httpSampler("http://my.service/accounts/${ACCOUNT_ID}")
+      )
+    ).run();
+    assertThat(stats.overall().sampleTimePercentile99()).isLessThan(Duration.ofSeconds(5));
+  }
+
+}
+```
+
+::: warning
+Be aware that this element uses JMeter JSON JMESPath Extractor element, and not the JMeter JSON Extractor element. This means that uses JMESPath instead of JSON Path. 
+:::
+
 ## Requests generation
 
 ### Conditionals

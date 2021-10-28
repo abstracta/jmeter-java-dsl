@@ -23,6 +23,7 @@ import us.abstracta.jmeter.javadsl.core.listeners.InfluxDbBackendListener;
 import us.abstracta.jmeter.javadsl.core.listeners.JtlWriter;
 import us.abstracta.jmeter.javadsl.core.listeners.ResponseFileSaver;
 import us.abstracta.jmeter.javadsl.core.postprocessors.DslBoundaryExtractor;
+import us.abstracta.jmeter.javadsl.core.postprocessors.DslJsonExtractor;
 import us.abstracta.jmeter.javadsl.core.postprocessors.DslJsr223PostProcessor;
 import us.abstracta.jmeter.javadsl.core.postprocessors.DslJsr223PostProcessor.PostProcessorScript;
 import us.abstracta.jmeter.javadsl.core.postprocessors.DslRegexExtractor;
@@ -662,6 +663,27 @@ public class JmeterDsl {
   public static DslBoundaryExtractor boundaryExtractor(String variableName, String leftBoundary,
       String rightBoundary) {
     return new DslBoundaryExtractor(variableName, leftBoundary, rightBoundary);
+  }
+
+  /**
+   * Builds a JSON JMESPath Extractor which allows using a JMESPath to extract part of a JSON
+   * response.
+   * <p>
+   * This method provides a simple default implementation with required settings, but more settings
+   * are provided by returned DslJsonExtractor.
+   * <p>
+   * By default when no match is found, no variable will be created or modified. On the other hand,
+   * when a match is found, it will by default store the first match.
+   *
+   * @param variableName is the name of the variable to be used to store the extracted value to.
+   * @param jmesPath specifies the JMESPath to extract the value.
+   * @return the JSON JMESPath Extractor which can be used to define additional settings to use when
+   * extracting (like defining match number, scope, etc.).
+   * @see DslJsonExtractor
+   * @since 0.28
+   */
+  public static DslJsonExtractor jsonExtractor(String variableName, String jmesPath) {
+    return new DslJsonExtractor(variableName, jmesPath);
   }
 
   /**

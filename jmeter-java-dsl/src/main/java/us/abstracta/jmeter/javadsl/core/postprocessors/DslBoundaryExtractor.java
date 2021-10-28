@@ -4,8 +4,6 @@ import java.util.function.Consumer;
 import org.apache.jmeter.extractor.BoundaryExtractor;
 import org.apache.jmeter.extractor.gui.BoundaryExtractorGui;
 import org.apache.jmeter.testelement.TestElement;
-import us.abstracta.jmeter.javadsl.core.DslScopedTestElement;
-import us.abstracta.jmeter.javadsl.core.MultiLevelTestElement;
 
 /**
  * Provides simple means for extracting into a variable a part of a request or response using just
@@ -17,19 +15,14 @@ import us.abstracta.jmeter.javadsl.core.MultiLevelTestElement;
  *
  * @since 0.28
  */
-public class DslBoundaryExtractor extends DslScopedTestElement<DslBoundaryExtractor> implements
-    MultiLevelTestElement {
+public class DslBoundaryExtractor extends DslVariableExtractor<DslBoundaryExtractor> {
 
-  private final String varName;
   private final String leftBoundary;
   private final String rightBoundary;
-  private int matchNumber = 1;
-  private String defaultValue;
   private TargetField fieldToCheck = TargetField.RESPONSE_BODY;
 
   public DslBoundaryExtractor(String varName, String leftBoundary, String rightBoundary) {
-    super("Boundary Extractor", BoundaryExtractorGui.class);
-    this.varName = varName;
+    super(varName, "Boundary Extractor", BoundaryExtractorGui.class);
     this.leftBoundary = leftBoundary;
     this.rightBoundary = rightBoundary;
   }

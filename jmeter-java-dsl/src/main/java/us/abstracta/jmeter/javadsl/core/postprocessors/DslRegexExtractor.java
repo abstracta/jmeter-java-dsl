@@ -4,8 +4,6 @@ import java.util.function.Consumer;
 import org.apache.jmeter.extractor.RegexExtractor;
 import org.apache.jmeter.extractor.gui.RegexExtractorGui;
 import org.apache.jmeter.testelement.TestElement;
-import us.abstracta.jmeter.javadsl.core.DslScopedTestElement;
-import us.abstracta.jmeter.javadsl.core.MultiLevelTestElement;
 
 /**
  * Allows extracting part of a request or response using regular expressions to store into a
@@ -18,19 +16,14 @@ import us.abstracta.jmeter.javadsl.core.MultiLevelTestElement;
  *
  * @since 0.8
  */
-public class DslRegexExtractor extends DslScopedTestElement<DslRegexExtractor> implements
-    MultiLevelTestElement {
+public class DslRegexExtractor extends DslVariableExtractor<DslRegexExtractor> {
 
-  private final String variableName;
   private final String regex;
-  private int matchNumber = 1;
   private String template = "$1$";
-  private String defaultValue;
   private TargetField fieldToCheck = TargetField.RESPONSE_BODY;
 
-  public DslRegexExtractor(String variableName, String regex) {
-    super("Regular Expression Extractor", RegexExtractorGui.class);
-    this.variableName = variableName;
+  public DslRegexExtractor(String varName, String regex) {
+    super(varName, "Regular Expression Extractor", RegexExtractorGui.class);
     this.regex = regex;
   }
 
@@ -116,7 +109,7 @@ public class DslRegexExtractor extends DslScopedTestElement<DslRegexExtractor> i
     RegexExtractor ret = new RegexExtractor();
     setScopeTo(ret);
     fieldToCheck.applyTo(ret);
-    ret.setRefName(variableName);
+    ret.setRefName(varName);
     ret.setRegex(regex);
     ret.setMatchNumber(matchNumber);
     ret.setTemplate(template);
