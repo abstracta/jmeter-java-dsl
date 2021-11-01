@@ -20,7 +20,6 @@ import org.apache.jmeter.testelement.property.JMeterProperty;
 import org.apache.jorphan.collections.HashTree;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import us.abstracta.jmeter.javadsl.core.EmbeddedJmeterEngine.JMeterEnvironment;
 
 /**
  * Provides the basic logic for all {@link DslTestElement}.

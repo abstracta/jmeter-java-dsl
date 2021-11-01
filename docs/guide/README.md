@@ -111,9 +111,11 @@ Since JMeter uses [log4j2](https://logging.apache.org/log4j/2.x/), if you want t
 
 Check [HTTP performance testing](#http-performance-testing) for additional details while testing HTTP services.
 
-## Run test at scale in BlazeMeter
+## Run test at scale
 
 Running a load test from one machine is not always enough, since you are limited to the machine hardware capabilities. Sometimes, is necessary to run the test using a cluster of machines to be able to generate enough load for the system under test.
+
+### BlazeMeter
 
 By including following module as dependency:
 
@@ -187,6 +189,50 @@ In case you want to get debug logs for HTTP calls to BlazeMeter API, you can inc
 ::: warning
 If you use JSR223 Pre- or Post- processors with Java code (lambdas) instead of strings ([here](#change-sample-result-statuses-with-custom-logic) are some examples), or use one of the HTTP Sampler methods which receive a function as parameter (as in [here](#provide-request-parameters-programmatically-per-request)), then BlazeMeter execution won't work. You can migrate them to use `jsrPreProcessor` with string scripts instead. Check associated methods documentation for more details.
 :::
+
+### JMeter Remote Testing
+
+JMeter already provides means to run a test on several machines controlled by one master/client machine. This is refered as [Remote Testing](http://jmeter.apache.org/usermanual/remote-test.html).
+
+JMeter remote testing requires to setup nodes in server mode (as slaves) (using `bin/jmeter-server` JMeter script) with a configured keystore (usually `rmi_keystore.jks`, generated with `bin/` JMeter script) which will execute a testplan triggered in a client/master node.
+
+You can trigger such tests with the DSL using `DistributedJMeterEngine` as in following example:
+
+```java
+import static org.assertj.core.api.Assertions.assertThat;
+import static us.abstracta.jmeter.javadsl.JmeterDsl.*;
+
+import java.time.Duration;
+import org.junit.jupiter.api.Test;
+import us.abstracta.jmeter.javadsl.core.DistributedJMeterEngine;
+import us.abstracta.jmeter.javadsl.core.TestPlanStats;
+
+public class PerformanceTest {
+
+  @Test
+  public void testPerformance() throws Exception {
+    TestPlanStats stats = testPlan(
+        threadGroup(200, Duration.ofMinutes(10),
+            httpSampler("http://my.service")
+        )
+    ).runIn(new DistributedJMeterEngine("host1", "host2"));
+    assertThat(stats.overall().sampleTimePercentile99()).isLessThan(Duration.ofSeconds(5));
+  }
+
+}
+```
+
+This will run 200 users for 10 minutes on each server/slave (`host1` and `host2`) and aggregate all the results in provided stats.
+
+::: warning
+To be able to run the test you require the `rmi_keystore.jks` file in working directory of the test. For the time being we couldn't find a way to allow setting any arbitrary path for the file.
+:::
+
+::: warning
+In general prefer using BlazeMeter option which avoids all the setup and maintenance costs of the infrastructure required by JMeter remote, and additional useful features (like reporting capabilities).
+:::
+
+Check [DistributedJMeterEngine](../../jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/DistributedJMeterEngine.java) and [JMeter documentation](http://jmeter.apache.org/usermanual/remote-test.html) for proper setup and additional options.
 
 ## Advanced threads configuration
 

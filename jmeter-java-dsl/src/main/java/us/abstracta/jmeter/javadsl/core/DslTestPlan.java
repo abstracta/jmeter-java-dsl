@@ -13,7 +13,6 @@ import org.apache.jmeter.testelement.TestPlan;
 import org.apache.jorphan.collections.HashTree;
 import org.apache.jorphan.collections.ListedHashTree;
 import us.abstracta.jmeter.javadsl.core.DslTestPlan.TestPlanChild;
-import us.abstracta.jmeter.javadsl.core.EmbeddedJmeterEngine.JMeterEnvironment;
 
 /**
  * Represents a JMeter test plan, with associated thread groups and other children elements.

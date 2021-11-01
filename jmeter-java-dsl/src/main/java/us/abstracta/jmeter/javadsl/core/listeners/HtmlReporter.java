@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.nio.file.DirectoryNotEmptyException;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
+import java.util.concurrent.atomic.AtomicInteger;
 import org.apache.jmeter.JMeter;
 import org.apache.jmeter.report.config.ConfigurationException;
 import org.apache.jmeter.report.dashboard.GenerationException;
@@ -49,8 +50,7 @@ public class HtmlReporter extends BaseTestElement implements MultiLevelTestEleme
     }
     File resultsFile = new File(reportDirectory, "report.jtl");
     HtmlReportSummariser reporter = new HtmlReportSummariser(resultsFile);
-    ResultCollector logger = new ResultCollector(reporter);
-    reporter.setCollector(logger);
+    ResultCollector logger = new AutoFlushingResultCollector(reporter);
     logger.setFilename(resultsFile.getPath());
     return logger;
   }
@@ -58,19 +58,16 @@ public class HtmlReporter extends BaseTestElement implements MultiLevelTestEleme
   private static class HtmlReportSummariser extends Summariser {
 
     private final File resultsFile;
-    private ResultCollector logger;
+    private final AtomicInteger hostsCount = new AtomicInteger(0);
 
     private HtmlReportSummariser(File resultsFile) {
       this.resultsFile = resultsFile;
     }
 
-    public void setCollector(ResultCollector logger) {
-      this.logger = logger;
-    }
-
     @Override
-    public void testStarted() {
-      // we are not interested on any of existing logic in summarizer, only in test end invocation
+    public void testStarted(String host) {
+      super.testStarted(host);
+      hostsCount.incrementAndGet();
     }
 
     @Override
@@ -80,14 +77,37 @@ public class HtmlReporter extends BaseTestElement implements MultiLevelTestEleme
 
     @Override
     public void testEnded(String host) {
-      JMeterUtils.setProperty(JMeter.JMETER_REPORT_OUTPUT_DIR_PROPERTY,
-          new File(resultsFile.getParent()).getAbsolutePath());
-      try {
-        logger.flushFile();
-        new ReportGenerator(resultsFile.getPath(), null).generate();
-      } catch (GenerationException | ConfigurationException e) {
-        throw new RuntimeException(e);
+      // verify that all remote hosts have ended before generating report
+      if (hostsCount.decrementAndGet() <= 0) {
+        try {
+          JMeterUtils.setProperty(JMeter.JMETER_REPORT_OUTPUT_DIR_PROPERTY,
+              new File(resultsFile.getParent()).getAbsolutePath());
+          new ReportGenerator(resultsFile.getPath(), null).generate();
+        } catch (GenerationException | ConfigurationException e) {
+          throw new RuntimeException(e);
+        }
       }
+    }
+
+  }
+
+  /*
+   this class is required to assure (even in remote execution) that file is written before
+   generating report
+   */
+  public static class AutoFlushingResultCollector extends ResultCollector {
+
+    public AutoFlushingResultCollector() {
+    }
+
+    public AutoFlushingResultCollector(Summariser summer) {
+      super(summer);
+    }
+
+    @Override
+    public void testEnded(String host) {
+      flushFile();
+      super.testEnded(host);
     }
 
   }
