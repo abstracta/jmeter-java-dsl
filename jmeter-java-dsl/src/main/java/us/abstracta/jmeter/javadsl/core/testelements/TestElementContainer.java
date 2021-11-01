@@ -1,10 +1,13 @@
-package us.abstracta.jmeter.javadsl.core;
+package us.abstracta.jmeter.javadsl.core.testelements;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import org.apache.jmeter.gui.JMeterGUIComponent;
 import org.apache.jorphan.collections.HashTree;
+import us.abstracta.jmeter.javadsl.core.BuildTreeContext;
+import us.abstracta.jmeter.javadsl.core.DslTestElement;
+import us.abstracta.jmeter.javadsl.core.DslTestPlan;
 
 /**
  * Abstracts logic for {@link DslTestElement} that can nest other test elements.

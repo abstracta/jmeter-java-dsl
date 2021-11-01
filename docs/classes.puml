@@ -21,21 +21,6 @@ package core {
     Map<DslVisualizer, Supplier<Component>> visualizers
   }
 
-  abstract class BaseTestElement implements DslTestElement {
-    String name
-    Class guiClass
-    TestElement buildTestElement()
-    BeanInfoSupport getBeanInfo()
-  }
-
-  abstract class TestElementContainer extends BaseTestElement {
-    void addChildren(DslTestElement[] children)
-  }
-
-  abstract class TestPlanSingletonChildElement extends BaseTestElement implements TestPlanChild {
-    boolean enabled
-  }
-
   class DslTestPlan extends TestElementContainer {
     TestPlanStats run()
     TestPlanStats runIn(DslJmeterEngine engine)
@@ -49,14 +34,6 @@ package core {
     TestPlanStats run(DslTestPlan testPlan)
   }
 
-  class EmbeddedJmeterEngine implements DslJmeterEngine
-
-  class JMeterEnvironment {
-    File homeDir
-  }
-
-  EmbeddedJmeterEngine ..> JMeterEnvironment
-
   class DslThreadGroup extends TestElementContainer implements TestPlanChild {
     List<Stage> stages
   }
@@ -69,66 +46,59 @@ package core {
 
   interface ThreadGroupChild extends DslTestElement
 
-  abstract class DslSampler extends TestElementContainer implements ThreadGroupChild
+  package testelements {
 
-  interface SamplerChild extends DslTestElement
+    abstract class BaseTestElement implements DslTestElement {
+      String name
+      Class guiClass
+      TestElement buildTestElement()
+      BeanInfoSupport getBeanInfo()
+    }
 
-  interface MultiLevelTestElement extends TestPlanChild, ThreadGroupChild, SamplerChild
+    abstract class TestElementContainer extends BaseTestElement {
+      void addChildren(DslTestElement[] children)
+    }
 
-  abstract class DslJsr223TestElement extends BaseTestElement {
-    String language
-    abstract DslJsr223TestElement buildJsr223TestElement()
+    abstract class TestPlanSingletonChildElement extends BaseTestElement implements TestPlanChild {
+      boolean enabled
+    }
+
+    class EmbeddedJmeterEngine implements DslJmeterEngine
+
+    class JMeterEnvironment {
+      File homeDir
+    }
+
+    EmbeddedJmeterEngine ..> JMeterEnvironment
+
+    abstract class DslSampler extends TestElementContainer implements ThreadGroupChild
+
+    interface SamplerChild extends DslTestElement
+
+    interface MultiLevelTestElement extends TestPlanChild, ThreadGroupChild, SamplerChild
+
+    abstract class DslJsr223TestElement extends BaseTestElement {
+      String language
+      abstract DslJsr223TestElement buildJsr223TestElement()
+    }
+
+    abstract class DslScopedTestElement extends BaseTestElement {
+      Scope scope;
+      String scopeVariable
+    }
+
+    enum Scope {
+      ALL
+      MAIN_SAMPLE
+      SUB_SAMPLES
+    }
+
+    DslScopedTestElement ..> Scope
+    TestElementContainer -up-> "*" DslTestElement
+    DslJsr223TestElement --> DslScriptBuilder
+    DslSampler ..> SamplerChild
+
   }
-
-  class DslScriptBuilder {
-    int scriptId
-    DslScript script
-    Class varsClass
-    Map<String, String> varsNameMapping
-    String scriptString
-    String build()
-    String buildAsProperty()
-  }
-
-  interface DslScript {
-    Object run(DslScriptVars vars)
-  }
-
-  abstract class DslScriptVars {
-    SampleResult prev
-    JMeterContext ctx
-    JMeterVariables vars
-    Properties props
-    Sampler sampler
-    Logger log
-  }
-
-  class PropertyScriptBuilder extends DslScriptBuilder
-
-  interface PropertyScript extends DslScript
-
-  class PropertyScriptVars extends DslScriptVars
-
-  interface Jsr223Script extends DslScript {
-    void run(Jsr223ScriptVars vars)
-  }
-
-  abstract class Jsr223ScriptVars extends DslScriptVars {
-    String Label
-  }
-
-  abstract class DslScopedTestElement extends BaseTestElement {
-    Scope scope;
-    String scopeVariable
-  }
-
-  enum Scope {
-    ALL
-    MAIN_SAMPLE
-    SUB_SAMPLES
-  }
-
-  DslScopedTestElement ..> Scope
 
   package threadgroups {
 
@@ -225,10 +195,10 @@ package core {
     class DslRegexExtractor extends DslVariableExtractor {
       String regex
       String template
-      TargetField fieldToCheck
+      ExtractorTargetField fieldToCheck
     }
 
-    enum TargetField {
+    enum ExtractorTargetField {
       RESPONSE_BODY
       RESPONSE_BODY_UNESCAPED
       RESPONSE_BODY_AS_DOCUMENT
@@ -242,11 +212,11 @@ package core {
     class DslBoundaryExtractor extends DslVariableExtractor {
       String leftBoundary
       String rightBoundary
-      TargetField fieldToCheck
+      ExtractorTargetField fieldToCheck
     }
 
-    DslRegexExtractor ..> TargetField
-    DslBoundaryExtractor ..> TargetField
+    DslRegexExtractor ..> ExtractorTargetField
+    DslBoundaryExtractor ..> ExtractorTargetField
 
     class DslJsonExtractor extends DslVariableExtractor {
       String jmesPath
@@ -255,8 +225,9 @@ package core {
   }
 
   package assertions {
+
     class DslResponseAssertion extends DslScopedTestElement {
-      TargetField fieldToTest
+      AssertionTargetField fieldToTest
       boolean ignoreStatus
       String[] testStrings
       TestStringStrategy testStrategy
@@ -264,7 +235,7 @@ package core {
       boolean anyMatch
     }
 
-    enum TargetField {
+    enum AssertionTargetField {
       RESPONSE_BODY
       RESPONSE_BODY_AS_DOCUMENT
       RESPONSE_CODE
@@ -282,7 +253,7 @@ package core {
       MATCHES_REGEX
     }
 
-    DslResponseAssertion ..> TargetField
+    DslResponseAssertion ..> AssertionTargetField
     DslResponseAssertion ..> TestStringStrategy
 
   }
@@ -330,6 +301,53 @@ package core {
 
   }
 
+  package util {
+
+    class DslScriptBuilder {
+      int scriptId
+      DslScript script
+      Class varsClass
+      Map<String, String> varsNameMapping
+      String scriptString
+      String build()
+      String buildAsProperty()
+    }
+
+    interface DslScript {
+      Object run(DslScriptVars vars)
+    }
+
+    abstract class DslScriptVars {
+      SampleResult prev
+      JMeterContext ctx
+      JMeterVariables vars
+      Properties props
+      Sampler sampler
+      Logger log
+    }
+
+    class PropertyScriptBuilder extends DslScriptBuilder
+
+    interface PropertyScript extends DslScript
+
+    class PropertyScriptVars extends DslScriptVars
+
+    interface Jsr223Script extends DslScript {
+      void run(Jsr223ScriptVars vars)
+    }
+
+    abstract class Jsr223ScriptVars extends DslScriptVars {
+      String Label
+    }
+
+  }
+
+  DslTestPlan ..> TestPlanChild
+  DslThreadGroup ..> ThreadGroupChild
+  DslTestPlan ..> EmbeddedJmeterEngine
+  DslThreadGroup ..> Stage
+  DslTestElement ..> BuildTreeContext
+
 }
 
 package http {
@@ -348,20 +366,18 @@ package http {
 
   class DslCookieManager extends TestPlanSingletonChildElement
 
+  DslHttpSampler --> HttpHeaders
+
 }
 
 package java {
+
   class DslJsr223Sampler extends DslJsr223TestElement implements ThreadGroupChild
+
+  DslJsr223Sampler ..> SamplerChild
+
 }
 
 JmeterDsl -[hidden]- core
-TestElementContainer -up-> "*" DslTestElement
-DslTestPlan ..> TestPlanChild
-DslThreadGroup ..> ThreadGroupChild
-DslTestPlan ..> EmbeddedJmeterEngine
-DslJsr223TestElement --> DslScriptBuilder
-DslSampler ..> SamplerChild
-DslJsr223Sampler ..> SamplerChild
-DslHttpSampler --> HttpHeaders
 
 @enduml

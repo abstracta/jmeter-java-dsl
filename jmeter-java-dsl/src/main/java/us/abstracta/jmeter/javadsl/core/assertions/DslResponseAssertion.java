@@ -7,8 +7,8 @@ import java.util.function.Consumer;
 import org.apache.jmeter.assertions.ResponseAssertion;
 import org.apache.jmeter.assertions.gui.AssertionGui;
 import org.apache.jmeter.testelement.TestElement;
-import us.abstracta.jmeter.javadsl.core.DslScopedTestElement;
-import us.abstracta.jmeter.javadsl.core.MultiLevelTestElement;
+import us.abstracta.jmeter.javadsl.core.testelements.DslScopedTestElement;
+import us.abstracta.jmeter.javadsl.core.testelements.MultiLevelTestElement;
 
 /**
  * Allows marking a request result as success or failure by a specific result field value.

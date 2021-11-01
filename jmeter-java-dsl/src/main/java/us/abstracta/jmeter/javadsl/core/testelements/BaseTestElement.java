@@ -1,4 +1,4 @@
-package us.abstracta.jmeter.javadsl.core;
+package us.abstracta.jmeter.javadsl.core.testelements;
 
 import java.awt.Component;
 import java.awt.event.WindowAdapter;
@@ -20,6 +20,9 @@ import org.apache.jmeter.testelement.property.JMeterProperty;
 import org.apache.jorphan.collections.HashTree;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import us.abstracta.jmeter.javadsl.core.BuildTreeContext;
+import us.abstracta.jmeter.javadsl.core.DslTestElement;
+import us.abstracta.jmeter.javadsl.core.engines.JMeterEnvironment;
 
 /**
  * Provides the basic logic for all {@link DslTestElement}.
@@ -115,7 +118,7 @@ public abstract class BaseTestElement implements DslTestElement {
     }
   }
 
-  protected void showTestElementGui(Supplier<Component> guiBuilder, Runnable closeListener) {
+  public void showTestElementGui(Supplier<Component> guiBuilder, Runnable closeListener) {
     showFrameWith(guiBuilder.get(), name, 800, 600, closeListener);
   }
 

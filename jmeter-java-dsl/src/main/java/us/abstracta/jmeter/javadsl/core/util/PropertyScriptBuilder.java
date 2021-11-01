@@ -1,4 +1,4 @@
-package us.abstracta.jmeter.javadsl.core;
+package us.abstracta.jmeter.javadsl.core.util;
 
 import java.util.HashMap;
 import java.util.Map;

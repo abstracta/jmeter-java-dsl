@@ -1,9 +1,10 @@
-package us.abstracta.jmeter.javadsl.core;
+package us.abstracta.jmeter.javadsl.core.engines;
 
 import java.time.Duration;
 import java.time.Instant;
 import org.apache.jmeter.report.processor.StatisticsSummaryData;
 import org.apache.jmeter.samplers.SampleResult;
+import us.abstracta.jmeter.javadsl.core.TestPlanStats;
 
 /**
  * A {@link TestPlanStats} which automatically calculate aggregates from sample results.

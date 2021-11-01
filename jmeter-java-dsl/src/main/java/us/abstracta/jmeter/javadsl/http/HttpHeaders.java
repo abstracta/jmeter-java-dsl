@@ -8,8 +8,8 @@ import org.apache.jmeter.protocol.http.gui.HeaderPanel;
 import org.apache.jmeter.testelement.TestElement;
 import org.eclipse.jetty.http.HttpHeader;
 import org.eclipse.jetty.http.MimeTypes;
-import us.abstracta.jmeter.javadsl.core.BaseTestElement;
-import us.abstracta.jmeter.javadsl.core.MultiLevelTestElement;
+import us.abstracta.jmeter.javadsl.core.testelements.BaseTestElement;
+import us.abstracta.jmeter.javadsl.core.testelements.MultiLevelTestElement;
 
 /**
  * Allows specifying HTTP headers (through an underlying JMeter HttpHeaderManager) to be used by

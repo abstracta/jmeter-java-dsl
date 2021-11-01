@@ -4,10 +4,10 @@ import java.util.List;
 import org.apache.jmeter.control.IfController;
 import org.apache.jmeter.control.gui.IfControllerPanel;
 import org.apache.jmeter.testelement.TestElement;
-import us.abstracta.jmeter.javadsl.core.DslScriptBuilder;
 import us.abstracta.jmeter.javadsl.core.DslThreadGroup.ThreadGroupChild;
-import us.abstracta.jmeter.javadsl.core.PropertyScriptBuilder;
-import us.abstracta.jmeter.javadsl.core.PropertyScriptBuilder.PropertyScript;
+import us.abstracta.jmeter.javadsl.core.util.DslScriptBuilder;
+import us.abstracta.jmeter.javadsl.core.util.PropertyScriptBuilder;
+import us.abstracta.jmeter.javadsl.core.util.PropertyScriptBuilder.PropertyScript;
 
 /**
  * Allows to conditionally run part of a test plan according to certain condition.

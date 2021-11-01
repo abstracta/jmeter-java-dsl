@@ -179,7 +179,7 @@ public class DashboardVisualizer extends DslVisualizer {
   }
 
   @Override
-  protected void showTestElementGui(Supplier<Component> guiBuilder, Runnable closeListener) {
+  public void showTestElementGui(Supplier<Component> guiBuilder, Runnable closeListener) {
     showFrameWith(guiBuilder.get(), "Dashboard", 1080, 600, closeListener);
   }
 

@@ -4,10 +4,10 @@ import java.util.List;
 import org.apache.jmeter.control.WhileController;
 import org.apache.jmeter.control.gui.WhileControllerGui;
 import org.apache.jmeter.testelement.TestElement;
-import us.abstracta.jmeter.javadsl.core.DslScriptBuilder;
 import us.abstracta.jmeter.javadsl.core.DslThreadGroup.ThreadGroupChild;
-import us.abstracta.jmeter.javadsl.core.PropertyScriptBuilder;
-import us.abstracta.jmeter.javadsl.core.PropertyScriptBuilder.PropertyScript;
+import us.abstracta.jmeter.javadsl.core.util.DslScriptBuilder;
+import us.abstracta.jmeter.javadsl.core.util.PropertyScriptBuilder;
+import us.abstracta.jmeter.javadsl.core.util.PropertyScriptBuilder.PropertyScript;
 
 /**
  * Allows running part of a test plan until a condition is met.

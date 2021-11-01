@@ -19,8 +19,8 @@ import org.apache.jorphan.collections.HashTree;
 import us.abstracta.jmeter.javadsl.core.BuildTreeContext;
 import us.abstracta.jmeter.javadsl.core.DslTestPlan.TestPlanChild;
 import us.abstracta.jmeter.javadsl.core.DslThreadGroup.ThreadGroupChild;
-import us.abstracta.jmeter.javadsl.core.SingleSeriesTimelinePanel;
-import us.abstracta.jmeter.javadsl.core.TestElementContainer;
+import us.abstracta.jmeter.javadsl.core.testelements.TestElementContainer;
+import us.abstracta.jmeter.javadsl.core.util.SingleSeriesTimelinePanel;
 
 /**
  * Configures a thread group which dynamically adapts the number of threads and pauses to match a

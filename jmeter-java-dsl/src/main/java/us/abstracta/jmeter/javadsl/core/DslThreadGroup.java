@@ -16,6 +16,8 @@ import org.apache.jmeter.threads.ThreadGroup;
 import org.apache.jmeter.threads.gui.ThreadGroupGui;
 import us.abstracta.jmeter.javadsl.core.DslTestPlan.TestPlanChild;
 import us.abstracta.jmeter.javadsl.core.DslThreadGroup.ThreadGroupChild;
+import us.abstracta.jmeter.javadsl.core.testelements.TestElementContainer;
+import us.abstracta.jmeter.javadsl.core.util.SingleSeriesTimelinePanel;
 
 /**
  * Represents the standard thread group test element included by JMeter.

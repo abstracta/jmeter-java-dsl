@@ -10,8 +10,8 @@ import org.apache.jmeter.samplers.SampleSaveConfiguration;
 import org.apache.jmeter.testelement.TestElement;
 import org.apache.jmeter.util.JMeterUtils;
 import org.apache.jmeter.visualizers.SimpleDataWriter;
-import us.abstracta.jmeter.javadsl.core.BaseTestElement;
-import us.abstracta.jmeter.javadsl.core.MultiLevelTestElement;
+import us.abstracta.jmeter.javadsl.core.testelements.BaseTestElement;
+import us.abstracta.jmeter.javadsl.core.testelements.MultiLevelTestElement;
 
 /**
  * Allows to generate a result log file (JTL) with data for each sample for a test plan, thread

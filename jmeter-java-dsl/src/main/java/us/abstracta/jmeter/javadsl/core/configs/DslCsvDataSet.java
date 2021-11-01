@@ -5,8 +5,8 @@ import org.apache.jmeter.config.CSVDataSetBeanInfo;
 import org.apache.jmeter.testbeans.BeanInfoSupport;
 import org.apache.jmeter.testbeans.gui.TestBeanGUI;
 import org.apache.jmeter.testelement.TestElement;
-import us.abstracta.jmeter.javadsl.core.BaseTestElement;
-import us.abstracta.jmeter.javadsl.core.MultiLevelTestElement;
+import us.abstracta.jmeter.javadsl.core.testelements.BaseTestElement;
+import us.abstracta.jmeter.javadsl.core.testelements.MultiLevelTestElement;
 
 /**
  * Allows using a CSV file as input data for JMeter variables to use in test plan.

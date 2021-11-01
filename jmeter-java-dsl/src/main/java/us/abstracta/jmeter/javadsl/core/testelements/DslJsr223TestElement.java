@@ -1,4 +1,4 @@
-package us.abstracta.jmeter.javadsl.core;
+package us.abstracta.jmeter.javadsl.core.testelements;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -13,8 +13,9 @@ import org.apache.jmeter.threads.JMeterVariables;
 import org.apache.jmeter.util.JSR223BeanInfoSupport;
 import org.apache.jmeter.util.JSR223TestElement;
 import org.slf4j.Logger;
-import us.abstracta.jmeter.javadsl.core.DslScriptBuilder.DslScript;
-import us.abstracta.jmeter.javadsl.core.DslScriptBuilder.DslScriptVars;
+import us.abstracta.jmeter.javadsl.core.util.DslScriptBuilder;
+import us.abstracta.jmeter.javadsl.core.util.DslScriptBuilder.DslScript;
+import us.abstracta.jmeter.javadsl.core.util.DslScriptBuilder.DslScriptVars;
 
 /**
  * Abstracts common logic used by JSR223 test elements.

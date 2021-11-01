@@ -1,8 +1,8 @@
 package us.abstracta.jmeter.javadsl.core.postprocessors;
 
 import org.apache.jmeter.processor.gui.AbstractPostProcessorGui;
-import us.abstracta.jmeter.javadsl.core.DslScopedTestElement;
-import us.abstracta.jmeter.javadsl.core.MultiLevelTestElement;
+import us.abstracta.jmeter.javadsl.core.testelements.DslScopedTestElement;
+import us.abstracta.jmeter.javadsl.core.testelements.MultiLevelTestElement;
 
 /**
  * Contains common logic for post processors which extract some value into a variable.

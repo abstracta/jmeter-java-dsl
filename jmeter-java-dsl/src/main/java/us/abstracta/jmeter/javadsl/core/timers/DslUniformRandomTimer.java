@@ -3,8 +3,8 @@ package us.abstracta.jmeter.javadsl.core.timers;
 import org.apache.jmeter.testelement.TestElement;
 import org.apache.jmeter.timers.UniformRandomTimer;
 import org.apache.jmeter.timers.gui.UniformRandomTimerGui;
-import us.abstracta.jmeter.javadsl.core.BaseTestElement;
-import us.abstracta.jmeter.javadsl.core.MultiLevelTestElement;
+import us.abstracta.jmeter.javadsl.core.testelements.BaseTestElement;
+import us.abstracta.jmeter.javadsl.core.testelements.MultiLevelTestElement;
 
 /**
  * Allows specifying JMeter Uniform Random Timers which pause the thread with a random time with

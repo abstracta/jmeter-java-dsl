@@ -1,7 +1,8 @@
-package us.abstracta.jmeter.javadsl.core;
+package us.abstracta.jmeter.javadsl.core.testelements;
 
 import java.util.List;
 import org.apache.jmeter.gui.JMeterGUIComponent;
+import us.abstracta.jmeter.javadsl.core.DslTestElement;
 import us.abstracta.jmeter.javadsl.core.DslThreadGroup.ThreadGroupChild;
 import us.abstracta.jmeter.javadsl.http.DslHttpSampler;
 

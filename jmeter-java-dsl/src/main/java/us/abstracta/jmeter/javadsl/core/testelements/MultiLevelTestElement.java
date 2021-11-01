@@ -1,8 +1,8 @@
-package us.abstracta.jmeter.javadsl.core;
+package us.abstracta.jmeter.javadsl.core.testelements;
 
-import us.abstracta.jmeter.javadsl.core.DslSampler.SamplerChild;
 import us.abstracta.jmeter.javadsl.core.DslTestPlan.TestPlanChild;
 import us.abstracta.jmeter.javadsl.core.DslThreadGroup.ThreadGroupChild;
+import us.abstracta.jmeter.javadsl.core.testelements.DslSampler.SamplerChild;
 
 /**
  * This is just a simple interface to avoid code duplication for test elements that apply at

@@ -1,4 +1,4 @@
-package us.abstracta.jmeter.javadsl.core;
+package us.abstracta.jmeter.javadsl.core.engines;
 
 import java.io.Closeable;
 import java.io.File;

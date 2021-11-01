@@ -23,9 +23,9 @@ import us.abstracta.jmeter.javadsl.blazemeter.api.TestRunSummaryStats.TestRunLab
 import us.abstracta.jmeter.javadsl.core.BuildTreeContext;
 import us.abstracta.jmeter.javadsl.core.DslJmeterEngine;
 import us.abstracta.jmeter.javadsl.core.DslTestPlan;
-import us.abstracta.jmeter.javadsl.core.JMeterEnvironment;
 import us.abstracta.jmeter.javadsl.core.TestPlanStats;
 import us.abstracta.jmeter.javadsl.core.TestPlanStats.StatsSummary;
+import us.abstracta.jmeter.javadsl.core.engines.JMeterEnvironment;
 
 /**
  * A {@link DslJmeterEngine} which allows running DslTestPlan in BlazeMeter.

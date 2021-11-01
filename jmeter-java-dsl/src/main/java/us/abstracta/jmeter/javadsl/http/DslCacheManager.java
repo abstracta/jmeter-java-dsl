@@ -3,7 +3,7 @@ package us.abstracta.jmeter.javadsl.http;
 import org.apache.jmeter.protocol.http.control.CacheManager;
 import org.apache.jmeter.protocol.http.gui.CacheManagerGui;
 import org.apache.jmeter.testelement.TestElement;
-import us.abstracta.jmeter.javadsl.core.TestPlanSingletonChildElement;
+import us.abstracta.jmeter.javadsl.core.testelements.TestPlanSingletonChildElement;
 
 /**
  * Allows configuring caching behavior used by HTTP samplers.

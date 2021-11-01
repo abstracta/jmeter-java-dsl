@@ -3,8 +3,8 @@ package us.abstracta.jmeter.javadsl.core.listeners;
 import org.apache.jmeter.reporters.ResultSaver;
 import org.apache.jmeter.reporters.gui.ResultSaverGui;
 import org.apache.jmeter.testelement.TestElement;
-import us.abstracta.jmeter.javadsl.core.BaseTestElement;
-import us.abstracta.jmeter.javadsl.core.MultiLevelTestElement;
+import us.abstracta.jmeter.javadsl.core.testelements.BaseTestElement;
+import us.abstracta.jmeter.javadsl.core.testelements.MultiLevelTestElement;
 
 /**
  * Generates one file for each response of a sample/request.

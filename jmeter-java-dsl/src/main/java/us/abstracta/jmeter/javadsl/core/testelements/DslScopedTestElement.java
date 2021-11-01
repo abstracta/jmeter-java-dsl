@@ -1,4 +1,4 @@
-package us.abstracta.jmeter.javadsl.core;
+package us.abstracta.jmeter.javadsl.core.testelements;
 
 import java.util.function.Consumer;
 import org.apache.jmeter.gui.JMeterGUIComponent;

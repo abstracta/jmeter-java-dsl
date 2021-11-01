@@ -204,7 +204,7 @@ import static us.abstracta.jmeter.javadsl.JmeterDsl.*;
 
 import java.time.Duration;
 import org.junit.jupiter.api.Test;
-import us.abstracta.jmeter.javadsl.core.DistributedJMeterEngine;
+import us.abstracta.jmeter.javadsl.core.engines.DistributedJMeterEngine;
 import us.abstracta.jmeter.javadsl.core.TestPlanStats;
 
 public class PerformanceTest {
@@ -232,7 +232,7 @@ To be able to run the test you require the `rmi_keystore.jks` file in working di
 In general prefer using BlazeMeter option which avoids all the setup and maintenance costs of the infrastructure required by JMeter remote, and additional useful features (like reporting capabilities).
 :::
 
-Check [DistributedJMeterEngine](../../jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/DistributedJMeterEngine.java) and [JMeter documentation](http://jmeter.apache.org/usermanual/remote-test.html) for proper setup and additional options.
+Check [DistributedJMeterEngine](../../jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/engines/DistributedJMeterEngine.java) and [JMeter documentation](http://jmeter.apache.org/usermanual/remote-test.html) for proper setup and additional options.
 
 ## Advanced threads configuration
 
@@ -312,8 +312,7 @@ rpsThreadGroup()
   )
 ```
 
-This will internally use JMeter [Concurrency Thread Group](https://jmeter-plugins.org/wiki/ConcurrencyThreadGroup/) element in combination with [Throughput
-Shaping Time](https://jmeter-plugins.org/wiki/ThroughputShapingTimer/).
+This will internally use JMeter [Concurrency Thread Group](https://jmeter-plugins.org/wiki/ConcurrencyThreadGroup/) element in combination with [Throughput Shaping Time](https://jmeter-plugins.org/wiki/ThroughputShapingTimer/).
 
 ::: tip
 `rpsThreadGroup` will dynamically create and remove threads and add delays between requests to match the traffic to the expected RPS. You can also specify to control iterations per second (number of times the flow in the thread group runs per second) instead of threads by using `.counting(RpsThreadGroup.EventType.ITERATIONS)`.

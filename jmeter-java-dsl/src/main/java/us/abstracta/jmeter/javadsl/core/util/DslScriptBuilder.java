@@ -1,4 +1,4 @@
-package us.abstracta.jmeter.javadsl.core;
+package us.abstracta.jmeter.javadsl.core.util;
 
 import java.lang.reflect.Field;
 import java.time.Instant;

@@ -1,7 +1,8 @@
-package us.abstracta.jmeter.javadsl.core;
+package us.abstracta.jmeter.javadsl.core.testelements;
 
 import org.apache.jmeter.gui.JMeterGUIComponent;
 import org.apache.jorphan.collections.HashTree;
+import us.abstracta.jmeter.javadsl.core.BuildTreeContext;
 import us.abstracta.jmeter.javadsl.core.DslTestPlan.TestPlanChild;
 
 /**

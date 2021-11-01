@@ -9,7 +9,6 @@ import us.abstracta.jmeter.javadsl.core.DslTestPlan;
 import us.abstracta.jmeter.javadsl.core.DslTestPlan.TestPlanChild;
 import us.abstracta.jmeter.javadsl.core.DslThreadGroup;
 import us.abstracta.jmeter.javadsl.core.DslThreadGroup.ThreadGroupChild;
-import us.abstracta.jmeter.javadsl.core.PropertyScriptBuilder.PropertyScript;
 import us.abstracta.jmeter.javadsl.core.assertions.DslResponseAssertion;
 import us.abstracta.jmeter.javadsl.core.configs.DslCsvDataSet;
 import us.abstracta.jmeter.javadsl.core.controllers.DslIfController;
@@ -32,6 +31,7 @@ import us.abstracta.jmeter.javadsl.core.preprocessors.DslJsr223PreProcessor.PreP
 import us.abstracta.jmeter.javadsl.core.preprocessors.DslJsr223PreProcessor.PreProcessorVars;
 import us.abstracta.jmeter.javadsl.core.threadgroups.RpsThreadGroup;
 import us.abstracta.jmeter.javadsl.core.timers.DslUniformRandomTimer;
+import us.abstracta.jmeter.javadsl.core.util.PropertyScriptBuilder.PropertyScript;
 import us.abstracta.jmeter.javadsl.http.DslCacheManager;
 import us.abstracta.jmeter.javadsl.http.DslCookieManager;
 import us.abstracta.jmeter.javadsl.http.DslHttpSampler;

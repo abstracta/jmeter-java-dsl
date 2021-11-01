@@ -16,9 +16,9 @@ import org.apache.jmeter.util.JSR223TestElement;
 import org.apache.jorphan.collections.HashTree;
 import org.slf4j.Logger;
 import us.abstracta.jmeter.javadsl.core.BuildTreeContext;
-import us.abstracta.jmeter.javadsl.core.DslJsr223TestElement;
-import us.abstracta.jmeter.javadsl.core.DslSampler.SamplerChild;
 import us.abstracta.jmeter.javadsl.core.DslThreadGroup.ThreadGroupChild;
+import us.abstracta.jmeter.javadsl.core.testelements.DslJsr223TestElement;
+import us.abstracta.jmeter.javadsl.core.testelements.DslSampler.SamplerChild;
 
 /**
  * Allows sampling java APIs and custom logic.

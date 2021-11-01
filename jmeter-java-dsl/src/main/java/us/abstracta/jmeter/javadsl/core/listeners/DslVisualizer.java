@@ -6,9 +6,9 @@ import org.apache.jmeter.testelement.TestElement;
 import org.apache.jorphan.collections.HashTree;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import us.abstracta.jmeter.javadsl.core.BaseTestElement;
 import us.abstracta.jmeter.javadsl.core.BuildTreeContext;
-import us.abstracta.jmeter.javadsl.core.MultiLevelTestElement;
+import us.abstracta.jmeter.javadsl.core.testelements.BaseTestElement;
+import us.abstracta.jmeter.javadsl.core.testelements.MultiLevelTestElement;
 
 /**
  * Provides general logic for listeners which show some live information in Swing window.

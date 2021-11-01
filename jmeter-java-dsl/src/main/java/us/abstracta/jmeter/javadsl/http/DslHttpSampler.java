@@ -14,9 +14,9 @@ import org.eclipse.jetty.http.HttpMethod;
 import org.eclipse.jetty.http.MimeTypes;
 import us.abstracta.jmeter.javadsl.JmeterDsl;
 import us.abstracta.jmeter.javadsl.core.BuildTreeContext;
-import us.abstracta.jmeter.javadsl.core.DslSampler;
 import us.abstracta.jmeter.javadsl.core.preprocessors.DslJsr223PreProcessor.PreProcessorScript;
 import us.abstracta.jmeter.javadsl.core.preprocessors.DslJsr223PreProcessor.PreProcessorVars;
+import us.abstracta.jmeter.javadsl.core.testelements.DslSampler;
 
 /**
  * Allows to configure a JMeter HTTP sampler to make HTTP requests in a test plan.
@@ -41,7 +41,8 @@ public class DslHttpSampler extends DslSampler {
     super(buildName(name), HttpTestSampleGui.class, new ArrayList<>());
     String variableName = "PRE_PROCESSOR_URL";
     this.url = "${" + variableName + "}";
-    children(jsr223PreProcessor(s -> s.vars.put(variableName, urlSupplier.apply(s))
+    children(
+        jsr223PreProcessor(s -> s.vars.put(variableName, urlSupplier.apply(s))
     ));
   }
 
@@ -181,7 +182,8 @@ public class DslHttpSampler extends DslSampler {
   public DslHttpSampler body(Function<PreProcessorVars, String> bodySupplier) {
     String variableName = "PRE_PROCESSOR_REQUEST_BODY";
     this.body = "${" + variableName + "}";
-    return children(jsr223PreProcessor(s -> s.vars.put(variableName, bodySupplier.apply(s))));
+    return children(
+        jsr223PreProcessor(s -> s.vars.put(variableName, bodySupplier.apply(s))));
   }
 
   /**
