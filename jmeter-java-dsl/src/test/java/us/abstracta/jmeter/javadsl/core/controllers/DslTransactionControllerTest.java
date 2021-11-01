@@ -25,4 +25,19 @@ public class DslTransactionControllerTest extends JmeterDslTest {
     assertThat(stats.overall().samplesCount()).isEqualTo(2);
   }
 
+  @Test
+  public void shouldOnlyReportTransactionResultWhenTestPlanWithTransactionAndGenerateParentSample()
+      throws Exception {
+    TestPlanStats stats = testPlan(
+        threadGroup(1, 1,
+            transaction("My Transaction")
+                .generateParentSample(true)
+                .children(
+                    httpSampler(wiremockUri)
+                )
+        )
+    ).run();
+    assertThat(stats.overall().samplesCount()).isEqualTo(1);
+  }
+
 }

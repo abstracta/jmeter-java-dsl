@@ -3,6 +3,7 @@ package us.abstracta.jmeter.javadsl;
 import java.io.IOException;
 import java.time.Duration;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.function.Function;
 import us.abstracta.jmeter.javadsl.core.DslTestElement;
 import us.abstracta.jmeter.javadsl.core.DslTestPlan;
@@ -210,12 +211,25 @@ public class JmeterDsl {
    *
    * @param name specifies the name to identify the transaction.
    * @param children contains the test elements that will be contained within the transaction.
-   * @return the test plan instance.
+   * @return the transaction instance.
    * @see DslTransactionController
    * @since 0.14
    */
   public static DslTransactionController transaction(String name, ThreadGroupChild... children) {
     return new DslTransactionController(name, Arrays.asList(children));
+  }
+
+  /**
+   * Same as {@link #transaction(String, ThreadGroupChild...)} but postponing children setting to
+   * allow further configuration before specifying children elements.
+   *
+   * @param name specifies the name to identify the transaction.
+   * @return the transaction instance.
+   * @see DslTransactionController
+   * @since 0.29
+   */
+  public static DslTransactionController transaction(String name) {
+    return new DslTransactionController(name, Collections.emptyList());
   }
 
   /**
