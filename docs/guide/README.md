@@ -319,6 +319,15 @@ This will internally use JMeter [Concurrency Thread Group](https://jmeter-plugin
 :::
 
 ::: warning
+RPS values control how often to adjust threads and waits. Avoid too low (eg: under 1) values which can cause big waits and don't match expected RPS. 
+
+JMeter Throughput Shaping Timer calculates each time the delay to be used not taking into consideration future expected RPS. 
+For instance, if you configure 1 thread with ramp from 0.01 to 10 RPS with 10 seconds duration, when 1 request is sent it will calculate that to
+match 0.01 RPS has to wait `requestsCount/expectedRPS = 1/0.01 = 100` seconds, which would keep the thread stuck for 100 seconds when in fact should have done two additional requests after waiting 1 second (to match the ramp).
+Setting this value greater or equal to 1 will assure at least 1 evaluation every second.
+:::
+
+::: warning
 When no `maxThreads` are specified, `rpsThreadGroup` will use as many threads as needed. In such scenarios, you might end with unexpected number of threads with associated CPU and Memory requirements, which may affect the performance test metrics. **You should always set maximum threads to use** to avoid such scenarios.
 
 You can use following formula to calculate a value for `maxThreads`: `T*R`, being `T` the maximum RPS that you want to achieve and `R` the maximum expected response time (or iteration time if you use `.counting(RpsThreadGroup.EventType.ITERATIONS)`) in seconds.

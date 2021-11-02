@@ -7,6 +7,7 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import kg.apc.jmeter.JMeterPluginsUtils;
 import kg.apc.jmeter.timers.VariableThroughputTimer;
 import kg.apc.jmeter.timers.VariableThroughputTimerGui;
@@ -46,7 +47,7 @@ public class RpsThreadGroup extends TestElementContainer<ThreadGroupChild> imple
 
   private static int timerId = 1;
   private final List<TimerSchedule> schedules = new ArrayList<>();
-  private double lastRps = 0.0;
+  private double lastRps = 1;
   private EventType counting = EventType.REQUESTS;
   private int initThreads = 1;
   private int maxThreads = Integer.MAX_VALUE;
@@ -109,6 +110,10 @@ public class RpsThreadGroup extends TestElementContainer<ThreadGroupChild> imple
    * }</pre>
    *
    * @param rps specifies the final RPS (requests/iterations per second) after the given period.
+   * This value directly affects how often threads and pauses are adjusted. For example, if you
+   * configure a ramp from 0.01 to 10 RPS with 10 seconds duration, after 1 request it will wait 100
+   * seconds and then reevaluate, not honoring configured ramp. A value greater than 1 should at
+   * least re adjust every second.
    * @param duration duration taken to reach the given RPS and move to the next stage or end the
    * test plan. Since JMeter only supports specifying times in seconds, if you specify a smaller
    * granularity (like milliseconds) it will be rounded up to seconds.
@@ -148,7 +153,10 @@ public class RpsThreadGroup extends TestElementContainer<ThreadGroupChild> imple
    * Simply combines {@link #rampTo(double, Duration)} and {@link #holdFor(Duration)} which are
    * usually used in combination.
    *
-   * @param rps target RPS to ramp up/down to.
+   * @param rps target RPS to ramp up/down to. This value directly affects how often threads and
+   * pauses are adjusted. For example, if you configure a ramp from 0.01 to 10 RPS with 10 seconds
+   * duration, after 1 request it will wait 100 seconds and then reevaluate, not honoring configured
+   * ramp. A value greater than 1 should at least re adjust every second.
    * @param rampDuration duration taken to reach the given RPS.
    * @param holdDuration duration to hold the given RPS after the ramp, until moving to next stage
    * or ending the test plan.
@@ -243,14 +251,17 @@ public class RpsThreadGroup extends TestElementContainer<ThreadGroupChild> imple
 
   @Override
   public HashTree buildTreeUnder(HashTree parent, BuildTreeContext context) {
-    HashTree ret = super.buildTreeUnder(parent, context);
+    HashTree ret = parent.add(buildConfiguredTestElement());
     HashTree timerParent = counting == EventType.ITERATIONS ? ret.add(buildTestAction()) : ret;
     timerParent.add(buildTimer());
+    children.forEach(c -> c.buildTreeUnder(ret, context));
     return ret;
   }
 
   private TestElement buildTestAction() {
     TestAction ret = new TestAction();
+    ret.setAction(TestAction.PAUSE);
+    ret.setDuration("0");
     configureTestElement(ret, "Flow Control Action", TestActionGui.class, null);
     return ret;
   }
@@ -278,9 +289,13 @@ public class RpsThreadGroup extends TestElementContainer<ThreadGroupChild> imple
   @Override
   protected TestElement buildTestElement() {
     ConcurrencyThreadGroup ret = new ConcurrencyThreadGroup();
+    /*
+     Using US locale to avoid particular locales generating commas which break parsing of function
+     and are not properly parsed by JMeter.
+     */
     ret.setTargetLevel(
-        String.format("${__tstFeedback(%s,%d,%d,%.2f)}", buildTimerName(timerId), initThreads,
-            maxThreads, spareThreads));
+        String.format(Locale.US, "${__tstFeedback(%s,%d,%d,%.2f)}", buildTimerName(timerId),
+            initThreads, maxThreads, spareThreads));
     ret.setHold(String.valueOf(schedules.stream().mapToLong(s -> s.durationSecs).sum()));
     ret.setUnit(AbstractDynamicThreadGroup.UNIT_SECONDS);
     return ret;
