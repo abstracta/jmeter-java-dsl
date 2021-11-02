@@ -16,7 +16,7 @@ jobs:
         id: version
         run: echo "dsl_version=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
       - name: Check version
-        run: .github/check_version.sh ${{ env.dsl_version }}
+        run: .github/semver-check.sh ${{ env.dsl_version }}
       - name: set maven project version
         run: mvn --batch-mode --no-transfer-progress versions:set -DnewVersion=${{ env.dsl_version }} --settings .github/settings.xml
       - name: package release
