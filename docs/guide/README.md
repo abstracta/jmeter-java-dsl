@@ -29,7 +29,7 @@ To use the DSL just include it in your project:
 <dependency>
   <groupId>us.abstracta.jmeter</groupId>
   <artifactId>jmeter-java-dsl</artifactId>
-  <version>0.28</version>
+  <version>0.29</version>
   <scope>test</scope>
 </dependency>
 ```
@@ -50,7 +50,7 @@ class JMeterRule implements ComponentMetadataRule {
 
 dependencies {
     ...
-    testImplementation 'us.abstracta.jmeter:jmeter-java-dsl:0.28'
+    testImplementation 'us.abstracta.jmeter:jmeter-java-dsl:0.29'
     components {
         withModule("org.apache.jmeter:ApacheJMeter_core", JMeterRule)
         withModule("org.apache.jmeter:ApacheJMeter_java", JMeterRule)
@@ -125,14 +125,14 @@ By including following module as dependency:
 <dependency>
   <groupId>us.abstracta.jmeter</groupId>
   <artifactId>jmeter-java-dsl-blazemeter</artifactId>
-  <version>0.28</version>
+  <version>0.29</version>
   <scope>test</scope>
 </dependency>
 ```
 :::
 ::: tab Gradle
 ```groovy
-testImplementation 'us.abstracta.jmeter:jmeter-java-dsl-blazemeter:0.28'
+testImplementation 'us.abstracta.jmeter:jmeter-java-dsl-blazemeter:0.29'
 ```
 :::
 ::::
@@ -570,7 +570,7 @@ To use the module, you will need to include following dependency in your project
 <dependency>
   <groupId>us.abstracta.jmeter</groupId>
   <artifactId>jmeter-java-dsl-elasticsearch-listener</artifactId>
-  <version>0.28</version>
+  <version>0.29</version>
   <scope>test</scope>
 </dependency>
 ```
@@ -583,7 +583,7 @@ maven { url 'https://jitpack.io' }
 
 And the dependency:
 ```groovy
-testImplementation 'us.abstracta.jmeter:jmeter-java-dsl-elasticsearch-listener:0.28'
+testImplementation 'us.abstracta.jmeter:jmeter-java-dsl-elasticsearch-listener:0.29'
 ```
 
 :::
@@ -683,14 +683,14 @@ To use it, you need to add following dependency:
 <dependency>
   <groupId>us.abstracta.jmeter</groupId>
   <artifactId>jmeter-java-dsl-dashboard</artifactId>
-  <version>0.28</version>
+  <version>0.29</version>
   <scope>test</scope>
 </dependency>
 ```
 :::
 ::: tab Gradle
 ```groovy
-testImplementation 'us.abstracta.jmeter:jmeter-java-dsl-dashboard:0.28'
+testImplementation 'us.abstracta.jmeter:jmeter-java-dsl-dashboard:0.29'
 ```
 :::
 ::::
