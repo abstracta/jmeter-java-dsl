@@ -194,7 +194,7 @@ If you use JSR223 Pre- or Post- processors with Java code (lambdas) instead of s
 
 JMeter already provides means to run a test on several machines controlled by one master/client machine. This is refered as [Remote Testing](http://jmeter.apache.org/usermanual/remote-test.html).
 
-JMeter remote testing requires to setup nodes in server mode (as slaves) (using `bin/jmeter-server` JMeter script) with a configured keystore (usually `rmi_keystore.jks`, generated with `bin/` JMeter script) which will execute a testplan triggered in a client/master node.
+JMeter remote testing requires to setup nodes in server/slave mode (using `bin/jmeter-server` JMeter script) with a configured keystore (usually `rmi_keystore.jks`, generated with `bin/` JMeter script) which will execute a test plan triggered in a client/master node.
 
 You can trigger such tests with the DSL using `DistributedJMeterEngine` as in following example:
 
@@ -222,14 +222,14 @@ public class PerformanceTest {
 }
 ```
 
-This will run 200 users for 10 minutes on each server/slave (`host1` and `host2`) and aggregate all the results in provided stats.
+This will run 200 users for 10 minutes on each server/slave (`host1` and `host2`) and aggregate all the results in returned stats.
 
 ::: warning
 To be able to run the test you require the `rmi_keystore.jks` file in working directory of the test. For the time being we couldn't find a way to allow setting any arbitrary path for the file.
 :::
 
 ::: warning
-In general prefer using BlazeMeter option which avoids all the setup and maintenance costs of the infrastructure required by JMeter remote, and additional useful features (like reporting capabilities).
+In general, prefer using BlazeMeter option which avoids all the setup and maintenance costs of the infrastructure required by JMeter remote testing, in addition to additional useful features (like reporting capabilities).
 :::
 
 Check [DistributedJMeterEngine](../../jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/engines/DistributedJMeterEngine.java) and [JMeter documentation](http://jmeter.apache.org/usermanual/remote-test.html) for proper setup and additional options.
