@@ -1433,11 +1433,11 @@ public class PerformanceTest {
 ```
 
 ::: tip
-By default the controller executes up to 6 requests in parallel per JMeter thread, but this can be easily changed with provided `maxThreadsCount(int)` method. Additionally, you can opt to aggregate children results in a parent sampler using `generateParentSample(boolean)` method, in similar fashion to transaction controller.
+By default the controller has no limit on the number of parallel requests per JMeter thread. You can set a limit by using provided `maxThreads(int)` method. Additionally, you can opt to aggregate children results in a parent sampler using `generateParentSample(boolean)` method, in similar fashion to transaction controller.
 :::
 
 ::: tip
-When requesting embedded resources of an HTML respose, prefer using `downloadEmbeddedResources(boolean)` method in `httpSampler` instead. Likewise, when you just need independent parts of a test plan to execute in parallel, prefer using different thread group for each part.
+When requesting embedded resources of an HTML response, prefer using `downloadEmbeddedResources(boolean)` method in `httpSampler` instead. Likewise, when you just need independent parts of a test plan to execute in parallel, prefer using different thread group for each part.
 :::
 
 Check [ParallelController](../../jmeter-java-dsl-parallel/src/main/java/us/abstracta/jmeter/javadsl/parallel/ParallelController.java) for additional info.
