@@ -10,14 +10,10 @@
     <version>0.1-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
-  <artifactId>jmeter-java-dsl-dashboard</artifactId>
+  <artifactId>jmeter-java-dsl-parallel</artifactId>
 
   <name>${project.artifactId}</name>
-  <description>Module which includes listener for showing live dashboard window with graphs and stats.</description>
-
-  <properties>
-    <jmeter-plugins-graphs.version>2.0</jmeter-plugins-graphs.version>
-  </properties>
+  <description>Module which includes parallel controller plugin.</description>
 
   <dependencies>
     <dependency>
@@ -26,9 +22,9 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>kg.apc</groupId>
-      <artifactId>jmeter-plugins-graphs-basic</artifactId>
-      <version>${jmeter-plugins-graphs.version}</version>
+      <groupId>com.blazemeter</groupId>
+      <artifactId>jmeter-parallel</artifactId>
+      <version>0.11</version>
       <exclusions>
         <exclusion>
           <groupId>javax.servlet</groupId>
@@ -43,11 +39,6 @@
           <artifactId>jorphan</artifactId>
         </exclusion>
       </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>kg.apc</groupId>
-      <artifactId>jmeter-plugins-graphs-additional</artifactId>
-      <version>${jmeter-plugins-graphs.version}</version>
     </dependency>
     <dependency>
       <groupId>us.abstracta.jmeter</groupId>

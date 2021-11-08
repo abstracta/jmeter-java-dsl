@@ -15,7 +15,7 @@ public class ElasticsearchBackendListener extends DslBackendListener {
   private String username;
   private String password;
 
-  private ElasticsearchBackendListener(String url) {
+  public ElasticsearchBackendListener(String url) {
     super(ElasticsearchBackendClient.class, url);
   }
 

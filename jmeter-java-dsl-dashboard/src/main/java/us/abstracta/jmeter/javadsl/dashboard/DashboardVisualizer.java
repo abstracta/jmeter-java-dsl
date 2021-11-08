@@ -42,7 +42,7 @@ import us.abstracta.jmeter.javadsl.core.listeners.DslVisualizer;
  */
 public class DashboardVisualizer extends DslVisualizer {
 
-  private DashboardVisualizer() {
+  public DashboardVisualizer() {
     super(null, null);
   }
 

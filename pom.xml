@@ -58,6 +58,7 @@
     <module>jmeter-java-dsl-blazemeter</module>
     <module>jmeter-java-dsl-elasticsearch-listener</module>
     <module>jmeter-java-dsl-dashboard</module>
+    <module>jmeter-java-dsl-parallel</module>
   </modules>
 
   <dependencyManagement>

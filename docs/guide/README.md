@@ -1380,6 +1380,68 @@ public class PerformanceTest {
 
 Check [PercentController](../../jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/controllers/PercentController.java) for more details.
 
+### Parallel requests
+
+JMeter provides two main ways for running requests in parallel: thread groups and http samplers downloading embedded resources in parallel. But in some cases is necessary to run requests in parallel which can't be properly modeled with previously mentioned scenarios. For such cases you can use `paralleController` which allows using the [Parallel Controller plugin](https://github.com/Blazemeter/jmeter-bzm-plugins/blob/master/parallel/Parallel.md) to execute a given set of requests in parallel (while in a JMeter thread iteration step).
+
+To use it, add following dependency to your project:
+
+:::: tabs type:card
+::: tab Maven
+```xml
+<dependency>
+  <groupId>us.abstracta.jmeter</groupId>
+  <artifactId>jmeter-java-parallel</artifactId>
+  <version>0.30</version>
+  <scope>test</scope>
+</dependency>
+```
+:::
+::: tab Gradle
+```groovy
+testImplementation 'us.abstracta.jmeter:jmeter-java-dsl-dashboard:0.30'
+```
+:::
+::::
+
+And use it like in following example:
+
+```java
+import static org.assertj.core.api.Assertions.assertThat;
+import static us.abstracta.jmeter.javadsl.JmeterDsl.*;
+import static us.abstracta.jmeter.javadsl.parallel.ParallelController.*;
+
+import java.time.Duration;
+import org.junit.jupiter.api.Test;
+import us.abstracta.jmeter.javadsl.core.TestPlanStats;
+
+public class PerformanceTest {
+
+  @Test
+  public void testPerformance() throws Exception {
+    TestPlanStats stats = testPlan(
+      threadGroup(2, 10,
+        parallelController(
+            httpSampler("http://my.service/status"),
+            httpSampler("http://my.service/poll"))
+      )
+    ).run();
+    assertThat(stats.overall().sampleTimePercentile99()).isLessThan(Duration.ofSeconds(5));
+  }
+
+}
+```
+
+::: tip
+By default the controller executes up to 6 requests in parallel per JMeter thread, but this can be easily changed with provided `maxThreadsCount(int)` method. Additionally, you can opt to aggregate children results in a parent sampler using `generateParentSample(boolean)` method, in similar fashion to transaction controller.
+:::
+
+::: tip
+When requesting embedded resources of an HTML respose, prefer using `downloadEmbeddedResources(boolean)` method in `httpSampler` instead. Likewise, when you just need independent parts of a test plan to execute in parallel, prefer using different thread group for each part.
+:::
+
+Check [ParallelController](../../jmeter-java-dsl-parallel/src/main/java/us/abstracta/jmeter/javadsl/parallel/ParallelController.java) for additional info.
+
 ## Protocols
 
 ### HTTP performance testing
@@ -1552,9 +1614,11 @@ public class TestRedis {
 }
 ```
 
-::: tip
+::::: tip
 Remember adding any particular dependencies required by your code. For example, above example requires this dependency:
 
+:::: tabs type:card
+::: tab Maven
 ```xml
 <dependency>
   <groupId>redis.clients</groupId>
@@ -1564,6 +1628,13 @@ Remember adding any particular dependencies required by your code. For example, 
 </dependency>
 ```
 :::
+::: tab Gradle
+```groovy
+testImplementation 'redis.clients:jedis:3.6.0'
+```
+:::
+::::
+:::::
 
 You can also use Java lambdas instead of Groovy script to take advantage of IDEs auto-completion and Java type safety:
 
