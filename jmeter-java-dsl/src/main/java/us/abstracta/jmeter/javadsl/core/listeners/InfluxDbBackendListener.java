@@ -1,6 +1,8 @@
 package us.abstracta.jmeter.javadsl.core.listeners;
 
 import java.time.Instant;
+import java.util.HashMap;
+import java.util.Map;
 import org.apache.jmeter.config.Arguments;
 import org.apache.jmeter.visualizers.backend.influxdb.InfluxdbBackendListenerClient;
 
@@ -13,6 +15,7 @@ public class InfluxDbBackendListener extends DslBackendListener {
 
   private String title = "Test jmeter-java-dsl " + Instant.now().toString();
   private String token;
+  private final Map<String, String> tags = new HashMap<>();
 
   public InfluxDbBackendListener(String url) {
     super(InfluxdbBackendListenerClient.class, url);
@@ -56,9 +59,23 @@ public class InfluxDbBackendListener extends DslBackendListener {
    * @param queueSize the size of the queue to use
    * @return this instance for fluent API usage.
    * @see #setQueueSize(int)
+   * @since 0.32
    */
   public InfluxDbBackendListener queueSize(int queueSize) {
     setQueueSize(queueSize);
+    return this;
+  }
+
+  /**
+   * Allows adding tags to be included with every measurement sent to InfluxDB.
+   *
+   * @param name specifies the name of the tag. Take into consideration that, in contrast to JMeter
+   * GUI, no <pre>TAG_</pre> prefix should be included.
+   * @param value specifies the value of the tag.
+   * @return this instance for fluent API usage.
+   */
+  public InfluxDbBackendListener tag(String name, String value) {
+    tags.put(name, value);
     return this;
   }
 
@@ -71,6 +88,7 @@ public class InfluxDbBackendListener extends DslBackendListener {
     if (token != null) {
       ret.addArgument("influxdbToken", token);
     }
+    tags.forEach((name, value) -> ret.addArgument("TAG_" + name, value));
     return ret;
   }
 
