@@ -109,6 +109,10 @@ When working with multiple samplers in a test plan, specify their names to easil
 Since JMeter uses [log4j2](https://logging.apache.org/log4j/2.x/), if you want to control logging level or output, you can use something similar to this [log4j2.xml](../../jmeter-java-dsl/src/test/resources/log4j2.xml).
 :::
 
+::: tip
+Keep in mind that you can use Java programming to modularize and create abstractions which allow you to build complex test plans that are still easy to read, use and maintain. [Here is an example](https://github.com/abstracta/jmeter-java-dsl/issues/26#issuecomment-953783407) of some complex abstraction built using Java features and the DSL.
+:::
+
 Check [HTTP performance testing](#http-performance-testing) for additional details while testing HTTP services.
 
 ## Run test at scale
@@ -418,6 +422,9 @@ Here is an example screenshot debugging HTTP Sampler:
 JMeter class in charge of executing threads logic is `org.apache.jmeter.threads.JMeterThread`. You can check classes used by each DSL provided test element by checking the DSL code.
 :::
 
+### Debug Groovy code
+
+In some cases you may want to debug some Groovy script used in some sampler, pre- or post-processor. For such scenarios you can check [here](https://github.com/abstracta/jmeter-java-dsl/issues/41#issuecomment-966715062) where we list some options.
 
 ## Reporting
 
