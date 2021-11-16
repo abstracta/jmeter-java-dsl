@@ -59,6 +59,7 @@
     <module>jmeter-java-dsl-elasticsearch-listener</module>
     <module>jmeter-java-dsl-dashboard</module>
     <module>jmeter-java-dsl-parallel</module>
+    <module>jmeter-java-dsl-csv-random</module>
   </modules>
 
   <dependencyManagement>
