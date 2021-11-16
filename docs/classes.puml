@@ -65,11 +65,11 @@ package core {
 
     class EmbeddedJmeterEngine implements DslJmeterEngine
 
-    class JMeterEnvironment {
+    class JmeterEnvironment {
       File homeDir
     }
 
-    EmbeddedJmeterEngine ..> JMeterEnvironment
+    EmbeddedJmeterEngine ..> JmeterEnvironment
 
     abstract class DslSampler extends TestElementContainer implements ThreadGroupChild
 

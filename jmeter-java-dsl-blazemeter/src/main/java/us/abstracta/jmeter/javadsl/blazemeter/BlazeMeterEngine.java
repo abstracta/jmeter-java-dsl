@@ -25,7 +25,7 @@ import us.abstracta.jmeter.javadsl.core.DslJmeterEngine;
 import us.abstracta.jmeter.javadsl.core.DslTestPlan;
 import us.abstracta.jmeter.javadsl.core.TestPlanStats;
 import us.abstracta.jmeter.javadsl.core.TestPlanStats.StatsSummary;
-import us.abstracta.jmeter.javadsl.core.engines.JMeterEnvironment;
+import us.abstracta.jmeter.javadsl.core.engines.JmeterEnvironment;
 
 /**
  * A {@link DslJmeterEngine} which allows running DslTestPlan in BlazeMeter.
@@ -309,7 +309,7 @@ public class BlazeMeterEngine implements DslJmeterEngine {
   }
 
   private void saveTestPlanTo(DslTestPlan testPlan, File jmxFile) throws IOException {
-    try (JMeterEnvironment env = new JMeterEnvironment();
+    try (JmeterEnvironment env = new JmeterEnvironment();
         FileOutputStream output = new FileOutputStream(jmxFile.getPath())) {
       HashTree tree = new ListedHashTree();
       BuildTreeContext context = new BuildTreeContext(tree);

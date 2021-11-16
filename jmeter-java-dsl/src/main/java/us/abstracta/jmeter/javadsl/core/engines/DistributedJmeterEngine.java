@@ -26,14 +26,14 @@ import us.abstracta.jmeter.javadsl.core.TestPlanStats;
  *
  * @since 0.29
  */
-public class DistributedJMeterEngine extends EmbeddedJmeterEngine {
+public class DistributedJmeterEngine extends EmbeddedJmeterEngine {
 
   private final List<String> hosts;
   private int basePort;
   private boolean stopEngines;
-  private JMeterEnvironment jmeterEnv;
+  private JmeterEnvironment jmeterEnv;
 
-  public DistributedJMeterEngine(String... hosts) {
+  public DistributedJmeterEngine(String... hosts) {
     this.hosts = Arrays.asList(hosts);
   }
 
@@ -48,7 +48,7 @@ public class DistributedJMeterEngine extends EmbeddedJmeterEngine {
    * connection to a remote port, and ports will be assigned incrementally from the given value.
    * @return the DistributedJMeterEngine instance for further configuration or usage.
    */
-  public DistributedJMeterEngine localBasePort(int basePort) {
+  public DistributedJmeterEngine localBasePort(int basePort) {
     this.basePort = basePort;
     return this;
   }
@@ -58,13 +58,13 @@ public class DistributedJMeterEngine extends EmbeddedJmeterEngine {
    *
    * @return the DistributedJMeterEngine instance for further configuration or usage.
    */
-  public DistributedJMeterEngine stopEnginesOnTestEnd() {
+  public DistributedJmeterEngine stopEnginesOnTestEnd() {
     stopEngines = true;
     return this;
   }
 
   @VisibleForTesting
-  protected DistributedJMeterEngine localJMeterEnv(JMeterEnvironment env) {
+  protected DistributedJmeterEngine localJMeterEnv(JmeterEnvironment env) {
     this.jmeterEnv = env;
     return this;
   }
@@ -74,7 +74,7 @@ public class DistributedJMeterEngine extends EmbeddedJmeterEngine {
     if (jmeterEnv != null) {
       return runInEnv(testPlan, jmeterEnv);
     } else {
-      try (JMeterEnvironment env = new JMeterEnvironment()) {
+      try (JmeterEnvironment env = new JmeterEnvironment()) {
         return runInEnv(testPlan, env);
       }
     }

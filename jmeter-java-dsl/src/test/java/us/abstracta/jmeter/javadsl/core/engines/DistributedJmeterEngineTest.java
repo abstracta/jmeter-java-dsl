@@ -18,20 +18,20 @@ import us.abstracta.jmeter.javadsl.JmeterDslTest;
 import us.abstracta.jmeter.javadsl.TestResource;
 import us.abstracta.jmeter.javadsl.core.TestPlanStats;
 
-public class DistributedJMeterEngineTest extends JmeterDslTest {
+public class DistributedJmeterEngineTest extends JmeterDslTest {
 
   @Test
   public void shouldGetExpectedCountWhenRunTestInRemoteEngine() throws Exception {
     String keystoreFileName = "rmi_keystore.jks";
     File keystoreResource = new TestResource("/" + keystoreFileName).getFile();
     try (TempFileCopy ignored = new TempFileCopy(keystoreResource, new File(keystoreFileName));
-        JMeterEnvironment env = new JMeterEnvironment()) {
+        JmeterEnvironment env = new JmeterEnvironment()) {
       RemoteJMeterEngineImpl.startServer(RmiUtils.getRmiRegistryPort());
       TestPlanStats stats = testPlan(
           threadGroup(1, 1,
               httpSampler(wiremockUri)
           )
-      ).runIn(new DistributedJMeterEngine(RmiUtils.getRmiHost().getHostName())
+      ).runIn(new DistributedJmeterEngine(RmiUtils.getRmiHost().getHostName())
           .localJMeterEnv(env)
           .stopEnginesOnTestEnd());
       assertThat(stats.overall().samplesCount()).isEqualTo(1);

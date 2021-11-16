@@ -37,12 +37,12 @@ public class EmbeddedJmeterEngine implements DslJmeterEngine {
 
   @Override
   public TestPlanStats run(DslTestPlan testPlan) throws IOException {
-    try (JMeterEnvironment env = new JMeterEnvironment()) {
+    try (JmeterEnvironment env = new JmeterEnvironment()) {
       return runInEnv(testPlan, env);
     }
   }
 
-  protected TestPlanStats runInEnv(DslTestPlan testPlan, JMeterEnvironment env) {
+  protected TestPlanStats runInEnv(DslTestPlan testPlan, JmeterEnvironment env) {
     HashTree rootTree = new ListedHashTree();
     BuildTreeContext buildContext = new BuildTreeContext(rootTree);
     HashTree testPlanTree = testPlan.buildTreeUnder(rootTree, buildContext);

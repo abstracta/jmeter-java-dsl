@@ -14,7 +14,7 @@ import org.apache.jorphan.collections.HashTree;
 import org.apache.jorphan.collections.ListedHashTree;
 import us.abstracta.jmeter.javadsl.core.DslTestPlan.TestPlanChild;
 import us.abstracta.jmeter.javadsl.core.engines.EmbeddedJmeterEngine;
-import us.abstracta.jmeter.javadsl.core.engines.JMeterEnvironment;
+import us.abstracta.jmeter.javadsl.core.engines.JmeterEnvironment;
 import us.abstracta.jmeter.javadsl.core.testelements.TestElementContainer;
 
 /**
@@ -65,7 +65,7 @@ public class DslTestPlan extends TestElementContainer<TestPlanChild> {
    * @throws IOException when there is a problem saving to the file.
    */
   public void saveAsJmx(String filePath) throws IOException {
-    try (JMeterEnvironment env = new JMeterEnvironment();
+    try (JmeterEnvironment env = new JmeterEnvironment();
         FileOutputStream output = new FileOutputStream(filePath)) {
       HashTree tree = new ListedHashTree();
       buildTreeUnder(tree, new BuildTreeContext(tree));
@@ -82,7 +82,7 @@ public class DslTestPlan extends TestElementContainer<TestPlanChild> {
    * @since 0.3
    */
   public static DslTestPlan fromJmx(String filePath) throws IOException {
-    try (JMeterEnvironment env = new JMeterEnvironment()) {
+    try (JmeterEnvironment env = new JmeterEnvironment()) {
       HashTree tree = env.loadTree(new File(filePath));
       return new JmxTestPlan(tree);
     }

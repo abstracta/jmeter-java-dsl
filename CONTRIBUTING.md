@@ -30,7 +30,7 @@ You might also implement a new "child" interface if you need additional hierarch
 
 ## Test runs
 
-When you want to run a test plan, it needs to run in a JMeter engine. By default, DslTestPlan uses [EmbeddedJMeterEngine](jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/EmbeddedJmeterEngine.java), which is the fastest and easiest way to run a test plan, but you might use EmbeddedJMeterEngine as an example and implement your own engine (for example to run tests on BlazeMeter, or in a distributed fashion). 
+When you want to run a test plan, it needs to run in a JMeter engine. By default, DslTestPlan uses [EmbeddedJmeterEngine](jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/engines/EmbeddedJmeterEngine.java), which is the fastest and easiest way to run a test plan, but you might use EmbeddedJmeterEngine as an example and implement your own engine (for example to run tests on BlazeMeter, or in a distributed fashion). 
 
 When a test plan runs, the engine returns an instance of [TestPlanStats](jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/TestPlanStats.java), grouping information by test element name (aka label). This allows to check the expected statistics and verify that everything worked within expected boundaries.
 
@@ -57,7 +57,7 @@ A complete class diagram can be found [here](docs/classes.puml), but it is way m
 
 First, you will need to add an optional dependency to the [pom.xml](/pom.xml) to include the plugin and libraries required to support the new functionality.
 
-After that, you need to create a new package (e.g.: us.abstracta.jmeter.javadsl.http2) containing a new class (e.g.: Http2JMeterDsl) that provides factory methods for the test elements of the protocol or plugin. 
+After that, you need to create a new package (e.g.: us.abstracta.jmeter.javadsl.http2) containing a new class (e.g.: Http2JmeterDsl) that provides factory methods for the test elements of the protocol or plugin. 
 
 Additionally, you need to create new [DslTestElement] classes to implement the logic for each of the new test elements (e.g. Http2Sampler). Check [Core classes section] and following item for some guidelines.
 

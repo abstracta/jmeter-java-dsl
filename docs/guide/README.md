@@ -38,7 +38,7 @@ To use the DSL just include it in your project:
 ```groovy
 // this is required due to JMeter open issue: https://bz.apache.org/bugzilla/show_bug.cgi?id=64465
 @CacheableRule
-class JMeterRule implements ComponentMetadataRule {
+class JmeterRule implements ComponentMetadataRule {
     void execute(ComponentMetadataContext context) {
         context.details.allVariants {
             withDependencies {
@@ -52,14 +52,14 @@ dependencies {
     ...
     testImplementation 'us.abstracta.jmeter:jmeter-java-dsl:0.32'
     components {
-        withModule("org.apache.jmeter:ApacheJMeter_core", JMeterRule)
-        withModule("org.apache.jmeter:ApacheJMeter_java", JMeterRule)
-        withModule("org.apache.jmeter:ApacheJMeter", JMeterRule)
-        withModule("org.apache.jmeter:ApacheJMeter_http", JMeterRule)
-        withModule("org.apache.jmeter:ApacheJMeter_functions", JMeterRule)
-        withModule("org.apache.jmeter:ApacheJMeter_components", JMeterRule)
-        withModule("org.apache.jmeter:ApacheJMeter_config", JMeterRule)
-        withModule("org.apache.jmeter:jorphan", JMeterRule)
+        withModule("org.apache.jmeter:ApacheJMeter_core", JmeterRule)
+        withModule("org.apache.jmeter:ApacheJMeter_java", JmeterRule)
+        withModule("org.apache.jmeter:ApacheJMeter", JmeterRule)
+        withModule("org.apache.jmeter:ApacheJMeter_http", JmeterRule)
+        withModule("org.apache.jmeter:ApacheJMeter_functions", JmeterRule)
+        withModule("org.apache.jmeter:ApacheJMeter_components", JmeterRule)
+        withModule("org.apache.jmeter:ApacheJMeter_config", JmeterRule)
+        withModule("org.apache.jmeter:jorphan", JmeterRule)
     }
 }
 ```
@@ -200,7 +200,7 @@ JMeter already provides means to run a test on several machines controlled by on
 
 JMeter remote testing requires to setup nodes in server/slave mode (using `bin/jmeter-server` JMeter script) with a configured keystore (usually `rmi_keystore.jks`, generated with `bin/` JMeter script) which will execute a test plan triggered in a client/master node.
 
-You can trigger such tests with the DSL using `DistributedJMeterEngine` as in following example:
+You can trigger such tests with the DSL using `DistributedJmeterEngine` as in following example:
 
 ```java
 import static org.assertj.core.api.Assertions.assertThat;
@@ -208,7 +208,7 @@ import static us.abstracta.jmeter.javadsl.JmeterDsl.*;
 
 import java.time.Duration;
 import org.junit.jupiter.api.Test;
-import us.abstracta.jmeter.javadsl.core.engines.DistributedJMeterEngine;
+import us.abstracta.jmeter.javadsl.core.engines.DistributedJmeterEngine;
 import us.abstracta.jmeter.javadsl.core.TestPlanStats;
 
 public class PerformanceTest {
@@ -219,7 +219,7 @@ public class PerformanceTest {
         threadGroup(200, Duration.ofMinutes(10),
             httpSampler("http://my.service")
         )
-    ).runIn(new DistributedJMeterEngine("host1", "host2"));
+    ).runIn(new DistributedJmeterEngine("host1", "host2"));
     assertThat(stats.overall().sampleTimePercentile99()).isLessThan(Duration.ofSeconds(5));
   }
 
@@ -236,7 +236,7 @@ To be able to run the test you require the `rmi_keystore.jks` file in working di
 In general, prefer using BlazeMeter option which avoids all the setup and maintenance costs of the infrastructure required by JMeter remote testing, in addition to additional useful features (like reporting capabilities).
 :::
 
-Check [DistributedJMeterEngine](../../jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/engines/DistributedJMeterEngine.java) and [JMeter documentation](http://jmeter.apache.org/usermanual/remote-test.html) for proper setup and additional options.
+Check [DistributedJmeterEngine](../../jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/engines/DistributedJmeterEngine.java) and [JMeter documentation](http://jmeter.apache.org/usermanual/remote-test.html) for proper setup and additional options.
 
 ## Advanced threads configuration
 

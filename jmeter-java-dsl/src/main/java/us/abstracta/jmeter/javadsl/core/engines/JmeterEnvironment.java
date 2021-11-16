@@ -27,11 +27,11 @@ import org.apache.jorphan.collections.HashTree;
  *
  * @since 0.29
  */
-public class JMeterEnvironment implements Closeable {
+public class JmeterEnvironment implements Closeable {
 
   private final File homeDir;
 
-  public JMeterEnvironment() throws IOException {
+  public JmeterEnvironment() throws IOException {
     homeDir = Files.createTempDirectory("jmeter-java-dsl").toFile();
     try {
       JMeterUtils.setJMeterHome(homeDir.getPath());

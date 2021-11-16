@@ -22,7 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import us.abstracta.jmeter.javadsl.core.BuildTreeContext;
 import us.abstracta.jmeter.javadsl.core.DslTestElement;
-import us.abstracta.jmeter.javadsl.core.engines.JMeterEnvironment;
+import us.abstracta.jmeter.javadsl.core.engines.JmeterEnvironment;
 
 /**
  * Provides the basic logic for all {@link DslTestElement}.
@@ -93,7 +93,7 @@ public abstract class BaseTestElement implements DslTestElement {
 
   @Override
   public void showInGui() {
-    try (JMeterEnvironment env = new JMeterEnvironment()) {
+    try (JmeterEnvironment env = new JmeterEnvironment()) {
       // this is required for proper visualization of labels and messages from resources bundle
       env.initLocale();
       showTestElementGui(() -> buildTestElementGui(buildConfiguredTestElement()), null);
