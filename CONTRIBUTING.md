@@ -15,16 +15,16 @@ Test elements are classes that implement [DslTestElement] interface, which basic
 To implement your own DslTestElement, the library already provides some base classes from where to start:
  
 * [BaseTestElement](jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/testelements/BaseTestElement.java): This contains the very basics of test elements, allowing to abstract the common logic of all test elements (ie: naming them, setting common properties and adding them to a JMeter tree). Create a subclass of this class only if the test element can't nest children, otherwise extend [TestElementContainer]. Examples: [HttpHeaders] and [JtlWriter].
-* [TestElementContainer]: This represents a test element which can nest other test elements. If you need to implement a Sampler, then extend DslSampler instead. Examples: [DslTestPlan](jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/DslTestPlan.java), [DslThreadGroup](jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/DslThreadGroup.java).
+* [TestElementContainer]: This represents a test element which can nest other test elements. If you need to implement a Sampler, then extend DslSampler instead. Examples: [DslTestPlan](jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/DslTestPlan.java), [DslThreadGroup](jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/threadgroups/DslThreadGroup.java).
 * [DslSampler]: This contains common logic for samplers, and should be the class extended in most of the cases. Examples: [DslHttpSampler](jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/http/DslHttpSampler.java)
 
 As previously mentioned, DslTestElement instances can be nested, and when implementing one, you should define under what other test elements this element can be nested (eg: thread groups can only be added under test plans). To do that, just implement the appropriate interface required by the associated "parent" element, currently provided interfaces are: 
 
 * [TestPlanChild](jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/DslTestPlan.java)
-* [ThreadGroupChild](jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/DslThreadGroup.java)
+* [ThreadGroupChild](jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/threadgroups/BaseThreadGroup.java)
 * [SamplerChild](jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/testelements/DslSampler.java)
 
-So, for example, [DslThreadGroup](jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/DslThreadGroup.java) implements TestPlanChild and [DslSampler] implements ThreadGroupChild. You might implement multiple interfaces if the element can be used at different levels, for example check [HttpHeaders] and [JtlWriter] implement multiple interfaces.
+So, for example, [DslThreadGroup](jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/threadgroups/DslThreadGroup.java) implements TestPlanChild and [DslSampler] implements ThreadGroupChild. You might implement multiple interfaces if the element can be used at different levels, for example check [HttpHeaders] and [JtlWriter] implement multiple interfaces.
 
 You might also implement a new "child" interface if you need additional hierarchy levels (like ControllerChild).
 

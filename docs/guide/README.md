@@ -283,7 +283,7 @@ Which would translate in the following threads' timeline:
 
 ![Thread Group Timeline](./images/ultimate-thread-group-timeline.png)
 
-Check [DslThreadGroup](../../jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/DslThreadGroup.java) for more details.
+Check [DslThreadGroup](../../jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/threadgroups/DslThreadGroup.java) for more details.
 
 ::: tip
 To visualize threads timeline, for complex thread group configurations like previous one, you can get a chart like previous one by using provided `DslThreadGroup.showTimeline()` method.
@@ -344,6 +344,89 @@ As with default thread group, with `rpsThreadGroup` you can use `showTimeline` t
 :::
 
 Check [RpsThreadGroup](../../jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/threadgroups/RpsThreadGroup.java) for more details.
+
+### Set Up & Tear Down
+
+When you need to run some custom logic before or after a test plan, the simplest approach is just adding plain java code to it, or using your test framework (eg: JUnit) provided features for this purpose. Eg:
+
+```java
+import static org.assertj.core.api.Assertions.assertThat;
+import static us.abstracta.jmeter.javadsl.JmeterDsl.*;
+
+import java.io.IOException;
+import java.time.Duration;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.AfterEach;
+import us.abstracta.jmeter.javadsl.core.TestPlanStats;
+
+public class PerformanceTest {
+  
+  @BeforeEach
+  public void setup() {
+    // my custom setup logic
+  }
+
+  @AfterEach
+  public void setup() {
+    // my custom setup logic
+  }
+
+  @Test
+  public void testPerformance() throws IOException {
+    TestPlanStats stats = testPlan(
+      threadGroup(2, 10,
+        httpSampler("http://my.service")
+      )
+    ).run();
+    assertThat(stats.overall().sampleTimePercentile99()).isLessThan(Duration.ofSeconds(5));
+  }
+  
+}
+```
+
+But, in some cases you may need the logic to run inside the JMeter execution context (eg: set some JMeter properties), or, when test plan runs at scale, to run in same host where the test plan runs (for example to use some common file). 
+
+In such scenarios you can use provided `setupThreadGroup` & `teardownThreadGroup` like in following example:
+
+```java
+import static org.assertj.core.api.Assertions.assertThat;
+import static us.abstracta.jmeter.javadsl.JmeterDsl.*;
+
+import java.io.IOException;
+import java.time.Duration;
+import org.eclipse.jetty.http.HttpMethod;
+import org.junit.jupiter.api.Test;
+import us.abstracta.jmeter.javadsl.core.TestPlanStats;
+
+public class PerformanceTest {
+
+  @Test
+  public void testPerformance() throws IOException {
+    TestPlanStats stats = testPlan(
+        setupThreadGroup(
+            httpSampler("http://my.service/tokens")
+                .method(HttpMethod.POST)
+                .children(
+                    jsr223PostProcessor("props.put('MY_TEST_TOKEN', prev.responseDataAsString)")
+                )
+        ),
+        threadGroup(2, 10,
+            httpSampler("http://my.service/products")
+                .header("X-MY-TOKEN", "${__P(MY_TEST_TOKEN)}")
+        ),
+        teardownThreadGroup(
+            httpSampler("http://my.service/tokens/${__P(MY_TEST_TOKEN)}")
+                .method(HttpMethod.DELETE)
+        )
+    ).run();
+    assertThat(stats.overall().sampleTimePercentile99()).isLessThan(Duration.ofSeconds(5));
+  }
+
+}
+```
+
+Check [DslSetupThreadGroup](../../jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/threadgroups/DslSetupThreadGroup.java) and [DslTeardownThreadGroup](../../jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/threadgroups/DslTeardownThreadGroup.java) for additional tips and details on the usage of these components.
 
 ## Test plan debugging
 

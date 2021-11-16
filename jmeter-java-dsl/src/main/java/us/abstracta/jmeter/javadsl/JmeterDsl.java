@@ -8,8 +8,6 @@ import java.util.function.Function;
 import us.abstracta.jmeter.javadsl.core.DslTestElement;
 import us.abstracta.jmeter.javadsl.core.DslTestPlan;
 import us.abstracta.jmeter.javadsl.core.DslTestPlan.TestPlanChild;
-import us.abstracta.jmeter.javadsl.core.DslThreadGroup;
-import us.abstracta.jmeter.javadsl.core.DslThreadGroup.ThreadGroupChild;
 import us.abstracta.jmeter.javadsl.core.assertions.DslResponseAssertion;
 import us.abstracta.jmeter.javadsl.core.configs.DslCsvDataSet;
 import us.abstracta.jmeter.javadsl.core.controllers.DslIfController;
@@ -30,6 +28,10 @@ import us.abstracta.jmeter.javadsl.core.postprocessors.DslRegexExtractor;
 import us.abstracta.jmeter.javadsl.core.preprocessors.DslJsr223PreProcessor;
 import us.abstracta.jmeter.javadsl.core.preprocessors.DslJsr223PreProcessor.PreProcessorScript;
 import us.abstracta.jmeter.javadsl.core.preprocessors.DslJsr223PreProcessor.PreProcessorVars;
+import us.abstracta.jmeter.javadsl.core.threadgroups.BaseThreadGroup.ThreadGroupChild;
+import us.abstracta.jmeter.javadsl.core.threadgroups.DslSetupThreadGroup;
+import us.abstracta.jmeter.javadsl.core.threadgroups.DslTeardownThreadGroup;
+import us.abstracta.jmeter.javadsl.core.threadgroups.DslThreadGroup;
 import us.abstracta.jmeter.javadsl.core.threadgroups.RpsThreadGroup;
 import us.abstracta.jmeter.javadsl.core.timers.DslUniformRandomTimer;
 import us.abstracta.jmeter.javadsl.core.util.PropertyScriptBuilder.PropertyScript;
@@ -165,6 +167,42 @@ public class JmeterDsl {
    */
   public static DslThreadGroup threadGroup(String name) {
     return new DslThreadGroup(name);
+  }
+
+  /**
+   * Builds a thread group that allows running logic before other thread groups.
+   *
+   * This is usually used to run some setup logic before the actual test plan logic. In particular
+   * logic that needs to be run within the context of JMeter test (eg: requires setting some JMeter
+   * property) or needs to be run from same machines as the test plan.
+   *
+   * Check {@link DslSetupThreadGroup} for more details and configuration options.
+   *
+   * @param children test elements to be run before any other thread group.
+   * @return the setup thread group for further customization or just usage in test plan
+   * @see DslSetupThreadGroup
+   * @since 0.33
+   */
+  public static DslSetupThreadGroup setupThreadGroup(ThreadGroupChild... children) {
+    return new DslSetupThreadGroup(Arrays.asList(children));
+  }
+
+  /**
+   * Builds a thread group that allows running logic after other thread groups.
+   *
+   * This is usually used to run some clean up logic after the actual test plan logic. In particular
+   * logic that needs to be run within the context of JMeter test (eg: requires setting some JMeter
+   * property) or needs to be run from same machines as the test plan.
+   *
+   * Check {@link DslTeardownThreadGroup} for more details and configuration options.
+   *
+   * @param children test elements to be run after any other thread group.
+   * @return the teardown thread group for further customization or just usage in test plan
+   * @see DslTeardownThreadGroup
+   * @since 0.33
+   */
+  public static DslTeardownThreadGroup teardownThreadGroup(ThreadGroupChild... children) {
+    return new DslTeardownThreadGroup(Arrays.asList(children));
   }
 
   /**

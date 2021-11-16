@@ -4,7 +4,7 @@ import java.util.List;
 import org.apache.jmeter.control.ThroughputController;
 import org.apache.jmeter.control.gui.ThroughputControllerGui;
 import org.apache.jmeter.testelement.TestElement;
-import us.abstracta.jmeter.javadsl.core.DslThreadGroup.ThreadGroupChild;
+import us.abstracta.jmeter.javadsl.core.threadgroups.BaseThreadGroup.ThreadGroupChild;
 
 /**
  * Allows running only given percent of times given test plan elements.

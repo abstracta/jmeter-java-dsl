@@ -16,11 +16,9 @@ import org.apache.jmeter.sampler.TestAction;
 import org.apache.jmeter.sampler.gui.TestActionGui;
 import org.apache.jmeter.testelement.TestElement;
 import org.apache.jmeter.testelement.property.CollectionProperty;
+import org.apache.jmeter.threads.AbstractThreadGroup;
 import org.apache.jorphan.collections.HashTree;
 import us.abstracta.jmeter.javadsl.core.BuildTreeContext;
-import us.abstracta.jmeter.javadsl.core.DslTestPlan.TestPlanChild;
-import us.abstracta.jmeter.javadsl.core.DslThreadGroup.ThreadGroupChild;
-import us.abstracta.jmeter.javadsl.core.testelements.TestElementContainer;
 import us.abstracta.jmeter.javadsl.core.util.SingleSeriesTimelinePanel;
 
 /**
@@ -42,8 +40,7 @@ import us.abstracta.jmeter.javadsl.core.util.SingleSeriesTimelinePanel;
  *
  * @since 0.26
  */
-public class RpsThreadGroup extends TestElementContainer<ThreadGroupChild> implements
-    TestPlanChild {
+public class RpsThreadGroup extends BaseThreadGroup<RpsThreadGroup> {
 
   private static int timerId = 1;
   private final List<TimerSchedule> schedules = new ArrayList<>();
@@ -239,16 +236,6 @@ public class RpsThreadGroup extends TestElementContainer<ThreadGroupChild> imple
     return this;
   }
 
-  /**
-   * Allows specifying thread group children elements (samplers, listeners, post processors, etc.).
-   *
-   * @param children list of test elements to add as children of the thread group.
-   * @return the altered thread group to allow for fluent API usage.
-   */
-  public RpsThreadGroup children(ThreadGroupChild... children) {
-    return (RpsThreadGroup) addChildren(children);
-  }
-
   @Override
   public HashTree buildTreeUnder(HashTree parent, BuildTreeContext context) {
     HashTree ret = parent.add(buildConfiguredTestElement());
@@ -287,7 +274,7 @@ public class RpsThreadGroup extends TestElementContainer<ThreadGroupChild> imple
   }
 
   @Override
-  protected TestElement buildTestElement() {
+  protected AbstractThreadGroup buildThreadGroup() {
     ConcurrencyThreadGroup ret = new ConcurrencyThreadGroup();
     /*
      Using US locale to avoid particular locales generating commas which break parsing of function

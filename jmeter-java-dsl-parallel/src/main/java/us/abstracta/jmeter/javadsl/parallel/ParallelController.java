@@ -6,8 +6,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import org.apache.jmeter.testelement.TestElement;
-import us.abstracta.jmeter.javadsl.core.DslThreadGroup.ThreadGroupChild;
 import us.abstracta.jmeter.javadsl.core.controllers.DslController;
+import us.abstracta.jmeter.javadsl.core.threadgroups.BaseThreadGroup.ThreadGroupChild;
 
 /**
  * Allows grouping requests that need to execute in parallel.

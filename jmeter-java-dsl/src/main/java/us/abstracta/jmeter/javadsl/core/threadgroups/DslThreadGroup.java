@@ -1,4 +1,4 @@
-package us.abstracta.jmeter.javadsl.core;
+package us.abstracta.jmeter.javadsl.core.threadgroups;
 
 import java.time.Duration;
 import java.util.ArrayList;
@@ -11,12 +11,9 @@ import kg.apc.jmeter.threads.UltimateThreadGroup;
 import kg.apc.jmeter.threads.UltimateThreadGroupGui;
 import org.apache.jmeter.control.LoopController;
 import org.apache.jmeter.gui.util.PowerTableModel;
-import org.apache.jmeter.testelement.TestElement;
+import org.apache.jmeter.threads.AbstractThreadGroup;
 import org.apache.jmeter.threads.ThreadGroup;
 import org.apache.jmeter.threads.gui.ThreadGroupGui;
-import us.abstracta.jmeter.javadsl.core.DslTestPlan.TestPlanChild;
-import us.abstracta.jmeter.javadsl.core.DslThreadGroup.ThreadGroupChild;
-import us.abstracta.jmeter.javadsl.core.testelements.TestElementContainer;
 import us.abstracta.jmeter.javadsl.core.util.SingleSeriesTimelinePanel;
 
 /**
@@ -24,8 +21,7 @@ import us.abstracta.jmeter.javadsl.core.util.SingleSeriesTimelinePanel;
  *
  * @since 0.1
  */
-public class DslThreadGroup extends TestElementContainer<ThreadGroupChild> implements
-    TestPlanChild {
+public class DslThreadGroup extends BaseThreadGroup<DslThreadGroup> {
 
   private final List<Stage> stages = new ArrayList<>();
 
@@ -214,12 +210,13 @@ public class DslThreadGroup extends TestElementContainer<ThreadGroupChild> imple
    * @return the altered thread group to allow for fluent API usage.
    * @since 0.12
    */
+  @Override
   public DslThreadGroup children(ThreadGroupChild... children) {
-    return (DslThreadGroup) addChildren(children);
+    return super.children(children);
   }
 
   @Override
-  public TestElement buildTestElement() {
+  public AbstractThreadGroup buildThreadGroup() {
     return isSimpleThreadGroup() ? buildSimpleThreadGroup() : buildUltimateThreadGroup();
   }
 
@@ -231,7 +228,7 @@ public class DslThreadGroup extends TestElementContainer<ThreadGroupChild> imple
         && stages.get(1).threadCount == stages.get(2).threadCount);
   }
 
-  private TestElement buildSimpleThreadGroup() {
+  private AbstractThreadGroup buildSimpleThreadGroup() {
     int threads = 1;
     int iterations = 1;
     Duration rampUpPeriod = null;
@@ -263,10 +260,10 @@ public class DslThreadGroup extends TestElementContainer<ThreadGroupChild> imple
       }
     }
     guiClass = ThreadGroupGui.class;
-    return buildThreadGroup(threads, iterations, rampUpPeriod, duration, delay);
+    return buildSimpleThreadGroup(threads, iterations, rampUpPeriod, duration, delay);
   }
 
-  private ThreadGroup buildThreadGroup(int threads, int iterations, Duration rampUpPeriod,
+  private ThreadGroup buildSimpleThreadGroup(int threads, int iterations, Duration rampUpPeriod,
       Duration duration, Duration delay) {
     ThreadGroup ret = new ThreadGroup();
     ret.setNumThreads(Math.max(threads, 1));
@@ -289,7 +286,7 @@ public class DslThreadGroup extends TestElementContainer<ThreadGroupChild> imple
     return ret;
   }
 
-  private TestElement buildUltimateThreadGroup() {
+  private AbstractThreadGroup buildUltimateThreadGroup() {
     guiClass = UltimateThreadGroupGui.class;
     UltimateThreadGroup ret = new UltimateThreadGroup();
     PowerTableModel table = new PowerTableModel(UltimateThreadGroupGui.columnIdentifiers,
@@ -421,14 +418,6 @@ public class DslThreadGroup extends TestElementContainer<ThreadGroupChild> imple
     chart.add(0, 0);
     stages.forEach(s -> chart.add(s.duration.toMillis(), s.threadCount));
     showFrameWith(chart, name + " threads timeline", 800, 300, null);
-  }
-
-  /**
-   * Test elements that can be added as direct children of a thread group in jmeter should implement
-   * this interface.
-   */
-  public interface ThreadGroupChild extends DslTestElement {
-
   }
 
 }

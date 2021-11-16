@@ -16,6 +16,7 @@ import us.abstracta.jmeter.javadsl.core.DslTestPlan.TestPlanChild;
 import us.abstracta.jmeter.javadsl.core.engines.EmbeddedJmeterEngine;
 import us.abstracta.jmeter.javadsl.core.engines.JmeterEnvironment;
 import us.abstracta.jmeter.javadsl.core.testelements.TestElementContainer;
+import us.abstracta.jmeter.javadsl.core.threadgroups.DslThreadGroup;
 
 /**
  * Represents a JMeter test plan, with associated thread groups and other children elements.

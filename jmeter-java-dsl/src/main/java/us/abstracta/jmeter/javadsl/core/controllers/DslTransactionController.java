@@ -4,7 +4,7 @@ import java.util.List;
 import org.apache.jmeter.control.TransactionController;
 import org.apache.jmeter.control.gui.TransactionControllerGui;
 import org.apache.jmeter.testelement.TestElement;
-import us.abstracta.jmeter.javadsl.core.DslThreadGroup.ThreadGroupChild;
+import us.abstracta.jmeter.javadsl.core.threadgroups.BaseThreadGroup.ThreadGroupChild;
 
 /**
  * Allows specifying JMeter transaction controllers which group different samples associated to same

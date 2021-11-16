@@ -1,6 +1,10 @@
-package us.abstracta.jmeter.javadsl.core;
+package us.abstracta.jmeter.javadsl.core.threadgroups;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static us.abstracta.jmeter.javadsl.JmeterDsl.httpSampler;
+import static us.abstracta.jmeter.javadsl.JmeterDsl.testPlan;
+import static us.abstracta.jmeter.javadsl.JmeterDsl.threadGroup;
 
 import java.time.Duration;
 import java.util.Collections;
@@ -17,6 +21,9 @@ import org.apache.jmeter.testelement.property.JMeterProperty;
 import org.apache.jmeter.threads.ThreadGroup;
 import org.assertj.core.api.AbstractAssert;
 import org.junit.jupiter.api.Test;
+import us.abstracta.jmeter.javadsl.core.TestPlanStats;
+import us.abstracta.jmeter.javadsl.core.threadgroups.BaseThreadGroup.SampleErrorAction;
+import us.abstracta.jmeter.javadsl.core.threadgroups.DslThreadGroup;
 
 public class DslThreadGroupTest {
 
@@ -29,7 +36,7 @@ public class DslThreadGroupTest {
   @Test
   public void shouldBuildSimpleThreadGroupWhenBuildTestElementWithThreadsAndIterations() {
     assertThat(new DslThreadGroup(null, THREAD_COUNT, ITERATIONS,
-        Collections.emptyList()).buildTestElement())
+        Collections.emptyList()).buildThreadGroup())
         .isEqualTo(buildSimpleThreadGroup(THREAD_COUNT, ITERATIONS, 0, 0, 0));
   }
 
@@ -55,7 +62,7 @@ public class DslThreadGroupTest {
     return ret;
   }
 
-  public static TestElementAssert assertThat(TestElement actual) {
+  public static TestElementAssert assertThatThreadGroup(TestElement actual) {
     return new TestElementAssert(actual);
   }
 
@@ -86,104 +93,105 @@ public class DslThreadGroupTest {
 
   @Test
   public void shouldBuildSimpleThreadGroupWhenBuildTestElementWithHoldRampAndIterations() {
-    assertThat(new DslThreadGroup(null)
+    assertThatThreadGroup(new DslThreadGroup(null)
         .holdFor(Duration.ofSeconds(DURATION1_SECONDS))
         .rampTo(THREAD_COUNT, Duration.ofSeconds(DURATION2_SECONDS))
         .holdIterating(ITERATIONS)
-        .buildTestElement())
+        .buildThreadGroup())
         .isEqualTo(buildSimpleThreadGroup(THREAD_COUNT, ITERATIONS, 0, DURATION2_SECONDS,
             DURATION1_SECONDS));
   }
 
   @Test
   public void shouldBuildSimpleThreadGroupWhenBuildTestElementWithRampAndIterations() {
-    assertThat(new DslThreadGroup(null)
+    assertThatThreadGroup(new DslThreadGroup(null)
         .rampTo(THREAD_COUNT, Duration.ofSeconds(DURATION1_SECONDS))
         .holdIterating(ITERATIONS)
-        .buildTestElement())
+        .buildThreadGroup())
         .isEqualTo(buildSimpleThreadGroup(THREAD_COUNT, ITERATIONS, 0, DURATION1_SECONDS, 0));
   }
 
   @Test
   public void shouldBuildSimpleThreadGroupWhenBuildTestElementWithHoldAndRampWithZeroDurationAndIterations() {
-    assertThat(new DslThreadGroup(null)
+    assertThatThreadGroup(new DslThreadGroup(null)
         .holdFor(Duration.ofSeconds(DURATION1_SECONDS))
         .rampTo(THREAD_COUNT, Duration.ZERO)
         .holdIterating(ITERATIONS)
-        .buildTestElement())
+        .buildThreadGroup())
         .isEqualTo(buildSimpleThreadGroup(THREAD_COUNT, ITERATIONS, 0, 0, DURATION1_SECONDS));
   }
 
   @Test
   public void shouldBuildSimpleThreadGroupWhenBuildTestElementWithRampWithZeroDurationAndIterations() {
-    assertThat(new DslThreadGroup(null)
+    assertThatThreadGroup(new DslThreadGroup(null)
         .rampTo(THREAD_COUNT, Duration.ZERO)
         .holdIterating(ITERATIONS)
-        .buildTestElement())
+        .buildThreadGroup())
         .isEqualTo(buildSimpleThreadGroup(THREAD_COUNT, ITERATIONS, 0, 0, 0));
   }
 
   @Test
   public void shouldBuildSimpleThreadGroupWhenBuildTestElementWithHoldAndRampAndZeroIterations() {
-    assertThat(new DslThreadGroup(null)
+    assertThatThreadGroup(new DslThreadGroup(null)
         .holdFor(Duration.ofSeconds(DURATION1_SECONDS))
         .rampTo(THREAD_COUNT, Duration.ofSeconds(DURATION2_SECONDS))
         .holdIterating(0)
-        .buildTestElement())
+        .buildThreadGroup())
         .isEqualTo(
             buildSimpleThreadGroup(THREAD_COUNT, 0, 0, DURATION2_SECONDS, DURATION1_SECONDS));
   }
 
   @Test
   public void shouldBuildSimpleThreadGroupWhenBuildTestElementWithRampAndZeroIterations() {
-    assertThat(new DslThreadGroup(null)
+    assertThatThreadGroup(new DslThreadGroup(null)
         .rampTo(THREAD_COUNT, Duration.ofSeconds(DURATION1_SECONDS))
         .holdIterating(0)
-        .buildTestElement())
+        .buildThreadGroup())
         .isEqualTo(
             buildSimpleThreadGroup(THREAD_COUNT, 0, 0, DURATION1_SECONDS, 0));
   }
 
   @Test
   public void shouldBuildSimpleThreadGroupWhenBuildTestElementWithThreadsAndDuration() {
-    assertThat(new DslThreadGroup(null, THREAD_COUNT, Duration.ofSeconds(DURATION1_SECONDS),
-        Collections.emptyList()).buildTestElement())
+    assertThatThreadGroup(
+        new DslThreadGroup(null, THREAD_COUNT, Duration.ofSeconds(DURATION1_SECONDS),
+            Collections.emptyList()).buildThreadGroup())
         .isEqualTo(buildSimpleThreadGroup(THREAD_COUNT, 0, DURATION1_SECONDS, 0, 0));
   }
 
   @Test
   public void shouldBuildSimpleThreadGroupWhenHoldAndRampAndHoldDuration() {
-    assertThat(new DslThreadGroup(null)
+    assertThatThreadGroup(new DslThreadGroup(null)
         .holdFor(Duration.ofSeconds(DURATION1_SECONDS))
         .rampTo(THREAD_COUNT, Duration.ofSeconds(DURATION2_SECONDS))
         .holdFor(Duration.ofSeconds(DURATION3_SECONDS))
-        .buildTestElement())
+        .buildThreadGroup())
         .isEqualTo(buildSimpleThreadGroup(THREAD_COUNT, 0, DURATION3_SECONDS, DURATION2_SECONDS,
             DURATION1_SECONDS));
   }
 
   @Test
   public void shouldBuildSimpleThreadGroupWhenRampAndHoldDuration() {
-    assertThat(new DslThreadGroup(null)
+    assertThatThreadGroup(new DslThreadGroup(null)
         .rampTo(THREAD_COUNT, Duration.ofSeconds(DURATION1_SECONDS))
         .holdFor(Duration.ofSeconds(DURATION2_SECONDS))
-        .buildTestElement())
+        .buildThreadGroup())
         .isEqualTo(
             buildSimpleThreadGroup(THREAD_COUNT, 0, DURATION2_SECONDS, DURATION1_SECONDS, 0));
   }
 
   @Test
   public void shouldBuildSimpleThreadGroupWhenRamp() {
-    assertThat(new DslThreadGroup(null)
+    assertThatThreadGroup(new DslThreadGroup(null)
         .rampTo(THREAD_COUNT, Duration.ofSeconds(DURATION1_SECONDS))
-        .buildTestElement())
+        .buildThreadGroup())
         .isEqualTo(buildSimpleThreadGroup(THREAD_COUNT, 0, 0, DURATION1_SECONDS, 0));
   }
 
   @Test
   public void shouldBuildSimpleThreadGroupWhenNoStages() {
-    assertThat(new DslThreadGroup(null)
-        .buildTestElement())
+    assertThatThreadGroup(new DslThreadGroup(null)
+        .buildThreadGroup())
         .isEqualTo(buildSimpleThreadGroup(1, 1, 0, 0, 0));
   }
 
@@ -219,10 +227,10 @@ public class DslThreadGroupTest {
 
   @Test
   public void shouldBuildUltimateThreadGroupWhenRampUpAndDown() {
-    assertThat(new DslThreadGroup(null)
+    assertThatThreadGroup(new DslThreadGroup(null)
         .rampTo(THREAD_COUNT, Duration.ofSeconds(DURATION1_SECONDS))
         .rampTo(0, Duration.ofSeconds(DURATION2_SECONDS))
-        .buildTestElement())
+        .buildThreadGroup())
         .isEqualTo(buildUltimateThreadGroup(
             new int[][]{{THREAD_COUNT, 0, DURATION1_SECONDS, 0, DURATION2_SECONDS}}));
   }
@@ -256,7 +264,7 @@ public class DslThreadGroupTest {
         .rampToAndHold(7, d, d)
         .rampToAndHold(5, d, d)
         .rampTo(1, d);
-    assertThat(threadGroup.buildTestElement())
+    assertThatThreadGroup(threadGroup.buildThreadGroup())
         .isEqualTo(buildUltimateThreadGroup(new int[][]{
             {1, 10, 4, 107, 0},
             {1, 14, 4, 101, 3},
@@ -266,6 +274,18 @@ public class DslThreadGroupTest {
             {2, 70, 5, 35, 5},
             {2, 75, 5, 10, 10}
         }));
+  }
+
+  @Test
+  public void shouldStopIteratingWhenThreadGroupWithStopThreadOnError() throws Exception {
+    TestPlanStats stats = testPlan(
+        threadGroup(THREAD_COUNT, ITERATIONS)
+            .sampleErrorAction(SampleErrorAction.STOP_THREAD)
+            .children(
+                httpSampler("http://myservice")
+            )
+    ).run();
+    assertThat(stats.overall().samplesCount()).isEqualTo(THREAD_COUNT);
   }
 
 }

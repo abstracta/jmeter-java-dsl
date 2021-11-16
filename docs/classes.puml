@@ -21,7 +21,7 @@ package core {
     Map<DslVisualizer, Supplier<Component>> visualizers
   }
 
-  class DslTestPlan extends TestElementContainer {
+  class DslTestPlan {
     TestPlanStats run()
     TestPlanStats runIn(DslJmeterEngine engine)
     void saveAsJmx(String filePath)
@@ -33,18 +33,6 @@ package core {
   interface DslJmeterEngine {
     TestPlanStats run(DslTestPlan testPlan)
   }
-
-  class DslThreadGroup extends TestElementContainer implements TestPlanChild {
-    List<Stage> stages
-  }
-
-  class Stage {
-      int threads
-      int iterations
-      Duration duration
-  }
-
-  interface ThreadGroupChild extends DslTestElement
 
   package testelements {
 
@@ -63,19 +51,11 @@ package core {
       boolean enabled
     }
 
-    class EmbeddedJmeterEngine implements DslJmeterEngine
-
-    class JmeterEnvironment {
-      File homeDir
-    }
-
-    EmbeddedJmeterEngine ..> JmeterEnvironment
-
-    abstract class DslSampler extends TestElementContainer implements ThreadGroupChild
+    abstract class DslSampler extends TestElementContainer
 
     interface SamplerChild extends DslTestElement
 
-    interface MultiLevelTestElement extends TestPlanChild, ThreadGroupChild, SamplerChild
+    interface MultiLevelTestElement extends TestPlanChild, SamplerChild
 
     abstract class DslJsr223TestElement extends BaseTestElement {
       String language
@@ -102,7 +82,31 @@ package core {
 
   package threadgroups {
 
-    class RpsThreadGroup extends TestElementContainer implements TestPlanChild {
+    abstract class BaseThreadGroup extends TestElementContainer implements TestPlanChild {
+      SampleErrorAction sampleErrorAction
+    }
+
+    interface ThreadGroupChild extends DslTestElement
+
+    enum SampleErrorAction {
+      CONTINUE,
+      START_NEXT_ITERATION,
+      STOP_THREAD,
+      STOP_TEST,
+      STOP_TEST_NOW
+    }
+
+    class DslThreadGroup extends BaseThreadGroup {
+      List<Stage> stages
+    }
+
+    class Stage {
+        int threads
+        int iterations
+        Duration duration
+    }
+
+    class RpsThreadGroup extends BaseThreadGroup {
       List<TimerSchedule> schedules
       EventType counting
       int initThreads
@@ -120,6 +124,34 @@ package core {
       REQUESTS
       ITERATIONS
     }
+
+    abstract class DslSimpleThreadGroup extends BaseThreadGroup {
+      int iterations
+      int threads
+    }
+
+    class DslSetupThreadGroup extends DslSimpleThreadGroup
+    class DslTeardownThreadGroup extends DslSimpleThreadGroup
+
+    BaseThreadGroup ..> SampleErrorAction
+    DslThreadGroup ..> ThreadGroupChild
+    DslThreadGroup ..> Stage
+    RpsThreadGroup ..> TimerSchedule
+    RpsThreadGroup ..> EventType
+
+  }
+
+  package engines {
+
+    class EmbeddedJmeterEngine implements DslJmeterEngine
+
+    class JmeterEnvironment {
+      File homeDir
+    }
+
+    class DistributedJmeterEngine extends EmbeddedJmeterEngine
+
+    EmbeddedJmeterEngine ..> JmeterEnvironment
 
   }
 
@@ -162,9 +194,6 @@ package core {
     class ForLoopController extends DslController {
       int count
     }
-
-    DslIfController --> PropertyScriptBuilder
-    DslWhileController --> PropertyScriptBuilder
 
   }
 
@@ -257,7 +286,7 @@ package core {
     DslResponseAssertion ..> TestStringStrategy
 
   }
-  
+
   package timers {
 
     class DslUniformRandomTimer extends BaseTestElement implements MultiLevelTestElement {
@@ -343,10 +372,13 @@ package core {
   }
 
   DslTestPlan ..> TestPlanChild
-  DslThreadGroup ..> ThreadGroupChild
   DslTestPlan ..> EmbeddedJmeterEngine
-  DslThreadGroup ..> Stage
   DslTestElement ..> BuildTreeContext
+  DslTestPlan -up-|> TestElementContainer
+  DslSampler .up.|> ThreadGroupChild
+  MultiLevelTestElement .up.|> ThreadGroupChild
+  DslIfController --> PropertyScriptBuilder
+  DslWhileController --> PropertyScriptBuilder
 
 }
 

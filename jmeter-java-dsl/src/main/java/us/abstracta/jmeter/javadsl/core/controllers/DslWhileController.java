@@ -4,7 +4,7 @@ import java.util.List;
 import org.apache.jmeter.control.WhileController;
 import org.apache.jmeter.control.gui.WhileControllerGui;
 import org.apache.jmeter.testelement.TestElement;
-import us.abstracta.jmeter.javadsl.core.DslThreadGroup.ThreadGroupChild;
+import us.abstracta.jmeter.javadsl.core.threadgroups.BaseThreadGroup.ThreadGroupChild;
 import us.abstracta.jmeter.javadsl.core.util.DslScriptBuilder;
 import us.abstracta.jmeter.javadsl.core.util.PropertyScriptBuilder;
 import us.abstracta.jmeter.javadsl.core.util.PropertyScriptBuilder.PropertyScript;
