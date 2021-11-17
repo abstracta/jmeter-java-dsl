@@ -9,9 +9,6 @@
         <Root level="INFO">
             <AppenderRef ref="Console"/>
         </Root>
-        <Logger name="ru.lanwen.wiremock" level="WARN"/>
-        <Logger name="WireMock" level="WARN"/>
-        <Logger name="org.eclipse.jetty" level="WARN"/>
         <Logger name="org.apache.jmeter" level="WARN"/>
     </Loggers>
 </Configuration>

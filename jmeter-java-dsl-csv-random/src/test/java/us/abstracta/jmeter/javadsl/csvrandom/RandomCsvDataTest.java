@@ -13,7 +13,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.*;
 import static us.abstracta.jmeter.javadsl.csvrandom.RandomCsvDataSetConfig.csvRandomDataSet;
 
-public class RandomCsvDataTest extends JmeterDslTest {
+public class RandomCsvDataTest {
 
     @Test
     public void shouldGetDataFromCSVDataSetRandom()
@@ -26,7 +26,7 @@ public class RandomCsvDataTest extends JmeterDslTest {
         TestPlanStats stats = testPlan(
                 csvRandomDataSet(path).variableNames("test"),
                 threadGroup(1, 1,
-                        jsr223Sampler("if (vars.get('test')!='foo') {SampleResult.setSuccessful(false); return 'FAIL'} else { return 'OK'}")
+                        jsr223Sampler("SampleResult.successful = (vars['test'] == 'foo')")
                 )
         ).run();
         assertThat(stats.overall().errorsCount()).isLessThan(1);
