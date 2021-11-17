@@ -40,7 +40,7 @@ public class RandomCsvDataSetConfig extends BaseTestElement implements MultiLeve
     /**
      * Builds a RandomCsvDataSetConfig.
      *
-     * @param csvFile test elements to execute in parallel.
+     * @param csvFile file path string to push file into data set.
      * @return the RandomCsvDataSetConfig for additional configuration and usage.
      */
     public static RandomCsvDataSetConfig csvRandomDataSet(String csvFile) {

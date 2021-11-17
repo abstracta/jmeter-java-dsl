@@ -29,7 +29,7 @@ public class RandomCsvDataTest {
                         jsr223Sampler("SampleResult.successful = (vars['test'] == 'foo')")
                 )
         ).run();
-        assertThat(stats.overall().errorsCount()).isLessThan(1);
+        assertThat(stats.overall().errorsCount()).isEqualTo(0);
     }
 
 }
