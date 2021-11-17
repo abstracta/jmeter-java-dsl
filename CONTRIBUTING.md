@@ -45,10 +45,11 @@ A complete class diagram can be found [here](docs/classes.puml), but it is way m
 ## General Guidelines
 
 * When submitting changes follow same conventions followed in rest of the code, and specify clear intention of why are the changes required.
+* Code conventions are based on Google coding conventions. You can find [here](https://github.com/google/styleguide) configuration files for many IDEs that will match the conventions enforced in the maven build process. When IDE is configured with one of such files, most of the issues are fixed by IDE auto formatting features.
 * Avoid including backward incompatible changes (unless required), that would require users changing existing code where they use the api. 
 * Avoid using names already taken by JMeter for classes to avoid confusion (eg: instead of using TestPlan use DslTestPlan).
 * For any changes include appropriate automated tests.
-* Update documentation if necessary.
+* Update documentation if necessary. In particular the user guide which you can find [here](./docs/guide/README.md).
 * Include `@since` with proper next version id for new methods and classes or changes of methods signatures  
 
 ## FAQ
