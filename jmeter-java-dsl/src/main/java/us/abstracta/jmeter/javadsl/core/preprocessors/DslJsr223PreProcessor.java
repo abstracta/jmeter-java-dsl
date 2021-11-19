@@ -3,12 +3,10 @@ package us.abstracta.jmeter.javadsl.core.preprocessors;
 import java.util.Collections;
 import java.util.Properties;
 import org.apache.jmeter.modifiers.JSR223PreProcessor;
-import org.apache.jmeter.modifiers.JSR223PreProcessorBeanInfo;
 import org.apache.jmeter.samplers.SampleResult;
 import org.apache.jmeter.samplers.Sampler;
 import org.apache.jmeter.threads.JMeterContext;
 import org.apache.jmeter.threads.JMeterVariables;
-import org.apache.jmeter.util.JSR223BeanInfoSupport;
 import org.apache.jmeter.util.JSR223TestElement;
 import org.slf4j.Logger;
 import us.abstracta.jmeter.javadsl.core.testelements.DslJsr223TestElement;
@@ -42,11 +40,6 @@ public class DslJsr223PreProcessor extends DslJsr223TestElement implements Multi
   @Override
   protected JSR223TestElement buildJsr223TestElement() {
     return new JSR223PreProcessor();
-  }
-
-  @Override
-  protected JSR223BeanInfoSupport getJsr223BeanInfo() {
-    return new JSR223PreProcessorBeanInfo();
   }
 
   /**
