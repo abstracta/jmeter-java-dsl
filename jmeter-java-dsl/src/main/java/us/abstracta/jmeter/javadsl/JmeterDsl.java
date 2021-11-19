@@ -150,6 +150,10 @@ public class JmeterDsl {
    *    .children(...)
    * }</pre>
    *
+   * For complex thread profiles that can't be mapped to JMeter built-in thread group element, the
+   * DSL uses <a href="https://jmeter-plugins.org/wiki/UltimateThreadGroup/">Ultimate Thread Group
+   * plugin</a>.
+   *
    * @return the thread group instance.
    * @since 0.18
    */

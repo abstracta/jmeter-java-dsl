@@ -19,6 +19,10 @@ import us.abstracta.jmeter.javadsl.core.util.SingleSeriesTimelinePanel;
 /**
  * Represents the standard thread group test element included by JMeter.
  *
+ * For complex thread profiles that can't be mapped to JMeter built-in thread group element, the DSL
+ * uses <a href="https://jmeter-plugins.org/wiki/UltimateThreadGroup/">Ultimate Thread Group
+ * plugin</a>
+ *
  * @since 0.1
  */
 public class DslThreadGroup extends BaseThreadGroup<DslThreadGroup> {
