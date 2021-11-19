@@ -24,8 +24,8 @@ public class DistributedJmeterEngineTest extends JmeterDslTest {
   public void shouldGetExpectedCountWhenRunTestInRemoteEngine() throws Exception {
     String keystoreFileName = "rmi_keystore.jks";
     File keystoreResource = new TestResource("/" + keystoreFileName).getFile();
-    try (TempFileCopy ignored = new TempFileCopy(keystoreResource, new File(keystoreFileName));
-        JmeterEnvironment env = new JmeterEnvironment()) {
+    JmeterEnvironment env = new JmeterEnvironment();
+    try (TempFileCopy ignored = new TempFileCopy(keystoreResource, new File(keystoreFileName))) {
       RemoteJMeterEngineImpl.startServer(RmiUtils.getRmiRegistryPort());
       TestPlanStats stats = testPlan(
           threadGroup(1, 1,

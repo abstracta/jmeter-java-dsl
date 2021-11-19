@@ -37,9 +37,7 @@ public class EmbeddedJmeterEngine implements DslJmeterEngine {
 
   @Override
   public TestPlanStats run(DslTestPlan testPlan) throws IOException {
-    try (JmeterEnvironment env = new JmeterEnvironment()) {
-      return runInEnv(testPlan, env);
-    }
+    return runInEnv(testPlan, new JmeterEnvironment());
   }
 
   protected TestPlanStats runInEnv(DslTestPlan testPlan, JmeterEnvironment env) {

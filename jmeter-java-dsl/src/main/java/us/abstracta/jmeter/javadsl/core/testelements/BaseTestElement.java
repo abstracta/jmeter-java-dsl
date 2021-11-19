@@ -93,9 +93,9 @@ public abstract class BaseTestElement implements DslTestElement {
 
   @Override
   public void showInGui() {
-    try (JmeterEnvironment env = new JmeterEnvironment()) {
+    try {
       // this is required for proper visualization of labels and messages from resources bundle
-      env.initLocale();
+      new JmeterEnvironment().initLocale();
       showTestElementGui(() -> buildTestElementGui(buildConfiguredTestElement()), null);
     } catch (IOException e) {
       throw new RuntimeException(e);

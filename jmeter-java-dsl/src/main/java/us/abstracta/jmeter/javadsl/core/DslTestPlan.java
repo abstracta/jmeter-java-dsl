@@ -66,8 +66,8 @@ public class DslTestPlan extends TestElementContainer<TestPlanChild> {
    * @throws IOException when there is a problem saving to the file.
    */
   public void saveAsJmx(String filePath) throws IOException {
-    try (JmeterEnvironment env = new JmeterEnvironment();
-        FileOutputStream output = new FileOutputStream(filePath)) {
+    JmeterEnvironment env = new JmeterEnvironment();
+    try (FileOutputStream output = new FileOutputStream(filePath)) {
       HashTree tree = new ListedHashTree();
       buildTreeUnder(tree, new BuildTreeContext(tree));
       env.saveTree(tree, output);
@@ -83,10 +83,9 @@ public class DslTestPlan extends TestElementContainer<TestPlanChild> {
    * @since 0.3
    */
   public static DslTestPlan fromJmx(String filePath) throws IOException {
-    try (JmeterEnvironment env = new JmeterEnvironment()) {
-      HashTree tree = env.loadTree(new File(filePath));
-      return new JmxTestPlan(tree);
-    }
+    JmeterEnvironment env = new JmeterEnvironment();
+    HashTree tree = env.loadTree(new File(filePath));
+    return new JmxTestPlan(tree);
   }
 
   private static class JmxTestPlan extends DslTestPlan {

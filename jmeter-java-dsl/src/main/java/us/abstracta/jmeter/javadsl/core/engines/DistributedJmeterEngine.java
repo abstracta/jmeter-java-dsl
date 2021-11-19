@@ -74,9 +74,7 @@ public class DistributedJmeterEngine extends EmbeddedJmeterEngine {
     if (jmeterEnv != null) {
       return runInEnv(testPlan, jmeterEnv);
     } else {
-      try (JmeterEnvironment env = new JmeterEnvironment()) {
-        return runInEnv(testPlan, env);
-      }
+      return runInEnv(testPlan, new JmeterEnvironment());
     }
   }
 

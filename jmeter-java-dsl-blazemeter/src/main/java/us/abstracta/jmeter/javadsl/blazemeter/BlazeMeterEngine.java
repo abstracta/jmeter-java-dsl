@@ -309,8 +309,8 @@ public class BlazeMeterEngine implements DslJmeterEngine {
   }
 
   private void saveTestPlanTo(DslTestPlan testPlan, File jmxFile) throws IOException {
-    try (JmeterEnvironment env = new JmeterEnvironment();
-        FileOutputStream output = new FileOutputStream(jmxFile.getPath())) {
+    JmeterEnvironment env = new JmeterEnvironment();
+    try (FileOutputStream output = new FileOutputStream(jmxFile.getPath())) {
       HashTree tree = new ListedHashTree();
       BuildTreeContext context = new BuildTreeContext(tree);
       testPlan.buildTreeUnder(tree, context);
