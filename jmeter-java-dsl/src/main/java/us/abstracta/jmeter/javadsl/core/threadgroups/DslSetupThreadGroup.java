@@ -30,7 +30,15 @@ public class DslSetupThreadGroup extends DslSimpleThreadGroup<DslSetupThreadGrou
   public DslSetupThreadGroup(List<ThreadGroupChild> children) {
     super("setUp Thread Group", SetupThreadGroupGui.class, children);
   }
+  
+  public DslSetupThreadGroup(String name) {
+    super(solveName(name), null, Collections.emptyList());
+  }
 
+  private static String solveName(String name) {
+    return name != null ? name : "setUp Thread Group";
+  }
+  
   @Override
   protected AbstractThreadGroup buildSimpleThreadGroup() {
     return new SetupThreadGroup();
