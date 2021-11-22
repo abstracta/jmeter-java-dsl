@@ -5,12 +5,10 @@ import java.util.Map;
 import java.util.Properties;
 import org.apache.jmeter.samplers.SampleResult;
 import org.apache.jmeter.samplers.Sampler;
-import org.apache.jmeter.testbeans.BeanInfoSupport;
 import org.apache.jmeter.testbeans.gui.TestBeanGUI;
 import org.apache.jmeter.testelement.TestElement;
 import org.apache.jmeter.threads.JMeterContext;
 import org.apache.jmeter.threads.JMeterVariables;
-import org.apache.jmeter.util.JSR223BeanInfoSupport;
 import org.apache.jmeter.util.JSR223TestElement;
 import org.slf4j.Logger;
 import us.abstracta.jmeter.javadsl.core.util.DslScriptBuilder;
@@ -59,13 +57,6 @@ public abstract class DslJsr223TestElement extends BaseTestElement {
   }
 
   protected abstract JSR223TestElement buildJsr223TestElement();
-
-  @Override
-  protected BeanInfoSupport getBeanInfo() {
-    return getJsr223BeanInfo();
-  }
-
-  protected abstract JSR223BeanInfoSupport getJsr223BeanInfo();
 
   protected interface Jsr223Script<T extends Jsr223ScriptVars> extends DslScript<T, Void> {
 

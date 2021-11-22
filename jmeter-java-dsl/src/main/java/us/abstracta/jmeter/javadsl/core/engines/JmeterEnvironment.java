@@ -1,6 +1,5 @@
 package us.abstracta.jmeter.javadsl.core.engines;
 
-import java.io.Closeable;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -14,7 +13,6 @@ import java.util.Collections;
 import java.util.Properties;
 import java.util.stream.Collectors;
 import kg.apc.jmeter.timers.functions.TSTFeedback;
-import org.apache.commons.io.FileUtils;
 import org.apache.jmeter.functions.EvalFunction;
 import org.apache.jmeter.save.SaveService;
 import org.apache.jmeter.util.JMeterUtils;
@@ -27,29 +25,24 @@ import org.apache.jorphan.collections.HashTree;
  *
  * @since 0.29
  */
-public class JmeterEnvironment implements Closeable {
-
-  private final File homeDir;
+public class JmeterEnvironment {
 
   public JmeterEnvironment() throws IOException {
-    homeDir = Files.createTempDirectory("jmeter-java-dsl").toFile();
-    try {
-      JMeterUtils.setJMeterHome(homeDir.getPath());
-      File binDir = new File(homeDir, "bin");
-      installConfig(binDir);
-      Properties props = JMeterUtils
-          .getProperties(new File(binDir, "jmeter.properties").getPath());
-      /*
-       include functions and components jars paths so jmeter search methods can find classes in
-       such jars
-       */
-      props.setProperty("search_paths",
-          buildJarPathsFromClasses(EvalFunction.class, BackendListenerClient.class,
-              TSTFeedback.class));
-    } catch (IOException | RuntimeException e) {
-      FileUtils.deleteDirectory(homeDir);
-      throw e;
-    }
+    File homeDir = Files.createTempDirectory("jmeter-java-dsl").toFile();
+    homeDir.deleteOnExit();
+    JMeterUtils.setJMeterHome(homeDir.getPath());
+    File binDir = new File(homeDir, "bin");
+    binDir.deleteOnExit();
+    installConfig(binDir);
+    Properties props = JMeterUtils
+        .getProperties(new File(binDir, "jmeter.properties").getPath());
+    /*
+     include functions and components jars paths so jmeter search methods can find classes in
+     such jars
+     */
+    props.setProperty("search_paths",
+        buildJarPathsFromClasses(EvalFunction.class, BackendListenerClient.class,
+            TSTFeedback.class));
   }
 
   private String buildJarPathsFromClasses(Class<?>... classes) {
@@ -75,6 +68,7 @@ public class JmeterEnvironment implements Closeable {
       for (Path p : (Iterable<Path>) Files.walk(configBinDir)::iterator) {
         Path targetPath = binDir.toPath().resolve(configBinDir.relativize(p).toString());
         Files.copy(p, targetPath);
+        targetPath.toFile().deleteOnExit();
       }
     } catch (URISyntaxException e) {
       throw new RuntimeException(e);
@@ -91,11 +85,6 @@ public class JmeterEnvironment implements Closeable {
 
   public void initLocale() {
     JMeterUtils.initLocale();
-  }
-
-  @Override
-  public void close() throws IOException {
-    FileUtils.deleteDirectory(homeDir);
   }
 
 }

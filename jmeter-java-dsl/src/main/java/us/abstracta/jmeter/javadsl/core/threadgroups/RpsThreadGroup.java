@@ -249,15 +249,14 @@ public class RpsThreadGroup extends BaseThreadGroup<RpsThreadGroup> {
     TestAction ret = new TestAction();
     ret.setAction(TestAction.PAUSE);
     ret.setDuration("0");
-    configureTestElement(ret, "Flow Control Action", TestActionGui.class, null);
+    configureTestElement(ret, "Flow Control Action", TestActionGui.class);
     return ret;
   }
 
   private TestElement buildTimer() {
     VariableThroughputTimer ret = new VariableThroughputTimer();
     ret.setData(buildTimerSchedulesData());
-    configureTestElement(ret, buildTimerName(timerId++), VariableThroughputTimerGui.class,
-        null);
+    configureTestElement(ret, buildTimerName(timerId++), VariableThroughputTimerGui.class);
     return ret;
   }
 

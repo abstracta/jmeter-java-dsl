@@ -3,6 +3,9 @@ package us.abstracta.jmeter.javadsl.core.testelements;
 import java.awt.Component;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.beans.BeanInfo;
+import java.beans.IntrospectionException;
+import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -11,7 +14,6 @@ import java.util.function.Supplier;
 import javax.swing.JFrame;
 import javax.swing.WindowConstants;
 import org.apache.jmeter.gui.JMeterGUIComponent;
-import org.apache.jmeter.testbeans.BeanInfoSupport;
 import org.apache.jmeter.testbeans.TestBeanHelper;
 import org.apache.jmeter.testbeans.gui.TestBeanGUI;
 import org.apache.jmeter.testelement.TestElement;
@@ -56,46 +58,47 @@ public abstract class BaseTestElement implements DslTestElement {
 
   protected TestElement buildConfiguredTestElement() {
     TestElement ret = buildTestElement();
-    return configureTestElement(ret, name, guiClass, getBeanInfo());
+    return configureTestElement(ret, name, guiClass);
   }
 
   protected static TestElement configureTestElement(TestElement ret, String name,
-      Class<? extends JMeterGUIComponent> guiClass, BeanInfoSupport beanInfo) {
+      Class<? extends JMeterGUIComponent> guiClass) {
     ret.setName(name);
     ret.setProperty(TestElement.GUI_CLASS, guiClass.getName());
     ret.setProperty(TestElement.TEST_CLASS, ret.getClass().getName());
-    if (beanInfo != null) {
-      loadBeanProperties(ret, beanInfo);
+    if (guiClass == TestBeanGUI.class) {
+      loadBeanProperties(ret);
     }
     return ret;
   }
 
   protected abstract TestElement buildTestElement();
 
-  protected BeanInfoSupport getBeanInfo() {
-    return null;
-  }
-
-  private static void loadBeanProperties(TestElement bean, BeanInfoSupport beanInfo) {
-    for (PropertyDescriptor prop : beanInfo.getPropertyDescriptors()) {
-      if (TestBeanHelper.isDescriptorIgnored(prop)) {
-        continue;
+  private static void loadBeanProperties(TestElement bean) {
+    try {
+      BeanInfo beanInfo = Introspector.getBeanInfo(bean.getClass());
+      for (PropertyDescriptor prop : beanInfo.getPropertyDescriptors()) {
+        if (TestBeanHelper.isDescriptorIgnored(prop)) {
+          continue;
+        }
+        try {
+          JMeterProperty jprop = AbstractProperty.createProperty(prop.getReadMethod().invoke(bean));
+          jprop.setName(prop.getName());
+          bean.setProperty(jprop);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+          LOG.error("Could not set property {} for bean {}", prop.getName(), bean);
+        }
       }
-      try {
-        JMeterProperty jprop = AbstractProperty.createProperty(prop.getReadMethod().invoke(bean));
-        jprop.setName(prop.getName());
-        bean.setProperty(jprop);
-      } catch (IllegalAccessException | InvocationTargetException e) {
-        LOG.error("Could not set property {} for bean {}", prop.getName(), bean);
-      }
+    } catch (IntrospectionException e) {
+      throw new RuntimeException(e);
     }
   }
 
   @Override
   public void showInGui() {
-    try (JmeterEnvironment env = new JmeterEnvironment()) {
+    try {
       // this is required for proper visualization of labels and messages from resources bundle
-      env.initLocale();
+      new JmeterEnvironment().initLocale();
       showTestElementGui(() -> buildTestElementGui(buildConfiguredTestElement()), null);
     } catch (IOException e) {
       throw new RuntimeException(e);

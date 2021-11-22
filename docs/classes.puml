@@ -40,7 +40,6 @@ package core {
       String name
       Class guiClass
       TestElement buildTestElement()
-      BeanInfoSupport getBeanInfo()
     }
 
     abstract class TestElementContainer extends BaseTestElement {

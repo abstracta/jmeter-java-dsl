@@ -6,12 +6,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 import org.apache.jmeter.protocol.java.sampler.JSR223Sampler;
-import org.apache.jmeter.protocol.java.sampler.JSR223SamplerBeanInfo;
 import org.apache.jmeter.samplers.SampleResult;
 import org.apache.jmeter.samplers.Sampler;
 import org.apache.jmeter.threads.JMeterContext;
 import org.apache.jmeter.threads.JMeterVariables;
-import org.apache.jmeter.util.JSR223BeanInfoSupport;
 import org.apache.jmeter.util.JSR223TestElement;
 import org.apache.jorphan.collections.HashTree;
 import org.slf4j.Logger;
@@ -62,11 +60,6 @@ public class DslJsr223Sampler extends DslJsr223TestElement implements ThreadGrou
   @Override
   protected JSR223TestElement buildJsr223TestElement() {
     return new JSR223Sampler();
-  }
-
-  @Override
-  protected JSR223BeanInfoSupport getJsr223BeanInfo() {
-    return new JSR223SamplerBeanInfo();
   }
 
   @Override

@@ -1,8 +1,6 @@
 package us.abstracta.jmeter.javadsl.core.configs;
 
 import org.apache.jmeter.config.CSVDataSet;
-import org.apache.jmeter.config.CSVDataSetBeanInfo;
-import org.apache.jmeter.testbeans.BeanInfoSupport;
 import org.apache.jmeter.testbeans.gui.TestBeanGUI;
 import org.apache.jmeter.testelement.TestElement;
 import us.abstracta.jmeter.javadsl.core.testelements.BaseTestElement;
@@ -139,11 +137,6 @@ public class DslCsvDataSet extends BaseTestElement implements MultiLevelTestElem
     ret.setStopThread(stopThread);
     ret.setShareMode(shareMode.jmeterPropertyValue);
     return ret;
-  }
-
-  @Override
-  protected BeanInfoSupport getBeanInfo() {
-    return new CSVDataSetBeanInfo();
   }
 
   /**
