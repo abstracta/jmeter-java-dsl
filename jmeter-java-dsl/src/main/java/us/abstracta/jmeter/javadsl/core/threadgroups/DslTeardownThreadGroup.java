@@ -27,8 +27,12 @@ import org.apache.jmeter.threads.gui.PostThreadGroupGui;
  */
 public class DslTeardownThreadGroup extends DslSimpleThreadGroup<DslSetupThreadGroup> {
 
-  public DslTeardownThreadGroup(List<ThreadGroupChild> children) {
-    super("tearDown Thread Group", PostThreadGroupGui.class, children);
+  public DslTeardownThreadGroup(String name, List<ThreadGroupChild> children) {
+    super(solveName(name), PostThreadGroupGui.class, children);
+  }
+
+  private static String solveName(String name) {
+    return name != null ? name : "tearDown Thread Group";
   }
 
   @Override

@@ -189,7 +189,32 @@ public class JmeterDsl {
    * @since 0.33
    */
   public static DslSetupThreadGroup setupThreadGroup(ThreadGroupChild... children) {
-    return new DslSetupThreadGroup(Arrays.asList(children));
+    return new DslSetupThreadGroup(null, Arrays.asList(children));
+  }
+
+  /**
+   * This allowing to set a name on the setup thread group.
+   * <p>
+   * Setting a proper name allows to properly identify the requests generated in each thread group.
+   *
+   * @see DslSetupThreadGroup
+   * @since 0.33.2
+   */
+  public static DslSetupThreadGroup setupThreadGroup(String name, ThreadGroupChild... children) {
+    return new DslSetupThreadGroup(name, Arrays.asList(children));
+  }
+
+  /**
+   * This allowing to create empty the setup thread group,
+   * which allows the item to be configured via '.children'.
+   * <p>
+   * Setting a proper name allows to properly identify the requests generated in each thread group.
+   *
+   * @see DslTeardownThreadGroup
+   * @since 0.33.2
+   */
+  public static DslSetupThreadGroup setupThreadGroup() {
+    return new DslSetupThreadGroup("null", Collections.emptyList());
   }
 
   /**
@@ -207,7 +232,33 @@ public class JmeterDsl {
    * @since 0.33
    */
   public static DslTeardownThreadGroup teardownThreadGroup(ThreadGroupChild... children) {
-    return new DslTeardownThreadGroup(Arrays.asList(children));
+    return new DslTeardownThreadGroup("null", Arrays.asList(children));
+  }
+
+  /**
+   * This allowing to set a name on the teardown thread group.
+   * <p>
+   * Setting a proper name allows to properly identify the requests generated in each thread group.
+   *
+   * @see DslTeardownThreadGroup
+   * @since 0.33.2
+   */
+  public static DslTeardownThreadGroup teardownThreadGroup(String name,
+                                                           ThreadGroupChild... children) {
+    return new DslTeardownThreadGroup(name, Arrays.asList(children));
+  }
+
+  /**
+   * This allowing to create empty the teardown thread group,
+   * which allows the item to be configured via '.children'.
+   * <p>
+   * Setting a proper name allows to properly identify the requests generated in each thread group.
+   *
+   * @see DslTeardownThreadGroup
+   * @since 0.33.2
+   */
+  public static DslTeardownThreadGroup teardownThreadGroup() {
+    return new DslTeardownThreadGroup("null", Collections.emptyList());
   }
 
   /**
