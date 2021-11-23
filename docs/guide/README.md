@@ -1221,7 +1221,7 @@ Check [ForLoopController](../../jmeter-java-dsl/src/main/java/us/abstracta/jmete
 #### Once Only Controller
 
 In some cases, you only need to run part of a test plan once. For these needs you can use `DslOnceOnlyController`. This controller will execute a part of test plan only one time on first iteration (Uses [JMeter Once Only Controller Component](https://jmeter.apache.org/usermanual/component_reference.html#Once_Only_Controller) )
-
+You can use this, for example, for one-time authorization or for setting vars / props.
 ```java
 import org.junit.jupiter.api.Test;
 import us.abstracta.jmeter.javadsl.JmeterDslTest;
