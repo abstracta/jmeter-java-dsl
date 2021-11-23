@@ -9,17 +9,16 @@ import static us.abstracta.jmeter.javadsl.JmeterDsl.*;
 
 public class DslOnceOnlyControllerTest extends JmeterDslTest {
 
-
-    @Test
-    public void shouldExecuteOnlyOneTimeWhenOnceOnlyControllerInPlan() throws Exception {
-        TestPlanStats stats = testPlan(
-                threadGroup(1, 10,
-                        onceOnlyController(
-                                httpSampler(wiremockUri)
-                        )
-                )
-        ).run();
-        assertThat(stats.overall().samplesCount()).isEqualTo(1);
-    }
+  @Test
+  public void shouldExecuteOnlyOneTimeWhenOnceOnlyControllerInPlan() throws Exception {
+    TestPlanStats stats = testPlan(
+        threadGroup(1, 10,
+            onceOnlyController(
+                httpSampler(wiremockUri)
+            )
+        )
+    ).run();
+    assertThat(stats.overall().samplesCount()).isEqualTo(1);
+  }
 
 }

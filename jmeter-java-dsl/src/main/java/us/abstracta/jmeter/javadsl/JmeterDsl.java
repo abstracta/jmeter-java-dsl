@@ -11,10 +11,10 @@ import us.abstracta.jmeter.javadsl.core.DslTestPlan.TestPlanChild;
 import us.abstracta.jmeter.javadsl.core.assertions.DslResponseAssertion;
 import us.abstracta.jmeter.javadsl.core.configs.DslCsvDataSet;
 import us.abstracta.jmeter.javadsl.core.controllers.DslIfController;
+import us.abstracta.jmeter.javadsl.core.controllers.DslOnceOnlyController;
 import us.abstracta.jmeter.javadsl.core.controllers.DslTransactionController;
 import us.abstracta.jmeter.javadsl.core.controllers.DslWhileController;
 import us.abstracta.jmeter.javadsl.core.controllers.ForLoopController;
-import us.abstracta.jmeter.javadsl.core.controllers.DslOnceOnlyController;
 import us.abstracta.jmeter.javadsl.core.controllers.PercentController;
 import us.abstracta.jmeter.javadsl.core.listeners.DslViewResultsTree;
 import us.abstracta.jmeter.javadsl.core.listeners.HtmlReporter;
@@ -76,15 +76,15 @@ public class JmeterDsl {
   /**
    * Builds a new thread group with a given number of threads &amp; iterations.
    *
-   * @param threads specifies the number of threads to simulate concurrent virtual users.
+   * @param threads    specifies the number of threads to simulate concurrent virtual users.
    * @param iterations specifies the number of iterations that each virtual user will run of
-   * children elements until it stops.
-   * @param children contains the test elements that each thread will execute in each iteration.
+   *                   children elements until it stops.
+   * @param children   contains the test elements that each thread will execute in each iteration.
    * @return the thread group instance.
    * @see DslThreadGroup
    */
   public static DslThreadGroup threadGroup(int threads, int iterations,
-                                           ThreadGroupChild... children) {
+      ThreadGroupChild... children) {
     return threadGroup(null, threads, iterations, children);
   }
 
@@ -97,25 +97,25 @@ public class JmeterDsl {
    * @see #threadGroup(int, int, ThreadGroupChild...)
    */
   public static DslThreadGroup threadGroup(String name, int threads, int iterations,
-                                           ThreadGroupChild... children) {
+      ThreadGroupChild... children) {
     return new DslThreadGroup(name, threads, iterations, Arrays.asList(children));
   }
 
   /**
    * Builds a new thread group with a given number of threads &amp; their duration.
    *
-   * @param threads to simulate concurrent virtual users.
+   * @param threads  to simulate concurrent virtual users.
    * @param duration to keep each thread running for this period of time. Take into consideration
-   * that JMeter supports specifying duration in seconds, so if you specify a smaller granularity
-   * (like milliseconds) it will be rounded up to seconds.
+   *                 that JMeter supports specifying duration in seconds, so if you specify a
+   *                 smaller granularity (like milliseconds) it will be rounded up to seconds.
    * @param children contains the test elements that each thread will execute until specified
-   * duration is reached.
+   *                 duration is reached.
    * @return the thread group instance.
    * @see ThreadGroup
    * @since 0.5
    */
   public static DslThreadGroup threadGroup(int threads, Duration duration,
-                                           ThreadGroupChild... children) {
+      ThreadGroupChild... children) {
     return threadGroup(null, threads, duration, children);
   }
 
@@ -129,18 +129,18 @@ public class JmeterDsl {
    * @since 0.5
    */
   public static DslThreadGroup threadGroup(String name, int threads, Duration duration,
-                                           ThreadGroupChild... children) {
+      ThreadGroupChild... children) {
     return new DslThreadGroup(name, threads, duration, Arrays.asList(children));
   }
 
   /**
    * Builds a new thread group without any thread configuration.
-   *
+   * <p>
    * This method should be used as starting point for creating complex test thread profiles (like
    * spike, or incremental tests) in combination with {@link DslThreadGroup#holdFor(Duration)},
    * {@link DslThreadGroup#rampTo(int, Duration)} and {@link DslThreadGroup#rampToAndHold(int,
    * Duration, Duration)}.
-   *
+   * <p>
    * Eg:
    * <pre>{@code
    *  threadGroup()
@@ -150,7 +150,7 @@ public class JmeterDsl {
    *    .rampTo(0, Duration.ofSeconds(5))
    *    .children(...)
    * }</pre>
-   *
+   * <p>
    * For complex thread profiles that can't be mapped to JMeter built-in thread group element, the
    * DSL uses <a href="https://jmeter-plugins.org/wiki/UltimateThreadGroup/">Ultimate Thread Group
    * plugin</a>.
@@ -176,11 +176,11 @@ public class JmeterDsl {
 
   /**
    * Builds a thread group that allows running logic before other thread groups.
-   *
+   * <p>
    * This is usually used to run some setup logic before the actual test plan logic. In particular
    * logic that needs to be run within the context of JMeter test (eg: requires setting some JMeter
    * property) or needs to be run from same machines as the test plan.
-   *
+   * <p>
    * Check {@link DslSetupThreadGroup} for more details and configuration options.
    *
    * @param children test elements to be run before any other thread group.
@@ -194,11 +194,11 @@ public class JmeterDsl {
 
   /**
    * Builds a thread group that allows running logic after other thread groups.
-   *
+   * <p>
    * This is usually used to run some clean up logic after the actual test plan logic. In particular
    * logic that needs to be run within the context of JMeter test (eg: requires setting some JMeter
    * property) or needs to be run from same machines as the test plan.
-   *
+   * <p>
    * Check {@link DslTeardownThreadGroup} for more details and configuration options.
    *
    * @param children test elements to be run after any other thread group.
@@ -212,12 +212,12 @@ public class JmeterDsl {
 
   /**
    * Builds a thread group that dynamically adapts thread count and pauses to match a given RPS.
-   *
+   * <p>
    * Internally this element uses
    * <a href="https://jmeter-plugins.org/wiki/ConcurrencyThreadGroup/">Concurrency Thread Group</a>
    * in combination with <a href="https://jmeter-plugins.org/wiki/ThroughputShapingTimer/">Throughput
    * Shaping Timer</a>.
-   *
+   * <p>
    * Eg:
    * <pre>{@code
    *  rpsThreadGroup()
@@ -252,7 +252,7 @@ public class JmeterDsl {
   /**
    * Builds a new transaction controller with the given name.
    *
-   * @param name specifies the name to identify the transaction.
+   * @param name     specifies the name to identify the transaction.
    * @param children contains the test elements that will be contained within the transaction.
    * @return the transaction instance.
    * @see DslTransactionController
@@ -279,8 +279,8 @@ public class JmeterDsl {
    * Builds an If Controller that allows to conditionally run specified children.
    *
    * @param condition contains an expression that when evaluated to true tells the controller to run
-   * specified children.
-   * @param children contains the test plan elements to execute when the condition is true.
+   *                  specified children.
+   * @param children  contains the test plan elements to execute when the condition is true.
    * @return the controller instance for further configuration and usage.
    * @see DslIfController
    * @since 0.27
@@ -305,7 +305,7 @@ public class JmeterDsl {
    * @since 0.27
    */
   public static DslIfController ifController(PropertyScript condition,
-                                             ThreadGroupChild... children) {
+      ThreadGroupChild... children) {
     return new DslIfController(condition, Arrays.asList(children));
   }
 
@@ -314,8 +314,8 @@ public class JmeterDsl {
    * condition is met in one thread iteration.
    *
    * @param condition contains an expression that will be evaluated to identify when to stop
-   * looping.
-   * @param children contains the test plan elements to execute while the condition is true.
+   *                  looping.
+   * @param children  contains the test plan elements to execute while the condition is true.
    * @return the controller instance for further configuration and usage.
    * @see DslWhileController
    * @since 0.27
@@ -328,19 +328,19 @@ public class JmeterDsl {
    * Same as {@link #whileController(String, ThreadGroupChild...)} but allowing to set a name which
    * defines autogenerated variable created by JMeter containing iteration index.
    *
-   * @param name specifies the name to assign to the controller. This variable affects the JMeter
-   * autogenerated variable {@code __jm__<controllerName>__idx} which holds the loop iteration
-   * number (starting at 0).
+   * @param name      specifies the name to assign to the controller. This variable affects the
+   *                  JMeter autogenerated variable {@code __jm__<controllerName>__idx} which holds
+   *                  the loop iteration number (starting at 0).
    * @param condition contains an expression that will be evaluated to identify when to stop
-   * looping.
-   * @param children contains the test plan elements to execute while the condition is true.
+   *                  looping.
+   * @param children  contains the test plan elements to execute while the condition is true.
    * @return the controller instance for further configuration and usage.
    * @see DslWhileController
    * @see #whileController(String, ThreadGroupChild...)
    * @since 0.27
    */
   public static DslWhileController whileController(String name, String condition,
-                                                   ThreadGroupChild... children) {
+      ThreadGroupChild... children) {
     return new DslWhileController(name, condition, Arrays.asList(children));
   }
 
@@ -356,14 +356,14 @@ public class JmeterDsl {
    * thread group. So make sure that provided logic is thread safe.
    *
    * @param condition contains java code that will be evaluated to identify when to stop looping.
-   * @param children contains the test plan elements to execute while the condition is true.
+   * @param children  contains the test plan elements to execute while the condition is true.
    * @return the controller instance for further configuration and usage.
    * @see PropertyScript
    * @see #whileController(String, ThreadGroupChild...)
    * @since 0.27
    */
   public static DslWhileController whileController(PropertyScript condition,
-                                                   ThreadGroupChild... children) {
+      ThreadGroupChild... children) {
     return new DslWhileController(null, condition, Arrays.asList(children));
   }
 
@@ -371,32 +371,32 @@ public class JmeterDsl {
    * Same as {@link #whileController(PropertyScript, ThreadGroupChild...)} but allowing to set a
    * name which defines autogenerated variable created by JMeter containing iteration index.
    *
-   * @param name specifies the name to assign to the controller. This variable affects the JMeter
-   * autogenerated variable {@code __jm__<controllerName>__idx} which holds the loop iteration
-   * number (starting at 0).
+   * @param name      specifies the name to assign to the controller. This variable affects the
+   *                  JMeter autogenerated variable {@code __jm__<controllerName>__idx} which holds
+   *                  the loop iteration number (starting at 0).
    * @param condition contains java code that will be evaluated to identify when to stop looping.
-   * @param children contains the test plan elements to execute while the condition is true.
+   * @param children  contains the test plan elements to execute while the condition is true.
    * @return the controller instance for further configuration and usage.
    * @see PropertyScript
    * @see #whileController(PropertyScript, ThreadGroupChild...)
    * @since 0.27
    */
   public static DslWhileController whileController(String name, PropertyScript condition,
-                                                   ThreadGroupChild... children) {
+      ThreadGroupChild... children) {
     return new DslWhileController(name, condition, Arrays.asList(children));
   }
 
   /**
    * Builds a Loop Controller that allows to run specific number of times the given children in each
    * thread group iteration.
-   *
+   * <p>
    * Eg: if a thread group iterates 3 times and the Loop Controller is configured to 5, then the
    * children elements will run {@code 3*5=15} times for each thread.
    *
-   * @param count specifies the number of times to execute the children elements in each thread
-   * group iteration.
+   * @param count    specifies the number of times to execute the children elements in each thread
+   *                 group iteration.
    * @param children contains the test plan elements to execute the given number of times in each
-   * thread group iteration.
+   *                 thread group iteration.
    * @return the controller instance for further configuration and usage.
    * @see ForLoopController
    * @since 0.27
@@ -406,13 +406,32 @@ public class JmeterDsl {
   }
 
   /**
-   * Builds a Once Only Controller that Allows running a part of a test plan only once
-   * and only on the first iteration of each thread group.
+   * Same as {@link #forLoopController(int, ThreadGroupChild...)} but allowing to set a name which
+   * defines autogenerated variable created by JMeter containing iteration index.
    *
-   * Eg: if a thread group iterates 3 times and contains few samplers inside the Once Only Controller, then the
-   * children elements will run 1 times for each thread.
+   * @param count    specifies the number of times to execute the children elements in each thread
+   *                 group iteration.
+   * @param children contains the test plan elements to execute the given number of times in each
+   *                 thread group iteration.
+   * @return the controller instance for further configuration and usage.
+   * @see ForLoopController
+   * @see #forLoopController(int, ThreadGroupChild...)
+   * @since 0.27
+   */
+  public static ForLoopController forLoopController(String name, int count,
+      ThreadGroupChild... children) {
+    return new ForLoopController(name, count, Arrays.asList(children));
+  }
+
+  /**
+   * Builds a Once Only Controller that allows running a part of a test plan only once and only on
+   * the first iteration of each thread group.
+   * <p>
+   * Eg: if a thread group iterates 3 times and contains few samplers inside the Once Only
+   * Controller, then children elements will run 1 time for each thread.
    *
-   * @param children contains the test plan elements to execute only one time on first iteration of each thread group.
+   * @param children contains the test plan elements to execute only one time on first iteration of
+   *                 each thread group.
    * @return the controller instance for further configuration and usage.
    * @see DslOnceOnlyController
    * @since 0.34
@@ -422,30 +441,12 @@ public class JmeterDsl {
   }
 
   /**
-   * Same as {@link #forLoopController(int, ThreadGroupChild...)} but allowing to set a name which
-   * defines autogenerated variable created by JMeter containing iteration index.
-   *
-   * @param count specifies the number of times to execute the children elements in each thread
-   * group iteration.
-   * @param children contains the test plan elements to execute the given number of times in each
-   * thread group iteration.
-   * @return the controller instance for further configuration and usage.
-   * @see ForLoopController
-   * @see #forLoopController(int, ThreadGroupChild...)
-   * @since 0.27
-   */
-  public static ForLoopController forLoopController(String name, int count,
-                                                    ThreadGroupChild... children) {
-    return new ForLoopController(name, count, Arrays.asList(children));
-  }
-
-  /**
    * Builds a Percent Controller to execute children only a given percent of times.
-   *
+   * <p>
    * Internally, this uses a JMeter Throughput Controller with executions percentage configuration.
    *
-   * @param percent defines a number between 0 and 100 that defines the percentage of times to
-   * execute given children elements.
+   * @param percent  defines a number between 0 and 100 that defines the percentage of times to
+   *                 execute given children elements.
    * @param children holds test plan elements to execute when for the given percent of times.
    * @return the controller instance for further configuration and usage.
    * @see PercentController
@@ -516,7 +517,7 @@ public class JmeterDsl {
    * @since 0.10
    */
   public static DslHttpSampler httpSampler(String name,
-                                           Function<PreProcessorVars, String> urlSupplier) {
+      Function<PreProcessorVars, String> urlSupplier) {
     return new DslHttpSampler(name, urlSupplier);
   }
 
@@ -561,7 +562,8 @@ public class JmeterDsl {
    * <p>
    *
    * @param script contains the script to be use while sampling. By default, this will be a groovy
-   * script, but you can change it by setting the language property in the returned post processor.
+   *               script, but you can change it by setting the language property in the returned
+   *               post processor.
    * @return the JSR223 Sampler instance
    * @see DslJsr223Sampler
    * @since 0.22
@@ -628,8 +630,8 @@ public class JmeterDsl {
    * implement any kind of custom logic that you may think.
    *
    * @param script contains the script to be executed by the preprocessor. By default, this will be
-   * a groovy script, but you can change it by setting the language property in the returned post
-   * processor.
+   *               a groovy script, but you can change it by setting the language property in the
+   *               returned post processor.
    * @return the JSR223 Pre Processor instance
    * @see DslJsr223PreProcessor
    * @since 0.7
@@ -701,11 +703,12 @@ public class JmeterDsl {
    * expression between parenthesis) of the first match for the regular expression.
    *
    * @param variableName is the name of the variable to be used to store the extracted value to.
-   * Additional variables {@code <variableName>_g<groupId>} will be created for each regular
-   * expression capturing group (segment of regex between parenthesis), being the group 0 the entire
-   * match of the regex. {@code <variableName>_g} variable contains the number of matched capturing
-   * groups (not counting the group 0).
-   * @param regex regular expression used to extract part of request or response.
+   *                     Additional variables {@code <variableName>_g<groupId>} will be created for
+   *                     each regular expression capturing group (segment of regex between
+   *                     parenthesis), being the group 0 the entire match of the regex. {@code
+   *                     <variableName>_g} variable contains the number of matched capturing groups
+   *                     (not counting the group 0).
+   * @param regex        regular expression used to extract part of request or response.
    * @return the Regex Extractor which can be used to define additional settings to use when
    * extracting (like defining match number, template, etc.).
    * @see DslRegexExtractor
@@ -725,8 +728,8 @@ public class JmeterDsl {
    * By default when no match is found, no variable will be created or modified. On the other hand,
    * when a match is found, it will by default store the first match.
    *
-   * @param variableName is the name of the variable to be used to store the extracted value to.
-   * @param leftBoundary specifies text preceding the text to be extracted.
+   * @param variableName  is the name of the variable to be used to store the extracted value to.
+   * @param leftBoundary  specifies text preceding the text to be extracted.
    * @param rightBoundary specifies text following the text to be extracted.
    * @return the Boundary Extractor which can be used to define additional settings to use when
    * extracting (like defining match number, targetField, etc.).
@@ -734,7 +737,7 @@ public class JmeterDsl {
    * @since 0.28
    */
   public static DslBoundaryExtractor boundaryExtractor(String variableName, String leftBoundary,
-                                                       String rightBoundary) {
+      String rightBoundary) {
     return new DslBoundaryExtractor(variableName, leftBoundary, rightBoundary);
   }
 
@@ -749,7 +752,7 @@ public class JmeterDsl {
    * when a match is found, it will by default store the first match.
    *
    * @param variableName is the name of the variable to be used to store the extracted value to.
-   * @param jmesPath specifies the JMESPath to extract the value.
+   * @param jmesPath     specifies the JMESPath to extract the value.
    * @return the JSON JMESPath Extractor which can be used to define additional settings to use when
    * extracting (like defining match number, scope, etc.).
    * @see DslJsonExtractor
@@ -766,8 +769,8 @@ public class JmeterDsl {
    * implement any kind of custom logic that you may think.
    *
    * @param script contains the script to be executed by the post processor. By default, this will
-   * be a groovy script, but you can change it by setting the language property in the returned post
-   * processor.
+   *               be a groovy script, but you can change it by setting the language property in the
+   *               returned post processor.
    * @return the JSR223 Post Processor instance
    * @see DslJsr223PostProcessor
    * @since 0.6
@@ -824,14 +827,14 @@ public class JmeterDsl {
    * @since 0.10
    */
   public static DslJsr223PostProcessor jsr223PostProcessor(String name,
-                                                           PostProcessorScript script) {
+      PostProcessorScript script) {
     return new DslJsr223PostProcessor(name, script);
   }
 
   /**
    * Builds a Response Assertion to be able to check that obtained sample result is the expected
    * one.
-   *
+   * <p>
    * JMeter by default uses repose codes (eg: 4xx and 5xx HTTP response codes are error codes) to
    * determine if a request was success or not, but in some cases this might not be enough or
    * correct. In some cases applications might not behave in this way, for example, they might
@@ -839,7 +842,7 @@ public class JmeterDsl {
    * success one, but the information contained within the response is not the expected one to
    * continue executing the test. In such scenarios you can use response assertions to properly
    * verify your assumptions before continuing with next request in the test plan.
-   *
+   * <p>
    * By default, response assertion will use the response body of the main sample result (not sub
    * samples as redirects, or embedded resources) to check the specified criteria (substring match,
    * entire string equality, contained regex or entire regex match) against.
@@ -882,8 +885,9 @@ public class JmeterDsl {
    * Builds a Response File Saver to generate a file for each response of a sample.
    *
    * @param fileNamePrefix the prefix to be used when generating the files. This should contain the
-   * directory location where the files should be generated and can contain a file name prefix for
-   * all file names (eg: target/response-files/response-).
+   *                       directory location where the files should be generated and can contain a
+   *                       file name prefix for all file names (eg: target/response-files/response-
+   *                       ).
    * @return the ResponseFileSaver instance.
    * @see ResponseFileSaver
    * @since 0.13
@@ -897,7 +901,7 @@ public class JmeterDsl {
    * historic, comparison and live test results.
    *
    * @param influxDbUrl is the URL to connect to the InfluxDB instance where test results should be
-   * sent.
+   *                    sent.
    * @return the Backend Listener instance which can be used to set additional settings like title,
    * token &amp; queueSize.
    * @see InfluxDbBackendListener
@@ -913,8 +917,9 @@ public class JmeterDsl {
    * @param reportDirectory directory where HTML report is generated.
    * @return the HTML Reporter instance
    * @throws IOException if reportDirectory is an existing file, or an existing nonempty directory.
-   * The idea of this exception is to avoid users unintentionally overwriting previous reports and
-   * don't force any particular structure on collection of reports.
+   *                     The idea of this exception is to avoid users unintentionally overwriting
+   *                     previous reports and don't force any particular structure on collection of
+   *                     reports.
    * @see HtmlReporter
    * @since 0.6
    */
@@ -925,7 +930,7 @@ public class JmeterDsl {
   /**
    * Builds a View Results Tree element to show live results in a pop-up window while the test
    * runs.
-   *
+   * <p>
    * This element is helpful when debugging a test plan to verify each sample result, and general
    * structure of results.
    *
@@ -956,7 +961,8 @@ public class JmeterDsl {
    *
    * @param minimumMillis is used to set the constant delay of the Uniform Random Timer.
    * @param maximumMillis is used to set the maximum time the timer will be paused and will be used
-   * to obtain the random delay from the result of (maximumMillis - minimumMillis).
+   *                      to obtain the random delay from the result of (maximumMillis -
+   *                      minimumMillis).
    * @return The Uniform Random Timer instance
    * @see DslUniformRandomTimer
    * @since 0.16
@@ -967,14 +973,14 @@ public class JmeterDsl {
 
   /**
    * Builds a CSV Data Set which allows loading from a CSV file variables to be used in test plan.
-   *
+   * <p>
    * This allows to store for example in a CSV file one line for each user credentials, and then in
    * the test plan be able to use all the credentials to test with different users.
-   *
+   * <p>
    * By default, the CSV data set will read comma separated values, use first row as name of the
    * generated variables, restart from beginning when csv entries are exhausted and will read a new
    * line of CSV for each thread and iteration.
-   *
+   * <p>
    * E.g: If you have a csv with 2 entries and a test plan with two threads, iterating 2 times each,
    * you might get (since threads run in parallel, the assignment is not deterministic) following
    * assignment of rows:

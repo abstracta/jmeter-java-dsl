@@ -27,10 +27,10 @@ To use the DSL just include it in your project:
 ::: tab Maven
 ```xml
 <dependency>
-    <groupId>us.abstracta.jmeter</groupId>
-    <artifactId>jmeter-java-dsl</artifactId>
-    <version>0.33.1</version>
-    <scope>test</scope>
+  <groupId>us.abstracta.jmeter</groupId>
+  <artifactId>jmeter-java-dsl</artifactId>
+  <version>0.33.1</version>
+  <scope>test</scope>
 </dependency>
 ```
 :::
@@ -86,17 +86,17 @@ import us.abstracta.jmeter.javadsl.core.TestPlanStats;
 
 public class PerformanceTest {
 
-    @Test
-    public void testPerformance() throws IOException {
-        TestPlanStats stats = testPlan(
-                threadGroup(2, 10,
-                        httpSampler("http://my.service")
-                ),
-                //this is just to log details of each request stats
-                jtlWriter("test" + Instant.now().toString().replace(":", "-") + ".jtl")
-        ).run();
-        assertThat(stats.overall().sampleTimePercentile99()).isLessThan(Duration.ofSeconds(5));
-    }
+  @Test
+  public void testPerformance() throws IOException {
+    TestPlanStats stats = testPlan(
+        threadGroup(2, 10,
+            httpSampler("http://my.service")
+        ),
+        //this is just to log details of each request stats
+        jtlWriter("test" + Instant.now().toString().replace(":", "-") + ".jtl")
+    ).run();
+    assertThat(stats.overall().sampleTimePercentile99()).isLessThan(Duration.ofSeconds(5));
+  }
 
 }
 ```
@@ -127,10 +127,10 @@ By including following module as dependency:
 ::: tab Maven
 ```xml
 <dependency>
-    <groupId>us.abstracta.jmeter</groupId>
-    <artifactId>jmeter-java-dsl-blazemeter</artifactId>
-    <version>0.33.1</version>
-    <scope>test</scope>
+  <groupId>us.abstracta.jmeter</groupId>
+  <artifactId>jmeter-java-dsl-blazemeter</artifactId>
+  <version>0.33.1</version>
+  <scope>test</scope>
 </dependency>
 ```
 :::
@@ -154,21 +154,21 @@ import us.abstracta.jmeter.javadsl.core.TestPlanStats;
 
 public class PerformanceTest {
 
-    @Test
-    public void testPerformance() throws Exception {
-        TestPlanStats stats = testPlan(
-                // number of threads and iterations are in the end overwritten by BlazeMeter engine settings 
-                threadGroup(2, 10,
-                        httpSampler("http://my.service")
-                )
-        ).runIn(new BlazeMeterEngine(System.getenv("BZ_TOKEN"))
-                .testName("DSL test")
-                .totalUsers(500)
-                .holdFor(Duration.ofMinutes(10))
-                .threadsPerEngine(100)
-                .testTimeout(Duration.ofMinutes(20)));
-        assertThat(stats.overall().sampleTimePercentile99()).isLessThan(Duration.ofSeconds(5));
-    }
+  @Test
+  public void testPerformance() throws Exception {
+    TestPlanStats stats = testPlan(
+        // number of threads and iterations are in the end overwritten by BlazeMeter engine settings 
+        threadGroup(2, 10,
+            httpSampler("http://my.service")
+        )
+    ).runIn(new BlazeMeterEngine(System.getenv("BZ_TOKEN"))
+        .testName("DSL test")
+        .totalUsers(500)
+        .holdFor(Duration.ofMinutes(10))
+        .threadsPerEngine(100)
+        .testTimeout(Duration.ofMinutes(20)));
+    assertThat(stats.overall().sampleTimePercentile99()).isLessThan(Duration.ofSeconds(5));
+  }
 
 }
 ```
@@ -213,15 +213,15 @@ import us.abstracta.jmeter.javadsl.core.TestPlanStats;
 
 public class PerformanceTest {
 
-    @Test
-    public void testPerformance() throws Exception {
-        TestPlanStats stats = testPlan(
-                threadGroup(200, Duration.ofMinutes(10),
-                        httpSampler("http://my.service")
-                )
-        ).runIn(new DistributedJmeterEngine("host1", "host2"));
-        assertThat(stats.overall().sampleTimePercentile99()).isLessThan(Duration.ofSeconds(5));
-    }
+  @Test
+  public void testPerformance() throws Exception {
+    TestPlanStats stats = testPlan(
+        threadGroup(200, Duration.ofMinutes(10),
+            httpSampler("http://my.service")
+        )
+    ).runIn(new DistributedJmeterEngine("host1", "host2"));
+    assertThat(stats.overall().sampleTimePercentile99()).isLessThan(Duration.ofSeconds(5));
+  }
 
 }
 ```
@@ -249,7 +249,7 @@ This is how they look in code:
 
 ```java
 threadGroup(10, 20) // 10 threads for 20 iterations each
-        threadGroup(10, Duration.ofSeconds(20)) // 10 threads for 20 seconds each
+threadGroup(10, Duration.ofSeconds(20)) // 10 threads for 20 seconds each
 ```
 
 But these options are not good when working with many threads or when trying to configure some complex test scenarios (like when doing incremental or peak tests).
@@ -262,21 +262,21 @@ You can easily configure a ramp up with the DSL like this:
 
 ```java
 threadGroup().rampTo(10, Duration.ofSeconds(5)).holdIterating(20) // ramp to 10 threads for 5 seconds (1 thread every half second) and iterating each thread 20 times
-        threadGroup().rampToAndHold(10, Duration.ofSeconds(5), Duration.ofSeconds(20)) //similar as above but after ramping up holding execution for 20 seconds
+threadGroup().rampToAndHold(10, Duration.ofSeconds(5), Duration.ofSeconds(20)) //similar as above but after ramping up holding execution for 20 seconds
 ```
 
 Additionally, you can use and combine these same methods to configure more complex scenarios (incremental, peak, and any other types of tests) like the following one:
 
 ```java
 threadGroup()
-        .rampToAndHold(10, Duration.ofSeconds(5), Duration.ofSeconds(20))
-        .rampToAndHold(100, Duration.ofSeconds(10), Duration.ofSeconds(30))
-        .rampTo(200, Duration.ofSeconds(10))
-        .rampToAndHold(100, Duration.ofSeconds(10), Duration.ofSeconds(30))
-        .rampTo(0, Duration.ofSeconds(5))
-        .children(
-        httpSampler("http://my.service")
-        )
+    .rampToAndHold(10, Duration.ofSeconds(5), Duration.ofSeconds(20))
+    .rampToAndHold(100, Duration.ofSeconds(10), Duration.ofSeconds(30))
+    .rampTo(200, Duration.ofSeconds(10))
+    .rampToAndHold(100, Duration.ofSeconds(10), Duration.ofSeconds(30))
+    .rampTo(0, Duration.ofSeconds(5))
+    .children(
+      httpSampler("http://my.service")
+    )
 ```
 
 Which would translate in the following threads' timeline:
@@ -307,13 +307,13 @@ Sometimes you want to focus just on the number of requests per second to generat
 
 ```java
 rpsThreadGroup()
-        .maxThreads(500)
-        .rampTo(20, Duration.ofSeconds(10))
-        .rampTo(10, Duration.ofSeconds(10))
-        .rampToAndHold(1000, Duration.ofSeconds(5), Duration.ofSeconds(10))
-        .children(
-        httpSampler("http://my.service")
-        )
+    .maxThreads(500)
+    .rampTo(20, Duration.ofSeconds(10))
+    .rampTo(10, Duration.ofSeconds(10))
+    .rampToAndHold(1000, Duration.ofSeconds(5), Duration.ofSeconds(10))
+    .children(
+      httpSampler("http://my.service")
+    )
 ```
 
 This will internally use JMeter [Concurrency Thread Group](https://jmeter-plugins.org/wiki/ConcurrencyThreadGroup/) element in combination with [Throughput Shaping Time](https://jmeter-plugins.org/wiki/ThroughputShapingTimer/).
@@ -362,25 +362,25 @@ import us.abstracta.jmeter.javadsl.core.TestPlanStats;
 
 public class PerformanceTest {
 
-    @BeforeEach
-    public void setup() {
-        // my custom setup logic
-    }
+  @BeforeEach
+  public void setup() {
+    // my custom setup logic
+  }
 
-    @AfterEach
-    public void setup() {
-        // my custom setup logic
-    }
+  @AfterEach
+  public void setup() {
+    // my custom setup logic
+  }
 
-    @Test
-    public void testPerformance() throws IOException {
-        TestPlanStats stats = testPlan(
-                threadGroup(2, 10,
-                        httpSampler("http://my.service")
-                )
-        ).run();
-        assertThat(stats.overall().sampleTimePercentile99()).isLessThan(Duration.ofSeconds(5));
-    }
+  @Test
+  public void testPerformance() throws IOException {
+    TestPlanStats stats = testPlan(
+        threadGroup(2, 10,
+            httpSampler("http://my.service")
+        )
+    ).run();
+    assertThat(stats.overall().sampleTimePercentile99()).isLessThan(Duration.ofSeconds(5));
+  }
 
 }
 ```
@@ -401,27 +401,27 @@ import us.abstracta.jmeter.javadsl.core.TestPlanStats;
 
 public class PerformanceTest {
 
-    @Test
-    public void testPerformance() throws IOException {
-        TestPlanStats stats = testPlan(
-                setupThreadGroup(
-                        httpSampler("http://my.service/tokens")
-                                .method(HttpMethod.POST)
-                                .children(
-                                        jsr223PostProcessor("props.put('MY_TEST_TOKEN', prev.responseDataAsString)")
-                                )
-                ),
-                threadGroup(2, 10,
-                        httpSampler("http://my.service/products")
-                                .header("X-MY-TOKEN", "${__P(MY_TEST_TOKEN)}")
-                ),
-                teardownThreadGroup(
-                        httpSampler("http://my.service/tokens/${__P(MY_TEST_TOKEN)}")
-                                .method(HttpMethod.DELETE)
+  @Test
+  public void testPerformance() throws IOException {
+    TestPlanStats stats = testPlan(
+        setupThreadGroup(
+            httpSampler("http://my.service/tokens")
+                .method(HttpMethod.POST)
+                .children(
+                    jsr223PostProcessor("props.put('MY_TEST_TOKEN', prev.responseDataAsString)")
                 )
-        ).run();
-        assertThat(stats.overall().sampleTimePercentile99()).isLessThan(Duration.ofSeconds(5));
-    }
+        ),
+        threadGroup(2, 10,
+            httpSampler("http://my.service/products")
+                .header("X-MY-TOKEN", "${__P(MY_TEST_TOKEN)}")
+        ),
+        teardownThreadGroup(
+            httpSampler("http://my.service/tokens/${__P(MY_TEST_TOKEN)}")
+                .method(HttpMethod.DELETE)
+        )
+    ).run();
+    assertThat(stats.overall().sampleTimePercentile99()).isLessThan(Duration.ofSeconds(5));
+  }
 
 }
 ```
@@ -444,15 +444,15 @@ import org.junit.jupiter.api.Test;
 
 public class PerformanceTest {
 
-    @Test
-    public void testPerformance() throws IOException {
-        testPlan(
-                threadGroup(1, 1,
-                        httpSampler("http://my.service")
-                ),
-                resultsTreeVisualizer()
-        ).run();
-    }
+  @Test
+  public void testPerformance() throws IOException {
+    testPlan(
+        threadGroup(1, 1,
+            httpSampler("http://my.service")
+        ),
+        resultsTreeVisualizer()
+    ).run();
+  }
 
 }
 ```
@@ -532,16 +532,16 @@ import us.abstracta.jmeter.javadsl.core.TestPlanStats;
 
 public class PerformanceTest {
 
-    @Test
-    public void testPerformance() throws IOException {
-        TestPlanStats stats = testPlan(
-                threadGroup(2, 10,
-                        httpSampler("http://my.service")
-                ),
-                jtlWriter("test" + Instant.now().toString().replace(":", "-") + ".jtl")
-        ).run();
-        assertThat(stats.overall().sampleTimePercentile99()).isLessThan(Duration.ofSeconds(5));
-    }
+  @Test
+  public void testPerformance() throws IOException {
+    TestPlanStats stats = testPlan(
+        threadGroup(2, 10,
+            httpSampler("http://my.service")
+        ),
+        jtlWriter("test" + Instant.now().toString().replace(":", "-") + ".jtl")
+    ).run();
+    assertThat(stats.overall().sampleTimePercentile99()).isLessThan(Duration.ofSeconds(5));
+  }
 
 }
 ```
@@ -551,7 +551,7 @@ By default, `jtlWriter` will write most used information to evaluate performance
 An additional option, specially targeted towards logging sample responses, is `responseFileSaver` which automatically generates a file for each received response. Here is an example:
 
 ```java
- import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.*;
 
 import java.io.IOException;
@@ -563,16 +563,16 @@ import us.abstracta.jmeter.javadsl.core.TestPlanStats;
 
 public class PerformanceTest {
 
-    @Test
-    public void testPerformance() throws IOException {
-        TestPlanStats stats = testPlan(
-                threadGroup(2, 10,
-                        httpSampler("http://my.service")
-                ),
-                responseFileSaver(Instant.now().toString().replace(":", "-") + "-response")
-        ).run();
-        assertThat(stats.overall().sampleTimePercentile99()).isLessThan(Duration.ofSeconds(5));
-    }
+  @Test
+  public void testPerformance() throws IOException {
+    TestPlanStats stats = testPlan(
+        threadGroup(2, 10,
+            httpSampler("http://my.service")
+        ),
+        responseFileSaver(Instant.now().toString().replace(":", "-") + "-response")
+    ).run();
+    assertThat(stats.overall().sampleTimePercentile99()).isLessThan(Duration.ofSeconds(5));
+  }
 
 }
 ```
@@ -594,16 +594,17 @@ import us.abstracta.jmeter.javadsl.core.TestPlanStats;
 
 public class PerformanceTest {
 
-    @Test
-    public void testPerformance() throws IOException {
-        TestPlanStats stats = testPlan(
-                threadGroup(2, 10,
-                        httpSampler("http://my.service")
-                                .children(jsr223PostProcessor("new File('traceFile') << \"${prev.sampleLabel}>>${prev.responseDataAsString}\\n\""))
-                )
-        ).run();
-        assertThat(stats.overall().sampleTimePercentile99()).isLessThan(Duration.ofSeconds(5));
-    }
+  @Test
+  public void testPerformance() throws IOException {
+    TestPlanStats stats = testPlan(
+        threadGroup(2, 10,
+            httpSampler("http://my.service")
+                .children(jsr223PostProcessor(
+                    "new File('traceFile') << \"${prev.sampleLabel}>>${prev.responseDataAsString}\\n\""))
+        )
+    ).run();
+    assertThat(stats.overall().sampleTimePercentile99()).isLessThan(Duration.ofSeconds(5));
+  }
 
 }
 ```
@@ -635,16 +636,16 @@ import us.abstracta.jmeter.javadsl.core.TestPlanStats;
 
 public class PerformanceTest {
 
-    @Test
-    public void testPerformance() throws IOException {
-        TestPlanStats stats = testPlan(
-                threadGroup(2, 10,
-                        httpSampler("http://my.service")
-                ),
-                influxDbListener("http://localhost:8086/write?db=jmeter")
-        ).run();
-        assertThat(stats.overall().sampleTimePercentile99()).isLessThan(Duration.ofSeconds(5));
-    }
+  @Test
+  public void testPerformance() throws IOException {
+    TestPlanStats stats = testPlan(
+        threadGroup(2, 10,
+            httpSampler("http://my.service")
+        ),
+        influxDbListener("http://localhost:8086/write?db=jmeter")
+    ).run();
+    assertThat(stats.overall().sampleTimePercentile99()).isLessThan(Duration.ofSeconds(5));
+  }
 
 }
 ```
@@ -667,10 +668,10 @@ To use the module, you will need to include following dependency in your project
 ::: tab Maven
 ```xml
 <dependency>
-    <groupId>us.abstracta.jmeter</groupId>
-    <artifactId>jmeter-java-dsl-elasticsearch-listener</artifactId>
-    <version>0.33.1</version>
-    <scope>test</scope>
+  <groupId>us.abstracta.jmeter</groupId>
+  <artifactId>jmeter-java-dsl-elasticsearch-listener</artifactId>
+  <version>0.33.1</version>
+  <scope>test</scope>
 </dependency>
 ```
 :::
@@ -702,16 +703,16 @@ import us.abstracta.jmeter.javadsl.core.TestPlanStats;
 
 public class PerformanceTest {
 
-    @Test
-    public void testPerformance() throws IOException {
-        TestPlanStats stats = testPlan(
-                threadGroup(2, 10,
-                        httpSampler("http://my.service")
-                ),
-                elasticsearchListener("http://localhost:9200/jmeter")
-        ).run();
-        assertThat(stats.overall().sampleTimePercentile99()).isLessThan(Duration.ofSeconds(5));
-    }
+  @Test
+  public void testPerformance() throws IOException {
+    TestPlanStats stats = testPlan(
+        threadGroup(2, 10,
+            httpSampler("http://my.service")
+        ),
+        elasticsearchListener("http://localhost:9200/jmeter")
+    ).run();
+    assertThat(stats.overall().sampleTimePercentile99()).isLessThan(Duration.ofSeconds(5));
+  }
 
 }
 ```
@@ -750,16 +751,16 @@ import us.abstracta.jmeter.javadsl.core.TestPlanStats;
 
 public class PerformanceTest {
 
-    @Test
-    public void testPerformance() throws IOException {
-        TestPlanStats stats = testPlan(
-                threadGroup(2, 10,
-                        httpSampler("http://my.service")
-                ),
-                htmlReporter("html-report-" + Instant.now().toString().replace(":", "-"))
-        ).run();
-        assertThat(stats.overall().sampleTimePercentile99()).isLessThan(Duration.ofSeconds(5));
-    }
+  @Test
+  public void testPerformance() throws IOException {
+    TestPlanStats stats = testPlan(
+        threadGroup(2, 10,
+            httpSampler("http://my.service")
+        ),
+        htmlReporter("html-report-" + Instant.now().toString().replace(":", "-"))
+    ).run();
+    assertThat(stats.overall().sampleTimePercentile99()).isLessThan(Duration.ofSeconds(5));
+  }
 
 }
 ```
@@ -780,10 +781,10 @@ To use it, you need to add following dependency:
 ::: tab Maven
 ```xml
 <dependency>
-    <groupId>us.abstracta.jmeter</groupId>
-    <artifactId>jmeter-java-dsl-dashboard</artifactId>
-    <version>0.33.1</version>
-    <scope>test</scope>
+  <groupId>us.abstracta.jmeter</groupId>
+  <artifactId>jmeter-java-dsl-dashboard</artifactId>
+  <version>0.33.1</version>
+  <scope>test</scope>
 </dependency>
 ```
 :::
@@ -810,23 +811,23 @@ import us.abstracta.jmeter.javadsl.core.TestPlanStats;
 
 public class PerformanceTest {
 
-    @Test
-    public void testPerformance() throws IOException {
-        TestPlanStats stats = testPlan(
-                threadGroup("Group1")
-                        .rampToAndHold(10, Duration.ofSeconds(10), Duration.ofSeconds(10))
-                        .children(
-                                httpSampler("Sample 1", "http://my.service")
-                        ),
-                threadGroup("Group2")
-                        .rampToAndHold(20, Duration.ofSeconds(10), Duration.ofSeconds(20))
-                        .children(
-                                httpSampler("Sample 2", "http://my.service/get")
-                        ),
-                dashboardVisualizer()
-        ).run();
-        assertThat(stats.overall().sampleTimePercentile99()).isLessThan(Duration.ofSeconds(5));
-    }
+  @Test
+  public void testPerformance() throws IOException {
+    TestPlanStats stats = testPlan(
+        threadGroup("Group1")
+            .rampToAndHold(10, Duration.ofSeconds(10), Duration.ofSeconds(10))
+            .children(
+                httpSampler("Sample 1", "http://my.service")
+            ),
+        threadGroup("Group2")
+            .rampToAndHold(20, Duration.ofSeconds(10), Duration.ofSeconds(20))
+            .children(
+                httpSampler("Sample 2", "http://my.service/get")
+            ),
+        dashboardVisualizer()
+    ).run();
+    assertThat(stats.overall().sampleTimePercentile99()).isLessThan(Duration.ofSeconds(5));
+  }
 
 }
 ```
@@ -871,18 +872,18 @@ import us.abstracta.jmeter.javadsl.core.TestPlanStats;
 
 public class PerformanceTest {
 
-    @Test
-    public void testPerformance() throws IOException {
-        TestPlanStats stats = testPlan(
-                threadGroup(2, 10,
-                        httpSampler("http://my.service")
-                                .children(
-                                        responseAssertion().containsSubstrings("OK")
-                                )
+  @Test
+  public void testPerformance() throws IOException {
+    TestPlanStats stats = testPlan(
+        threadGroup(2, 10,
+            httpSampler("http://my.service")
+                .children(
+                    responseAssertion().containsSubstrings("OK")
                 )
-        ).run();
-        assertThat(stats.overall().sampleTimePercentile99()).isLessThan(Duration.ofSeconds(5));
-    }
+        )
+    ).run();
+    assertThat(stats.overall().sampleTimePercentile99()).isLessThan(Duration.ofSeconds(5));
+  }
 
 }
 ```
@@ -906,18 +907,19 @@ import us.abstracta.jmeter.javadsl.core.TestPlanStats;
 
 public class PerformanceTest {
 
-    @Test
-    public void testPerformance() throws IOException {
-        TestPlanStats stats = testPlan(
-                threadGroup(2, 10,
-                        httpSampler("http://my.service")
-                                .children(
-                                        jsr223PostProcessor("if (prev.responseCode == '429') { prev.successful = true }")
-                                )
+  @Test
+  public void testPerformance() throws IOException {
+    TestPlanStats stats = testPlan(
+        threadGroup(2, 10,
+            httpSampler("http://my.service")
+                .children(
+                    jsr223PostProcessor(
+                        "if (prev.responseCode == '429') { prev.successful = true }")
                 )
-        ).run();
-        assertThat(stats.overall().sampleTimePercentile99()).isLessThan(Duration.ofSeconds(5));
-    }
+        )
+    ).run();
+    assertThat(stats.overall().sampleTimePercentile99()).isLessThan(Duration.ofSeconds(5));
+  }
 
 }
 ```
@@ -926,10 +928,10 @@ You can also use a Java lambda instead of providing Groovy script, which benefit
 
 ```java
 jsr223PostProcessor(s -> {
-        if ("429".equals(s.prev.getResponseCode())) {
-        s.prev.setSuccessful(true);
-        }
-        })
+    if ("429".equals(s.prev.getResponseCode())) {
+      s.prev.setSuccessful(true);
+    }
+})
 ```
 
 ::: warning
@@ -962,20 +964,20 @@ import us.abstracta.jmeter.javadsl.core.TestPlanStats;
 
 public class PerformanceTest {
 
-    @Test
-    public void testPerformance() throws IOException {
-        TestPlanStats stats = testPlan(
-                threadGroup(2, 10,
-                        httpSampler("http://my.service/accounts")
-                                .post("{\"name\": \"John Doe\"}", Type.APPLICATION_JSON)
-                                .children(
-                                        regexExtractor("ACCOUNT_ID", "\"id\":\"([^\"]+)\"")
-                                ),
-                        httpSampler("http://my.service/accounts/${ACCOUNT_ID}")
-                )
-        ).run();
-        assertThat(stats.overall().sampleTimePercentile99()).isLessThan(Duration.ofSeconds(5));
-    }
+  @Test
+  public void testPerformance() throws IOException {
+    TestPlanStats stats = testPlan(
+        threadGroup(2, 10,
+            httpSampler("http://my.service/accounts")
+                .post("{\"name\": \"John Doe\"}", Type.APPLICATION_JSON)
+                .children(
+                    regexExtractor("ACCOUNT_ID", "\"id\":\"([^\"]+)\"")
+                ),
+            httpSampler("http://my.service/accounts/${ACCOUNT_ID}")
+        )
+    ).run();
+    assertThat(stats.overall().sampleTimePercentile99()).isLessThan(Duration.ofSeconds(5));
+  }
 
 }
 ```
@@ -998,20 +1000,20 @@ import us.abstracta.jmeter.javadsl.core.TestPlanStats;
 
 public class PerformanceTest {
 
-    @Test
-    public void testPerformance() throws IOException {
-        TestPlanStats stats = testPlan(
-                threadGroup(2, 10,
-                        httpSampler("http://my.service/accounts")
-                                .post("{\"name\": \"John Doe\"}", Type.APPLICATION_JSON)
-                                .children(
-                                        boundaryExtractor("ACCOUNT_ID", "\"id\":\"", "\"")
-                                ),
-                        httpSampler("http://my.service/accounts/${ACCOUNT_ID}")
-                )
-        ).run();
-        assertThat(stats.overall().sampleTimePercentile99()).isLessThan(Duration.ofSeconds(5));
-    }
+  @Test
+  public void testPerformance() throws IOException {
+    TestPlanStats stats = testPlan(
+        threadGroup(2, 10,
+            httpSampler("http://my.service/accounts")
+                .post("{\"name\": \"John Doe\"}", Type.APPLICATION_JSON)
+                .children(
+                    boundaryExtractor("ACCOUNT_ID", "\"id\":\"", "\"")
+                ),
+            httpSampler("http://my.service/accounts/${ACCOUNT_ID}")
+        )
+    ).run();
+    assertThat(stats.overall().sampleTimePercentile99()).isLessThan(Duration.ofSeconds(5));
+  }
 
 }
 ```
@@ -1034,20 +1036,20 @@ import us.abstracta.jmeter.javadsl.core.TestPlanStats;
 
 public class PerformanceTest {
 
-    @Test
-    public void testPerformance() throws IOException {
-        TestPlanStats stats = testPlan(
-                threadGroup(2, 10,
-                        httpSampler("http://my.service/accounts")
-                                .post("{\"name\": \"John Doe\"}", Type.APPLICATION_JSON)
-                                .children(
-                                        jsonExtractor("ACCOUNT_ID", "id")
-                                ),
-                        httpSampler("http://my.service/accounts/${ACCOUNT_ID}")
-                )
-        ).run();
-        assertThat(stats.overall().sampleTimePercentile99()).isLessThan(Duration.ofSeconds(5));
-    }
+  @Test
+  public void testPerformance() throws IOException {
+    TestPlanStats stats = testPlan(
+        threadGroup(2, 10,
+            httpSampler("http://my.service/accounts")
+                .post("{\"name\": \"John Doe\"}", Type.APPLICATION_JSON)
+                .children(
+                    jsonExtractor("ACCOUNT_ID", "id")
+                ),
+            httpSampler("http://my.service/accounts/${ACCOUNT_ID}")
+        )
+    ).run();
+    assertThat(stats.overall().sampleTimePercentile99()).isLessThan(Duration.ofSeconds(5));
+  }
 
 }
 ```
@@ -1074,22 +1076,22 @@ import us.abstracta.jmeter.javadsl.core.TestPlanStats;
 
 public class PerformanceTest {
 
-    @Test
-    public void testPerformance() throws IOException {
-        TestPlanStats stats = testPlan(
-                threadGroup(2, 10,
-                        httpSampler("http://my.service/accounts")
-                                .post("{\"name\": \"John Doe\"}", Type.APPLICATION_JSON)
-                                .children(
-                                        regexExtractor("ACCOUNT_ID", "\"id\":\"([^\"]+)\"")
-                                ),
-                        ifController("${__groovy(vars['ACCOUNT_ID'] != null)}",
-                                httpSampler("http://my.service/accounts/${ACCOUNT_ID}")
-                        )
-                )
-        ).run();
-        assertThat(stats.overall().sampleTimePercentile99()).isLessThan(Duration.ofSeconds(5));
-    }
+  @Test
+  public void testPerformance() throws IOException {
+    TestPlanStats stats = testPlan(
+        threadGroup(2, 10,
+            httpSampler("http://my.service/accounts")
+                .post("{\"name\": \"John Doe\"}", Type.APPLICATION_JSON)
+                .children(
+                    regexExtractor("ACCOUNT_ID", "\"id\":\"([^\"]+)\"")
+                ),
+            ifController("${__groovy(vars['ACCOUNT_ID'] != null)}",
+                httpSampler("http://my.service/accounts/${ACCOUNT_ID}")
+            )
+        )
+    ).run();
+    assertThat(stats.overall().sampleTimePercentile99()).isLessThan(Duration.ofSeconds(5));
+  }
 
 }
 ```
@@ -1098,8 +1100,8 @@ You can also use a Java lambda instead of providing JMeter expression, which ben
 
 ```java
 ifController(s -> s.vars.get("ACCOUNT_ID") != null,
-        httpSampler("http://my.service/accounts/${ACCOUNT_ID}")
-        )
+    httpSampler("http://my.service/accounts/${ACCOUNT_ID}")
+)
 ```
 
 ::: warning
@@ -1126,21 +1128,21 @@ import us.abstracta.jmeter.javadsl.core.TestPlanStats;
 
 public class PerformanceTest {
 
-    @Test
-    public void testPerformance() throws IOException {
-        TestPlanStats stats = testPlan(
-                threadGroup(2, 10,
-                        whileController("${__groovy(vars['ACCOUNT_ID'] == null)}",
-                                httpSampler("http://my.service/accounts")
-                                        .post("{\"name\": \"John Doe\"}", Type.APPLICATION_JSON)
-                                        .children(
-                                                regexExtractor("ACCOUNT_ID", "\"id\":\"([^\"]+)\"")
-                                        )
-                        )
-                )
-        ).run();
-        assertThat(stats.overall().sampleTimePercentile99()).isLessThan(Duration.ofSeconds(5));
-    }
+  @Test
+  public void testPerformance() throws IOException {
+    TestPlanStats stats = testPlan(
+        threadGroup(2, 10,
+            whileController("${__groovy(vars['ACCOUNT_ID'] == null)}",
+                httpSampler("http://my.service/accounts")
+                    .post("{\"name\": \"John Doe\"}", Type.APPLICATION_JSON)
+                    .children(
+                        regexExtractor("ACCOUNT_ID", "\"id\":\"([^\"]+)\"")
+                    )
+            )
+        )
+    ).run();
+    assertThat(stats.overall().sampleTimePercentile99()).isLessThan(Duration.ofSeconds(5));
+  }
 
 }
 ```
@@ -1149,12 +1151,12 @@ As with `ifController`, you can also use Java lambdas to benefit from IDE auto-c
 
 ```java
 whileController(s -> s.vars.get("ACCOUNT_ID") == null,
-        httpSampler("http://my.service/accounts")
-        .post("{\"name\": \"John Doe\"}", Type.APPLICATION_JSON)
-        .children(
+    httpSampler("http://my.service/accounts")
+      .post("{\"name\": \"John Doe\"}", Type.APPLICATION_JSON)
+      .children(
         regexExtractor("ACCOUNT_ID", "\"id\":\"([^\"]+)\"")
-        )
-        )
+      )
+)
 ```
 
 ::: warning
@@ -1170,9 +1172,9 @@ JMeter automatically generates a variable `__jm__<loopName>__idx` with the curre
 
 ```java
 whileController("items", "${__groovy(vars.getObject('__jm__items__idx') < 4)}",
-        httpSampler("http://my.service/items")
-        .post("{\"name\": \"My Item\"}", Type.APPLICATION_JSON)
-        )
+    httpSampler("http://my.service/items")
+      .post("{\"name\": \"My Item\"}", Type.APPLICATION_JSON)
+)
 ```
 
 Default name for while controller, when not specified, is `while`.
@@ -1195,17 +1197,17 @@ import us.abstracta.jmeter.javadsl.core.TestPlanStats;
 
 public class PerformanceTest {
 
-    @Test
-    public void testPerformance() throws IOException {
-        TestPlanStats stats = testPlan(
-                threadGroup(2, 10,
-                        forLoopController(5,
-                                httpSampler("http://my.service/accounts")
-                        )
-                )
-        ).run();
-        assertThat(stats.overall().sampleTimePercentile99()).isLessThan(Duration.ofSeconds(5));
-    }
+  @Test
+  public void testPerformance() throws IOException {
+    TestPlanStats stats = testPlan(
+        threadGroup(2, 10,
+            forLoopController(5,
+                httpSampler("http://my.service/accounts")
+            )
+        )
+    ).run();
+    assertThat(stats.overall().sampleTimePercentile99()).isLessThan(Duration.ofSeconds(5));
+  }
 
 }
 ```
@@ -1220,34 +1222,41 @@ Check [ForLoopController](../../jmeter-java-dsl/src/main/java/us/abstracta/jmete
 
 #### Once Only Controller
 
-In some cases, you only need to run part of a test plan once. For these needs you can use `DslOnceOnlyController`. This controller will execute a part of test plan only one time on first iteration (Uses [JMeter Once Only Controller Component](https://jmeter.apache.org/usermanual/component_reference.html#Once_Only_Controller) )
-You can use this, for example, for one-time authorization or for setting vars / props.
+In some cases, you only need to run part of a test plan once. For these needs you can use `onceOnlyController`. This controller will execute a part of test plan only one time on first iteration (using [JMeter Once Only Controller Component](https://jmeter.apache.org/usermanual/component_reference.html#Once_Only_Controller)).
+
+You can use this, for example, for one-time authorization or for setting JMeter variables or properties.
+
+Here is an example:
+
 ```java
+import static us.abstracta.jmeter.javadsl.JmeterDsl.*;
+
+import org.eclipse.jetty.http.HttpMethod;
 import org.junit.jupiter.api.Test;
 import us.abstracta.jmeter.javadsl.JmeterDslTest;
-import us.abstracta.jmeter.javadsl.core.TestPlanStats;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static us.abstracta.jmeter.javadsl.JmeterDsl.*;
 
 public class DslOnceOnlyControllerTest extends JmeterDslTest {
 
-
   @Test
   public void shouldExecuteOnlyOneTimeWhenOnceOnlyControllerInPlan() throws Exception {
-    TestPlanStats stats = testPlan(
+    testPlan(
         threadGroup(1, 10,
             onceOnlyController(
-                httpSampler("http://my.service/accounts")
-            )
+                httpSampler("http://my.service/login") // only runs once
+                    .method(HttpMethod.POST)
+                    .header("Authorization", "Basic asdf=")
+                    .children(
+                        regexExtractor("AUTH_TOKEN", "authToken=(.*)")
+                    )
+            ),
+            httpSampler("http://my.service/accounts") // runs ten times
+                .header("Authorization", "Bearer ${AUTH_TOKEN}")
         )
     ).run();
-    assertThat(stats.overall().samplesCount()).isEqualTo(1);
   }
 
 }
 ```
-This will result only 1 request.
 
 Check [DslOnceOnlyController](../../jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/controllers/DslOnceOnlyController.java) for more details.
 
@@ -1268,27 +1277,28 @@ import us.abstracta.jmeter.javadsl.core.TestPlanStats;
 
 public class PerformanceTest {
 
-    @Test
-    public void testPerformance() throws IOException {
-        TestPlanStats stats = testPlan(
-                threadGroup(2, 10,
-                        httpSampler("http://my.service")
-                                .post("${REQUEST_BODY}", Type.TEXT_PLAIN)
-                                .children(
-                                        jsr223PreProcessor("vars.put('REQUEST_BODY', " + getClass().getName()+ ".buildRequestBody(vars))")
-                                )
+  @Test
+  public void testPerformance() throws IOException {
+    TestPlanStats stats = testPlan(
+        threadGroup(2, 10,
+            httpSampler("http://my.service")
+                .post("${REQUEST_BODY}", Type.TEXT_PLAIN)
+                .children(
+                    jsr223PreProcessor("vars.put('REQUEST_BODY', " + getClass().getName()
+                        + ".buildRequestBody(vars))")
                 )
-        ).run();
-        assertThat(stats.overall().sampleTimePercentile99()).isLessThan(Duration.ofSeconds(5));
-    }
+        )
+    ).run();
+    assertThat(stats.overall().sampleTimePercentile99()).isLessThan(Duration.ofSeconds(5));
+  }
 
-    public static String buildRequestBody(JMeterVariables vars) {
-        String countVarName = "REQUEST_COUNT";
-        Integer countVar = (Integer) vars.getObject(countVarName);
-        int count = countVar != null ? countVar + 1 : 1;
-        vars.putObject(countVarName, count);
-        return "MyBody" + count;
-    }
+  public static String buildRequestBody(JMeterVariables vars) {
+    String countVarName = "REQUEST_COUNT";
+    Integer countVar = (Integer) vars.getObject(countVarName);
+    int count = countVar != null ? countVar + 1 : 1;
+    vars.putObject(countVarName, count);
+    return "MyBody" + count;
+  }
 
 }
 ```
@@ -1338,19 +1348,19 @@ import us.abstracta.jmeter.javadsl.core.TestPlanStats;
 
 public class PerformanceTest {
 
-    @Test
-    public void testPerformance() throws IOException {
-        TestPlanStats stats = testPlan(
-                csvDataSet("users.csv"),
-                threadGroup(5, 10,
-                        httpSampler("http://my.service/login")
-                                .post("{\"${USER}\": \"${PASS}\"", Type.APPLICATION_JSON),
-                        httpSampler("http://my.service/logout")
-                                .method(HttpMethod.POST)
-                )
-        ).run();
-        assertThat(stats.overall().sampleTimePercentile99()).isLessThan(Duration.ofSeconds(5));
-    }
+  @Test
+  public void testPerformance() throws IOException {
+    TestPlanStats stats = testPlan(
+        csvDataSet("users.csv"),
+        threadGroup(5, 10,
+            httpSampler("http://my.service/login")
+                .post("{\"${USER}\": \"${PASS}\"", Type.APPLICATION_JSON),
+            httpSampler("http://my.service/logout")
+                .method(HttpMethod.POST)
+        )
+    ).run();
+    assertThat(stats.overall().sampleTimePercentile99()).isLessThan(Duration.ofSeconds(5));
+  }
 
 }
 ```
@@ -1363,16 +1373,16 @@ If you want to change this (to only share file per thread group, or using one fi
 ```java
 import us.abstracta.jmeter.javadsl.core.configs.DslCsvDataSet.Sharing;
 ...
-        TestPlanStats stats=testPlan(
-        csvDataSet("users.csv")
+  TestPlanStats stats = testPlan(
+      csvDataSet("users.csv")
         .sharedIn(Sharing.THREAD),
-        threadGroup(5,10,
-        httpSampler("http://my.service/login")
-        .post("{\"${USER}\": \"${PASS}\"",Type.APPLICATION_JSON),
-        httpSampler("http://my.service/logout")
-        .method(HttpMethod.POST)
-        )
-        )
+      threadGroup(5, 10,
+          httpSampler("http://my.service/login")
+            .post("{\"${USER}\": \"${PASS}\"", Type.APPLICATION_JSON),
+          httpSampler("http://my.service/logout")
+            .method(HttpMethod.POST)
+      )
+  )
 ```
 :::
 
@@ -1391,23 +1401,23 @@ import org.junit.jupiter.api.Test;
 
 public class SaveTestPlanAsJMX {
 
-    @Test
-    public void testTransactions() throws IOException {
-        testPlan(
-                threadGroup(2, 10,
-                        transaction('login',
-                                httpSampler("http://my.service"),
-                                httpSampler("http://my.service/login")
-                                        .post("user=test&password=test", Type.FORM_ENCODED)
-                        ),
-                        transaction('addItemToCart',
-                                httpSampler("http://my.service/items"),
-                                httpSampler("http://my.service/cart/items")
-                                        .post("{\"id\": 1}", Type.APPLICATION_JSON)
-                        )
-                )
-        ).run();
-    }
+  @Test
+  public void testTransactions() throws IOException {
+    testPlan(
+        threadGroup(2, 10,
+            transaction('login',
+                httpSampler("http://my.service"),
+                httpSampler("http://my.service/login")
+                    .post("user=test&password=test", Type.FORM_ENCODED)
+            ),
+            transaction('addItemToCart',
+                httpSampler("http://my.service/items"),
+                httpSampler("http://my.service/cart/items")
+                    .post("{\"id\": 1}", Type.APPLICATION_JSON)
+            )
+        )
+    ).run();
+  }
 
 }
 ```
@@ -1427,24 +1437,26 @@ import org.junit.jupiter.api.Test;
 
 public class PerformanceTest {
 
-    @Test
-    public void testTransactions() throws IOException {
-        testPlan(
-                threadGroup(2, 10,
-                        transaction('addItemToCart',
-                                httpSampler("http://my.service/items"),
-                                httpSampler("http://my.service/cart/items")
-                                        .post("{\"id\": 1}", Type.APPLICATION_JSON)
-                        ),
-                        transaction('chekcout',
-                                httpSampler("http://my.service/cart/chekout"),
-                                uniformRandomTimer(4000, 10000),
-                                httpSampler("http://my.service/cart/checkout/userinfo")
-                                        .post("{\"Name\": Dave, \"lastname\": Tester, \"Street\": 1483  Smith Road, \"City\": Atlanta}", Type.APPLICATION_JSON)
-                        )
-                )
-        ).run();
-    }
+  @Test
+  public void testTransactions() throws IOException {
+    testPlan(
+        threadGroup(2, 10,
+            transaction('addItemToCart',
+                httpSampler("http://my.service/items"),
+                httpSampler("http://my.service/cart/items")
+                    .post("{\"id\": 1}", Type.APPLICATION_JSON)
+            ),
+            transaction('chekcout',
+                httpSampler("http://my.service/cart/chekout"),
+                uniformRandomTimer(4000, 10000),
+                httpSampler("http://my.service/cart/checkout/userinfo")
+                    .post(
+                        "{\"Name\": Dave, \"lastname\": Tester, \"Street\": 1483  Smith Road, \"City\": Atlanta}",
+                        Type.APPLICATION_JSON)
+            )
+        )
+    ).run();
+  }
 
 }
 ```
@@ -1456,7 +1468,7 @@ If you want to apply a timer only to one sampler, add it as child of the given s
 
 ```java
 httpSampler("http://my.service/cart/chekout")
-        .children(uniformRandomTimer(4000, 10000))
+    .children(uniformRandomTimer(4000, 10000))
 ```
 :::
 
@@ -1484,19 +1496,19 @@ import us.abstracta.jmeter.javadsl.core.TestPlanStats;
 
 public class PerformanceTest {
 
-    @Test
-    public void testPerformance() throws Exception {
-        TestPlanStats stats = testPlan(
-                threadGroup(2, 10,
-                        percentController(40, // run this 40% of the times
-                                httpSampler("http://my.service/status"),
-                                httpSampler("http://my.service/poll")),
-                        percentController(70, // run this 70% of the times
-                                httpSampler("http://my.service/items"))
-                )
-        ).run();
-        assertThat(stats.overall().sampleTimePercentile99()).isLessThan(Duration.ofSeconds(5));
-    }
+  @Test
+  public void testPerformance() throws Exception {
+    TestPlanStats stats = testPlan(
+        threadGroup(2, 10,
+            percentController(40, // run this 40% of the times
+                httpSampler("http://my.service/status"),
+                httpSampler("http://my.service/poll")),
+            percentController(70, // run this 70% of the times
+                httpSampler("http://my.service/items"))
+        )
+    ).run();
+    assertThat(stats.overall().sampleTimePercentile99()).isLessThan(Duration.ofSeconds(5));
+  }
 
 }
 ```
@@ -1513,10 +1525,10 @@ To use it, add following dependency to your project:
 ::: tab Maven
 ```xml
 <dependency>
-    <groupId>us.abstracta.jmeter</groupId>
-    <artifactId>jmeter-java-parallel</artifactId>
-    <version>0.30</version>
-    <scope>test</scope>
+  <groupId>us.abstracta.jmeter</groupId>
+  <artifactId>jmeter-java-dsl-parallel</artifactId>
+  <version>0.33.1</version>
+  <scope>test</scope>
 </dependency>
 ```
 :::
@@ -1540,17 +1552,17 @@ import us.abstracta.jmeter.javadsl.core.TestPlanStats;
 
 public class PerformanceTest {
 
-    @Test
-    public void testPerformance() throws Exception {
-        TestPlanStats stats = testPlan(
-                threadGroup(2, 10,
-                        parallelController(
-                                httpSampler("http://my.service/status"),
-                                httpSampler("http://my.service/poll"))
-                )
-        ).run();
-        assertThat(stats.overall().sampleTimePercentile99()).isLessThan(Duration.ofSeconds(5));
-    }
+  @Test
+  public void testPerformance() throws Exception {
+    TestPlanStats stats = testPlan(
+        threadGroup(2, 10,
+            parallelController(
+                httpSampler("http://my.service/status"),
+                httpSampler("http://my.service/poll"))
+        )
+    ).run();
+    assertThat(stats.overall().sampleTimePercentile99()).isLessThan(Duration.ofSeconds(5));
+  }
 
 }
 ```
@@ -1579,27 +1591,27 @@ As previously seen you can do simple gets and post like in following snippet:
 
 ```java
 httpSampler("http://my.service") // A simple get
-        httpSampler("http://my.service")
-        .post("{\"field\":\"val\"}", Type.APPLICATION_JSON) // simple post
+httpSampler("http://my.service")
+    .post("{\"field\":\"val\"}", Type.APPLICATION_JSON) // simple post
 ```
 
 But you can also use additional methods to specify any HTTP method and body:
 
 ```java
 httpSampler("http://my.service")
-        .method(HttpMethod.PUT)
-        .contentType(Type.APPLICATION_JSON)
-        .body("{\"field\":\"val\"}")
+  .method(HttpMethod.PUT)
+  .contentType(Type.APPLICATION_JSON)
+  .body("{\"field\":\"val\"}")
 ```
 
 When in need to generate dynamic URLs or bodies you can use a lambda expressions (as previously seen in some example):
 
 ```java
 httpSampler("http://my.service")
-        .post(s -> buildRequestBody(s.vars), Type.TEXT_PLAIN)
-        httpSampler("http://my.service")
-        .body(s -> buildRequestBody(s.vars))
-        httpSampler(s -> buildRequestUrl(s.vars))
+  .post(s -> buildRequestBody(s.vars), Type.TEXT_PLAIN)
+httpSampler("http://my.service")
+  .body(s -> buildRequestBody(s.vars))
+httpSampler(s -> buildRequestUrl(s.vars))
 ```
 
 ::: warning
@@ -1612,30 +1624,30 @@ You might have already noticed in some of the examples that we have shown alread
 
 ```java
 httpSampler("http://my.service")
-        .post("{\"field\":\"val\"}", Type.APPLICATION_JSON)
-        httpSampler("http://my.service").
-        contentType(Type.APPLICATION_JSON)
+  .post("{\"field\":\"val\"}", Type.APPLICATION_JSON)
+httpSampler("http://my.service")
+  .contentType(Type.APPLICATION_JSON)
 ```
 
 These are handy methods to specify `Content-Type` header, but you can also set any header on a particular request using provided `header` method, like this:
 
 ```java
 httpSampler("http://my.service")
-        .header("X-First-Header", "val1")
-        .header("X-Second-Header", "val2")
+  .header("X-First-Header", "val1")
+  .header("X-Second-Header", "val2")
 ```
 
 Additionally, you can specify headers to be used by all samplers in a test plan, thread group, transaction controllers, etc. For this you can use `httpHeaders` like this:
 
 ```java
 testPlan(
-        threadGroup(2, 10,
+    threadGroup(2, 10,
         httpHeaders()
-        .header("X-Header", "val1"),
+          .header("X-Header", "val1"),
         httpSampler("http://my.service"),
         httpSampler("http://my.service/users")
-        )
-        ).run();
+    )
+).run();
 ```
 
 ::: tip
@@ -1648,12 +1660,12 @@ jmeter-java-dsl automatically adds a cookie manager and cache manager for automa
 
 ```java
 testPlan(
-        httpCookies().disable(),
-        httpCache().disable(),
-        threadGroup(2, 10,
+    httpCookies().disable(),
+    httpCache().disable(),
+    threadGroup(2, 10,
         httpSampler("http://my.service")
-        )
-        )
+    )
+)
 ```
 
 #### Embedded resources
@@ -1673,16 +1685,16 @@ import us.abstracta.jmeter.javadsl.core.TestPlanStats;
 
 public class PerformanceTest {
 
-    @Test
-    public void testPerformance() throws IOException {
-        TestPlanStats stats = testPlan(
-                threadGroup(5, 10,
-                        httpSampler("http://my.service/")
-                                .downloadEmbeddedResources()
-                )
-        ).run();
-        assertThat(stats.overall().sampleTimePercentile99()).isLessThan(Duration.ofSeconds(5));
-    }
+  @Test
+  public void testPerformance() throws IOException {
+    TestPlanStats stats = testPlan(
+        threadGroup(5, 10,
+            httpSampler("http://my.service/")
+                .downloadEmbeddedResources()
+        )
+    ).run();
+    assertThat(stats.overall().sampleTimePercentile99()).isLessThan(Duration.ofSeconds(5));
+  }
 
 }
 ```
@@ -1718,21 +1730,21 @@ import us.abstracta.jmeter.javadsl.core.TestPlanStats;
 
 public class TestRedis {
 
-    @Test
-    public void shouldGetExpectedSampleResultWhenJsr223SamplerWithLambdaAndCustomResponse()
-            throws IOException {
-        TestPlanStats stats = testPlan(
-                threadGroup(2, 10,
-                        jsr223Sampler("import redis.clients.jedis.Jedis\n"
-                                + "Jedis jedis = new Jedis('localhost', 6379)\n"
-                                + "jedis.connect()\n"
-                                + "SampleResult.connectEnd()\n"
-                                + "jedis.set('foo', 'bar')\n"
-                                + "return jedis.get(\"foo\")")
-                )
-        ).run();
-        assertThat(stats.overall().sampleTimePercentile99()).isLessThan(Duration.ofMillis(500));
-    }
+  @Test
+  public void shouldGetExpectedSampleResultWhenJsr223SamplerWithLambdaAndCustomResponse()
+      throws IOException {
+    TestPlanStats stats = testPlan(
+        threadGroup(2, 10,
+            jsr223Sampler("import redis.clients.jedis.Jedis\n"
+                + "Jedis jedis = new Jedis('localhost', 6379)\n"
+                + "jedis.connect()\n"
+                + "SampleResult.connectEnd()\n"
+                + "jedis.set('foo', 'bar')\n"
+                + "return jedis.get(\"foo\")")
+        )
+    ).run();
+    assertThat(stats.overall().sampleTimePercentile99()).isLessThan(Duration.ofMillis(500));
+  }
 
 }
 ```
@@ -1744,10 +1756,10 @@ Remember adding any particular dependencies required by your code. For example, 
 ::: tab Maven
 ```xml
 <dependency>
-    <groupId>redis.clients</groupId>
-    <artifactId>jedis</artifactId>
-    <version>3.6.0</version>
-    <scope>test</scope>
+  <groupId>redis.clients</groupId>
+  <artifactId>jedis</artifactId>
+  <version>3.6.0</version>
+  <scope>test</scope>
 </dependency>
 ```
 :::
@@ -1763,13 +1775,13 @@ You can also use Java lambdas instead of Groovy script to take advantage of IDEs
 
 ```java
 jsr223Sampler(v -> {
-        SampleResult result = v.sampleResult;
-        Jedis jedis = new Jedis("localhost", 6379);
-        jedis.connect();
-        result.connectEnd();
-        jedis.set("foo", "bar");
-        result.setResponseData(jedis.get("foo"), StandardCharsets.UTF_8.name());
-        })
+    SampleResult result = v.sampleResult;
+    Jedis jedis = new Jedis("localhost", 6379);
+    jedis.connect();
+    result.connectEnd();
+    jedis.set("foo", "bar");
+    result.setResponseData(jedis.get("foo"), StandardCharsets.UTF_8.name());
+})
 ```
 
 ::: warning
@@ -1791,13 +1803,13 @@ import static us.abstracta.jmeter.javadsl.JmeterDsl.*;
 
 public class SaveTestPlanAsJMX {
 
-    public static void main(String[] args) throws Exception {
-        testPlan(
-                threadGroup(2, 10,
-                        httpSampler("http://my.service")
-                )
-        ).saveAsJmx("dsl-test-plan.jmx");
-    }
+  public static void main(String[] args) throws Exception {
+    testPlan(
+        threadGroup(2, 10,
+            httpSampler("http://my.service")
+        )
+    ).saveAsJmx("dsl-test-plan.jmx");
+  }
 
 }
 ```
@@ -1827,11 +1839,11 @@ import us.abstracta.jmeter.javadsl.core.TestPlanStats;
 
 public class RunJmxTestPlan {
 
-    @Test
-    public void testPerformance() throws IOException {
-        TestPlanStats stats = DslTestPlan.fromJmx("test-plan.jmx").run();
-        assertThat(stats.overall().sampleTimePercentile99()).isLessThan(Duration.ofSeconds(5));
-    }
+  @Test
+  public void testPerformance() throws IOException {
+    TestPlanStats stats = DslTestPlan.fromJmx("test-plan.jmx").run();
+    assertThat(stats.overall().sampleTimePercentile99()).isLessThan(Duration.ofSeconds(5));
+  }
 
 }
 ``` 
@@ -1842,26 +1854,26 @@ This can be used to just run existing JMX files, or when DSL has no support for 
 When the JMX uses some custom plugin or JMeter protocol support, you might need to add required dependencies to be able to run the test in an embedded engine. For example, when running a TN3270 JMX test plan using RTE plugin you will need to add the following repository and dependencies:
 ```xml
 <repositories>
-    <repository>
-        <id>jitpack.io</id>
-        <url>https://jitpack.io</url>
-    </repository>
+  <repository>
+    <id>jitpack.io</id>
+    <url>https://jitpack.io</url>
+  </repository>
 </repositories>
 
 <dependencies>
-...
-<dependency>
+  ...
+  <dependency>
     <groupId>com.github.Blazemeter</groupId>
     <artifactId>RTEPlugin</artifactId>
     <version>3.1</version>
     <scope>test</scope>
-</dependency>
-<dependency>
+  </dependency>
+  <dependency>
     <groupId>com.github.Blazemeter</groupId>
     <artifactId>dm3270</artifactId>
     <version>0.12.3-lib</version>
     <scope>test</scope>
-</dependency>
+  </dependency>
 </dependencies>
 ```
 :::
