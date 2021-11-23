@@ -51,7 +51,7 @@ public class DslThreadGroup extends BaseThreadGroup<DslThreadGroup> {
   }
 
   public DslThreadGroup(String name, int threads, int iterations, List<ThreadGroupChild> children) {
-    super(solveName(name), null, children);
+    super(solveName(name), ThreadGroupGui.class, children);
     checkThreadCount(threads);
     if (iterations <= 0) {
       throw new IllegalArgumentException("Iterations must be >=1");
@@ -62,14 +62,14 @@ public class DslThreadGroup extends BaseThreadGroup<DslThreadGroup> {
 
   public DslThreadGroup(String name, int threads, Duration duration,
       List<ThreadGroupChild> children) {
-    super(solveName(name), null, children);
+    super(solveName(name), ThreadGroupGui.class, children);
     checkThreadCount(threads);
     stages.add(new Stage(threads, Duration.ZERO));
     stages.add(new Stage(threads, duration));
   }
 
   public DslThreadGroup(String name) {
-    super(solveName(name), null, Collections.emptyList());
+    super(solveName(name), ThreadGroupGui.class, Collections.emptyList());
   }
 
   private static String solveName(String name) {
@@ -263,7 +263,6 @@ public class DslThreadGroup extends BaseThreadGroup<DslThreadGroup> {
         }
       }
     }
-    guiClass = ThreadGroupGui.class;
     return buildSimpleThreadGroup(threads, iterations, rampUpPeriod, duration, delay);
   }
 

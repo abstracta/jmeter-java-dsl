@@ -1386,6 +1386,10 @@ import us.abstracta.jmeter.javadsl.core.configs.DslCsvDataSet.Sharing;
 ```
 :::
 
+::: warning
+You can use `randomOrder()` method to get CSV lines in random order (using [Random CSV Data Set plugin](https://github.com/Blazemeter/jmeter-bzm-plugins/blob/master/random-csv-data-set/RandomCSVDataSetConfig.md)), but this is less performant as getting them sequentially, so use it sparingly.
+:::
+
 Check [DslCsvDataSet](../../jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/configs/DslCsvDataSet.java) for additional details and options (like changing delimiter, handling files without headers line, stopping on end of file, etc.).
 
 ### Group requests

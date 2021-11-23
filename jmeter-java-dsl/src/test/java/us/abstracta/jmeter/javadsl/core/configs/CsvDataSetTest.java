@@ -2,13 +2,17 @@ package us.abstracta.jmeter.javadsl.core.configs;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.getRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
+import static org.assertj.core.api.Assertions.assertThat;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.csvDataSet;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.httpSampler;
+import static us.abstracta.jmeter.javadsl.JmeterDsl.jsr223Sampler;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.testPlan;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.threadGroup;
 
 import com.github.tomakehurst.wiremock.matching.RequestPatternBuilder;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import us.abstracta.jmeter.javadsl.JmeterDslTest;
 import us.abstracta.jmeter.javadsl.TestResource;
@@ -140,6 +144,30 @@ public class CsvDataSetTest extends JmeterDslTest {
         )
     ).run();
     wiremockServer.verify(2, getRequestedForFirstRow());
+  }
+
+  @Test
+  public void shouldGetDataInRandomOrderWhenDataSetWithRandomOrderEnabled()
+      throws Exception {
+    List<String> vals = new ArrayList<>();
+    testPlan(
+        csvDataSet(new TestResource("/dataset-long.csv").getFile().getPath())
+            .randomOrder(),
+        threadGroup(1, 10,
+            jsr223Sampler(s -> vals.add(s.vars.get("VAR")))
+        )
+    ).run();
+    List<String> orderedVals = buildOrderVals();
+    assertThat(vals).contains(orderedVals.toArray(new String[0]));
+    assertThat(vals).isNotEqualTo(orderedVals);
+  }
+
+  private List<String> buildOrderVals() {
+    List<String> ret = new ArrayList<>();
+    for (int i = 0; i < 10; i++) {
+      ret.add("val" + i);
+    }
+    return ret;
   }
 
 }
