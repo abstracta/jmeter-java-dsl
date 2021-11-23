@@ -193,25 +193,29 @@ public class JmeterDsl {
   }
 
   /**
-   * This allowing to set a name on the setup thread group.
+   * Same as {@link #setupThreadGroup(ThreadGroupChild...)} but allowing to set a name on the thread group.
+   *
+   * Allows setting the name on the setup thread group.
    * <p>
    * Setting a proper name allows to properly identify the requests generated in each thread group.
    *
    * @see DslSetupThreadGroup
-   * @since 0.33.2
+   * @since 0.35
    */
   public static DslSetupThreadGroup setupThreadGroup(String name, ThreadGroupChild... children) {
     return new DslSetupThreadGroup(name, Arrays.asList(children));
   }
 
   /**
-   * This allowing to create empty the setup thread group,
+   * Same as {@link #setupThreadGroup(ThreadGroupChild...)} but allowing to set nothing on the thread group.
+   *
+   * Allows to create the setup thread group with empty params,
    * which allows the item to be configured via '.children'.
    * <p>
    * Setting a proper name allows to properly identify the requests generated in each thread group.
    *
    * @see DslTeardownThreadGroup
-   * @since 0.33.2
+   * @since 0.35
    */
   public static DslSetupThreadGroup setupThreadGroup() {
     return new DslSetupThreadGroup("null", Collections.emptyList());
@@ -236,12 +240,14 @@ public class JmeterDsl {
   }
 
   /**
-   * This allowing to set a name on the teardown thread group.
+   * Same as {@link #teardownThreadGroup(ThreadGroupChild...)} but allowing to set a name on the thread group.
+   *
+   * Allows to set a name on the teardown thread group.
    * <p>
    * Setting a proper name allows to properly identify the requests generated in each thread group.
    *
    * @see DslTeardownThreadGroup
-   * @since 0.33.2
+   * @since 0.35
    */
   public static DslTeardownThreadGroup teardownThreadGroup(String name,
                                                            ThreadGroupChild... children) {
@@ -249,13 +255,15 @@ public class JmeterDsl {
   }
 
   /**
-   * This allowing to create empty the teardown thread group,
+   * Same as {@link #teardownThreadGroup(ThreadGroupChild...)} but allowing to set nothing on the thread group.
+   *
+   * Allows to create the teardown thread group with empty params,
    * which allows the item to be configured via '.children'.
    * <p>
    * Setting a proper name allows to properly identify the requests generated in each thread group.
    *
    * @see DslTeardownThreadGroup
-   * @since 0.33.2
+   * @since 0.35
    */
   public static DslTeardownThreadGroup teardownThreadGroup() {
     return new DslTeardownThreadGroup("null", Collections.emptyList());
