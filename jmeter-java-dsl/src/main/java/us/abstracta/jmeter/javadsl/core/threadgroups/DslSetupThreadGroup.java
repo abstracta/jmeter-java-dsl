@@ -27,10 +27,14 @@ import org.apache.jmeter.threads.gui.SetupThreadGroupGui;
  */
 public class DslSetupThreadGroup extends DslSimpleThreadGroup<DslSetupThreadGroup> {
 
-  public DslSetupThreadGroup(List<ThreadGroupChild> children) {
-    super("setUp Thread Group", SetupThreadGroupGui.class, children);
+  public DslSetupThreadGroup(String name, List<ThreadGroupChild> children) {
+    super(solveName(name), SetupThreadGroupGui.class, children);
   }
 
+  private static String solveName(String name) {
+    return name != null ? name : "setUp Thread Group";
+  }
+  
   @Override
   protected AbstractThreadGroup buildSimpleThreadGroup() {
     return new SetupThreadGroup();
