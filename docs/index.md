@@ -20,7 +20,7 @@ Add dependency to your project:
 <dependency>
   <groupId>us.abstracta.jmeter</groupId>
   <artifactId>jmeter-java-dsl</artifactId>
-  <version>0.35</version>
+  <version>0.36</version>
   <scope>test</scope>
 </dependency>
 ```
