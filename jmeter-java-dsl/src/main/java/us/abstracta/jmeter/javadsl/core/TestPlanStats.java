@@ -135,6 +135,11 @@ public class TestPlanStats {
      * This is just {@link #sentBytes()}/{@link #elapsedTime()}.
      */
     double sentBytesPerSecond();
+    
+     /**
+     * Gets the latency
+     */
+    Duration Latency();
 
   }
 
