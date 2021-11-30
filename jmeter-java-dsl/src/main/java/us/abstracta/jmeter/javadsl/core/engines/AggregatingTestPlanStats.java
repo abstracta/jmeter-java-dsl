@@ -2,8 +2,8 @@ package us.abstracta.jmeter.javadsl.core.engines;
 
 import java.time.Duration;
 import java.time.Instant;
-import org.apache.jmeter.report.processor.StatisticsSummaryData;
 import org.apache.jmeter.samplers.SampleResult;
+import us.abstracta.jmeter.javadsl.core.DslStatisticsSummaryData;
 import us.abstracta.jmeter.javadsl.core.TestPlanStats;
 
 /**
@@ -25,7 +25,7 @@ public class AggregatingTestPlanStats extends TestPlanStats {
 
   public static class AggregatingStatsSummary implements StatsSummary {
 
-    private final StatisticsSummaryData stats = new StatisticsSummaryData(90, 95, 99);
+    private final DslStatisticsSummaryData stats = new DslStatisticsSummaryData(90, 95, 99);
 
     private void setStart(Instant start) {
       stats.setFirstTime(start.toEpochMilli());
@@ -43,6 +43,10 @@ public class AggregatingTestPlanStats extends TestPlanStats {
         stats.incErrors();
       }
       updateElapsedTime(result.getTime());
+      updateLatencyTime(result.getLatency());
+      updateProcessingTime(result.getTime() - result.getLatency());
+      stats.setLatency(result.getLatency());
+      stats.setProcessing(result.getTime() - result.getLatency());
       stats.setFirstTime(result.getStartTime());
       stats.setEndTime(result.getEndTime());
     }
@@ -52,8 +56,30 @@ public class AggregatingTestPlanStats extends TestPlanStats {
       stats.getPercentile2().addValue(elapsedTime);
       stats.getPercentile3().addValue(elapsedTime);
       stats.getMean().addValue(elapsedTime);
+      stats.getMedian().addValue(elapsedTime);
       stats.setMin(elapsedTime);
       stats.setMax(elapsedTime);
+    }
+
+    private void updateLatencyTime(long latencyTime) {
+      stats.getLatencyPercentile1().addValue(latencyTime);
+      stats.getLatencyPercentile2().addValue(latencyTime);
+      stats.getLatencyPercentile3().addValue(latencyTime);
+      stats.getLatencyMean().addValue(latencyTime);
+      stats.getLatencyMedian().addValue(latencyTime);
+      stats.setLatencyMin(latencyTime);
+      stats.setLatencyMax(latencyTime);
+      stats.setLatencyMax(latencyTime);
+    }
+
+    private void updateProcessingTime(long processingTime) {
+      stats.getProcessingPercentile1().addValue(processingTime);
+      stats.getProcessingPercentile2().addValue(processingTime);
+      stats.getProcessingPercentile3().addValue(processingTime);
+      stats.getProcessingMean().addValue(processingTime);
+      stats.getProcessingMedian().addValue(processingTime);
+      stats.setProcessingMin(processingTime);
+      stats.setProcessingMax(processingTime);
     }
 
     @Override
@@ -134,6 +160,76 @@ public class AggregatingTestPlanStats extends TestPlanStats {
     @Override
     public double sentBytesPerSecond() {
       return stats.getSentBytesPerSecond();
+    }
+
+    @Override
+    public Duration minSampleLatencyTime() {
+      return Duration.ofMillis(stats.getLatencyMin());
+    }
+    
+    @Override
+    public Duration maxSampleLatencyTime() {
+      return Duration.ofMillis(stats.getLatencyMax());
+    }
+
+    @Override
+    public Duration meanSampleLatencyTime() {
+      return Duration.ofMillis((long) stats.getLatencyMean().getResult());
+    }
+
+    @Override
+    public Duration sampleLatencyTimePercentile90() {
+      return Duration.ofMillis((long) stats.getLatencyPercentile1().getResult());
+    }
+
+    @Override
+    public Duration sampleLatencyTimePercentile95() {
+      return Duration.ofMillis((long) stats.getLatencyPercentile2().getResult());
+    }
+
+    @Override
+    public Duration sampleLatencyTimePercentile99() {
+      return Duration.ofMillis((long) stats.getLatencyPercentile3().getResult());
+    }
+
+    @Override
+    public Duration minSampleProcessingTime() {
+      return Duration.ofMillis(stats.getProcessingMin());
+    }
+
+    @Override
+    public Duration maxSampleProcessingTime() {
+      return Duration.ofMillis(stats.getProcessingMax());
+    }
+
+    @Override
+    public Duration meanSampleProcessingTime() {
+      return Duration.ofMillis((long) stats.getProcessingMean().getResult());
+    }
+
+    @Override
+    public Duration sampleProcessingTimePercentile90() {
+      return Duration.ofMillis((long) stats.getProcessingPercentile1().getResult());
+    }
+
+    @Override
+    public Duration sampleProcessingTimePercentile95() {
+      return Duration.ofMillis((long) stats.getProcessingPercentile2().getResult());
+    }
+
+    @Override
+    public Duration sampleProcessingTimePercentile99() {
+      return Duration.ofMillis((long) stats.getProcessingPercentile3().getResult());
+    }
+
+    @Override
+    public Duration processingTime() {
+      return Duration.ofMillis(stats.getProcessingTime());
+    }
+
+    @Override
+    public Duration latencyTime() {
+      return Duration.ofMillis(stats.getLatencyTime());
     }
 
   }

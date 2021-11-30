@@ -136,6 +136,145 @@ public class TestPlanStats {
      */
     double sentBytesPerSecond();
 
+    /**
+     * Gets the duration from jmeter send request to jmeter
+     * get the first batch of response (like TTFB).
+     *
+     * @since 0.37
+     */
+    Duration latencyTime();
+
+    /**
+     * Get the the minimum latency time of sampler.
+     *
+     * Based on {@link #latencyTime()}
+     *
+     * @since 0.37
+     */
+    Duration minSampleLatencyTime();
+
+    /**
+     * Get the the maximum latency time of sampler.
+     *
+     * Based on {@link #latencyTime()}
+     *
+     * @since 0.37
+     */
+    Duration maxSampleLatencyTime();
+
+    /**
+     * Get the the average latency time of sampler.
+     *
+     * Based on {@link #latencyTime()}
+     *
+     * @since 0.37
+     */
+    Duration meanSampleLatencyTime();
+
+    /**
+     * Gets the 90 percentile of samples latencies time.
+     *
+     * 90% of samples latency time took less or equal to the returned value.
+     *
+     * Based on {@link #latencyTime()}
+     *
+     * @since 0.37
+     */
+    Duration sampleLatencyTimePercentile90();
+
+    /**
+     * Gets the 95 percentile of samples latencies time.
+     *
+     * 95% of samples latency time took less or equal to the returned value.
+     *
+     * Based on {@link #latencyTime()}
+     *
+     * @since 0.37
+     */
+    Duration sampleLatencyTimePercentile95();
+
+    /**
+     * Gets the 99 percentile of samples latencies time.
+     *
+     * 99% of samples latency time took less or equal to the returned value.
+     *
+     * Based on {@link #latencyTime()}
+     */
+    Duration sampleLatencyTimePercentile99();
+
+    /**
+     * Gets the duration of difference between elapsed time and latency time.
+     *
+     * With the degradation of the productivity of JMeter itself - this metric is able to show
+     * what is the longest part of its work.
+     *
+     * Based on {@link #elapsedTime()}-{@link #latencyTime()}
+     *
+     * @since 0.37
+     */
+    Duration processingTime();
+
+    /**
+     * Get the the minimum processing time of sampler.
+     *
+     * Based on {@link #processingTime()}
+     *
+     * @since 0.37
+     */
+    Duration minSampleProcessingTime();
+
+    /**
+     * Get the the maximum processing time of sampler.
+     *
+     * Based on {@link #processingTime()}
+     *
+     * @since 0.37
+     */
+    Duration maxSampleProcessingTime();
+
+    /**
+     * Get the the average processing time of sampler.
+     *
+     * Based on {@link #processingTime()}
+     *
+     * @since 0.37
+     */
+    Duration meanSampleProcessingTime();
+
+    /**
+     * Gets the 90 percentile of samples processing time.
+     *
+     * 90% of samples processing time took less or equal to the returned value.
+     *
+     * Based on {@link #processingTime()}
+     *
+     * @since 0.37
+     */
+    Duration sampleProcessingTimePercentile90();
+
+    /**
+     * Gets the 95 percentile of samples processing time.
+     *
+     * 95% of samples processing time took less or equal to the returned value.
+     *
+     * Based on {@link #processingTime()}
+     *
+     * @since 0.37
+     */
+    Duration sampleProcessingTimePercentile95();
+
+    /**
+     * Gets the 99 percentile of samples processing time.
+     *
+     * 99% of samples processing time took less or equal to the returned value.
+     *
+     * Based on {@link #processingTime()}
+     *
+     * @since 0.37
+     */
+
+    Duration sampleProcessingTimePercentile99();
+
   }
 
   public void setLabeledStats(String label, StatsSummary stats) {
