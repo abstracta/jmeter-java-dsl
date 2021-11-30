@@ -66,9 +66,12 @@ public class JmeterEnvironment {
             Collections.emptyMap())) {
       Path configBinDir = fs.getPath("/bin");
       for (Path p : (Iterable<Path>) Files.walk(configBinDir)::iterator) {
-        Path targetPath = binDir.toPath().resolve(configBinDir.relativize(p).toString());
-        Files.copy(p, targetPath);
-        targetPath.toFile().deleteOnExit();
+        String parent = p.getParent().toString();
+        if ("/bin".startsWith(parent)) {
+          Path targetPath = binDir.toPath().resolve(configBinDir.relativize(p).toString());
+          Files.copy(p, targetPath);
+          targetPath.toFile().deleteOnExit();
+        }
       }
     } catch (URISyntaxException e) {
       throw new RuntimeException(e);
