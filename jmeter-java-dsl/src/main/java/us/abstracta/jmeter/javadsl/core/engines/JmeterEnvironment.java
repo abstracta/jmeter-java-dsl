@@ -11,6 +11,7 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Properties;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import kg.apc.jmeter.timers.functions.TSTFeedback;
 import org.apache.jmeter.functions.EvalFunction;
@@ -27,15 +28,18 @@ import org.apache.jorphan.collections.HashTree;
  */
 public class JmeterEnvironment {
 
+  private static final String BIN_DIR = "bin";
+  private static final String JMETER_PROPS_FILE_NAME = "jmeter.properties";
+
   public JmeterEnvironment() throws IOException {
     File homeDir = Files.createTempDirectory("jmeter-java-dsl").toFile();
     homeDir.deleteOnExit();
     JMeterUtils.setJMeterHome(homeDir.getPath());
-    File binDir = new File(homeDir, "bin");
+    File binDir = new File(homeDir, BIN_DIR);
     binDir.deleteOnExit();
     installConfig(binDir);
     Properties props = JMeterUtils
-        .getProperties(new File(binDir, "jmeter.properties").getPath());
+        .getProperties(new File(binDir, JMETER_PROPS_FILE_NAME).getPath());
     /*
      include functions and components jars paths so jmeter search methods can find classes in
      such jars
@@ -61,13 +65,14 @@ public class JmeterEnvironment {
   }
 
   private void installConfig(File binDir) throws IOException {
+    Pattern whiteListPattern = Pattern.compile(
+        "/" + BIN_DIR + "(?:/(?:report-template.*|.*\\.properties))?");
     try (FileSystem fs = FileSystems
-        .newFileSystem(getClass().getResource("/bin/jmeter.properties").toURI(),
+        .newFileSystem(getClass().getResource("/" + BIN_DIR + "/" + JMETER_PROPS_FILE_NAME).toURI(),
             Collections.emptyMap())) {
-      Path configBinDir = fs.getPath("/bin");
+      Path configBinDir = fs.getPath("/" + BIN_DIR);
       for (Path p : (Iterable<Path>) Files.walk(configBinDir)::iterator) {
-        String parent = p.getParent().toString();
-        if ("/bin".startsWith(parent)) {
+        if (whiteListPattern.matcher(p.toString()).matches()) {
           Path targetPath = binDir.toPath().resolve(configBinDir.relativize(p).toString());
           Files.copy(p, targetPath);
           targetPath.toFile().deleteOnExit();
