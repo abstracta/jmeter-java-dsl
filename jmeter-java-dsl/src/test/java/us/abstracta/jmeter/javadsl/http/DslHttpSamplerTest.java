@@ -210,6 +210,7 @@ public class DslHttpSamplerTest extends JmeterDslTest {
 
   @Test
   public void shouldUseCachedResponseWhenSameRequestAndCacheableResponse() throws Exception {
+    setupCacheableHttpResponse();
     testPlan(
         buildHeadersToFixHttpCaching(),
         threadGroup(1, 1,
@@ -220,6 +221,11 @@ public class DslHttpSamplerTest extends JmeterDslTest {
     wiremockServer.verify(1, getRequestedFor(anyUrl()));
   }
 
+  private void setupCacheableHttpResponse() {
+    wiremockServer.stubFor(get(anyUrl())
+        .willReturn(aResponse().withHeader("Cache-Control", "max-age=600")));
+  }
+
   /*
    need to set header for request header to match otherwise jmeter automatically adds this
    header while sending request and stores it in cache and when it checks in next request
@@ -227,11 +233,6 @@ public class DslHttpSamplerTest extends JmeterDslTest {
    */
   private HttpHeaders buildHeadersToFixHttpCaching() {
     return httpHeaders().header("User-Agent", "jmeter-java-dsl");
-  }
-
-  private void setupCacheableHttpResponse() {
-    wiremockServer.stubFor(get(anyUrl())
-        .willReturn(aResponse().withHeader("Vary", "max-age=600")));
   }
 
   @Test

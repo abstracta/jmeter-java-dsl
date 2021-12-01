@@ -47,7 +47,7 @@
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
-    <testcontainers.version>1.16.0</testcontainers.version>
+    <testcontainers.version>1.16.2</testcontainers.version>
     <!-- can't use newer version, probably due to issues with wiremock-junit5 or some dependency
     conflict -->
     <wiremock.version>2.27.2</wiremock.version>
@@ -85,7 +85,7 @@
     <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter-engine</artifactId>
-      <version>5.8.0</version>
+      <version>5.8.1</version>
       <scope>test</scope>
     </dependency>
     <dependency>
