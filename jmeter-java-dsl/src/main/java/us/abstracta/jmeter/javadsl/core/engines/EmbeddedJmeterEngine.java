@@ -45,7 +45,7 @@ public class EmbeddedJmeterEngine implements DslJmeterEngine {
     BuildTreeContext buildContext = new BuildTreeContext(rootTree);
     HashTree testPlanTree = testPlan.buildTreeUnder(rootTree, buildContext);
 
-    AggregatingTestPlanStats stats = new AggregatingTestPlanStats();
+    TestPlanStats stats = new TestPlanStats(EmbeddedStatsSummary::new);
     addStatsCollector(testPlanTree, stats);
     testPlanTree.add(new ResultCollector(new Summariser()));
 
@@ -70,7 +70,7 @@ public class EmbeddedJmeterEngine implements DslJmeterEngine {
     return stats;
   }
 
-  protected void addStatsCollector(HashTree testPlanTree, AggregatingTestPlanStats stats) {
+  protected void addStatsCollector(HashTree testPlanTree, TestPlanStats stats) {
     ResultCollector collector = new ResultCollector();
     Visualizer statsVisualizer = new Visualizer() {
 

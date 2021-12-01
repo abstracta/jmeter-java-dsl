@@ -43,7 +43,8 @@ public class DslTestPlan extends TestElementContainer<TestPlanChild> {
    * @throws IOException thrown when there is some problem running the plan.
    */
   public TestPlanStats run() throws IOException {
-    return new EmbeddedJmeterEngine().run(this);
+    return new EmbeddedJmeterEngine()
+        .run(this);
   }
 
   /**
@@ -108,7 +109,7 @@ public class DslTestPlan extends TestElementContainer<TestPlanChild> {
   /**
    * Test elements that can be added directly as test plan children in JMeter should implement this
    * interface.
-   *
+   * <p>
    * Check {@link DslThreadGroup} for an example.
    */
   public interface TestPlanChild extends DslTestElement {

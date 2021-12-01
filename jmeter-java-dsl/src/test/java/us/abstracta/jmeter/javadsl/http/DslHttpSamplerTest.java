@@ -16,6 +16,7 @@ import static us.abstracta.jmeter.javadsl.JmeterDsl.httpSampler;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.jsr223PreProcessor;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.testPlan;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.threadGroup;
+import static us.abstracta.jmeter.javadsl.JmeterDsl.transaction;
 
 import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
 import java.time.Duration;
@@ -306,14 +307,16 @@ public class DslHttpSamplerTest extends JmeterDslTest {
     wiremockServer.stubFor(get(primaryUrl)
         .willReturn(buildEmbeddedResourcesResponse("/resource1", "/resource2")
             .withFixedDelay(responsesDelayMillis)));
-    String sampleLabel = "sample";
+    String transactionLabel = "sample";
     TestPlanStats stats = testPlan(
         threadGroup(1, 1,
-            httpSampler(sampleLabel, wiremockUri + primaryUrl)
-                .downloadEmbeddedResources()
+            transaction(transactionLabel,
+                httpSampler(wiremockUri + primaryUrl)
+                    .downloadEmbeddedResources()
+            )
         )
     ).run();
-    assertThat(stats.byLabel(sampleLabel).elapsedTime()).isLessThan(
+    assertThat(stats.byLabel(transactionLabel).sampleTime().max()).isLessThan(
         Duration.ofMillis(responsesDelayMillis * 3));
   }
 

@@ -28,7 +28,7 @@ public class ParallelControllerTest extends JmeterDslTest {
             )
         )
     ).run();
-    assertThat(stats.overall().elapsedTime()).isLessThan(Duration.ofMillis(responseTimeMillis * 2));
+    assertThat(stats.duration()).isLessThan(Duration.ofMillis(responseTimeMillis * 2));
 
   }
 

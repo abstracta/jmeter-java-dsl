@@ -52,7 +52,7 @@ public class JmeterDslCoreTest extends JmeterDslTest {
     ).run();
     // we use some threshold in case is not exact due to delays in starting.
     Duration threshold = Duration.ofSeconds(5);
-    assertThat(stats.overall().elapsedTime()).isGreaterThan(duration.minus(threshold));
+    assertThat(stats.duration()).isGreaterThan(duration.minus(threshold));
   }
 
   @Test

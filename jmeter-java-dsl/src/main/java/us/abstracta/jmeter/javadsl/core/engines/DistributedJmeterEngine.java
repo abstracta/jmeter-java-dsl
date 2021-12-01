@@ -21,7 +21,7 @@ import us.abstracta.jmeter.javadsl.core.TestPlanStats;
 
 /**
  * Allows running a JMeter test plan distributed across multiple machines.
- *
+ * <p>
  * This engine uses JMeter built-in feature to run tests from one node into remote machines.
  *
  * @since 0.29
@@ -40,12 +40,13 @@ public class DistributedJmeterEngine extends EmbeddedJmeterEngine {
   /**
    * Allows setting the initial port number used to calculate rest of ports to establish RMI
    * connections.
-   *
+   * <p>
    * This method allows to have a predefined range of ports to be used, and in consequence, properly
    * configure firewall rules.
    *
    * @param basePort the port number to start creating connections from. 1 port is required for each
-   * connection to a remote port, and ports will be assigned incrementally from the given value.
+   *                 connection to a remote port, and ports will be assigned incrementally from the
+   *                 given value.
    * @return the DistributedJMeterEngine instance for further configuration or usage.
    */
   public DistributedJmeterEngine localBasePort(int basePort) {
@@ -78,15 +79,16 @@ public class DistributedJmeterEngine extends EmbeddedJmeterEngine {
     }
   }
 
-  protected void addStatsCollector(HashTree testPlanTree, AggregatingTestPlanStats stats) {
+  protected void addStatsCollector(HashTree testPlanTree, TestPlanStats stats) {
     testPlanTree.add(new StatsCollector(stats));
   }
 
-  private static class StatsCollector implements SampleListener, Remoteable {
+  private static class StatsCollector implements SampleListener,
+      Remoteable {
 
-    private final AggregatingTestPlanStats stats;
+    private final TestPlanStats stats;
 
-    private StatsCollector(AggregatingTestPlanStats stats) {
+    private StatsCollector(TestPlanStats stats) {
       this.stats = stats;
     }
 

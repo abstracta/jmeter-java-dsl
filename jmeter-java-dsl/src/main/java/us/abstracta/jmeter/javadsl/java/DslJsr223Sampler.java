@@ -52,7 +52,7 @@ public class DslJsr223Sampler extends DslJsr223TestElement implements ThreadGrou
    * @param children list of test elements to add as children of this sampler.
    * @return the altered sampler to allow for fluent API usage.
    */
-  protected DslJsr223Sampler children(SamplerChild... children) {
+  public DslJsr223Sampler children(SamplerChild... children) {
     this.children.addAll(Arrays.asList(children));
     return this;
   }
