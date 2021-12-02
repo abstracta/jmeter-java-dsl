@@ -62,6 +62,9 @@ import us.abstracta.jmeter.javadsl.java.DslJsr223Sampler.SamplerScript;
  */
 public class JmeterDsl {
 
+  private JmeterDsl() {
+  }
+
   /**
    * Builds a new test plan.
    *

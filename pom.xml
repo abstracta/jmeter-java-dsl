@@ -47,6 +47,7 @@
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
+    <jmeter.version>5.4.1</jmeter.version>
     <testcontainers.version>1.16.2</testcontainers.version>
     <!-- can't use newer version, probably due to issues with wiremock-junit5 or some dependency
     conflict -->
@@ -59,6 +60,7 @@
     <module>jmeter-java-dsl-elasticsearch-listener</module>
     <module>jmeter-java-dsl-dashboard</module>
     <module>jmeter-java-dsl-parallel</module>
+    <module>jmeter-java-dsl-jdbc</module>
   </modules>
 
   <dependencyManagement>

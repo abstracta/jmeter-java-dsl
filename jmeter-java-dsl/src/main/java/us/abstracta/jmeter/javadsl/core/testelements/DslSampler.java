@@ -1,6 +1,6 @@
 package us.abstracta.jmeter.javadsl.core.testelements;
 
-import java.util.List;
+import java.util.Collections;
 import org.apache.jmeter.gui.JMeterGUIComponent;
 import us.abstracta.jmeter.javadsl.core.DslTestElement;
 import us.abstracta.jmeter.javadsl.core.threadgroups.BaseThreadGroup.ThreadGroupChild;
@@ -19,9 +19,8 @@ import us.abstracta.jmeter.javadsl.http.DslHttpSampler;
 public abstract class DslSampler extends
     TestElementContainer<DslSampler.SamplerChild> implements ThreadGroupChild {
 
-  protected DslSampler(String name, Class<? extends JMeterGUIComponent> guiClass,
-      List<DslSampler.SamplerChild> children) {
-    super(name, guiClass, children);
+  protected DslSampler(String name, Class<? extends JMeterGUIComponent> guiClass) {
+    super(name, guiClass, Collections.emptyList());
   }
 
   /**

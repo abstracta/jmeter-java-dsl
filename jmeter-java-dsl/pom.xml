@@ -17,10 +17,6 @@
   <description>Simple API to run JMeter performance tests in an VCS and programmers friendly way.
   </description>
 
-  <properties>
-    <jmeter.version>5.4.1</jmeter.version>
-  </properties>
-
   <dependencies>
     <dependency>
       <groupId>org.apache.jmeter</groupId>

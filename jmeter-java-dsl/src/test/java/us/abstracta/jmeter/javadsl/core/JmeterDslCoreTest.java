@@ -11,12 +11,12 @@ import static us.abstracta.jmeter.javadsl.JmeterDsl.jtlWriter;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.testPlan;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.threadGroup;
 
-import com.google.common.base.Stopwatch;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.time.Duration;
+import java.time.Instant;
 import org.eclipse.jetty.http.HttpHeader;
 import org.eclipse.jetty.http.MimeTypes.Type;
 import org.junit.jupiter.api.Test;
@@ -59,14 +59,14 @@ public class JmeterDslCoreTest extends JmeterDslTest {
   public void shouldTakeAtLeastRampTimesRunningTestWhenThreadGroupWithRampUpAndDown()
       throws IOException {
     Duration duration = Duration.ofSeconds(5);
-    Stopwatch time = Stopwatch.createStarted();
+    Instant start = Instant.now();
     testPlan(
         threadGroup()
             .rampTo(3, duration)
             .rampTo(0, duration)
             .children(httpSampler(wiremockUri))
     ).run();
-    assertThat(time.elapsed()).isGreaterThan(duration.multipliedBy(2));
+    assertThat(Duration.between(start, Instant.now())).isGreaterThan(duration.multipliedBy(2));
   }
 
   @Test

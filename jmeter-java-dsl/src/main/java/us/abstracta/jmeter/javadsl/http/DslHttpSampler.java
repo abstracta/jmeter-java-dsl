@@ -2,7 +2,6 @@ package us.abstracta.jmeter.javadsl.http;
 
 import static us.abstracta.jmeter.javadsl.JmeterDsl.jsr223PreProcessor;
 
-import java.util.ArrayList;
 import java.util.function.Function;
 import org.apache.jmeter.config.Arguments;
 import org.apache.jmeter.protocol.http.control.gui.HttpTestSampleGui;
@@ -33,12 +32,12 @@ public class DslHttpSampler extends DslSampler {
   private boolean downloadEmbeddedResources;
 
   public DslHttpSampler(String name, String url) {
-    super(buildName(name), HttpTestSampleGui.class, new ArrayList<>());
+    super(buildName(name), HttpTestSampleGui.class);
     this.url = url;
   }
 
   public DslHttpSampler(String name, Function<PreProcessorVars, String> urlSupplier) {
-    super(buildName(name), HttpTestSampleGui.class, new ArrayList<>());
+    super(buildName(name), HttpTestSampleGui.class);
     String variableName = "PRE_PROCESSOR_URL";
     this.url = "${" + variableName + "}";
     children(

@@ -6,8 +6,6 @@ import java.nio.charset.StandardCharsets;
 import org.apache.jmeter.config.CSVDataSet;
 import org.apache.jmeter.testbeans.gui.TestBeanGUI;
 import org.apache.jmeter.testelement.TestElement;
-import us.abstracta.jmeter.javadsl.core.testelements.BaseTestElement;
-import us.abstracta.jmeter.javadsl.core.testelements.MultiLevelTestElement;
 
 /**
  * Allows using a CSV file as input data for JMeter variables to use in test plan.
@@ -28,7 +26,7 @@ import us.abstracta.jmeter.javadsl.core.testelements.MultiLevelTestElement;
  *
  * @since 0.24
  */
-public class DslCsvDataSet extends BaseTestElement implements MultiLevelTestElement {
+public class DslCsvDataSet extends DslConfigElement {
 
   private final String file;
   private String delimiter = ",";

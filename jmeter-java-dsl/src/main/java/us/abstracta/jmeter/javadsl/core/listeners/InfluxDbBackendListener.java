@@ -88,6 +88,7 @@ public class InfluxDbBackendListener extends DslBackendListener {
    *
    * @param measurement specifies the name of the measurement.
    * @return this instance for fluent API usage.
+   * @since 0.38
    */
   public InfluxDbBackendListener measurement(String measurement) {
     this.measurement = measurement;
@@ -102,6 +103,7 @@ public class InfluxDbBackendListener extends DslBackendListener {
    *
    * @param applicationName specifies the name of the application tag.
    * @return this instance for fluent API usage.
+   * @since 0.38
    */
   public InfluxDbBackendListener applicationName(String applicationName) {
     this.applicationName = applicationName;
@@ -118,6 +120,7 @@ public class InfluxDbBackendListener extends DslBackendListener {
    *
    * @param samplersRegex specifies the name of the samplersRegex.
    * @return this instance for fluent API usage.
+   * @since 0.38
    */
   public InfluxDbBackendListener samplersRegex(String samplersRegex) {
     this.samplersRegex = samplersRegex;
