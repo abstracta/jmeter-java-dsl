@@ -16,6 +16,9 @@ public class InfluxDbBackendListener extends DslBackendListener {
   private String title = "Test jmeter-java-dsl " + Instant.now().toString();
   private String token;
   private final Map<String, String> tags = new HashMap<>();
+  private String samplersRegex;
+  private String measurement;
+  private String applicationName;
 
   public InfluxDbBackendListener(String url) {
     super(InfluxdbBackendListenerClient.class, url);
@@ -79,12 +82,59 @@ public class InfluxDbBackendListener extends DslBackendListener {
     return this;
   }
 
+  /**
+   * Allows specify the measurement which will contains all data of test.
+   *
+   * @param measurement specifies the name of the measurement.
+   * @return this instance for fluent API usage.
+   */
+  public InfluxDbBackendListener measurement(String measurement) {
+    this.measurement = measurement;
+    return this;
+  }
+
+  /**
+   * Allows specify the applicationName to do easily determinate tests on
+   * this chosen application in results.
+   *
+   * @param applicationName specifies the name of the applicationName.
+   * @return this instance for fluent API usage.
+   */
+  public InfluxDbBackendListener applicationName(String applicationName) {
+    this.applicationName = applicationName;
+    return this;
+  }
+
+  /**
+   * Allows specify the samplersRegex exclude samplers from results.
+   * Based on regular expressions.
+   * Samplers which doesn't match this regexp not sending to Influxdb.
+   * For example "^[^_].*" - will exclude
+   * samplers which labels start with symbol "_".
+   *
+   * @param samplersRegex specifies the name of the samplersRegex.
+   * @return this instance for fluent API usage.
+   */
+  public InfluxDbBackendListener samplersRegex(String samplersRegex) {
+    this.samplersRegex = samplersRegex;
+    return this;
+  }
+
   @Override
   protected Arguments buildListenerArguments() {
     Arguments ret = new Arguments();
     ret.addArgument("influxdbUrl", url);
     ret.addArgument("summaryOnly", "false");
     ret.addArgument("testTitle", title);
+    if (measurement != null) {
+      ret.addArgument("measurement", measurement);
+    }
+    if (applicationName != null) {
+      ret.addArgument("applicationName", applicationName);
+    }
+    if (samplersRegex != null) {
+      ret.addArgument("samplersRegex", samplersRegex);
+    }
     if (token != null) {
       ret.addArgument("influxdbToken", token);
     }
