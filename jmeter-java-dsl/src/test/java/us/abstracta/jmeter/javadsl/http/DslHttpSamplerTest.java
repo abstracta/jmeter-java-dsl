@@ -11,6 +11,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
 import static org.assertj.core.api.Assertions.assertThat;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.httpCache;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.httpCookies;
+import static us.abstracta.jmeter.javadsl.JmeterDsl.httpDefaults;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.httpHeaders;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.httpSampler;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.jsr223PreProcessor;
@@ -279,7 +280,7 @@ public class DslHttpSamplerTest extends JmeterDslTest {
     String primaryUrl = "/primary";
     String resourceUrl = "/resource";
     wiremockServer.stubFor(get(primaryUrl)
-        .willReturn(buildEmbeddedResourcesResponse(resourceUrl)));
+        .willReturn(HttpResponseBuilder.buildEmbeddedResourcesResponse(resourceUrl)));
     testPlan(
         threadGroup(1, 1,
             httpSampler(wiremockUri + primaryUrl)
@@ -289,16 +290,6 @@ public class DslHttpSamplerTest extends JmeterDslTest {
     wiremockServer.verify(getRequestedFor(urlPathEqualTo(resourceUrl)));
   }
 
-  private ResponseDefinitionBuilder buildEmbeddedResourcesResponse(String... resourcesUrls) {
-    return aResponse()
-        .withHeader(HttpHeader.CONTENT_TYPE.toString(), Type.TEXT_HTML.toString())
-        .withBody("<html>" +
-            Arrays.stream(resourcesUrls)
-                .map(r -> "<img src=\"" + r + "\"/>")
-                .collect(Collectors.joining())
-            + "</html>");
-  }
-
   @Test
   public void shouldDownloadEmbeddedResourcesInParallelWhenEnabled() throws Exception {
     int responsesDelayMillis = 3000;
@@ -306,7 +297,7 @@ public class DslHttpSamplerTest extends JmeterDslTest {
         .willReturn(aResponse().withFixedDelay(responsesDelayMillis)));
     String primaryUrl = "/primary";
     wiremockServer.stubFor(get(primaryUrl)
-        .willReturn(buildEmbeddedResourcesResponse("/resource1", "/resource2")
+        .willReturn(HttpResponseBuilder.buildEmbeddedResourcesResponse("/resource1", "/resource2")
             .withFixedDelay(responsesDelayMillis)));
     String transactionLabel = "sample";
     TestPlanStats stats = testPlan(

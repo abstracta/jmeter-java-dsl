@@ -156,7 +156,9 @@ package core {
 
   package configs {
 
-    class DslCsvDataSet extends BaseTestElement implements MultiLevelTestElement {
+    abstract class DslConfigElement extends BaseTestElement implements MultiLevelTestElement
+
+    class DslCsvDataSet extends DslConfigElement {
       String file
       String delimiter
       String encoding
@@ -396,6 +398,9 @@ package http {
   class DslCacheManager extends TestPlanSingletonChildElement
 
   class DslCookieManager extends TestPlanSingletonChildElement
+
+  class DslHttpDefaults extends DslConfigElement {
+  }
 
   DslHttpSampler --> HttpHeaders
 

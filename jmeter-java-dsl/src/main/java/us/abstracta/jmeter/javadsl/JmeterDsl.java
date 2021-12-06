@@ -38,6 +38,7 @@ import us.abstracta.jmeter.javadsl.core.timers.DslUniformRandomTimer;
 import us.abstracta.jmeter.javadsl.core.util.PropertyScriptBuilder.PropertyScript;
 import us.abstracta.jmeter.javadsl.http.DslCacheManager;
 import us.abstracta.jmeter.javadsl.http.DslCookieManager;
+import us.abstracta.jmeter.javadsl.http.DslHttpDefaults;
 import us.abstracta.jmeter.javadsl.http.DslHttpSampler;
 import us.abstracta.jmeter.javadsl.http.HttpHeaders;
 import us.abstracta.jmeter.javadsl.java.DslJsr223Sampler;
@@ -611,6 +612,21 @@ public class JmeterDsl {
    */
   public static HttpHeaders httpHeaders() {
     return new HttpHeaders();
+  }
+
+  /**
+   * Builds an HTTP request defaults element that allows setting default values used by HTTP
+   * samplers.
+   * <p>
+   * In general, prefer using Java variables or custom builder methods to abstract common logic for
+   * samplers which allows for easier debugging, readability and traceability. In some cases though
+   * it might be shorter/simpler to just use and httpDefaults element.
+   *
+   * @return the HTTP defaults test element for customization and usage.
+   * @since 0.39
+   */
+  public static DslHttpDefaults httpDefaults() {
+    return new DslHttpDefaults();
   }
 
   /**
