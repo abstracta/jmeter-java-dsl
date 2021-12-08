@@ -23,7 +23,7 @@ import us.abstracta.jmeter.javadsl.core.testelements.DslSampler;
  * @see DslJdbcConnectionPool
  * @since 0.38
  */
-public class DslJdbcSampler extends DslSampler {
+public class DslJdbcSampler extends DslSampler<DslJdbcSampler> {
 
   private final String poolName;
   private final String query;

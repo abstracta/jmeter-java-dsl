@@ -23,7 +23,7 @@ import us.abstracta.jmeter.javadsl.core.testelements.DslSampler;
  *
  * @since 0.1
  */
-public class DslHttpSampler extends DslSampler {
+public class DslHttpSampler extends DslSampler<DslHttpSampler> {
 
   private final String url;
   private HttpMethod method = HttpMethod.GET;
@@ -255,17 +255,6 @@ public class DslHttpSampler extends DslSampler {
   public DslHttpSampler clientImpl(HttpClientImpl clientImpl) {
     this.clientImpl = clientImpl;
     return this;
-  }
-
-  /**
-   * Allows specifying children test elements for the sampler, which allow for example extracting
-   * information from HTTP response, alter HTTP request, assert HTTP response contents, etc.
-   *
-   * @param children list of test elements to add as children of this sampler.
-   * @return the altered sampler to allow for fluent API usage.
-   */
-  public DslHttpSampler children(SamplerChild... children) {
-    return (DslHttpSampler) addChildren(children);
   }
 
   @Override

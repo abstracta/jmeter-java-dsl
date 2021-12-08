@@ -16,11 +16,22 @@ import us.abstracta.jmeter.javadsl.http.DslHttpSampler;
  *
  * @since 0.1
  */
-public abstract class DslSampler extends
+public abstract class DslSampler<T extends DslSampler<?>> extends
     TestElementContainer<DslSampler.SamplerChild> implements ThreadGroupChild {
 
   protected DslSampler(String name, Class<? extends JMeterGUIComponent> guiClass) {
     super(name, guiClass, Collections.emptyList());
+  }
+
+  /**
+   * Allows specifying children test elements for the sampler, which allow for example extracting
+   * information from response, alter request, assert response contents, etc.
+   *
+   * @param children list of test elements to add as children of this sampler.
+   * @return the altered sampler to allow for fluent API usage.
+   */
+  public T children(SamplerChild... children) {
+    return (T) addChildren(children);
   }
 
   /**
