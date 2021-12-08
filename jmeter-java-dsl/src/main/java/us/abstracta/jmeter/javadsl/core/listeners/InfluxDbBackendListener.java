@@ -137,7 +137,7 @@ public class InfluxDbBackendListener extends DslBackendListener {
       ret.addArgument("measurement", measurement);
     }
     if (applicationName != null) {
-      ret.addArgument("applicationName", applicationName);
+      ret.addArgument("application", applicationName);
     }
     if (samplersRegex != null) {
       ret.addArgument("samplersRegex", samplersRegex);
