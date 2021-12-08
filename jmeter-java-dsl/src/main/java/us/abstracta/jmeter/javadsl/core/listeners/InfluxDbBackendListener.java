@@ -105,7 +105,7 @@ public class InfluxDbBackendListener extends DslBackendListener {
    * @return this instance for fluent API usage.
    * @since 0.38
    */
-  public InfluxDbBackendListener applicationName(String applicationName) {
+  public InfluxDbBackendListener application(String applicationName) {
     this.applicationName = applicationName;
     return this;
   }
