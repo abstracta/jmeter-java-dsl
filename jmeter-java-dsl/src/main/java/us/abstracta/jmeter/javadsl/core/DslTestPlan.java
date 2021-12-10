@@ -25,6 +25,10 @@ import us.abstracta.jmeter.javadsl.core.threadgroups.DslThreadGroup;
  */
 public class DslTestPlan extends TestElementContainer<TestPlanChild> {
 
+  private boolean tearDown = true;
+  private boolean funcMode = false;
+  private boolean serializeTGs = false;
+
   public DslTestPlan(List<TestPlanChild> children) {
     super("Test Plan", TestPlanGui.class, children);
   }
@@ -33,7 +37,9 @@ public class DslTestPlan extends TestElementContainer<TestPlanChild> {
   protected TestElement buildTestElement() {
     TestPlan ret = new TestPlan();
     ret.setUserDefinedVariables(new Arguments());
-    ret...
+    ret.setTearDownOnShutdown(this.tearDown);
+    ret.setTearDownOnShutdown(this.funcMode);
+    ret.setTearDownOnShutdown(this.serializeTGs);
     return ret;
   }
 
@@ -44,8 +50,7 @@ public class DslTestPlan extends TestElementContainer<TestPlanChild> {
    * @throws IOException thrown when there is some problem running the plan.
    */
   public TestPlanStats run() throws IOException {
-    return new EmbeddedJmeterEngine()
-        .run(this);
+    return new EmbeddedJmeterEngine().run(this);
   }
 
   /**
@@ -90,6 +95,48 @@ public class DslTestPlan extends TestElementContainer<TestPlanChild> {
     return new JmxTestPlan(tree);
   }
 
+  /**
+   * if true, thread groups will start consecutively.
+   * One at one time in the order indicated in the plan
+   *
+   * @param serializeTGs enabling or disabling this feature (true/false).
+   * @return this instance for fluent API usage.
+   * @since 0.4
+   */
+  public DslTestPlan setSerialized(Boolean serializeTGs) {
+    this.serializeTGs = serializeTGs;
+    return this;
+  }
+
+  /**
+   * If true, it will cause JMeter to record the data returned from
+   * the server for each sample.
+   * If you have selected a file in your test listeners,
+   * this data will be written to file.
+   *
+   * @param funcMode enabling or disabling this mode (true/false).
+   * @return this instance for fluent API usage.
+   * @since 0.4
+   */
+  public DslTestPlan setGlobalFunctionalMode(Boolean funcMode) {
+    this.funcMode = funcMode;
+    return this;
+  }
+
+  /**
+   * if true, the tearDown groups (if any)
+   * will be run after graceful shutdown of the main threads.
+   * The tearDown threads won't be run if the test is forcibly stopped.
+   *
+   * @param tearDown enabling or disabling this feature (true/false).
+   * @return this instance for fluent API usage.
+   * @since 0.4
+   */
+  public DslTestPlan setTearDownOnShutdown(Boolean tearDown) {
+    this.tearDown = tearDown;
+    return this;
+  }
+
   private static class JmxTestPlan extends DslTestPlan {
 
     private final HashTree tree;
@@ -110,7 +157,7 @@ public class DslTestPlan extends TestElementContainer<TestPlanChild> {
   /**
    * Test elements that can be added directly as test plan children in JMeter should implement this
    * interface.
-   * <p>
+   *
    * Check {@link DslThreadGroup} for an example.
    */
   public interface TestPlanChild extends DslTestElement {
