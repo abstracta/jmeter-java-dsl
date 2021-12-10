@@ -102,7 +102,7 @@ public class PerformanceTest {
 ```
 ::: tip
 Also, you can configure the test plan in the same way as it is done in JMeter itself.
-Use `.setSerialized` for start threads consecutively, `.setGlobalFunctionalMode` for record all response data and `.setTearDownOnShutdown` for start [tearDown Thread Group](#set-up-&-tear-down)  after graceful shutdown of the main threads.
+Use `.setSerialized` for start threads consecutively, `.setGlobalFunctionalMode` for record all response data and `.setTearDownOnShutdown` for start [tearDown Thread Group](#set-up--tear-down)  after graceful shutdown of the main threads.
 :::
 
 ::: tip
