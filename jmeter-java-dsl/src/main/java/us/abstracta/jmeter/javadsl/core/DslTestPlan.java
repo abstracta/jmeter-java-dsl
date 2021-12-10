@@ -33,6 +33,7 @@ public class DslTestPlan extends TestElementContainer<TestPlanChild> {
   protected TestElement buildTestElement() {
     TestPlan ret = new TestPlan();
     ret.setUserDefinedVariables(new Arguments());
+    ret...
     return ret;
   }
 
