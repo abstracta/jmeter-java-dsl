@@ -100,10 +100,6 @@ public class PerformanceTest {
 
 }
 ```
-::: tip
-Also, you can configure the test plan in the same way as it is done in JMeter itself.
-Use `startThreadGroupsSequentially` for start threads consecutively and `startTearDownOnlyAfterMainThreadsDone` for start [tearDown Thread Group](#set-up--tear-down)  only after all main thread groups will be totally done (by default it start's after graceful shutdown of the main threads, like stop button).
-:::
 
 ::: tip
 When working with multiple samplers in a test plan, specify their names to easily check their respective statistics.
@@ -430,7 +426,16 @@ public class PerformanceTest {
 }
 ```
 
+::: tip
+By default, JMeter automatically executes teardown thread groups when a test plan stops due to unscheduled event like sample error when stop test is configured in thread group, invocation of `ctx.getEngine().askThreadsToStop()` in jsr223 element, etc. You can disable this behavior by using testPlan `tearDownOnlyAfterMainThreadsDone` method, which might be helpful if teardown
+thread group has only to run on clean test plan completion.
+:::
+
 Check [DslSetupThreadGroup](../../jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/threadgroups/DslSetupThreadGroup.java) and [DslTeardownThreadGroup](../../jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/threadgroups/DslTeardownThreadGroup.java) for additional tips and details on the usage of these components.
+
+### Thread groups order
+
+By default, when you add multiple thread groups to a test plan, JMeter will run them all in parallel. This is a very helpful behavior in many cases, but in some others you may want to run then sequentially (one after the other). To achieve this you can just use `sequentialThreadGroups()` test plan method.
 
 ## Test plan debugging
 
