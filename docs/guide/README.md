@@ -100,6 +100,10 @@ public class PerformanceTest {
 
 }
 ```
+::: tip
+Also, you can configure the test plan in the same way as it is done in JMeter itself.
+Use `startThreadGroupsSequentially` for start threads consecutively and `startTearDownOnlyAfterMainThreadsDone` for start [tearDown Thread Group](#set-up--tear-down)  only after all main thread groups will be totally done (by default it start's after graceful shutdown of the main threads, like stop button).
+:::
 
 ::: tip
 When working with multiple samplers in a test plan, specify their names to easily check their respective statistics.

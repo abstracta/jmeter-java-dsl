@@ -25,6 +25,9 @@ import us.abstracta.jmeter.javadsl.core.threadgroups.DslThreadGroup;
  */
 public class DslTestPlan extends TestElementContainer<TestPlanChild> {
 
+  private boolean tearDown = true;
+  private boolean serializeThreadGroups = false;
+
   public DslTestPlan(List<TestPlanChild> children) {
     super("Test Plan", TestPlanGui.class, children);
   }
@@ -33,6 +36,8 @@ public class DslTestPlan extends TestElementContainer<TestPlanChild> {
   protected TestElement buildTestElement() {
     TestPlan ret = new TestPlan();
     ret.setUserDefinedVariables(new Arguments());
+    ret.setTearDownOnShutdown(this.tearDown);
+    ret.setSerialized(this.serializeThreadGroups);
     return ret;
   }
 
@@ -43,8 +48,7 @@ public class DslTestPlan extends TestElementContainer<TestPlanChild> {
    * @throws IOException thrown when there is some problem running the plan.
    */
   public TestPlanStats run() throws IOException {
-    return new EmbeddedJmeterEngine()
-        .run(this);
+    return new EmbeddedJmeterEngine().run(this);
   }
 
   /**
@@ -89,6 +93,32 @@ public class DslTestPlan extends TestElementContainer<TestPlanChild> {
     return new JmxTestPlan(tree);
   }
 
+  /**
+   * Allows to specify the test plan thread
+   * groups to start sequentially instead of parallel start.
+   * One at one time in the order indicated in the plan
+   *
+   * @return this instance for fluent API usage.
+   * @since 0.40
+   */
+  public DslTestPlan startThreadGroupsSequentially() {
+    this.serializeThreadGroups = true;
+    return this;
+  }
+
+  /**
+   * Allows to run the tearDown groups only after total done
+   * of the main threads.
+   * The tearDown threads won't be run if the test is stopped.
+   *
+   * @return this instance for fluent API usage.
+   * @since 0.40
+   */
+  public DslTestPlan startTearDownOnlyAfterMainThreadsDone() {
+    this.tearDown = false;
+    return this;
+  }
+
   private static class JmxTestPlan extends DslTestPlan {
 
     private final HashTree tree;
@@ -109,7 +139,7 @@ public class DslTestPlan extends TestElementContainer<TestPlanChild> {
   /**
    * Test elements that can be added directly as test plan children in JMeter should implement this
    * interface.
-   * <p>
+   *
    * Check {@link DslThreadGroup} for an example.
    */
   public interface TestPlanChild extends DslTestElement {
