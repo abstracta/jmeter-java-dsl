@@ -26,8 +26,7 @@ import us.abstracta.jmeter.javadsl.core.threadgroups.DslThreadGroup;
 public class DslTestPlan extends TestElementContainer<TestPlanChild> {
 
   private boolean tearDown = true;
-  private boolean funcMode = false;
-  private boolean serializeTGs = false;
+  private boolean serializeThreadGroups = false;
 
   public DslTestPlan(List<TestPlanChild> children) {
     super("Test Plan", TestPlanGui.class, children);
@@ -38,8 +37,7 @@ public class DslTestPlan extends TestElementContainer<TestPlanChild> {
     TestPlan ret = new TestPlan();
     ret.setUserDefinedVariables(new Arguments());
     ret.setTearDownOnShutdown(this.tearDown);
-    ret.setTearDownOnShutdown(this.funcMode);
-    ret.setTearDownOnShutdown(this.serializeTGs);
+    ret.setSerialized(this.serializeThreadGroups);
     return ret;
   }
 
@@ -96,44 +94,28 @@ public class DslTestPlan extends TestElementContainer<TestPlanChild> {
   }
 
   /**
-   * if true, thread groups will start consecutively.
+   * Allows to specify the test plan thread
+   * groups to start sequentially instead of parallel start.
    * One at one time in the order indicated in the plan
    *
-   * @param serializeTGs enabling or disabling this feature (true/false).
    * @return this instance for fluent API usage.
-   * @since 0.4
+   * @since 0.40
    */
-  public DslTestPlan setSerialized(Boolean serializeTGs) {
-    this.serializeTGs = serializeTGs;
+  public DslTestPlan startThreadGroupsSequentially() {
+    this.serializeThreadGroups = true;
     return this;
   }
 
   /**
-   * If true, it will cause JMeter to record the data returned from
-   * the server for each sample.
-   * If you have selected a file in your test listeners,
-   * this data will be written to file.
+   * Allows to run the tearDown groups only after total done
+   * of the main threads.
+   * The tearDown threads won't be run if the test is stopped.
    *
-   * @param funcMode enabling or disabling this mode (true/false).
    * @return this instance for fluent API usage.
-   * @since 0.4
+   * @since 0.40
    */
-  public DslTestPlan setGlobalFunctionalMode(Boolean funcMode) {
-    this.funcMode = funcMode;
-    return this;
-  }
-
-  /**
-   * if true, the tearDown groups (if any)
-   * will be run after graceful shutdown of the main threads.
-   * The tearDown threads won't be run if the test is forcibly stopped.
-   *
-   * @param tearDown enabling or disabling this feature (true/false).
-   * @return this instance for fluent API usage.
-   * @since 0.4
-   */
-  public DslTestPlan setTearDownOnShutdown(Boolean tearDown) {
-    this.tearDown = tearDown;
+  public DslTestPlan startTearDownOnlyAfterMainThreadsDone() {
+    this.tearDown = false;
     return this;
   }
 
