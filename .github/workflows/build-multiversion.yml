@@ -1,4 +1,4 @@
-name: run tests
+name: run tests on Multi Jmeter Version
 on:
   push:
     tags-ignore:
