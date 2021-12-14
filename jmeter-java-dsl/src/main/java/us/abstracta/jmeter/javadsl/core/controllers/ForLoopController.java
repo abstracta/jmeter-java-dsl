@@ -2,7 +2,7 @@ package us.abstracta.jmeter.javadsl.core.controllers;
 
 import java.util.List;
 import org.apache.jmeter.control.LoopController;
-import org.apache.jmeter.control.gui.ForeachControlPanel;
+import org.apache.jmeter.control.gui.LoopControlPanel;
 import org.apache.jmeter.testelement.TestElement;
 import us.abstracta.jmeter.javadsl.core.threadgroups.BaseThreadGroup.ThreadGroupChild;
 
@@ -21,7 +21,7 @@ public class ForLoopController extends DslController {
   private final int count;
 
   public ForLoopController(String name, int count, List<ThreadGroupChild> children) {
-    super(name != null ? name : "for", ForeachControlPanel.class, children);
+    super(name != null ? name : "for", LoopControlPanel.class, children);
     this.count = count;
   }
 
