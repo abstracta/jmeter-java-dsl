@@ -5,6 +5,9 @@ import java.time.Instant;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Supplier;
+import org.apache.jmeter.samplers.SampleResult;
+import us.abstracta.jmeter.javadsl.core.stats.StatsSummary;
 
 /**
  * Contains all statistics collected during the execution of a test plan.
@@ -16,144 +19,56 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class TestPlanStats {
 
+  protected final Supplier<StatsSummary> statsSummaryBuilder;
   protected StatsSummary overallStats;
   protected final Map<String, StatsSummary> labeledStats = new ConcurrentHashMap<>();
+  private Instant start;
+  private Instant end;
 
-  public interface StatsSummary {
-
-    /**
-     * Gets the instant when the first sample started.
-     *
-     * When associated to a test plan or transaction it gets its start time.
-     */
-    Instant firstTime();
-
-    /**
-     * Gets the instant when the last sample ended.
-     *
-     * When associated to a test plan or transaction it gets its end time.
-     *
-     * Take into consideration that for transactions this time takes not only into consideration the
-     * endTime of last sample, but also the time spent in timers and pre and postprocessors.
-     */
-    Instant endTime();
-
-    /**
-     * Gets the duration between {@link #firstTime()} and {@link #endTime()}.
-     *
-     * It is a simple way to get the duration of a sample, transaction or test plan.
-     */
-    Duration elapsedTime();
-
-    /**
-     * Gets the total number of samples.
-     *
-     * This counts both failing and passing samples.
-     */
-    long samplesCount();
-
-    /**
-     * Gets the average count of samples per second.
-     *
-     * This is just {@link #samplesCount()}/{@link #elapsedTime()}.
-     */
-    double samplesPerSecond();
-
-    /**
-     * Gets the total number of samples that failed.
-     */
-    long errorsCount();
-
-    /**
-     * Gets the minimum time spent in a sample.
-     *
-     * @since 0.15
-     */
-    Duration minSampleTime();
-
-    /**
-     * Gets the maximum time spent in a sample.
-     *
-     * @since 0.15
-     */
-    Duration maxSampleTime();
-
-    /**
-     * Gets the mean value of samples times.
-     *
-     * @since 0.15
-     */
-    Duration meanSampleTime();
-
-    /**
-     * Gets the 90 percentile of samples times.
-     *
-     * 90% of samples took less or equal to the returned value.
-     *
-     * @since 0.15
-     */
-    Duration sampleTimePercentile90();
-
-    /**
-     * Gets the 95 percentile of samples times.
-     *
-     * 95% of samples took less or equal to the returned value.
-     *
-     * @since 0.15
-     */
-    Duration sampleTimePercentile95();
-
-    /**
-     * Gets the 99 percentile of samples times.
-     *
-     * 99% of samples took less or equal to the returned value.
-     *
-     * @since 0.15
-     */
-    Duration sampleTimePercentile99();
-
-    /**
-     * Gets the total sum of received bytes in samples responses.
-     */
-    long receivedBytes();
-
-    /**
-     * Gets the average amount of received bytes per second in samples responses.
-     *
-     * This is just {@link #receivedBytes()}/{@link #elapsedTime()}.
-     */
-    double receivedBytesPerSecond();
-
-    /**
-     * Gets the total sum of sent bytes in samples requests.
-     */
-    long sentBytes();
-
-    /**
-     * Gets the average amount of sent bytes per second in samples requests.
-     *
-     * This is just {@link #sentBytes()}/{@link #elapsedTime()}.
-     */
-    double sentBytesPerSecond();
-
+  public TestPlanStats(Supplier<StatsSummary> statsSummaryBuilder) {
+    this.statsSummaryBuilder = statsSummaryBuilder;
+    overallStats = statsSummaryBuilder.get();
   }
 
-  public void setLabeledStats(String label, StatsSummary stats) {
-    labeledStats.put(label, stats);
+  public synchronized void addSampleResult(SampleResult result) {
+    overallStats.add(result);
+    StatsSummary labelStats = labeledStats.computeIfAbsent(
+        result.getSampleLabel(), label -> statsSummaryBuilder.get());
+    labelStats.add(result);
   }
 
-  public void setOverallStats(StatsSummary stats) {
-    overallStats = stats;
+  public void setStart(Instant start) {
+    this.start = start;
   }
 
+  public void setEnd(Instant end) {
+    this.end = end;
+  }
+
+  /**
+   * Provides the time taken to run the test plan.
+   */
+  public Duration duration() {
+    return Duration.between(start, end);
+  }
+
+  /**
+   * Provides statistics for the entire test plan.
+   */
   public StatsSummary overall() {
     return overallStats;
   }
 
+  /**
+   * Provides statistics for a specific label (usually a sampler label).
+   */
   public StatsSummary byLabel(String label) {
     return labeledStats.get(label);
   }
 
+  /**
+   * Provides a set of collected labels (usually samplers labels).
+   */
   public Set<String> labels() {
     return labeledStats.keySet();
   }

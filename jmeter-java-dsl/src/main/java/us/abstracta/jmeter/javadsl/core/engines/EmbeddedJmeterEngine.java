@@ -4,6 +4,7 @@ import java.awt.Component;
 import java.io.IOException;
 import java.time.Instant;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -15,6 +16,7 @@ import org.apache.jmeter.engine.StandardJMeterEngine;
 import org.apache.jmeter.reporters.ResultCollector;
 import org.apache.jmeter.reporters.Summariser;
 import org.apache.jmeter.samplers.SampleResult;
+import org.apache.jmeter.util.JMeterUtils;
 import org.apache.jmeter.visualizers.Visualizer;
 import org.apache.jorphan.collections.HashTree;
 import org.apache.jorphan.collections.ListedHashTree;
@@ -34,6 +36,29 @@ import us.abstracta.jmeter.javadsl.core.listeners.DslVisualizer;
 public class EmbeddedJmeterEngine implements DslJmeterEngine {
 
   private static final Logger LOG = LoggerFactory.getLogger(EmbeddedJmeterEngine.class);
+  private final Map<String, Object> props = new HashMap<>();
+
+  /**
+   * Allows setting properties to be used during test plan execution.
+   * <p>
+   * This is an alternate to using {@link System#setProperty(String, String)} but that also works
+   * with <pre>props['PROP_NAME']</pre> and <pre>props.get('PROP_NAME')</pre> in groovy code, in
+   * addition to allowing to set arbitrary objects (and not just strings). This properties
+   * additionally don't alter the JVM properties, which is preferable to improve tests isolation.
+   * <p>
+   * Setting arbitrary objects might be helpful to pass some object that can be reused by all
+   * threads in test plan (eg: a cache).
+   *
+   * @param name  specifies the name of the property, used by test plan to access the associated
+   *              value.
+   * @param value specifies a value to store associated to the name.
+   * @return the engine instance for further configuration or usage.
+   * @since 0.37
+   */
+  public EmbeddedJmeterEngine prop(String name, Object value) {
+    props.put(name, value);
+    return this;
+  }
 
   @Override
   public TestPlanStats run(DslTestPlan testPlan) throws IOException {
@@ -41,11 +66,12 @@ public class EmbeddedJmeterEngine implements DslJmeterEngine {
   }
 
   protected TestPlanStats runInEnv(DslTestPlan testPlan, JmeterEnvironment env) {
+    JMeterUtils.getJMeterProperties().putAll(props);
     HashTree rootTree = new ListedHashTree();
     BuildTreeContext buildContext = new BuildTreeContext(rootTree);
     HashTree testPlanTree = testPlan.buildTreeUnder(rootTree, buildContext);
 
-    AggregatingTestPlanStats stats = new AggregatingTestPlanStats();
+    TestPlanStats stats = new TestPlanStats(EmbeddedStatsSummary::new);
     addStatsCollector(testPlanTree, stats);
     testPlanTree.add(new ResultCollector(new Summariser()));
 
@@ -70,7 +96,7 @@ public class EmbeddedJmeterEngine implements DslJmeterEngine {
     return stats;
   }
 
-  protected void addStatsCollector(HashTree testPlanTree, AggregatingTestPlanStats stats) {
+  protected void addStatsCollector(HashTree testPlanTree, TestPlanStats stats) {
     ResultCollector collector = new ResultCollector();
     Visualizer statsVisualizer = new Visualizer() {
 

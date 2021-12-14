@@ -23,7 +23,6 @@ import org.assertj.core.api.AbstractAssert;
 import org.junit.jupiter.api.Test;
 import us.abstracta.jmeter.javadsl.core.TestPlanStats;
 import us.abstracta.jmeter.javadsl.core.threadgroups.BaseThreadGroup.SampleErrorAction;
-import us.abstracta.jmeter.javadsl.core.threadgroups.DslThreadGroup;
 
 public class DslThreadGroupTest {
 

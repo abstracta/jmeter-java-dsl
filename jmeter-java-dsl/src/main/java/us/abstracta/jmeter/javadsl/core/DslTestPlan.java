@@ -25,6 +25,9 @@ import us.abstracta.jmeter.javadsl.core.threadgroups.DslThreadGroup;
  */
 public class DslTestPlan extends TestElementContainer<TestPlanChild> {
 
+  private boolean tearDownAfterMainThreadsShutDown = true;
+  private boolean serializeThreadGroups = false;
+
   public DslTestPlan(List<TestPlanChild> children) {
     super("Test Plan", TestPlanGui.class, children);
   }
@@ -33,6 +36,8 @@ public class DslTestPlan extends TestElementContainer<TestPlanChild> {
   protected TestElement buildTestElement() {
     TestPlan ret = new TestPlan();
     ret.setUserDefinedVariables(new Arguments());
+    ret.setTearDownOnShutdown(this.tearDownAfterMainThreadsShutDown);
+    ret.setSerialized(this.serializeThreadGroups);
     return ret;
   }
 
@@ -88,6 +93,35 @@ public class DslTestPlan extends TestElementContainer<TestPlanChild> {
     return new JmxTestPlan(tree);
   }
 
+  /**
+   * Specifies to run thread groups one after the other, instead of running them in parallel.
+   *
+   * @return this instance for fluent API usage.
+   * @since 0.40
+   */
+  public DslTestPlan sequentialThreadGroups() {
+    this.serializeThreadGroups = true;
+    return this;
+  }
+
+  /**
+   * Allows running tear down thread groups only after main thread groups ends cleanly (due to
+   * iterations or time limit).
+   * <p>
+   * By default, JMeter automatically executes tear down thread groups when a test plan stops due to
+   * unscheduled event like sample error when stop test is configured in thread group, invocation of
+   * `ctx.getEngine().askThreadsToStop()` in jsr223 element, etc. This method allows to disable such
+   * behavior not running teardown thread groups in such cases, which might be helpful if teardown
+   * thread group has only to run on clean test plan completion.
+   *
+   * @return this instance for fluent API usage.
+   * @since 0.40
+   */
+  public DslTestPlan tearDownOnlyAfterMainThreadsDone() {
+    this.tearDownAfterMainThreadsShutDown = false;
+    return this;
+  }
+
   private static class JmxTestPlan extends DslTestPlan {
 
     private final HashTree tree;
@@ -108,7 +142,7 @@ public class DslTestPlan extends TestElementContainer<TestPlanChild> {
   /**
    * Test elements that can be added directly as test plan children in JMeter should implement this
    * interface.
-   *
+   * <p>
    * Check {@link DslThreadGroup} for an example.
    */
   public interface TestPlanChild extends DslTestElement {

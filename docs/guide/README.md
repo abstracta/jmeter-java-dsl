@@ -29,7 +29,7 @@ To use the DSL just include it in your project:
 <dependency>
   <groupId>us.abstracta.jmeter</groupId>
   <artifactId>jmeter-java-dsl</artifactId>
-  <version>0.36</version>
+  <version>0.40</version>
   <scope>test</scope>
 </dependency>
 ```
@@ -50,7 +50,7 @@ class JmeterRule implements ComponentMetadataRule {
 
 dependencies {
     ...
-    testImplementation 'us.abstracta.jmeter:jmeter-java-dsl:0.36'
+    testImplementation 'us.abstracta.jmeter:jmeter-java-dsl:0.40'
     components {
         withModule("org.apache.jmeter:ApacheJMeter_core", JmeterRule)
         withModule("org.apache.jmeter:ApacheJMeter_java", JmeterRule)
@@ -129,14 +129,14 @@ By including following module as dependency:
 <dependency>
   <groupId>us.abstracta.jmeter</groupId>
   <artifactId>jmeter-java-dsl-blazemeter</artifactId>
-  <version>0.36</version>
+  <version>0.40</version>
   <scope>test</scope>
 </dependency>
 ```
 :::
 ::: tab Gradle
 ```groovy
-testImplementation 'us.abstracta.jmeter:jmeter-java-dsl-blazemeter:0.36'
+testImplementation 'us.abstracta.jmeter:jmeter-java-dsl-blazemeter:0.40'
 ```
 :::
 ::::
@@ -426,7 +426,16 @@ public class PerformanceTest {
 }
 ```
 
+::: tip
+By default, JMeter automatically executes teardown thread groups when a test plan stops due to unscheduled event like sample error when stop test is configured in thread group, invocation of `ctx.getEngine().askThreadsToStop()` in jsr223 element, etc. You can disable this behavior by using testPlan `tearDownOnlyAfterMainThreadsDone` method, which might be helpful if teardown
+thread group has only to run on clean test plan completion.
+:::
+
 Check [DslSetupThreadGroup](../../jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/threadgroups/DslSetupThreadGroup.java) and [DslTeardownThreadGroup](../../jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/threadgroups/DslTeardownThreadGroup.java) for additional tips and details on the usage of these components.
+
+### Thread groups order
+
+By default, when you add multiple thread groups to a test plan, JMeter will run them all in parallel. This is a very helpful behavior in many cases, but in some others you may want to run then sequentially (one after the other). To achieve this you can just use `sequentialThreadGroups()` test plan method.
 
 ## Test plan debugging
 
@@ -670,7 +679,7 @@ To use the module, you will need to include following dependency in your project
 <dependency>
   <groupId>us.abstracta.jmeter</groupId>
   <artifactId>jmeter-java-dsl-elasticsearch-listener</artifactId>
-  <version>0.36</version>
+  <version>0.40</version>
   <scope>test</scope>
 </dependency>
 ```
@@ -683,7 +692,7 @@ maven { url 'https://jitpack.io' }
 
 And the dependency:
 ```groovy
-testImplementation 'us.abstracta.jmeter:jmeter-java-dsl-elasticsearch-listener:0.36'
+testImplementation 'us.abstracta.jmeter:jmeter-java-dsl-elasticsearch-listener:0.40'
 ```
 
 :::
@@ -783,14 +792,14 @@ To use it, you need to add following dependency:
 <dependency>
   <groupId>us.abstracta.jmeter</groupId>
   <artifactId>jmeter-java-dsl-dashboard</artifactId>
-  <version>0.36</version>
+  <version>0.40</version>
   <scope>test</scope>
 </dependency>
 ```
 :::
 ::: tab Gradle
 ```groovy
-testImplementation 'us.abstracta.jmeter:jmeter-java-dsl-dashboard:0.36'
+testImplementation 'us.abstracta.jmeter:jmeter-java-dsl-dashboard:0.40'
 ```
 :::
 ::::
@@ -1531,14 +1540,14 @@ To use it, add following dependency to your project:
 <dependency>
   <groupId>us.abstracta.jmeter</groupId>
   <artifactId>jmeter-java-dsl-parallel</artifactId>
-  <version>0.36</version>
+  <version>0.40</version>
   <scope>test</scope>
 </dependency>
 ```
 :::
 ::: tab Gradle
 ```groovy
-testImplementation 'us.abstracta.jmeter:jmeter-java-dsl-dashboard:0.36'
+testImplementation 'us.abstracta.jmeter:jmeter-java-dsl-dashboard:0.40'
 ```
 :::
 ::::
@@ -1717,6 +1726,178 @@ When jmeter-java-dsl (using JMeter logic) detects a redirection, it will automat
 
 If you want to disable such logic, you can just call `.followRedirects(false)` in a given `httpSampler`.
 
+#### HTTP defaults
+
+Whenever you need to use some repetitive value or common setting among HTTP samplers (and any part of test plan) the preferred way (due to readability, debugability, traceability and, in some cases, simplicity) is to create a Java variable or custom builder method. 
+
+For example:
+
+```java
+import static us.abstracta.jmeter.javadsl.JmeterDsl.*;
+
+import java.io.IOException;
+import org.eclipse.jetty.http.MimeTypes.Type;
+import org.junit.jupiter.api.Test;
+import us.abstracta.jmeter.javadsl.http.DslHttpSampler;
+
+public class PerformanceTest {
+
+  @Test
+  public void performanceTest() throws IOException {
+    String host = "myservice.my";
+    testPlan(
+        threadGroup(10, 100,
+            productCreatorSampler(host, "Rubber"),
+            productCreatorSampler(host, "Pencil")
+        )
+    ).run();
+  }
+
+  private DslHttpSampler productCreatorSampler(String host, String productName) {
+    return httpSampler("https://" + host + "/api/product")
+        .post("{\"name\": \"" + productName + "\"}", Type.APPLICATION_JSON);
+  }
+
+}
+```
+
+In some cases though, it might be simpler to just use provided `httpDefaults` method, like in following example:
+
+```java
+import static us.abstracta.jmeter.javadsl.JmeterDsl.*;
+
+import java.io.IOException;
+import org.junit.jupiter.api.Test;
+
+public class PerformanceTest {
+
+  @Test
+  public void performanceTest() throws IOException {
+    testPlan(
+        httpDefaults()
+            .url("https://myservice.my")
+            .downloadEmbeddedResources(),
+        threadGroup(10, 100,
+            httpSampler("/products"),
+            httpSampler("/cart")
+        )
+    ).run();
+  }
+
+}
+```
+
+Check [DslHttpDefaults](../../jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/http/DslHttpDefaults.java) for additional details on available default options.
+
+### JDBC and databases interactions
+
+Several times you will need to interact with a database to either set it to a known state while setting up the test plan, cleaning it up while tearing down the test plan or even to check or generate some values in database while test plan is running.
+
+For these use cases you can use JDBC DSL provided elements.
+
+Including following dependency in your project:
+
+:::: tabs type:card
+::: tab Maven
+```xml
+<dependency>
+  <groupId>us.abstracta.jmeter</groupId>
+  <artifactId>jmeter-java-dsl-jdbc</artifactId>
+  <version>0.40</version>
+  <scope>test</scope>
+</dependency>
+```
+:::
+::: tab Gradle
+```groovy
+testImplementation 'us.abstracta.jmeter:jmeter-java-dsl-jdbc:0.40'
+```
+:::
+::::
+
+And adding proper JDBC driver for your database, like this an example for PostgreSQL:
+
+:::: tabs type:card
+::: tab Maven
+```xml
+<dependency>
+  <groupId>org.postgresql</groupId>
+  <artifactId>postgresql</artifactId>
+  <version>42.3.1</version>
+  <scope>test</scope>
+</dependency>
+```
+:::
+::: tab Gradle
+```groovy
+testImplementation 'org.postgresql:postgresql:42.3.1'
+```
+:::
+::::
+
+You can interact with the database like this:
+
+```java
+import static org.assertj.core.api.Assertions.assertThat;
+import static us.abstracta.jmeter.javadsl.JmeterDsl.*;
+import static us.abstracta.jmeter.javadsl.jdbc.JdbcJmeterDsl.*;
+
+import java.io.IOException;
+import java.sql.Types;
+import java.time.Duration;
+import org.eclipse.jetty.http.MimeTypes.Type;
+import org.junit.jupiter.api.Test;
+import org.postgresql.Driver;
+import us.abstracta.jmeter.javadsl.core.TestPlanStats;
+import us.abstracta.jmeter.javadsl.jdbc.DslJdbcSampler;
+
+public class PerformanceTest {
+
+  @Test
+  public void testPerformance() throws IOException {
+    String jdbcPoolName = "pgLocalPool";
+    String productName = "dsltest-prod";
+    DslJdbcSampler cleanUpSampler = jdbcSampler(jdbcPoolName,
+        "DELETE FROM products WHERE name = '" + productName + "'")
+        .timeout(Duration.ofSeconds(10));
+    TestPlanStats stats = testPlan(
+        jdbcConnectionPool(jdbcPoolName, Driver.class, "")
+            .user("user")
+            .password("pass"),
+        setupThreadGroup(
+            cleanUpSampler
+        ),
+        threadGroup(5, 10,
+            httpSampler("CreateProduct", "http://my.service/products")
+                .post("{\"name\", \"" + productName + "\"}", Type.APPLICATION_JSON),
+            jdbcSampler("GetProductsIdsByName", jdbcPoolName,
+                "SELECT id FROM products WHERE name=?")
+                .param(productName, Types.VARCHAR)
+                .vars("PRODUCT_ID")
+                .timeout(Duration.ofSeconds(10)),
+            httpSampler("GetLatestProduct",
+                "http://my.service/products/${__V(PRODUCT_ID_${PRODUCT_ID_#})}")
+        ),
+        teardownThreadGroup(
+            cleanUpSampler
+        )
+    ).run();
+    assertThat(stats.overall().sampleTimePercentile99()).isLessThan(Duration.ofSeconds(5));
+  }
+
+}
+```
+
+::: tip
+Always specify a query timeout to quickly identify unexpected behaviors in queries.
+:::
+
+::: tip
+Don't forget proper WHERE conditions in UPDATES and DELETES, and proper indexes for table columns participating in WHERE conditions 😊.
+:::
+
+Check [JdbcJmeterDsl](../../jmeter-java-dsl-jdbc/src/main/java/us/abstracta/jmeter/javadsl/jdbc/JdbcJmeterDsl.java) for additional details and options and [JdbcJmeterDslTest](../../jmeter-java-dsl-jdbc/src/test/java/us/abstracta/jmeter/javadsl/jdbc/JdbcJmeterDslTest.java) for additional examples.
+
 ### Java API performance testing
 
 Sometimes JMeter provided samplers are not enough for testing a particular technology, custom code or service that requires some custom code to interact with. For these cases you might use `jsr223Sampler` which allows you to use custom logic to generate a sample result.
@@ -1795,6 +1976,186 @@ Using java code (lambdas) will only work with embedded JMeter engine (no support
 `jsr223Sampler` is very powerful, but also makes code and test plan harder to maintain (as with any custom code) compared to using JMeter built-in samplers. So, in general, prefer using JMeter provided samplers if they are enough for the task at hand, and use `jsr223Sampler` sparingly.
 
 Check [DslJsr223Sampler](../../jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/java/DslJsr223Sampler.java) for more details and additional options.
+
+## JMeter properties
+
+You might reach a point where you want to pass some parameter to test plan or want to share some object or data that is available for all threads to use. In such scenarios you can use JMeter properties.
+
+JMeter properties are basically a map of keys and values, that is accessible to all threads. To access them you can use `${__P(PROPERTY_NAME)}` or equivalent `${__property(PROPERTY_NAME)` inside almost any string, `props['PROPERTY_NAME']` inside groovy scripts or `props.get("PROPERTY_NAME")` in lambda expressions.
+
+To set them, you can use `prop()` method included in `EmbeddedJmeterEngine` like in following example:
+
+```java
+import static us.abstracta.jmeter.javadsl.JmeterDsl.*;
+
+import org.junit.jupiter.api.Test;
+import us.abstracta.jmeter.javadsl.core.engines.EmbeddedJmeterEngine;
+
+public class PerformanceTest {
+
+  @Test
+  public void testProperties() {
+    testPlan(
+        threadGroup(1, 1,
+            httpSampler("http://myservice.test/${__P(MY_PROP)}")
+        )
+    ).runIn(new EmbeddedJmeterEngine()
+        .prop("MY_PROP", "MY_VAL"));
+  }
+
+}
+```
+
+Or you can set them in groovy or java code, like in following example:
+
+```java
+import static us.abstracta.jmeter.javadsl.JmeterDsl.*;
+
+import org.junit.jupiter.api.Test;
+
+public class PerformanceTest {
+
+  @Test
+  public void testProperties() {
+    testPlan(
+        threadGroup(1, 1,
+            jsr223Sampler("props.put('MY_PROP', 'MY_VAL')"),
+            httpSampler("http://myservice.test/${__P(MY_PROP)}")
+        )
+    ).run();
+  }
+
+}
+```
+
+::: tip
+You can put any object (not just strings) in properties, but only strings can be accessed via `${__P(PROPERTY_NAME)}` and `${__property(PROPERTY_NAME)}`.
+
+Being able to put any kind of object allows you to do very powerful stuff, like implementing a custom cache, or injecting some custom logic to test plan.
+:::
+
+::: tip
+You can also specify properties though JVM system properties either by setting JVM parameter `-D` or using `System.setProperty()` method.
+
+When properties are set as JVM system properties, they are not accessible via `props[PROPERTY_NAME]` or `props.get("PROPERTY_NAME")`. If you need to access them from groovy or java code, then use `props.getProperty("PROPERTY_NAME")` instead.
+:::
+
+::: warning
+JMeter properties can currently only be used with `EmbeddedJmeterEngine`, so use them sparingly and prefer other mechanisms when available.
+:::
+
+## Custom or yet not supported test elements
+
+Whenever you find some JMeter test element or feature that is not yet supported by the DSL, **we strongly encourage you to request it as an issue [here](https://github.com/abstracta/jmeter-java-dsl/issues)** or even contribute it to the DSL (check [Contributing guide](../../CONTRIBUTING.md)) so the entire community can benefit from it.
+
+In some cases though, you might have some private custom test element that you don't want to publish or share with the rest of the community, or you are just really in a hurry and want to use it while the proper support is included in the DSL.
+
+For such cases, the preferred approach is implementing a builder class for the test element. Eg:
+
+```java
+package us.abstracta.jmeter.javadsl;
+
+import org.apache.jmeter.testelement.TestElement;
+import us.abstracta.jmeter.javadsl.core.testelements.DslSampler;
+
+public class DslCustomSampler extends DslSampler<DslCustomSampler> {
+
+  private String myProp;
+
+  private DslCustomSampler(String name) {
+    super(name, CustomSamplerGui.class); // you can pass null here if custom sampler is a test bean
+  }
+
+  public DslCustomSampler myProp(String val) {
+    this.myProp = val;
+    return this;
+  }
+
+  @Override
+  protected TestElement buildTestElement() {
+    CustomSampler ret = new CustomSampler();
+    ret.setMyProp(myProp);
+    return ret;
+  }
+
+  public static DslCustomSampler customSampler(String name) {
+    return new DslCustomSampler(name);
+  }
+
+}
+```
+
+Which you can use as any other JMeter DSL component, like in this example:
+
+```java
+import static us.abstracta.jmeter.javadsl.DslCustomSampler.*;
+import static us.abstracta.jmeter.javadsl.JmeterDsl.*;
+
+import org.junit.jupiter.api.Test;
+
+public class PerformanceTest {
+
+  @Test
+  public void test() throws Exception {
+    testPlan(
+        threadGroup(1, 1,
+            customSampler("mySampler")
+                .myProp("myVal")
+            )
+    ).run();
+  }
+
+}
+```
+
+This approach allows for easy reuse, compact and simple usage in tests, and you might even create your own `CustomJmeterDsl` class containing builder methods for many custom components. 
+
+Alternatively, when you want to skip creating subclasses, you might use the DSL wrapper module.
+
+Include the module on your project:
+
+:::: tabs type:card
+::: tab Maven
+```xml
+<dependency>
+  <groupId>us.abstracta.jmeter</groupId>
+  <artifactId>jmeter-java-dsl-wrapper</artifactId>
+  <version>0.41</version>
+  <scope>test</scope>
+</dependency>
+```
+:::
+::: tab Gradle
+```groovy
+testImplementation 'us.abstracta.jmeter:jmeter-java-dsl-wrapper:0.41'
+```
+:::
+::::
+
+And use a wrapper like in following example:
+
+```java
+import static us.abstracta.jmeter.javadsl.JmeterDsl.*;
+import static us.abstracta.jmeter.javadsl.wrapper.WrapperJmeterDsl.*;
+
+import org.junit.jupiter.api.Test;
+
+public class PerformanceTest {
+
+  @Test
+  public void test() throws Exception {
+    testPlan(
+        threadGroup(1, 1,
+            testElement("mySampler", new CustomSamplerGui()) // for test beans you can just provide the test bean instance
+                .prop("myProp","myVal")
+            )
+    ).run();
+  }
+
+}
+```
+
+Check [WrapperJmeterDsl](../../jmeter-java-dsl-wrapper/src/main/java/us/abstracta/jmeter/javadsl/wrapper/WrapperJmeterDsl.java) for more details and additional wrappers.
 
 ## JMX support
 
@@ -1881,3 +2242,4 @@ When the JMX uses some custom plugin or JMeter protocol support, you might need 
 </dependencies>
 ```
 :::
+

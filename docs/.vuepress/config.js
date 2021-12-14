@@ -34,7 +34,9 @@ module.exports = {
     ['meta', { name: 'theme-color', content: '#00ace6' }],
     ['meta', { name: 'apple-mobile-web-app-capable', content: 'yes' }],
     ['meta', { name: 'apple-mobile-web-app-status-bar-style', content: 'black' }],
-    ['link', { rel: 'shortcut icon', href: '/favicon.ico'}]
+    ['link', { rel: 'shortcut icon', href: '/favicon.ico'}],
+    ['script', { async: true, src: 'https://www.googletagmanager.com/gtag/js?id=G-R8N6GMWK1H' }],
+    ['script', {}, ["window.dataLayer = window.dataLayer || [];\nfunction gtag(){dataLayer.push(arguments);}\ngtag('js', new Date());\ngtag('config', 'G-R8N6GMWK1H');"]]
   ],
 
   /**

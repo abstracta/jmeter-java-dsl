@@ -2,7 +2,7 @@ package us.abstracta.jmeter.javadsl.http;
 
 import static us.abstracta.jmeter.javadsl.JmeterDsl.jsr223PreProcessor;
 
-import java.util.ArrayList;
+import java.nio.charset.Charset;
 import java.util.function.Function;
 import org.apache.jmeter.config.Arguments;
 import org.apache.jmeter.protocol.http.control.gui.HttpTestSampleGui;
@@ -23,27 +23,29 @@ import us.abstracta.jmeter.javadsl.core.testelements.DslSampler;
  *
  * @since 0.1
  */
-public class DslHttpSampler extends DslSampler {
+public class DslHttpSampler extends DslSampler<DslHttpSampler> {
 
   private final String url;
   private HttpMethod method = HttpMethod.GET;
   private final HttpHeaders headers = new HttpHeaders();
   private String body;
+  private Charset encoding;
   private boolean followRedirects = true;
   private boolean downloadEmbeddedResources;
+  private HttpClientImpl clientImpl;
 
   public DslHttpSampler(String name, String url) {
-    super(buildName(name), HttpTestSampleGui.class, new ArrayList<>());
+    super(buildName(name), HttpTestSampleGui.class);
     this.url = url;
   }
 
   public DslHttpSampler(String name, Function<PreProcessorVars, String> urlSupplier) {
-    super(buildName(name), HttpTestSampleGui.class, new ArrayList<>());
+    super(buildName(name), HttpTestSampleGui.class);
     String variableName = "PRE_PROCESSOR_URL";
     this.url = "${" + variableName + "}";
     children(
         jsr223PreProcessor(s -> s.vars.put(variableName, urlSupplier.apply(s))
-    ));
+        ));
   }
 
   private static String buildName(String name) {
@@ -53,7 +55,7 @@ public class DslHttpSampler extends DslSampler {
   /**
    * Specifies that the sampler should send an HTTP POST to defined URL.
    *
-   * @param body to include in HTTP POST request body.
+   * @param body        to include in HTTP POST request body.
    * @param contentType to be sent as Content-Type header in HTTP POST request.
    * @return the altered sampler to allow for fluent API usage.
    */
@@ -77,7 +79,7 @@ public class DslHttpSampler extends DslSampler {
    * JmeterDsl#jsr223PreProcessor(String)}.
    *
    * @param bodySupplier function to calculate the body on each request.
-   * @param contentType to be sent as Content-Type header in HTTP POST request.
+   * @param contentType  to be sent as Content-Type header in HTTP POST request.
    * @return the altered sampler to allow for fluent API usage.
    * @see #body(Function)
    * @since 0.10
@@ -106,7 +108,7 @@ public class DslHttpSampler extends DslSampler {
    * To specify multiple headers just invoke this method several times with the different header
    * names and values.
    *
-   * @param name of the HTTP header.
+   * @param name  of the HTTP header.
    * @param value of the HTTP header.
    * @return the altered sampler to allow for fluent API usage.
    */
@@ -128,7 +130,7 @@ public class DslHttpSampler extends DslSampler {
    * String)} with a JMeter variable instead, and dynamically set the variable with {@link
    * JmeterDsl#jsr223PreProcessor(String)}.
    *
-   * @param name of the HTTP header.
+   * @param name          of the HTTP header.
    * @param valueSupplier builds the header value.
    * @return the altered sampler to allow for fluent API usage.
    * @since 0.10
@@ -187,14 +189,26 @@ public class DslHttpSampler extends DslSampler {
   }
 
   /**
-   * Allows enabling/disabling automatic request for redirects.
+   * Specifies the charset to be used to encode URLs and request contents.
    *
+   * @param encoding contains the charset to be used.
+   * @return the altered sampler to allow for fluent API usage.
+   * @since 0.39
+   */
+  public DslHttpSampler encoding(Charset encoding) {
+    this.encoding = encoding;
+    return this;
+  }
+
+  /**
+   * Allows enabling/disabling automatic request for redirects.
+   * <p>
    * When a response is a redirection response (3xx status code with a Location header), JMeter
    * automatically generates a new request to the redirected destination registering the redirect
    * request as a sub sample. This method allows enabling/disabling such behavior.
    *
    * @param followRedirects sets either to enable or disable automatic redirects. By default,
-   * redirects are automatically followed.
+   *                        redirects are automatically followed.
    * @return the altered sampler to allow for fluent API usage.
    * @since 0.21
    */
@@ -205,14 +219,14 @@ public class DslHttpSampler extends DslSampler {
 
   /**
    * Allows enabling automatic download of HTML embedded resources (images, iframes, etc).
-   *
+   * <p>
    * When enabled JMeter will automatically parse HTMLs and download any found embedded resources
    * adding their information as sub samples of the original request.
-   *
+   * <p>
    * Additionally, and in contrast to JMeter, this will download embedded resources in parallel by
    * default (with up to 6 parallel downloads). The DSL enables this behavior by default since it is
    * the most common way to use it to properly emulate browsers behavior.
-   *
+   * <p>
    * Check <a href="https://jmeter.apache.org/usermanual/component_reference.html#HTTP_Request">JMeter
    * HTTP Request documentation</a> for additional details on embedded resources download.
    *
@@ -225,27 +239,44 @@ public class DslHttpSampler extends DslSampler {
   }
 
   /**
-   * Allows specifying children test elements for the sampler, which allow for example extracting
-   * information from HTTP response, alter HTTP request, assert HTTP response contents, etc.
+   * Allows specifying the HTTP client implementation to use for this particular sampler.
+   * <p>
+   * Changing the default implementation ({@link DslHttpSampler.HttpClientImpl#HTTP_CLIENT}) to
+   * {@link DslHttpSampler.HttpClientImpl#JAVA} may improve performance in some scenarios
+   * (connection time, memory, cpu usage). But, Java implementation has its own limitations, check
+   * <a href="https://jmeter.apache.org/usermanual/component_reference.html#HTTP_Request">JMeter
+   * documentation</a> for more details.
    *
-   * @param children list of test elements to add as children of this sampler.
+   * @param clientImpl the HTTP client implementation to use. If none is specified, then {@link
+   *                   DslHttpSampler.HttpClientImpl#HTTP_CLIENT} is used.
    * @return the altered sampler to allow for fluent API usage.
+   * @since 0.39
    */
-  public DslHttpSampler children(SamplerChild... children) {
-    return (DslHttpSampler) addChildren(children);
+  public DslHttpSampler clientImpl(HttpClientImpl clientImpl) {
+    this.clientImpl = clientImpl;
+    return this;
   }
 
   @Override
   public TestElement buildTestElement() {
     HTTPSamplerProxy ret = new HTTPSamplerProxy();
-    ret.setFollowRedirects(followRedirects);
-    ret.setUseKeepAlive(true);
-    ret.setPath(url);
+    // this might be null if the url is set by defaults element
+    if (url != null) {
+      ret.setPath(url);
+    }
     ret.setMethod(method.name());
     ret.setArguments(buildArguments());
+    if (encoding != null) {
+      ret.setContentEncoding(encoding.toString());
+    }
+    ret.setFollowRedirects(followRedirects);
+    ret.setUseKeepAlive(true);
     if (downloadEmbeddedResources) {
       ret.setImageParser(true);
       ret.setConcurrentDwn(true);
+    }
+    if (clientImpl != null) {
+      ret.setImplementation(clientImpl.propertyValue);
     }
     return ret;
   }
@@ -269,6 +300,28 @@ public class DslHttpSampler extends DslSampler {
     new DslCookieManager().buildTreeUnder(null, context);
     new DslCacheManager().buildTreeUnder(null, context);
     return ret;
+  }
+
+  /**
+   * Specifies an HTTP client implementation to be used by HTTP samplers.
+   */
+  public enum HttpClientImpl {
+    /**
+     * Specifies to use the Java implementation.
+     */
+    JAVA("Java"),
+    /**
+     * Specifies to use the Apache HttpClient implementation. This is the default one and usually
+     * the preferred one.
+     */
+    HTTP_CLIENT("HttpClient4");
+
+    public final String propertyValue;
+
+    HttpClientImpl(String propertyValue) {
+      this.propertyValue = propertyValue;
+    }
+
   }
 
 }

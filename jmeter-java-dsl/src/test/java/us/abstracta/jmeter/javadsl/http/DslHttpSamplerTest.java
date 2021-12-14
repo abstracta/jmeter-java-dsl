@@ -11,11 +11,13 @@ import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
 import static org.assertj.core.api.Assertions.assertThat;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.httpCache;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.httpCookies;
+import static us.abstracta.jmeter.javadsl.JmeterDsl.httpDefaults;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.httpHeaders;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.httpSampler;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.jsr223PreProcessor;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.testPlan;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.threadGroup;
+import static us.abstracta.jmeter.javadsl.JmeterDsl.transaction;
 
 import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
 import java.time.Duration;
@@ -209,6 +211,7 @@ public class DslHttpSamplerTest extends JmeterDslTest {
 
   @Test
   public void shouldUseCachedResponseWhenSameRequestAndCacheableResponse() throws Exception {
+    setupCacheableHttpResponse();
     testPlan(
         buildHeadersToFixHttpCaching(),
         threadGroup(1, 1,
@@ -219,6 +222,11 @@ public class DslHttpSamplerTest extends JmeterDslTest {
     wiremockServer.verify(1, getRequestedFor(anyUrl()));
   }
 
+  private void setupCacheableHttpResponse() {
+    wiremockServer.stubFor(get(anyUrl())
+        .willReturn(aResponse().withHeader("Cache-Control", "max-age=600")));
+  }
+
   /*
    need to set header for request header to match otherwise jmeter automatically adds this
    header while sending request and stores it in cache and when it checks in next request
@@ -226,11 +234,6 @@ public class DslHttpSamplerTest extends JmeterDslTest {
    */
   private HttpHeaders buildHeadersToFixHttpCaching() {
     return httpHeaders().header("User-Agent", "jmeter-java-dsl");
-  }
-
-  private void setupCacheableHttpResponse() {
-    wiremockServer.stubFor(get(anyUrl())
-        .willReturn(aResponse().withHeader("Vary", "max-age=600")));
   }
 
   @Test
@@ -277,7 +280,7 @@ public class DslHttpSamplerTest extends JmeterDslTest {
     String primaryUrl = "/primary";
     String resourceUrl = "/resource";
     wiremockServer.stubFor(get(primaryUrl)
-        .willReturn(buildEmbeddedResourcesResponse(resourceUrl)));
+        .willReturn(HttpResponseBuilder.buildEmbeddedResourcesResponse(resourceUrl)));
     testPlan(
         threadGroup(1, 1,
             httpSampler(wiremockUri + primaryUrl)
@@ -287,16 +290,6 @@ public class DslHttpSamplerTest extends JmeterDslTest {
     wiremockServer.verify(getRequestedFor(urlPathEqualTo(resourceUrl)));
   }
 
-  private ResponseDefinitionBuilder buildEmbeddedResourcesResponse(String... resourcesUrls) {
-    return aResponse()
-        .withHeader(HttpHeader.CONTENT_TYPE.toString(), Type.TEXT_HTML.toString())
-        .withBody("<html>" +
-            Arrays.stream(resourcesUrls)
-                .map(r -> "<img src=\"" + r + "\"/>")
-                .collect(Collectors.joining())
-            + "</html>");
-  }
-
   @Test
   public void shouldDownloadEmbeddedResourcesInParallelWhenEnabled() throws Exception {
     int responsesDelayMillis = 3000;
@@ -304,16 +297,18 @@ public class DslHttpSamplerTest extends JmeterDslTest {
         .willReturn(aResponse().withFixedDelay(responsesDelayMillis)));
     String primaryUrl = "/primary";
     wiremockServer.stubFor(get(primaryUrl)
-        .willReturn(buildEmbeddedResourcesResponse("/resource1", "/resource2")
+        .willReturn(HttpResponseBuilder.buildEmbeddedResourcesResponse("/resource1", "/resource2")
             .withFixedDelay(responsesDelayMillis)));
-    String sampleLabel = "sample";
+    String transactionLabel = "sample";
     TestPlanStats stats = testPlan(
         threadGroup(1, 1,
-            httpSampler(sampleLabel, wiremockUri + primaryUrl)
-                .downloadEmbeddedResources()
+            transaction(transactionLabel,
+                httpSampler(wiremockUri + primaryUrl)
+                    .downloadEmbeddedResources()
+            )
         )
     ).run();
-    assertThat(stats.byLabel(sampleLabel).elapsedTime()).isLessThan(
+    assertThat(stats.byLabel(transactionLabel).sampleTime().max()).isLessThan(
         Duration.ofMillis(responsesDelayMillis * 3));
   }
 

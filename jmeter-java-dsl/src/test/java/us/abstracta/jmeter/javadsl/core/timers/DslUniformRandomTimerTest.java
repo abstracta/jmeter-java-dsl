@@ -10,6 +10,8 @@ import static us.abstracta.jmeter.javadsl.JmeterDsl.uniformRandomTimer;
 import org.junit.jupiter.api.Test;
 import us.abstracta.jmeter.javadsl.JmeterDslTest;
 import us.abstracta.jmeter.javadsl.core.TestPlanStats;
+import us.abstracta.jmeter.javadsl.core.controllers.DslTransactionController;
+import us.abstracta.jmeter.javadsl.core.threadgroups.BaseThreadGroup.ThreadGroupChild;
 
 public class DslUniformRandomTimerTest extends JmeterDslTest {
 
@@ -24,7 +26,7 @@ public class DslUniformRandomTimerTest extends JmeterDslTest {
             httpSampler(wiremockUri)
         )
     ).run();
-    assertThat(stats.overall().elapsedTime().toMillis()).isGreaterThan(MINIMUM_MILLIS);
+    assertThat(stats.duration().toMillis()).isGreaterThan(MINIMUM_MILLIS);
   }
 
   @Test
@@ -33,18 +35,25 @@ public class DslUniformRandomTimerTest extends JmeterDslTest {
     String transaction2Label = "Step2";
     TestPlanStats stats = testPlan(
         threadGroup(1, 1,
-            transaction(transaction1Label,
+            transactionWithIdleTimes(transaction1Label,
                 uniformRandomTimer(MINIMUM_MILLIS, MAXIMUM_MILLIS),
                 httpSampler(wiremockUri)
             ),
-            transaction(transaction2Label,
+            transactionWithIdleTimes(transaction2Label,
                 httpSampler(wiremockUri)
             )
         )
     ).run();
-    assertThat(stats.byLabel(transaction1Label).elapsedTime().toMillis()).isGreaterThan(
+    assertThat(stats.byLabel(transaction1Label).sampleTime().min().toMillis()).isGreaterThan(
         MINIMUM_MILLIS);
-    assertThat(stats.byLabel(transaction2Label).elapsedTime().toMillis()).isLessThan(3000);
+    assertThat(stats.byLabel(transaction2Label).sampleTime().max().toMillis()).isLessThan(3000);
+  }
+
+  private DslTransactionController transactionWithIdleTimes(String label,
+      ThreadGroupChild... children) {
+    return transaction(label)
+        .includeTimersAndProcessorsTime(true)
+        .children(children);
   }
 
 
@@ -55,17 +64,17 @@ public class DslUniformRandomTimerTest extends JmeterDslTest {
     TestPlanStats stats = testPlan(
         threadGroup(1, 1,
             uniformRandomTimer(MINIMUM_MILLIS, MAXIMUM_MILLIS),
-            transaction(transaction1Label,
+            transactionWithIdleTimes(transaction1Label,
                 httpSampler(wiremockUri)
             ),
-            transaction(transaction2Label,
+            transactionWithIdleTimes(transaction2Label,
                 httpSampler(wiremockUri)
             )
         )
     ).run();
-    assertThat(stats.byLabel(transaction1Label).elapsedTime().toMillis()).isGreaterThan(
+    assertThat(stats.byLabel(transaction1Label).sampleTime().min().toMillis()).isGreaterThan(
         MINIMUM_MILLIS);
-    assertThat(stats.byLabel(transaction2Label).elapsedTime().toMillis()).isGreaterThan(
+    assertThat(stats.byLabel(transaction2Label).sampleTime().min().toMillis()).isGreaterThan(
         MINIMUM_MILLIS);
   }
 }
