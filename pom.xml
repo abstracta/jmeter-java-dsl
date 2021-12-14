@@ -61,6 +61,7 @@
     <module>jmeter-java-dsl-dashboard</module>
     <module>jmeter-java-dsl-parallel</module>
     <module>jmeter-java-dsl-jdbc</module>
+    <module>jmeter-java-dsl-wrapper</module>
   </modules>
 
   <dependencyManagement>

@@ -29,12 +29,12 @@ import us.abstracta.jmeter.javadsl.core.engines.JmeterEnvironment;
 /**
  * Provides the basic logic for all {@link DslTestElement}.
  * <p>
- * In particular it currently allows to set the name of the TestElement and abstracts building of
+ * In particular, it currently allows to set the name of the TestElement and abstracts building of
  * the tree only requiring, from subclasses, to implement the logic to build the JMeter TestElement.
  * The test element name is particularly useful for later reporting and statistics collection to
  * differentiate metrics for each test element.
  * <p>
- * Sub classes may overwrite {@link #buildTreeUnder} if they need additional logic (e.g: {@link
+ * Subclasses may overwrite {@link #buildTreeUnder} if they need additional logic (e.g: {@link
  * TestElementContainer}).
  *
  * @since 0.1
@@ -64,7 +64,13 @@ public abstract class BaseTestElement implements DslTestElement {
   protected static TestElement configureTestElement(TestElement ret, String name,
       Class<? extends JMeterGUIComponent> guiClass) {
     ret.setName(name);
-    ret.setProperty(TestElement.GUI_CLASS, guiClass.getName());
+    /*
+     guiClass might be null when using wrappers, and we don't want to restrict running test plan
+     if none is set.
+     */
+    if (guiClass != null) {
+      ret.setProperty(TestElement.GUI_CLASS, guiClass.getName());
+    }
     ret.setProperty(TestElement.TEST_CLASS, ret.getClass().getName());
     if (guiClass == TestBeanGUI.class) {
       loadBeanProperties(ret);
