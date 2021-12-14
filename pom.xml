@@ -168,6 +168,17 @@
   </build>
 
   <profiles>
+
+    <profile>
+      <id>jmeter-snapshot</id>
+      <repositories>
+        <repository>
+          <id>apache-snapshot</id>
+          <name>apache snapshot</name>
+          <url>https://repository.apache.org/content/repositories/snapshots/</url>
+        </repository>
+      </repositories>
+    </profile>
     <profile>
       <id>release</id>
       <build>
