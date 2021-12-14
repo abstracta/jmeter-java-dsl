@@ -1,10 +1,9 @@
 name: run tests on Multi Jmeter Version
 on:
   push:
-    tags-ignore:
-      - "*"
-    branches:
-      - "**"
+  pull_request:
+  schedule:
+    - cron: '0 1 * * *'
 jobs:
   test:
     runs-on: ubuntu-latest
