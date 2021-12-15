@@ -21,12 +21,13 @@ import org.eclipse.jetty.http.HttpHeader;
 import org.eclipse.jetty.http.MimeTypes.Type;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
-import org.xmlunit.assertj.XmlAssert;
 import us.abstracta.jmeter.javadsl.JmeterDslTest;
+import us.abstracta.jmeter.javadsl.TestResource;
+import us.abstracta.jmeter.javadsl.core.listeners.FileTemplateAssert;
 
 public class JmeterDslCoreTest extends JmeterDslTest {
 
-  private static final String TEST_PLAN_RESOURCE_PATH = "/test-plan.jmx";
+  private static final String TEST_PLAN_RESOURCE_PATH = "/test-plan.template.jmx";
 
   @Test
   public void shouldSendRequestsToServerWhenSimpleHttpTestPlan() throws IOException {
@@ -103,9 +104,8 @@ public class JmeterDslCoreTest extends JmeterDslTest {
         ),
         jtlWriter("results.jtl")
     ).saveAsJmx(filePath.toString());
-    XmlAssert.assertThat(getFileContents(filePath))
-        .and(getResourceContents(TEST_PLAN_RESOURCE_PATH))
-        .areIdentical();
+    FileTemplateAssert.assertThat(filePath)
+        .matches(new TestResource(TEST_PLAN_RESOURCE_PATH).getFile().toPath());
   }
 
   @Test

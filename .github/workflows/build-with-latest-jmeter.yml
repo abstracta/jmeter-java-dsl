@@ -1,17 +1,14 @@
-name: run tests on Multi Jmeter Version
+name: run tests with latest jmeter snapshot
 on:
   push:
-  pull_request:
-  schedule:
-    - cron: '0 1 * * *'
+    tags-ignore:
+      - "*"
+    branches:
+      - "**"
 jobs:
   test:
     runs-on: ubuntu-latest
     concurrency: blazemeter_test
-    strategy:
-      matrix:
-        jmeterVersion: [ 5.5-SNAPSHOT ]
-
     steps:
       - uses: actions/checkout@v2
       - name: Setup Java 1.8
@@ -19,6 +16,6 @@ jobs:
         with:
           java-version: 1.8
       - name: Run maven tests
-        run: mvn --batch-mode --no-transfer-progress clean test  -Djmeter.version=${{ matrix.jmeterVersion }} -Pjmeter-snapshot
+        run: mvn --batch-mode --no-transfer-progress clean test  -Djmeter.version="[5.4,)" -Pjmeter-snapshot
         env:
           BZ_TOKEN: ${{ secrets.BZ_TOKEN }}
