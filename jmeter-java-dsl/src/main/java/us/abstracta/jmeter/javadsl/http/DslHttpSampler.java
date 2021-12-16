@@ -29,6 +29,7 @@ public class DslHttpSampler extends DslSampler<DslHttpSampler> {
   private HttpMethod method = HttpMethod.GET;
   private final HttpHeaders headers = new HttpHeaders();
   private String body;
+  private String host;
   private Charset encoding;
   private boolean followRedirects = true;
   private boolean downloadEmbeddedResources;
