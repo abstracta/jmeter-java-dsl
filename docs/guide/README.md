@@ -129,14 +129,14 @@ By including following module as dependency:
 <dependency>
   <groupId>us.abstracta.jmeter</groupId>
   <artifactId>jmeter-java-dsl-blazemeter</artifactId>
-  <version>0.41</version>
+  <version>0.42</version>
   <scope>test</scope>
 </dependency>
 ```
 :::
 ::: tab Gradle
 ```groovy
-testImplementation 'us.abstracta.jmeter:jmeter-java-dsl-blazemeter:0.41'
+testImplementation 'us.abstracta.jmeter:jmeter-java-dsl-blazemeter:0.42'
 ```
 :::
 ::::
@@ -1630,6 +1630,17 @@ httpSampler(s -> buildRequestUrl(s.vars))
 ::: warning
 As previously mentioned for other lambdas, using them will only work with embedded JMeter engine. So, prefer using [JSR223 pre processors](#provide-request-parameters-programmatically-per-request) with groovy script instead if you want to be able to run the test at scale or use generated JMX.
 :::
+
+#### Host, port and protocol
+
+If you need to specify just part of url you can use additional method for HTTP host, port and protocol:
+
+```java
+httpSampler()
+  .host("my.service")
+  .port(8080)
+  .protocol("http")
+```
 
 #### Headers
 

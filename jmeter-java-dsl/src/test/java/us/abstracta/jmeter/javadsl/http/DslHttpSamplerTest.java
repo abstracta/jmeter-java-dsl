@@ -9,15 +9,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.getRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
 import static org.assertj.core.api.Assertions.assertThat;
-import static us.abstracta.jmeter.javadsl.JmeterDsl.httpCache;
-import static us.abstracta.jmeter.javadsl.JmeterDsl.httpCookies;
-import static us.abstracta.jmeter.javadsl.JmeterDsl.httpDefaults;
-import static us.abstracta.jmeter.javadsl.JmeterDsl.httpHeaders;
-import static us.abstracta.jmeter.javadsl.JmeterDsl.httpSampler;
-import static us.abstracta.jmeter.javadsl.JmeterDsl.jsr223PreProcessor;
-import static us.abstracta.jmeter.javadsl.JmeterDsl.testPlan;
-import static us.abstracta.jmeter.javadsl.JmeterDsl.threadGroup;
-import static us.abstracta.jmeter.javadsl.JmeterDsl.transaction;
+import static us.abstracta.jmeter.javadsl.JmeterDsl.*;
 
 import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
 import java.time.Duration;
@@ -47,11 +39,24 @@ public class DslHttpSamplerTest extends JmeterDslTest {
     testPlan(
         threadGroup(1, 1,
             httpSampler(wiremockUri).post(JSON_BODY, contentType)
-        )
+        ),
+            resultsTreeVisualizer()
     ).run();
     wiremockServer.verify(postRequestedFor(anyUrl())
         .withHeader(HttpHeader.CONTENT_TYPE.toString(), equalTo(contentType.toString()))
         .withRequestBody(equalToJson(JSON_BODY)));
+  }
+
+  @Test
+  public void shouldSendGetWithHostAndProtocolWhenHttpSampler() throws Exception {
+
+    testPlan(
+            threadGroup(1, 1,
+                    httpSampler("").host("localhost").port(wiremockServer.port()).protocol("http")
+            ),
+            resultsTreeVisualizer()
+    ).run();
+    wiremockServer.verify(getRequestedFor(anyUrl()).withPort(wiremockServer.port()));
   }
 
   @Test
