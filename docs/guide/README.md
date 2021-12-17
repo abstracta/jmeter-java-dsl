@@ -1631,17 +1631,6 @@ httpSampler(s -> buildRequestUrl(s.vars))
 As previously mentioned for other lambdas, using them will only work with embedded JMeter engine. So, prefer using [JSR223 pre processors](#provide-request-parameters-programmatically-per-request) with groovy script instead if you want to be able to run the test at scale or use generated JMX.
 :::
 
-#### Host, port and protocol
-
-If you need to specify just part of url you can use additional method for HTTP host, port and protocol:
-
-```java
-httpSampler("")
-  .host("my.service")
-  .port(8080)
-  .protocol("http")
-```
-
 #### Headers
 
 You might have already noticed in some of the examples that we have shown already some ways to set some headers. For instance, in following snippet `Content-Type` header is being set in two different ways:
@@ -1799,6 +1788,63 @@ public class PerformanceTest {
 ```
 
 Check [DslHttpDefaults](../../jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/http/DslHttpDefaults.java) for additional details on available default options.
+
+#### Overriding URL protocol, host or port 
+
+In some cases you might want to use a default base url but some particular requests may require some part of the url to be different (eg: protocol, host or port).
+
+The preferred way (due to maintainability, language & IDE provided features, tracability, etc) of doing this, as with defaults, is using java code. Eg:
+
+```java
+import static us.abstracta.jmeter.javadsl.JmeterDsl.*;
+
+import org.junit.jupiter.api.Test;
+
+public class PerformanceTest {
+
+  @Test
+  public void test() throws Exception {
+    String protocol = "https://";
+    String host = "myservice.com";
+    String baseUrl = protocol + host;
+    testPlan(
+        threadGroup(1, 1,
+            httpSampler(baseUrl + "/products"),
+            httpSampler(protocol + "api." + host + "/cart"),
+            httpSampler(baseUrl + "/stores")
+        )
+    ).run();
+  }
+
+}
+```
+
+But in some cases this might be too verbose, or unnatural for users with existing JMeter knowledge. In such cases you can use provided methods (`protocol`, `host` & `port`) to just specify the part you want to modify for the sampler like in following example:
+
+```java
+import static us.abstracta.jmeter.javadsl.JmeterDsl.*;
+
+import org.junit.jupiter.api.Test;
+
+public class PerformanceTest {
+
+  @Test
+  public void test() throws Exception {
+    testPlan(
+        threadGroup(1, 1,
+            httpDefaults()
+                .url("https://myservice.com"),
+            httpSampler("/products"),
+            httpSampler("/cart")
+                .host("subDomain.myservice.com"),
+            httpSampler("/stores")
+        )
+    ).run();
+  }
+
+}
+```
+
 
 ### JDBC and databases interactions
 
@@ -2064,8 +2110,6 @@ In some cases though, you might have some private custom test element that you d
 For such cases, the preferred approach is implementing a builder class for the test element. Eg:
 
 ```java
-package us.abstracta.jmeter.javadsl;
-
 import org.apache.jmeter.testelement.TestElement;
 import us.abstracta.jmeter.javadsl.core.testelements.DslSampler;
 
