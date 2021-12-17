@@ -1,2 +1,2 @@
 timeStamp,elapsed,label,responseCode,responseMessage,threadName,dataType,success,failureMessage,bytes,sentBytes,grpThreads,allThreads,URL,Latency,IdleTime,Connect,"my_var"
-{{\d+}},{{\d+}},HTTP Request,200,OK,Thread Group 1-1,,true,,142,{{\d+}},1,1,http://localhost:{{\d+}},{{\d+}},0,{{\d+}},my_val
+{{\d+}},{{\d+}},HTTP Request,200,OK,Thread Group 1-1,,true,,142,{{\d+}},1,1,http://localhost:{{\d+}}/,{{\d+}},0,{{\d+}},my_val

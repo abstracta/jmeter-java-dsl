@@ -1,6 +1,5 @@
 package us.abstracta.jmeter.javadsl.http;
 
-import java.net.URI;
 import java.nio.charset.Charset;
 import org.apache.jmeter.config.ConfigTestElement;
 import org.apache.jmeter.protocol.http.config.gui.HttpDefaultsGui;
@@ -94,11 +93,15 @@ public class DslHttpDefaults extends DslConfigElement {
   protected TestElement buildTestElement() {
     ConfigTestElement ret = new ConfigTestElement();
     if (url != null) {
-      URI uri = URI.create(url);
-      ret.setProperty(HTTPSamplerBase.PROTOCOL, uri.getScheme());
-      ret.setProperty(HTTPSamplerBase.DOMAIN, uri.getHost());
-      ret.setProperty(HTTPSamplerBase.PORT, uri.getPort());
-      ret.setProperty(HTTPSamplerBase.PATH, uri.getRawPath());
+      /*
+       url is decomposed and not just set on path, to allow in samplers to override just path and
+       reuse other default settings
+       */
+      JmeterUrl parsedUrl = JmeterUrl.valueOf(url);
+      ret.setProperty(HTTPSamplerBase.PROTOCOL, parsedUrl.protocol());
+      ret.setProperty(HTTPSamplerBase.DOMAIN, parsedUrl.host());
+      ret.setProperty(HTTPSamplerBase.PORT, parsedUrl.port());
+      ret.setProperty(HTTPSamplerBase.PATH, parsedUrl.path());
     }
     if (encoding != null) {
       ret.setProperty(HTTPSamplerBase.CONTENT_ENCODING, encoding.toString());

@@ -3,13 +3,17 @@ package us.abstracta.jmeter.javadsl.http;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.jsr223PreProcessor;
 
 import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Function;
 import org.apache.http.entity.ContentType;
 import org.apache.jmeter.config.Arguments;
 import org.apache.jmeter.protocol.http.control.gui.HttpTestSampleGui;
+import org.apache.jmeter.protocol.http.sampler.HTTPSamplerBase;
 import org.apache.jmeter.protocol.http.sampler.HTTPSamplerProxy;
 import org.apache.jmeter.protocol.http.util.HTTPArgument;
 import org.apache.jmeter.protocol.http.util.HTTPConstants;
+import org.apache.jmeter.protocol.http.util.HTTPFileArg;
 import org.apache.jmeter.testelement.TestElement;
 import org.apache.jorphan.collections.HashTree;
 import org.eclipse.jetty.http.HttpMethod;
@@ -29,19 +33,29 @@ public class DslHttpSampler extends DslSampler<DslHttpSampler> {
 
   private String protocol;
   private String host;
-  private Integer port;
-  private final String path;
+  private String port;
+  private String path;
   private String method = HTTPConstants.GET;
+  private final List<HTTPArgument> arguments = new ArrayList<>();
   private final HttpHeaders headers = new HttpHeaders();
   private String body;
+  private boolean multiPart;
+  private final List<HTTPFileArg> files = new ArrayList<>();
   private Charset encoding;
   private boolean followRedirects = true;
   private boolean downloadEmbeddedResources;
   private HttpClientImpl clientImpl;
 
-  public DslHttpSampler(String name, String path) {
+  public DslHttpSampler(String name, String url) {
     super(buildName(name), HttpTestSampleGui.class);
-    this.path = path;
+    if (url == null) {
+      return;
+    }
+    JmeterUrl parsedUrl = JmeterUrl.valueOf(url);
+    protocol = parsedUrl.protocol();
+    host = parsedUrl.host();
+    port = parsedUrl.port();
+    path = parsedUrl.path();
   }
 
   public DslHttpSampler(String name, Function<PreProcessorVars, String> urlSupplier) {
@@ -110,7 +124,7 @@ public class DslHttpSampler extends DslSampler<DslHttpSampler> {
    * @since 0.42
    */
   public DslHttpSampler port(int port) {
-    this.port = port;
+    this.port = String.valueOf(port);
     return this;
   }
 
@@ -172,8 +186,7 @@ public class DslHttpSampler extends DslSampler<DslHttpSampler> {
   }
 
   /**
-   * Same as {@link #post(String, ContentType)} but allowing to use a dynamically calculated
-   * body.
+   * Same as {@link #post(String, ContentType)} but allowing to use a dynamically calculated body.
    * <p>
    * This method is just an abstraction that uses a JMeter variable as HTTP request body and
    * calculates the variable with a jsr223PreProcessor.
@@ -323,6 +336,75 @@ public class DslHttpSampler extends DslSampler<DslHttpSampler> {
   }
 
   /**
+   * Allows specifying a query parameter or url encoded form body parameter.
+   * <p>
+   * JMeter will automatically URL encode provided parameters names and values. Use {@link
+   * #encodedParam(String, String)} to send parameters values which are already encoded and should
+   * be sent as is by JMeter.
+   * <p>
+   * JMeter will use provided parameter in query string if method is GET, DELETE or OPTIONS,
+   * otherwise it will use them in url encoded form body.
+   * <p>
+   * If you set a parameter with empty string name, it results in same behavior as using {@link
+   * #body(String)} method. In general, you either use body function or parameters functions, but
+   * don't use both of them in same sampler.
+   *
+   * @param name  specifies the name of the parameter.
+   * @param value specifies the value of the parameter to be URL encoded to include in URL
+   * @return the altered sampler to allow for fluent API usage.
+   * @since 0.42
+   */
+  public DslHttpSampler param(String name, String value) {
+    arguments.add(new HTTPArgument(name, value));
+    return this;
+  }
+
+  /**
+   * Same as {@link #param(String, String)} but param name and value will be sent with no additional
+   * encoding.
+   *
+   * @see #param(String, String)
+   * @since 0.42
+   */
+  public DslHttpSampler encodedParam(String name, String value) {
+    arguments.add(new HTTPArgument(name, value, true));
+    return this;
+  }
+
+  /**
+   * Specifies a part of a multipart form body.
+   * <p>
+   * In general, samplers should not use this method in combination with {@link #param(String,
+   * String)} or {@link #encodedParam(String, String)}.
+   *
+   * @param name        specifies the name of the part.
+   * @param value       specifies the string to be sent in the part.
+   * @param contentType specifies the content-type associated to the part.
+   * @return the altered sampler to allow for fluent API usage.
+   * @since 0.42
+   */
+  public DslHttpSampler bodyPart(String name, String value, ContentType contentType) {
+    arguments.add(new HTTPArgument(name, value, contentType.toString()));
+    multiPart = true;
+    return this;
+  }
+
+  /**
+   * Specifies a file to be sent in a multipart form body.
+   *
+   * @param name        is the name to be assigned to the file part.
+   * @param filePath    is path to the file to be sent in the multipart form body.
+   * @param contentType the content type associated to the part.
+   * @return the altered sampler to allow for fluent API usage.
+   * @since 0.42
+   */
+  public DslHttpSampler bodyFilePart(String name, String filePath, ContentType contentType) {
+    multiPart = true;
+    files.add(new HTTPFileArg(filePath, name, contentType.toString()));
+    return this;
+  }
+
+  /**
    * Specifies the charset to be used to encode URLs and request contents.
    *
    * @param encoding contains the charset to be used.
@@ -394,21 +476,28 @@ public class DslHttpSampler extends DslSampler<DslHttpSampler> {
   @Override
   public TestElement buildTestElement() {
     HTTPSamplerProxy ret = new HTTPSamplerProxy();
-    // this might be null if the values are set by defaults element
+    if (protocol != null) {
+      ret.setProtocol(protocol);
+    }
     if (host != null) {
       ret.setDomain(host);
     }
     if (port != null) {
-      ret.setPort(port);
-    }
-    if (protocol != null) {
-      ret.setProtocol(protocol);
+      /*
+      need to use this method instead of setPort since we want to be able to set expressions on
+      port (like ${port}).
+      */
+      ret.setProperty(HTTPSamplerBase.PORT, port);
     }
     if (path != null) {
       ret.setPath(path);
     }
     ret.setMethod(method);
     ret.setArguments(buildArguments());
+    if (multiPart) {
+      ret.setDoMultipart(multiPart);
+    }
+    ret.setHTTPFiles(files.toArray(new HTTPFileArg[0]));
     if (encoding != null) {
       ret.setContentEncoding(encoding.toString());
     }
@@ -431,6 +520,7 @@ public class DslHttpSampler extends DslSampler<DslHttpSampler> {
       arg.setAlwaysEncoded(false);
       args.addArgument(arg);
     }
+    arguments.forEach(args::addArgument);
     return args;
   }
 

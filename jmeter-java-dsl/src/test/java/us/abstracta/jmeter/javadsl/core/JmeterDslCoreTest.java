@@ -14,6 +14,7 @@ import static us.abstracta.jmeter.javadsl.JmeterDsl.threadGroup;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.net.URI;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.time.Instant;
@@ -121,8 +122,9 @@ public class JmeterDslCoreTest extends JmeterDslTest {
   }
 
   private void copyJmxWithDynamicFieldsTo(File jmxFile) throws IOException {
+    String portXmlPart = "name=\"HTTPSampler.port\">";
     String jmxFileContents = getResourceContents(TEST_PLAN_RESOURCE_PATH)
-        .replace("http://localhost", wiremockUri)
+        .replace(portXmlPart, portXmlPart + URI.create(wiremockUri).getPort())
         .replace("results.jtl", new File(jmxFile.getParent(), "results.jtl").getPath());
     try (FileWriter fw = new FileWriter(jmxFile)) {
       fw.write(jmxFileContents);

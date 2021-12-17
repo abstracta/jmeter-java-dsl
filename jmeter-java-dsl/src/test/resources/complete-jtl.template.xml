@@ -7,7 +7,7 @@ Vary: Accept-Encoding, User-Agent
 Transfer-Encoding: chunked
 </responseHeader>
   <requestHeader class="java.lang.String">Connection: keep-alive
-Content-Type: application/json
+Content-Type: application/json; charset=UTF-8
 Content-Length: 13
 Host: localhost:{{\d+}}
 User-Agent: Apache-HttpClient/4.5.12 (Java/{{[\w\.]+}})
@@ -17,7 +17,7 @@ User-Agent: Apache-HttpClient/4.5.12 (Java/{{[\w\.]+}})
   <cookies class="java.lang.String"></cookies>
   <method class="java.lang.String">POST</method>
   <queryString class="java.lang.String">{&quot;var&quot;:&quot;val&quot;}</queryString>
-  <java.net.URL>http://localhost:{{\d+}}</java.net.URL>
+  <java.net.URL>http://localhost:{{\d+}}/</java.net.URL>
 </httpSample>
 
 </testResults>

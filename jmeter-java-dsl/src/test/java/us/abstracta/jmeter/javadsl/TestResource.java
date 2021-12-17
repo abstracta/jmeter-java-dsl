@@ -1,8 +1,11 @@
 package us.abstracta.jmeter.javadsl;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 
 public class TestResource {
 
@@ -18,6 +21,10 @@ public class TestResource {
     } catch (URISyntaxException e) {
       throw new RuntimeException(e);
     }
+  }
+
+  public String getContents() throws IOException {
+    return String.join("\n", Files.readAllLines(getFile().toPath(), StandardCharsets.UTF_8));
   }
 
 }
