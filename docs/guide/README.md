@@ -395,7 +395,7 @@ import static us.abstracta.jmeter.javadsl.JmeterDsl.*;
 
 import java.io.IOException;
 import java.time.Duration;
-import org.eclipse.jetty.http.HttpMethod;
+import org.apache.jmeter.protocol.http.util.HTTPConstants;
 import org.junit.jupiter.api.Test;
 import us.abstracta.jmeter.javadsl.core.TestPlanStats;
 
@@ -406,7 +406,7 @@ public class PerformanceTest {
     TestPlanStats stats = testPlan(
         setupThreadGroup(
             httpSampler("http://my.service/tokens")
-                .method(HttpMethod.POST)
+                .method(HTTPConstants.POST)
                 .children(
                     jsr223PostProcessor("props.put('MY_TEST_TOKEN', prev.responseDataAsString)")
                 )
@@ -417,7 +417,7 @@ public class PerformanceTest {
         ),
         teardownThreadGroup(
             httpSampler("http://my.service/tokens/${__P(MY_TEST_TOKEN)}")
-                .method(HttpMethod.DELETE)
+                .method(HTTPConstants.DELETE)
         )
     ).run();
     assertThat(stats.overall().sampleTimePercentile99()).isLessThan(Duration.ofSeconds(5));
@@ -535,7 +535,6 @@ import static us.abstracta.jmeter.javadsl.JmeterDsl.*;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
-import org.eclipse.jetty.http.MimeTypes.Type;
 import org.junit.jupiter.api.Test;
 import us.abstracta.jmeter.javadsl.core.TestPlanStats;
 
@@ -566,7 +565,6 @@ import static us.abstracta.jmeter.javadsl.JmeterDsl.*;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
-import org.eclipse.jetty.http.MimeTypes.Type;
 import org.junit.jupiter.api.Test;
 import us.abstracta.jmeter.javadsl.core.TestPlanStats;
 
@@ -597,7 +595,6 @@ import static us.abstracta.jmeter.javadsl.JmeterDsl.*;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
-import org.eclipse.jetty.http.MimeTypes.Type;
 import org.junit.jupiter.api.Test;
 import us.abstracta.jmeter.javadsl.core.TestPlanStats;
 
@@ -875,7 +872,6 @@ import static us.abstracta.jmeter.javadsl.JmeterDsl.*;
 
 import java.io.IOException;
 import java.time.Duration;
-import org.eclipse.jetty.http.MimeTypes.Type;
 import org.junit.jupiter.api.Test;
 import us.abstracta.jmeter.javadsl.core.TestPlanStats;
 
@@ -967,7 +963,7 @@ import static us.abstracta.jmeter.javadsl.JmeterDsl.*;
 
 import java.io.IOException;
 import java.time.Duration;
-import org.eclipse.jetty.http.MimeTypes.Type;
+import org.apache.http.entity.ContentType;
 import org.junit.jupiter.api.Test;
 import us.abstracta.jmeter.javadsl.core.TestPlanStats;
 
@@ -978,7 +974,7 @@ public class PerformanceTest {
     TestPlanStats stats = testPlan(
         threadGroup(2, 10,
             httpSampler("http://my.service/accounts")
-                .post("{\"name\": \"John Doe\"}", Type.APPLICATION_JSON)
+                .post("{\"name\": \"John Doe\"}", ContentType.APPLICATION_JSON)
                 .children(
                     regexExtractor("ACCOUNT_ID", "\"id\":\"([^\"]+)\"")
                 ),
@@ -1003,7 +999,7 @@ import static us.abstracta.jmeter.javadsl.JmeterDsl.*;
 
 import java.io.IOException;
 import java.time.Duration;
-import org.eclipse.jetty.http.MimeTypes.Type;
+import org.apache.http.entity.ContentType;
 import org.junit.jupiter.api.Test;
 import us.abstracta.jmeter.javadsl.core.TestPlanStats;
 
@@ -1014,7 +1010,7 @@ public class PerformanceTest {
     TestPlanStats stats = testPlan(
         threadGroup(2, 10,
             httpSampler("http://my.service/accounts")
-                .post("{\"name\": \"John Doe\"}", Type.APPLICATION_JSON)
+                .post("{\"name\": \"John Doe\"}", ContentType.APPLICATION_JSON)
                 .children(
                     boundaryExtractor("ACCOUNT_ID", "\"id\":\"", "\"")
                 ),
@@ -1039,7 +1035,7 @@ import static us.abstracta.jmeter.javadsl.JmeterDsl.*;
 
 import java.io.IOException;
 import java.time.Duration;
-import org.eclipse.jetty.http.MimeTypes.Type;
+import org.apache.http.entity.ContentType;
 import org.junit.jupiter.api.Test;
 import us.abstracta.jmeter.javadsl.core.TestPlanStats;
 
@@ -1050,7 +1046,7 @@ public class PerformanceTest {
     TestPlanStats stats = testPlan(
         threadGroup(2, 10,
             httpSampler("http://my.service/accounts")
-                .post("{\"name\": \"John Doe\"}", Type.APPLICATION_JSON)
+                .post("{\"name\": \"John Doe\"}", ContentType.APPLICATION_JSON)
                 .children(
                     jsonExtractor("ACCOUNT_ID", "id")
                 ),
@@ -1079,7 +1075,7 @@ import static us.abstracta.jmeter.javadsl.JmeterDsl.*;
 
 import java.io.IOException;
 import java.time.Duration;
-import org.eclipse.jetty.http.MimeTypes.Type;
+import org.apache.http.entity.ContentType;
 import org.junit.jupiter.api.Test;
 import us.abstracta.jmeter.javadsl.core.TestPlanStats;
 
@@ -1090,7 +1086,7 @@ public class PerformanceTest {
     TestPlanStats stats = testPlan(
         threadGroup(2, 10,
             httpSampler("http://my.service/accounts")
-                .post("{\"name\": \"John Doe\"}", Type.APPLICATION_JSON)
+                .post("{\"name\": \"John Doe\"}", ContentType.APPLICATION_JSON)
                 .children(
                     regexExtractor("ACCOUNT_ID", "\"id\":\"([^\"]+)\"")
                 ),
@@ -1131,7 +1127,7 @@ import static us.abstracta.jmeter.javadsl.JmeterDsl.*;
 
 import java.io.IOException;
 import java.time.Duration;
-import org.eclipse.jetty.http.MimeTypes.Type;
+import org.apache.http.entity.ContentType;
 import org.junit.jupiter.api.Test;
 import us.abstracta.jmeter.javadsl.core.TestPlanStats;
 
@@ -1143,7 +1139,7 @@ public class PerformanceTest {
         threadGroup(2, 10,
             whileController("${__groovy(vars['ACCOUNT_ID'] == null)}",
                 httpSampler("http://my.service/accounts")
-                    .post("{\"name\": \"John Doe\"}", Type.APPLICATION_JSON)
+                    .post("{\"name\": \"John Doe\"}", ContentType.APPLICATION_JSON)
                     .children(
                         regexExtractor("ACCOUNT_ID", "\"id\":\"([^\"]+)\"")
                     )
@@ -1240,7 +1236,7 @@ Here is an example:
 ```java
 import static us.abstracta.jmeter.javadsl.JmeterDsl.*;
 
-import org.eclipse.jetty.http.HttpMethod;
+import org.apache.jmeter.protocol.http.util.HTTPConstants;
 import org.junit.jupiter.api.Test;
 import us.abstracta.jmeter.javadsl.JmeterDslTest;
 
@@ -1252,7 +1248,7 @@ public class DslOnceOnlyControllerTest extends JmeterDslTest {
         threadGroup(1, 10,
             onceOnlyController(
                 httpSampler("http://my.service/login") // only runs once
-                    .method(HttpMethod.POST)
+                    .method(HTTPConstants.POST)
                     .header("Authorization", "Basic asdf=")
                     .children(
                         regexExtractor("AUTH_TOKEN", "authToken=(.*)")
@@ -1280,7 +1276,7 @@ import static us.abstracta.jmeter.javadsl.JmeterDsl.*;
 import java.io.IOException;
 import java.time.Duration;
 import org.apache.jmeter.threads.JMeterVariables;
-import org.eclipse.jetty.http.MimeTypes.Type;
+import org.apache.http.entity.ContentType;
 import org.junit.jupiter.api.Test;
 import us.abstracta.jmeter.javadsl.core.TestPlanStats;
 
@@ -1291,7 +1287,7 @@ public class PerformanceTest {
     TestPlanStats stats = testPlan(
         threadGroup(2, 10,
             httpSampler("http://my.service")
-                .post("${REQUEST_BODY}", Type.TEXT_PLAIN)
+                .post("${REQUEST_BODY}", ContentType.TEXT_PLAIN)
                 .children(
                     jsr223PreProcessor("vars.put('REQUEST_BODY', " + getClass().getName()
                         + ".buildRequestBody(vars))")
@@ -1350,8 +1346,8 @@ import static us.abstracta.jmeter.javadsl.JmeterDsl.*;
 
 import java.io.IOException;
 import java.time.Duration;
-import org.eclipse.jetty.http.HttpMethod;
-import org.eclipse.jetty.http.MimeTypes.Type;
+import org.apache.jmeter.protocol.http.util.HTTPConstants;
+import org.apache.http.entity.ContentType;
 import org.junit.jupiter.api.Test;
 import us.abstracta.jmeter.javadsl.core.TestPlanStats;
 
@@ -1363,9 +1359,9 @@ public class PerformanceTest {
         csvDataSet("users.csv"),
         threadGroup(5, 10,
             httpSampler("http://my.service/login")
-                .post("{\"${USER}\": \"${PASS}\"", Type.APPLICATION_JSON),
+                .post("{\"${USER}\": \"${PASS}\"", ContentType.APPLICATION_JSON),
             httpSampler("http://my.service/logout")
-                .method(HttpMethod.POST)
+                .method(HTTPConstants.POST)
         )
     ).run();
     assertThat(stats.overall().sampleTimePercentile99()).isLessThan(Duration.ofSeconds(5));
@@ -1389,7 +1385,7 @@ import us.abstracta.jmeter.javadsl.core.configs.DslCsvDataSet.Sharing;
           httpSampler("http://my.service/login")
             .post("{\"${USER}\": \"${PASS}\"", Type.APPLICATION_JSON),
           httpSampler("http://my.service/logout")
-            .method(HttpMethod.POST)
+            .method(HTTPConstants.POST)
       )
   )
 ```
@@ -1409,7 +1405,7 @@ Sometimes, is necessary to be able to group requests which constitute different 
 import static us.abstracta.jmeter.javadsl.JmeterDsl.*;
 
 import java.io.IOException;
-import org.eclipse.jetty.http.MimeTypes.Type;
+import org.apache.http.entity.ContentType;
 import org.junit.jupiter.api.Test;
 
 public class SaveTestPlanAsJMX {
@@ -1421,12 +1417,12 @@ public class SaveTestPlanAsJMX {
             transaction('login',
                 httpSampler("http://my.service"),
                 httpSampler("http://my.service/login")
-                    .post("user=test&password=test", Type.FORM_ENCODED)
+                    .post("user=test&password=test", ContentType.APPLICATION_FORM_URLENCODED)
             ),
             transaction('addItemToCart',
                 httpSampler("http://my.service/items"),
                 httpSampler("http://my.service/cart/items")
-                    .post("{\"id\": 1}", Type.APPLICATION_JSON)
+                    .post("{\"id\": 1}", ContentType.APPLICATION_JSON)
             )
         )
     ).run();
@@ -1445,7 +1441,7 @@ Sometimes, is necessary to replicate users' behavior on the test plan, adding a 
 import static us.abstracta.jmeter.javadsl.JmeterDsl.*;
 
 import java.io.IOException;
-import org.eclipse.jetty.http.MimeTypes.Type;
+import org.apache.http.entity.ContentType;
 import org.junit.jupiter.api.Test;
 
 public class PerformanceTest {
@@ -1457,7 +1453,7 @@ public class PerformanceTest {
             transaction('addItemToCart',
                 httpSampler("http://my.service/items"),
                 httpSampler("http://my.service/cart/items")
-                    .post("{\"id\": 1}", Type.APPLICATION_JSON)
+                    .post("{\"id\": 1}", ContentType.APPLICATION_JSON)
             ),
             transaction('chekcout',
                 httpSampler("http://my.service/cart/chekout"),
@@ -1465,7 +1461,7 @@ public class PerformanceTest {
                 httpSampler("http://my.service/cart/checkout/userinfo")
                     .post(
                         "{\"Name\": Dave, \"lastname\": Tester, \"Street\": 1483  Smith Road, \"City\": Atlanta}",
-                        Type.APPLICATION_JSON)
+                        ContentType.APPLICATION_JSON)
             )
         )
     ).run();
@@ -1612,7 +1608,7 @@ But you can also use additional methods to specify any HTTP method and body:
 
 ```java
 httpSampler("http://my.service")
-  .method(HttpMethod.PUT)
+  .method(HTTPConstants.PUT)
   .contentType(Type.APPLICATION_JSON)
   .body("{\"field\":\"val\"}")
 ```
@@ -1736,7 +1732,7 @@ For example:
 import static us.abstracta.jmeter.javadsl.JmeterDsl.*;
 
 import java.io.IOException;
-import org.eclipse.jetty.http.MimeTypes.Type;
+import org.apache.http.entity.ContentType;
 import org.junit.jupiter.api.Test;
 import us.abstracta.jmeter.javadsl.http.DslHttpSampler;
 
@@ -1755,7 +1751,7 @@ public class PerformanceTest {
 
   private DslHttpSampler productCreatorSampler(String host, String productName) {
     return httpSampler("https://" + host + "/api/product")
-        .post("{\"name\": \"" + productName + "\"}", Type.APPLICATION_JSON);
+        .post("{\"name\": \"" + productName + "\"}", ContentType.APPLICATION_JSON);
   }
 
 }
@@ -1902,7 +1898,7 @@ import static us.abstracta.jmeter.javadsl.jdbc.JdbcJmeterDsl.*;
 import java.io.IOException;
 import java.sql.Types;
 import java.time.Duration;
-import org.eclipse.jetty.http.MimeTypes.Type;
+import org.apache.http.entity.ContentType;
 import org.junit.jupiter.api.Test;
 import org.postgresql.Driver;
 import us.abstracta.jmeter.javadsl.core.TestPlanStats;
@@ -1926,7 +1922,7 @@ public class PerformanceTest {
         ),
         threadGroup(5, 10,
             httpSampler("CreateProduct", "http://my.service/products")
-                .post("{\"name\", \"" + productName + "\"}", Type.APPLICATION_JSON),
+                .post("{\"name\", \"" + productName + "\"}", ContentType.APPLICATION_JSON),
             jdbcSampler("GetProductsIdsByName", jdbcPoolName,
                 "SELECT id FROM products WHERE name=?")
                 .param(productName, Types.VARCHAR)

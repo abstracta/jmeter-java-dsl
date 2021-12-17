@@ -13,7 +13,7 @@ import java.io.IOException;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import org.eclipse.jetty.http.MimeTypes.Type;
+import org.apache.http.entity.ContentType;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import us.abstracta.jmeter.javadsl.JmeterDslTest;
@@ -95,7 +95,7 @@ public class JtlWriterTest extends JmeterDslTest {
     testPlan(
         threadGroup(1, 1,
             httpSampler(wiremockUri)
-                .post(JSON_BODY, Type.APPLICATION_JSON)
+                .post(JSON_BODY, ContentType.APPLICATION_JSON)
                 .children(
                     jtlWriter(resultsFilePath.toString())
                 ),
@@ -118,7 +118,7 @@ public class JtlWriterTest extends JmeterDslTest {
     testPlan(
         threadGroup(1, 1,
             httpSampler(wiremockUri)
-                .post(JSON_BODY, Type.APPLICATION_JSON)
+                .post(JSON_BODY, ContentType.APPLICATION_JSON)
                 .children(
                     jtlWriter(resultsFilePath.toString())
                         .withAllFields(true)

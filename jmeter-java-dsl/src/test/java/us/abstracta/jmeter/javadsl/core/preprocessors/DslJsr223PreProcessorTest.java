@@ -8,7 +8,7 @@ import static us.abstracta.jmeter.javadsl.JmeterDsl.jsr223PreProcessor;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.testPlan;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.threadGroup;
 
-import org.eclipse.jetty.http.MimeTypes;
+import org.apache.http.entity.ContentType;
 import org.junit.jupiter.api.Test;
 import us.abstracta.jmeter.javadsl.JmeterDslTest;
 
@@ -22,7 +22,7 @@ public class DslJsr223PreProcessorTest extends JmeterDslTest {
     testPlan(
         threadGroup(1, 1,
             httpSampler(wiremockUri)
-                .post("${REQUEST_BODY}", MimeTypes.Type.TEXT_PLAIN)
+                .post("${REQUEST_BODY}", ContentType.TEXT_PLAIN)
                 .children(
                     jsr223PreProcessor(
                         "vars.put('REQUEST_BODY', " + getClass().getName() + ".buildRequestBody())")
@@ -39,7 +39,7 @@ public class DslJsr223PreProcessorTest extends JmeterDslTest {
     testPlan(
         threadGroup(1, 1,
             httpSampler(wiremockUri)
-                .post("${REQUEST_BODY}", MimeTypes.Type.TEXT_PLAIN)
+                .post("${REQUEST_BODY}", ContentType.TEXT_PLAIN)
                 .children(
                     jsr223PreProcessor(s -> s.vars.put("REQUEST_BODY", buildRequestBody()))
                 )

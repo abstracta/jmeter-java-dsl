@@ -5,8 +5,8 @@ import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
 import java.util.Arrays;
 import java.util.stream.Collectors;
-import org.eclipse.jetty.http.HttpHeader;
-import org.eclipse.jetty.http.MimeTypes.Type;
+import org.apache.http.entity.ContentType;
+import org.apache.jmeter.protocol.http.util.HTTPConstants;
 
 public class HttpResponseBuilder {
 
@@ -15,7 +15,7 @@ public class HttpResponseBuilder {
 
   public static ResponseDefinitionBuilder buildEmbeddedResourcesResponse(String... resourcesUrls) {
     return aResponse()
-        .withHeader(HttpHeader.CONTENT_TYPE.toString(), Type.TEXT_HTML.toString())
+        .withHeader(HTTPConstants.HEADER_CONTENT_TYPE, ContentType.TEXT_XML.toString())
         .withBody("<html>" +
             Arrays.stream(resourcesUrls)
                 .map(r -> "<img src=\"" + r + "\"/>")

@@ -17,8 +17,8 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.time.Instant;
-import org.eclipse.jetty.http.HttpHeader;
-import org.eclipse.jetty.http.MimeTypes.Type;
+import org.apache.http.entity.ContentType;
+import org.apache.jmeter.protocol.http.util.HTTPConstants;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import us.abstracta.jmeter.javadsl.JmeterDslTest;
@@ -99,7 +99,7 @@ public class JmeterDslCoreTest extends JmeterDslTest {
     testPlan(
         threadGroup(1, TEST_ITERATIONS,
             httpSampler("http://localhost")
-                .post(JSON_BODY, Type.APPLICATION_JSON),
+                .post(JSON_BODY, ContentType.APPLICATION_JSON),
             httpSampler("http://localhost")
         ),
         jtlWriter("results.jtl")
@@ -115,7 +115,8 @@ public class JmeterDslCoreTest extends JmeterDslTest {
     copyJmxWithDynamicFieldsTo(jmxFile);
     DslTestPlan.fromJmx(jmxFile.getPath()).run();
     wiremockServer.verify(postRequestedFor(anyUrl())
-        .withHeader(HttpHeader.CONTENT_TYPE.toString(), equalTo(Type.APPLICATION_JSON.asString()))
+        .withHeader(HTTPConstants.HEADER_CONTENT_TYPE,
+            equalTo(ContentType.APPLICATION_JSON.toString()))
         .withRequestBody(equalToJson(JSON_BODY)));
   }
 

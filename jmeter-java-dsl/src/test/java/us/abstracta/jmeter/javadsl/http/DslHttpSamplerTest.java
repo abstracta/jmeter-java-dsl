@@ -15,12 +15,10 @@ import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.stream.Collectors;
+import org.apache.http.HttpStatus;
+import org.apache.http.entity.ContentType;
+import org.apache.jmeter.protocol.http.util.HTTPConstants;
 import org.apache.jmeter.threads.JMeterVariables;
-import org.eclipse.jetty.http.HttpHeader;
-import org.eclipse.jetty.http.HttpMethod;
-import org.eclipse.jetty.http.HttpStatus;
-import org.eclipse.jetty.http.MimeTypes;
-import org.eclipse.jetty.http.MimeTypes.Type;
 import org.junit.jupiter.api.Test;
 import us.abstracta.jmeter.javadsl.JmeterDslTest;
 import us.abstracta.jmeter.javadsl.core.TestPlanStats;
@@ -35,14 +33,14 @@ public class DslHttpSamplerTest extends JmeterDslTest {
 
   @Test
   public void shouldSendPostWithContentTypeToServerWhenHttpSamplerWithPost() throws Exception {
-    Type contentType = Type.APPLICATION_JSON;
+    ContentType contentType = ContentType.APPLICATION_JSON;
     testPlan(
         threadGroup(1, 1,
             httpSampler(wiremockUri).post(JSON_BODY, contentType)
         )
     ).run();
     wiremockServer.verify(postRequestedFor(anyUrl())
-        .withHeader(HttpHeader.CONTENT_TYPE.toString(), equalTo(contentType.toString()))
+        .withHeader(HTTPConstants.HEADER_CONTENT_TYPE, equalTo(contentType.toString()))
         .withRequestBody(equalToJson(JSON_BODY)));
   }
 
@@ -70,7 +68,7 @@ public class DslHttpSamplerTest extends JmeterDslTest {
 
   private void setupMockedRedirectionTo(String redirectPath) {
     wiremockServer.stubFor(get("/").willReturn(
-        aResponse().withStatus(HttpStatus.MOVED_PERMANENTLY_301)
+        aResponse().withStatus(HttpStatus.SC_MOVED_PERMANENTLY)
             .withHeader("Location", wiremockUri + redirectPath)));
   }
 
@@ -92,7 +90,7 @@ public class DslHttpSamplerTest extends JmeterDslTest {
     testPlan(
         threadGroup(1, 1,
             httpSampler(wiremockUri)
-                .method(HttpMethod.POST)
+                .method(HTTPConstants.POST)
                 .header(HEADER_NAME_1, HEADER_VALUE_1)
                 .header(HEADER_NAME_2, HEADER_VALUE_2)
         )
@@ -111,7 +109,7 @@ public class DslHttpSamplerTest extends JmeterDslTest {
     testPlan(
         threadGroup(1, 1,
             httpSampler(wiremockUri)
-                .method(HttpMethod.POST)
+                .method(HTTPConstants.POST)
                 .children(
                     httpHeaders()
                         .header(HEADER_NAME_1, HEADER_VALUE_1)
@@ -130,7 +128,7 @@ public class DslHttpSamplerTest extends JmeterDslTest {
                 .header(HEADER_NAME_1, HEADER_VALUE_1)
                 .header(HEADER_NAME_2, HEADER_VALUE_2),
             httpSampler(wiremockUri)
-                .method(HttpMethod.POST)
+                .method(HTTPConstants.POST)
         )
     ).run();
     verifyHeadersSentToServer();
@@ -148,7 +146,7 @@ public class DslHttpSamplerTest extends JmeterDslTest {
                 .children(jsr223PreProcessor(s -> incrementVar(countVarName, s.vars)))
                 .header(HEADER_NAME_1, s -> headerValuePrefix + s.vars.getObject(countVarName))
                 .header(HEADER_NAME_2, s -> headerValuePrefix + s.vars.getObject(countVarName))
-                .post(s -> bodyPrefix + s.vars.getObject(countVarName), MimeTypes.Type.TEXT_PLAIN)
+                .post(s -> bodyPrefix + s.vars.getObject(countVarName), ContentType.TEXT_PLAIN)
         )
     ).run();
     verifyDynamicRequestWithPrefixesAndCount(headerValuePrefix, bodyPrefix, 1);

@@ -22,7 +22,7 @@ import static us.abstracta.jmeter.javadsl.JmeterDsl.*;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
-import org.eclipse.jetty.http.MimeTypes.Type;
+import org.apache.http.entity.ContentType;
 import org.junit.jupiter.api.Test;
 import us.abstracta.jmeter.javadsl.core.TestPlanStats;
 
@@ -33,7 +33,7 @@ public class PerformanceTest {
     TestPlanStats stats = testPlan(
       threadGroup(2, 10,
         httpSampler("http://my.service")
-          .post("{\"name\": \"test\"}", Type.APPLICATION_JSON)
+          .post("{\"name\": \"test\"}", ContentType.APPLICATION_JSON)
       ),
       //this is just to log details of each request stats
       jtlWriter("test" + Instant.now().toString().replace(":", "-") + ".jtl")

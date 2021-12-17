@@ -2,9 +2,11 @@ package us.abstracta.jmeter.javadsl.http;
 
 import java.util.HashMap;
 import java.util.Map;
+import org.apache.http.entity.ContentType;
 import org.apache.jmeter.protocol.http.control.Header;
 import org.apache.jmeter.protocol.http.control.HeaderManager;
 import org.apache.jmeter.protocol.http.gui.HeaderPanel;
+import org.apache.jmeter.protocol.http.util.HTTPConstants;
 import org.apache.jmeter.testelement.TestElement;
 import org.eclipse.jetty.http.HttpHeader;
 import org.eclipse.jetty.http.MimeTypes;
@@ -53,9 +55,23 @@ public class HttpHeaders extends BaseTestElement implements MultiLevelTestElemen
    *
    * @param contentType value to use as Content-Type header.
    * @return the altered HttpHeaders to allow for fluent API usage.
+   * @deprecated as of 0.42 use {@link #contentType(ContentType)} instead.
    */
+  @Deprecated
   public HttpHeaders contentType(MimeTypes.Type contentType) {
     headers.put(HttpHeader.CONTENT_TYPE.toString(), contentType.toString());
+    return this;
+  }
+
+  /**
+   * Allows to easily specify the Content-Type HTTP header.
+   *
+   * @param contentType value to use as Content-Type header.
+   * @return the altered HttpHeaders to allow for fluent API usage.
+   * @since 0.42
+   */
+  public HttpHeaders contentType(ContentType contentType) {
+    headers.put(HTTPConstants.HEADER_CONTENT_TYPE, contentType.toString());
     return this;
   }
 
