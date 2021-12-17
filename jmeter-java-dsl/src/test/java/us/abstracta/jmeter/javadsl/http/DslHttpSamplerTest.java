@@ -39,8 +39,7 @@ public class DslHttpSamplerTest extends JmeterDslTest {
     testPlan(
         threadGroup(1, 1,
             httpSampler(wiremockUri).post(JSON_BODY, contentType)
-        ),
-            resultsTreeVisualizer()
+        )
     ).run();
     wiremockServer.verify(postRequestedFor(anyUrl())
         .withHeader(HttpHeader.CONTENT_TYPE.toString(), equalTo(contentType.toString()))
@@ -53,8 +52,7 @@ public class DslHttpSamplerTest extends JmeterDslTest {
     testPlan(
             threadGroup(1, 1,
                     httpSampler("").host("localhost").port(wiremockServer.port()).protocol("http")
-            ),
-            resultsTreeVisualizer()
+            )
     ).run();
     wiremockServer.verify(getRequestedFor(anyUrl()).withPort(wiremockServer.port()));
   }

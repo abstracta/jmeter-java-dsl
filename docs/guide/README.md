@@ -1636,7 +1636,7 @@ As previously mentioned for other lambdas, using them will only work with embedd
 If you need to specify just part of url you can use additional method for HTTP host, port and protocol:
 
 ```java
-httpSampler()
+httpSampler("")
   .host("my.service")
   .port(8080)
   .protocol("http")
