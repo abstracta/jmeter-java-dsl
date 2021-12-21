@@ -2,6 +2,7 @@ package us.abstracta.jmeter.javadsl.core.configs;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.getRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
+import static com.github.tomakehurst.wiremock.client.WireMock.verify;
 import static org.assertj.core.api.Assertions.assertThat;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.csvDataSet;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.httpSampler;
@@ -40,8 +41,8 @@ public class CsvDataSetTest extends JmeterDslTest {
   }
 
   private void verifyExpectedValuesWithCount(int count) {
-    wiremockServer.verify(count, getRequestedForFirstRow());
-    wiremockServer.verify(count, getRequestedFor(urlEqualTo(buildVarsPath("val,3", "val4"))));
+    verify(count, getRequestedForFirstRow());
+    verify(count, getRequestedFor(urlEqualTo(buildVarsPath("val,3", "val4"))));
   }
 
   private RequestPatternBuilder getRequestedForFirstRow() {
@@ -131,7 +132,7 @@ public class CsvDataSetTest extends JmeterDslTest {
             httpSampler(buildUrlWithVariableReferences())
         )
     ).run();
-    wiremockServer.verify(2, getRequestedForFirstRow());
+    verify(2, getRequestedForFirstRow());
   }
 
   @Test
@@ -143,7 +144,7 @@ public class CsvDataSetTest extends JmeterDslTest {
             httpSampler(buildUrlWithVariableReferences())
         )
     ).run();
-    wiremockServer.verify(2, getRequestedForFirstRow());
+    verify(2, getRequestedForFirstRow());
   }
 
   @Test

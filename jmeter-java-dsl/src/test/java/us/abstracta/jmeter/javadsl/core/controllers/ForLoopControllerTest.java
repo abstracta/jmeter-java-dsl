@@ -1,5 +1,6 @@
 package us.abstracta.jmeter.javadsl.core.controllers;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.verify;
 import static org.assertj.core.api.Assertions.assertThat;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.forLoopController;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.httpSampler;
@@ -44,7 +45,7 @@ public class ForLoopControllerTest extends JmeterDslTest {
   }
 
   private void verifyRequestMadeForPath(String path) {
-    wiremockServer.verify(WireMock.getRequestedFor(WireMock.urlPathEqualTo(path)));
+    verify(WireMock.getRequestedFor(WireMock.urlPathEqualTo(path)));
   }
 
 }

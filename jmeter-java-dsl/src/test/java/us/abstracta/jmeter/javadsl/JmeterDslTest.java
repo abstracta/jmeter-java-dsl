@@ -1,9 +1,12 @@
 package us.abstracta.jmeter.javadsl;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.any;
 import static com.github.tomakehurst.wiremock.client.WireMock.anyUrl;
 
-import com.github.tomakehurst.wiremock.WireMockServer;
+import com.github.tomakehurst.wiremock.client.WireMock;
+import com.github.tomakehurst.wiremock.junit5.WireMockRuntimeInfo;
+import com.github.tomakehurst.wiremock.junit5.WireMockTest;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
@@ -13,17 +16,9 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.extension.ExtendWith;
-import ru.lanwen.wiremock.ext.WiremockResolver;
-import ru.lanwen.wiremock.ext.WiremockResolver.Wiremock;
-import ru.lanwen.wiremock.ext.WiremockUriResolver;
-import ru.lanwen.wiremock.ext.WiremockUriResolver.WiremockUri;
 import us.abstracta.jmeter.javadsl.core.TestPlanStats;
 
-@ExtendWith({
-    WiremockResolver.class,
-    WiremockUriResolver.class
-})
+@WireMockTest
 public abstract class JmeterDslTest {
 
   protected static final int TEST_ITERATIONS = 3;
@@ -32,14 +27,14 @@ public abstract class JmeterDslTest {
   protected static final String OVERALL_STATS_LABEL = "overall";
   protected static final String JSON_BODY = "{\"var\":\"val\"}";
 
+  protected WireMockRuntimeInfo wiremockServer;
   protected String wiremockUri;
-  protected WireMockServer wiremockServer;
 
   @BeforeEach
-  public void setup(@Wiremock WireMockServer server, @WiremockUri String uri) {
-    server.stubFor(any(anyUrl()));
-    wiremockServer = server;
-    wiremockUri = uri;
+  public void setup(WireMockRuntimeInfo wiremock) {
+    wiremockServer = wiremock;
+    WireMock.stubFor(any(anyUrl()));
+    wiremockUri = wiremock.getHttpBaseUrl();
   }
 
   protected Map<String, Long> buildExpectedTotalCounts() {

@@ -2,7 +2,9 @@ package us.abstracta.jmeter.javadsl.http;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.getRequestedFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
+import static com.github.tomakehurst.wiremock.client.WireMock.verify;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.httpDefaults;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.httpSampler;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.testPlan;
@@ -17,7 +19,7 @@ public class DslHttpDefaultsTest extends JmeterDslTest {
   public void shouldUseDefaultSettingsWhenHttpDefaultAndNoOverwrites() throws Exception {
     String primaryUrl = "/primary";
     String resourceUrl = "/resource";
-    wiremockServer.stubFor(get(primaryUrl)
+    stubFor(get(primaryUrl)
         .willReturn(HttpResponseBuilder.buildEmbeddedResourcesResponse(resourceUrl)));
     testPlan(
         httpDefaults()
@@ -27,7 +29,7 @@ public class DslHttpDefaultsTest extends JmeterDslTest {
             httpSampler((String) null)
         )
     ).run();
-    wiremockServer.verify(getRequestedFor(urlPathEqualTo(resourceUrl)));
+    verify(getRequestedFor(urlPathEqualTo(resourceUrl)));
   }
 
   @Test
@@ -40,7 +42,7 @@ public class DslHttpDefaultsTest extends JmeterDslTest {
             httpSampler(customPath)
         )
     ).run();
-    wiremockServer.verify(getRequestedFor(urlPathEqualTo(customPath)));
+    verify(getRequestedFor(urlPathEqualTo(customPath)));
   }
 
   @Test
@@ -52,7 +54,7 @@ public class DslHttpDefaultsTest extends JmeterDslTest {
             httpSampler(wiremockUri)
         )
     ).run();
-    wiremockServer.verify(getRequestedFor(urlPathEqualTo("/")));
+    verify(getRequestedFor(urlPathEqualTo("/")));
   }
 
 }

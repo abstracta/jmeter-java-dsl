@@ -3,6 +3,7 @@ package us.abstracta.jmeter.javadsl.core.preprocessors;
 import static com.github.tomakehurst.wiremock.client.WireMock.anyUrl;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.verify;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.httpSampler;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.jsr223PreProcessor;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.testPlan;
@@ -29,7 +30,7 @@ public class DslJsr223PreProcessorTest extends JmeterDslTest {
                 )
         )
     ).run();
-    wiremockServer.verify(postRequestedFor(anyUrl())
+    verify(postRequestedFor(anyUrl())
         .withRequestBody(equalTo(REQUEST_BODY)));
   }
 
@@ -45,7 +46,7 @@ public class DslJsr223PreProcessorTest extends JmeterDslTest {
                 )
         )
     ).run();
-    wiremockServer.verify(postRequestedFor(anyUrl())
+    verify(postRequestedFor(anyUrl())
         .withRequestBody(equalTo(REQUEST_BODY)));
   }
 

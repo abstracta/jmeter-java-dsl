@@ -5,6 +5,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalToJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.getRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.verify;
 import static org.assertj.core.api.Assertions.assertThat;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.httpSampler;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.jtlWriter;
@@ -41,7 +42,7 @@ public class JmeterDslCoreTest extends JmeterDslTest {
   }
 
   private void verifyRequestsSentToServer(int testIterations) {
-    wiremockServer.verify(testIterations, getRequestedFor(anyUrl()));
+    verify(testIterations, getRequestedFor(anyUrl()));
   }
 
   @Test
@@ -115,7 +116,7 @@ public class JmeterDslCoreTest extends JmeterDslTest {
     File jmxFile = tmpDir.resolve("test-plan.jxm").toFile();
     copyJmxWithDynamicFieldsTo(jmxFile);
     DslTestPlan.fromJmx(jmxFile.getPath()).run();
-    wiremockServer.verify(postRequestedFor(anyUrl())
+    verify(postRequestedFor(anyUrl())
         .withHeader(HTTPConstants.HEADER_CONTENT_TYPE,
             equalTo(ContentType.APPLICATION_JSON.toString()))
         .withRequestBody(equalToJson(JSON_BODY)));

@@ -61,21 +61,25 @@
     <dependency>
       <groupId>org.eclipse.jetty</groupId>
       <artifactId>jetty-http</artifactId>
-      <version>9.4.35.v20201120</version>
+      <!-- same version as wiremock dependency -->
+      <version>9.4.44.v20210927</version>
     </dependency>
     <dependency>
       <groupId>org.apache.httpcomponents</groupId>
       <artifactId>httpcore</artifactId>
+      <!-- same version as JMeter dependency -->
       <version>4.4.13</version>
     </dependency>
     <dependency>
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
+      <!-- same version as JMeter dependency -->
       <version>2.8.0</version>
     </dependency>
     <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-math3</artifactId>
+      <!-- same version as JMeter dependency -->
       <version>3.6.1</version>
     </dependency>
 
@@ -97,11 +101,6 @@
       <groupId>org.junit.platform</groupId>
       <artifactId>junit-platform-commons</artifactId>
       <version>1.8.2</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>ru.lanwen.wiremock</groupId>
-      <artifactId>wiremock-junit5</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>

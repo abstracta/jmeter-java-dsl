@@ -47,12 +47,10 @@
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
-    <jmeter.version>5.4.1</jmeter.version>
+    <jmeter.version>5.4.2</jmeter.version>
     <testcontainers.version>1.16.2</testcontainers.version>
-    <!-- can't use newer version, probably due to issues with wiremock-junit5 or some dependency
-    conflict -->
-    <wiremock.version>2.27.2</wiremock.version>
-    <junit.version>5.8.1</junit.version>
+    <wiremock.version>2.32.0</wiremock.version>
+    <junit.version>5.8.2</junit.version>
   </properties>
 
   <modules>
@@ -68,19 +66,14 @@
   <dependencyManagement>
     <dependencies>
       <dependency>
-        <groupId>ru.lanwen.wiremock</groupId>
-        <artifactId>wiremock-junit5</artifactId>
-        <version>1.3.1</version>
-      </dependency>
-      <dependency>
         <groupId>org.assertj</groupId>
         <artifactId>assertj-swing-junit</artifactId>
-        <version>3.9.2</version>
+        <version>3.17.1</version>
       </dependency>
       <dependency>
-        <groupId>net.java.openjdk.cacio</groupId>
+        <groupId>com.github.caciocavallosilano</groupId>
         <artifactId>cacio-tta</artifactId>
-        <version>1.9</version>
+        <version>1.10</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -99,9 +92,8 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>net.java.openjdk.cacio</groupId>
+      <groupId>com.github.caciocavallosilano</groupId>
       <artifactId>cacio-tta</artifactId>
-      <version>1.9</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
@@ -121,7 +113,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-checkstyle-plugin</artifactId>
-        <version>3.1.1</version>
+        <version>3.1.2</version>
         <executions>
           <execution>
             <id>validate</id>
@@ -144,8 +136,8 @@
           <!-- use cacio-tta to avoid GUI in swing tests -->
           <systemPropertyVariables>
             <java.awt.headless>false</java.awt.headless>
-            <awt.toolkit>net.java.openjdk.cacio.ctc.CTCToolkit</awt.toolkit>
-            <java.awt.graphicsenv>net.java.openjdk.cacio.ctc.CTCGraphicsEnvironment
+            <awt.toolkit>com.github.caciocavallosilano.cacio.ctc.CTCToolkit</awt.toolkit>
+            <java.awt.graphicsenv>com.github.caciocavallosilano.cacio.ctc.CTCGraphicsEnvironment
             </java.awt.graphicsenv>
             <cacio.managed.screensize>1280x800</cacio.managed.screensize>
           </systemPropertyVariables>
@@ -154,7 +146,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
-        <version>3.2.0</version>
+        <version>3.3.1</version>
         <executions>
           <execution>
             <id>attach-javadocs</id>
@@ -199,7 +191,7 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-gpg-plugin</artifactId>
-            <version>1.6</version>
+            <version>3.0.1</version>
             <executions>
               <execution>
                 <id>sign-artifacts</id>

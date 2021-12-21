@@ -57,11 +57,6 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>ru.lanwen.wiremock</groupId>
-      <artifactId>wiremock-junit5</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
       <groupId>com.github.tomakehurst</groupId>
       <artifactId>wiremock-jre8</artifactId>
       <version>${wiremock.version}</version>

@@ -2,6 +2,7 @@ package us.abstracta.jmeter.javadsl.core.threadgroups;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.getRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
+import static com.github.tomakehurst.wiremock.client.WireMock.verify;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.httpSampler;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.jsr223Sampler;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.setupThreadGroup;
@@ -26,7 +27,7 @@ public class DslSetupThreadGroupTest extends JmeterDslTest {
             jsr223Sampler(s -> s.props.put(propName, propVal))
         )
     ).run();
-    wiremockServer.verify(getRequestedFor(urlEqualTo("/" + propVal)));
+    verify(getRequestedFor(urlEqualTo("/" + propVal)));
   }
 
 }

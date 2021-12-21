@@ -8,8 +8,10 @@ import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.getRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.matching;
 import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
+import static com.github.tomakehurst.wiremock.client.WireMock.verify;
 import static org.assertj.core.api.Assertions.assertThat;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.httpCache;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.httpCookies;
@@ -57,19 +59,20 @@ public class DslHttpSamplerTest extends JmeterDslTest {
             httpSampler(wiremockUri).post(JSON_BODY, contentType)
         )
     ).run();
-    wiremockServer.verify(postRequestedFor(anyUrl())
+    verify(postRequestedFor(anyUrl())
         .withHeader(HTTPConstants.HEADER_CONTENT_TYPE, equalTo(contentType.toString()))
         .withRequestBody(equalToJson(JSON_BODY)));
   }
 
   @Test
   public void shouldSendGetWithHostAndProtocolWhenHttpSampler() throws Exception {
+    int serverPort = wiremockServer.getHttpPort();
     testPlan(
         threadGroup(1, 1,
-            httpSampler("").protocol("http").host("localhost").port(wiremockServer.port())
+            httpSampler("").protocol("http").host("localhost").port(serverPort)
         )
     ).run();
-    wiremockServer.verify(getRequestedFor(anyUrl()).withPort(wiremockServer.port()));
+    verify(getRequestedFor(anyUrl()).withPort(serverPort));
   }
 
   @Test
@@ -80,11 +83,11 @@ public class DslHttpSamplerTest extends JmeterDslTest {
             httpSampler(wiremockUri)
         )
     ).run();
-    wiremockServer.verify(getRequestedFor(urlPathEqualTo(REDIRECT_PATH)));
+    verify(getRequestedFor(urlPathEqualTo(REDIRECT_PATH)));
   }
 
   private void setupMockedRedirectionTo(String redirectPath) {
-    wiremockServer.stubFor(get("/").willReturn(
+    stubFor(get("/").willReturn(
         aResponse().withStatus(HttpStatus.SC_MOVED_PERMANENTLY)
             .withHeader("Location", wiremockUri + redirectPath)));
   }
@@ -99,7 +102,7 @@ public class DslHttpSamplerTest extends JmeterDslTest {
                 .followRedirects(false)
         )
     ).run();
-    wiremockServer.verify(0, getRequestedFor(urlPathEqualTo(REDIRECT_PATH)));
+    verify(0, getRequestedFor(urlPathEqualTo(REDIRECT_PATH)));
   }
 
   @Test
@@ -116,7 +119,7 @@ public class DslHttpSamplerTest extends JmeterDslTest {
   }
 
   private void verifyHeadersSentToServer() {
-    wiremockServer.verify(postRequestedFor(anyUrl())
+    verify(postRequestedFor(anyUrl())
         .withHeader(HEADER_NAME_1, equalTo(HEADER_VALUE_1))
         .withHeader(HEADER_NAME_2, equalTo(HEADER_VALUE_2)));
   }
@@ -177,7 +180,7 @@ public class DslHttpSamplerTest extends JmeterDslTest {
 
   private void verifyDynamicRequestWithPrefixesAndCount(String headerValuePrefix, String bodyPrefix,
       int count) {
-    wiremockServer.verify(postRequestedFor(anyUrl())
+    verify(postRequestedFor(anyUrl())
         .withHeader(HEADER_NAME_1, equalTo(headerValuePrefix + count))
         .withHeader(HEADER_NAME_2, equalTo(headerValuePrefix + count))
         .withRequestBody(equalTo(bodyPrefix + count)));
@@ -195,8 +198,8 @@ public class DslHttpSamplerTest extends JmeterDslTest {
             })
         )
     ).run();
-    wiremockServer.verify(getRequestedFor(urlPathEqualTo("/" + 1)));
-    wiremockServer.verify(getRequestedFor(urlPathEqualTo("/" + 2)));
+    verify(getRequestedFor(urlPathEqualTo("/" + 1)));
+    verify(getRequestedFor(urlPathEqualTo("/" + 2)));
   }
 
   @Test
@@ -208,11 +211,11 @@ public class DslHttpSamplerTest extends JmeterDslTest {
             httpSampler(wiremockUri)
         )
     ).run();
-    wiremockServer.verify(getRequestedFor(anyUrl()).withHeader("Cookie", equalTo("MyCookie=val")));
+    verify(getRequestedFor(anyUrl()).withHeader("Cookie", equalTo("MyCookie=val")));
   }
 
   private void setupHttpResponseWithCookie() {
-    wiremockServer.stubFor(get(anyUrl())
+    stubFor(get(anyUrl())
         .willReturn(aResponse().withHeader("Set-Cookie", "MyCookie=val")));
   }
 
@@ -224,7 +227,7 @@ public class DslHttpSamplerTest extends JmeterDslTest {
             httpSampler(wiremockUri)
         )
     ).run();
-    wiremockServer.verify(getRequestedFor(anyUrl()).withoutHeader("Cookie"));
+    verify(getRequestedFor(anyUrl()).withoutHeader("Cookie"));
   }
 
   @Test
@@ -237,11 +240,11 @@ public class DslHttpSamplerTest extends JmeterDslTest {
             httpSampler(wiremockUri)
         )
     ).run();
-    wiremockServer.verify(1, getRequestedFor(anyUrl()));
+    verify(1, getRequestedFor(anyUrl()));
   }
 
   private void setupCacheableHttpResponse() {
-    wiremockServer.stubFor(get(anyUrl())
+    stubFor(get(anyUrl())
         .willReturn(aResponse().withHeader("Cache-Control", "max-age=600")));
   }
 
@@ -263,7 +266,7 @@ public class DslHttpSamplerTest extends JmeterDslTest {
             httpSampler(wiremockUri)
         )
     ).run();
-    wiremockServer.verify(2, getRequestedFor(anyUrl()));
+    verify(2, getRequestedFor(anyUrl()));
   }
 
   @Test
@@ -276,12 +279,12 @@ public class DslHttpSamplerTest extends JmeterDslTest {
             httpSampler(wiremockUri)
         )
     ).run();
-    wiremockServer.verify(2, getRequestedFor(anyUrl()).withoutHeader("Cookie"));
+    verify(2, getRequestedFor(anyUrl()).withoutHeader("Cookie"));
   }
 
   @Test
   public void shouldNotUseCacheWhenDisabled() throws Exception {
-    wiremockServer.stubFor(get(anyUrl())
+    stubFor(get(anyUrl())
         .willReturn(aResponse().withHeader("Set-Cookie", "MyCookie=val")));
     testPlan(
         httpCache().disable(),
@@ -290,14 +293,14 @@ public class DslHttpSamplerTest extends JmeterDslTest {
             httpSampler(wiremockUri)
         )
     ).run();
-    wiremockServer.verify(2, getRequestedFor(anyUrl()));
+    verify(2, getRequestedFor(anyUrl()));
   }
 
   @Test
   public void shouldDownloadEmbeddedResourceWhenEnabled() throws Exception {
     String primaryUrl = "/primary";
     String resourceUrl = "/resource";
-    wiremockServer.stubFor(get(primaryUrl)
+    stubFor(get(primaryUrl)
         .willReturn(HttpResponseBuilder.buildEmbeddedResourcesResponse(resourceUrl)));
     testPlan(
         threadGroup(1, 1,
@@ -305,16 +308,16 @@ public class DslHttpSamplerTest extends JmeterDslTest {
                 .downloadEmbeddedResources()
         )
     ).run();
-    wiremockServer.verify(getRequestedFor(urlPathEqualTo(resourceUrl)));
+    verify(getRequestedFor(urlPathEqualTo(resourceUrl)));
   }
 
   @Test
   public void shouldDownloadEmbeddedResourcesInParallelWhenEnabled() throws Exception {
     int responsesDelayMillis = 3000;
-    wiremockServer.stubFor(get(anyUrl())
+    stubFor(get(anyUrl())
         .willReturn(aResponse().withFixedDelay(responsesDelayMillis)));
     String primaryUrl = "/primary";
-    wiremockServer.stubFor(get(primaryUrl)
+    stubFor(get(primaryUrl)
         .willReturn(HttpResponseBuilder.buildEmbeddedResourcesResponse("/resource1", "/resource2")
             .withFixedDelay(responsesDelayMillis)));
     String transactionLabel = "sample";
@@ -339,7 +342,7 @@ public class DslHttpSamplerTest extends JmeterDslTest {
                 .encodedParam(PARAM2_NAME, PARAM2_VALUE)
         )
     ).run();
-    wiremockServer.verify(getRequestedFor(
+    verify(getRequestedFor(
         urlEqualTo("/?" + buildUrlEncodedParamsQuery())));
   }
 
@@ -366,7 +369,7 @@ public class DslHttpSamplerTest extends JmeterDslTest {
                 .encodedParam(PARAM2_NAME, PARAM2_VALUE)
         )
     ).run();
-    wiremockServer.verify(postRequestedFor(anyUrl())
+    verify(postRequestedFor(anyUrl())
         .withHeader(HTTPConstants.HEADER_CONTENT_TYPE, equalTo(
             ContentType.APPLICATION_FORM_URLENCODED.withCharset(StandardCharsets.UTF_8).toString()))
         .withRequestBody(equalTo(buildUrlEncodedParamsQuery())));
@@ -389,7 +392,7 @@ public class DslHttpSamplerTest extends JmeterDslTest {
                 .bodyFilePart(part2Name, part2Resource.getFile().getPath(), part2Encoding)
         )
     ).run();
-    wiremockServer.verify(postRequestedFor(anyUrl())
+    verify(postRequestedFor(anyUrl())
         .withHeader(HTTPConstants.HEADER_CONTENT_TYPE,
             matching(ContentType.MULTIPART_FORM_DATA.withCharset((String) null) + "; boundary="
                 + MULTIPART_BOUNDARY_PATTERN))

@@ -40,11 +40,6 @@
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
-    <dependency>
-      <groupId>ru.lanwen.wiremock</groupId>
-      <artifactId>wiremock-junit5</artifactId>
-      <scope>test</scope>
-    </dependency>
     <!-- using standalone version to avoid conflict with guava shaded inside
     jmeter-elasticsearch-backend-listener -->
     <dependency>

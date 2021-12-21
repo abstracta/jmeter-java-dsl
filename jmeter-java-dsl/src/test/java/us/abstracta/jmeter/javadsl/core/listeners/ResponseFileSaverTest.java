@@ -3,6 +3,7 @@ package us.abstracta.jmeter.javadsl.core.listeners;
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.any;
 import static com.github.tomakehurst.wiremock.client.WireMock.anyUrl;
+import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static org.assertj.core.api.Assertions.assertThat;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.httpSampler;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.responseFileSaver;
@@ -21,7 +22,7 @@ public class ResponseFileSaverTest extends JmeterDslTest {
   @Test
   public void shouldWriteFileWithResponseContentWhenResponseFileSaverInPlan(@TempDir Path tempDir) throws Exception {
     String body = "TEST BODY";
-    wiremockServer.stubFor(any(anyUrl()).willReturn(aResponse().withBody(body)));
+    stubFor(any(anyUrl()).willReturn(aResponse().withBody(body)));
     testPlan(
         threadGroup(1, 1,
             httpSampler(wiremockUri)

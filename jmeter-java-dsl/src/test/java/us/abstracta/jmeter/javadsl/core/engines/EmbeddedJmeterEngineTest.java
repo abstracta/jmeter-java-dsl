@@ -1,6 +1,9 @@
 package us.abstracta.jmeter.javadsl.core.engines;
 
-import static us.abstracta.jmeter.javadsl.JmeterDsl.*;
+import static com.github.tomakehurst.wiremock.client.WireMock.verify;
+import static us.abstracta.jmeter.javadsl.JmeterDsl.httpSampler;
+import static us.abstracta.jmeter.javadsl.JmeterDsl.testPlan;
+import static us.abstracta.jmeter.javadsl.JmeterDsl.threadGroup;
 
 import com.github.tomakehurst.wiremock.client.WireMock;
 import org.junit.jupiter.api.Test;
@@ -19,7 +22,7 @@ public class EmbeddedJmeterEngineTest extends JmeterDslTest {
         )
     ).runIn(new EmbeddedJmeterEngine()
         .prop(propName, propVal));
-    wiremockServer.verify(WireMock.getRequestedFor(WireMock.urlEqualTo("/" + propVal)));
+    verify(WireMock.getRequestedFor(WireMock.urlEqualTo("/" + propVal)));
   }
 
 }

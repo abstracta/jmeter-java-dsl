@@ -4,7 +4,9 @@ import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.anyUrl;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.getRequestedFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
+import static com.github.tomakehurst.wiremock.client.WireMock.verify;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.boundaryExtractor;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.httpSampler;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.testPlan;
@@ -21,8 +23,7 @@ public class DslBoundaryExtractorTest extends JmeterDslTest {
     String userBodyParameter = "user=";
     String user = "test";
     String bodyEnd = "\n";
-    wiremockServer
-        .stubFor(get(anyUrl()).willReturn(aResponse().withBody(userBodyParameter + user + bodyEnd)));
+    stubFor(get(anyUrl()).willReturn(aResponse().withBody(userBodyParameter + user + bodyEnd)));
     String userQueryParameter = "?user=";
     testPlan(
         threadGroup(1, 1,
@@ -35,8 +36,7 @@ public class DslBoundaryExtractorTest extends JmeterDslTest {
         )
     ).run();
 
-    wiremockServer
-        .verify(getRequestedFor(urlEqualTo(path + userQueryParameter + user)));
+    verify(getRequestedFor(urlEqualTo(path + userQueryParameter + user)));
   }
 
 }
