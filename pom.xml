@@ -47,7 +47,7 @@
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
-    <jmeter.version>5.4.2</jmeter.version>
+    <jmeter.version>5.4.3</jmeter.version>
     <testcontainers.version>1.16.2</testcontainers.version>
     <wiremock.version>2.32.0</wiremock.version>
     <junit.version>5.8.2</junit.version>
