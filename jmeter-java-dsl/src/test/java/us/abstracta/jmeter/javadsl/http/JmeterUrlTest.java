@@ -1,12 +1,12 @@
+package us.abstracta.jmeter.javadsl.http;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.jetbrains.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 import org.junitpioneer.jupiter.cartesian.CartesianTest;
 import org.junitpioneer.jupiter.cartesian.CartesianTest.Values;
-import us.abstracta.jmeter.javadsl.http.JmeterUrl;
 
-public class JmeterParameterizedUrlTest {
+public class JmeterUrlTest {
 
   @CartesianTest
   public void shouldGetExpectedParameterizedUrlWhenBuildFromString(
