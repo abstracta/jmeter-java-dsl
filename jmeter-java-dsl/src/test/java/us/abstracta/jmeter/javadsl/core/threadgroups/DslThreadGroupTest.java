@@ -130,24 +130,23 @@ public class DslThreadGroupTest {
   }
 
   @Test
-  public void shouldBuildSimpleThreadGroupWhenBuildTestElementWithHoldAndRampAndZeroIterations() {
+  public void shouldBuildSimpleThreadGroupWhenBuildTestElementWithHoldAndRamp() {
     assertThatThreadGroup(new DslThreadGroup(null)
         .holdFor(Duration.ofSeconds(DURATION1_SECONDS))
         .rampTo(THREAD_COUNT, Duration.ofSeconds(DURATION2_SECONDS))
-        .holdIterating(0)
         .buildThreadGroup())
         .isEqualTo(
-            buildSimpleThreadGroup(THREAD_COUNT, 0, 0, DURATION2_SECONDS, DURATION1_SECONDS));
+            buildSimpleThreadGroup(THREAD_COUNT, 0, DURATION2_SECONDS, DURATION2_SECONDS,
+                DURATION1_SECONDS));
   }
 
   @Test
-  public void shouldBuildSimpleThreadGroupWhenBuildTestElementWithRampAndZeroIterations() {
+  public void shouldBuildSimpleThreadGroupWhenBuildTestElementWithRamp() {
     assertThatThreadGroup(new DslThreadGroup(null)
         .rampTo(THREAD_COUNT, Duration.ofSeconds(DURATION1_SECONDS))
-        .holdIterating(0)
         .buildThreadGroup())
         .isEqualTo(
-            buildSimpleThreadGroup(THREAD_COUNT, 0, 0, DURATION1_SECONDS, 0));
+            buildSimpleThreadGroup(THREAD_COUNT, 0, DURATION1_SECONDS, DURATION1_SECONDS, 0));
   }
 
   @Test
@@ -165,8 +164,8 @@ public class DslThreadGroupTest {
         .rampTo(THREAD_COUNT, Duration.ofSeconds(DURATION2_SECONDS))
         .holdFor(Duration.ofSeconds(DURATION3_SECONDS))
         .buildThreadGroup())
-        .isEqualTo(buildSimpleThreadGroup(THREAD_COUNT, 0, DURATION3_SECONDS, DURATION2_SECONDS,
-            DURATION1_SECONDS));
+        .isEqualTo(buildSimpleThreadGroup(THREAD_COUNT, 0, DURATION2_SECONDS + DURATION3_SECONDS,
+            DURATION2_SECONDS, DURATION1_SECONDS));
   }
 
   @Test
@@ -176,7 +175,8 @@ public class DslThreadGroupTest {
         .holdFor(Duration.ofSeconds(DURATION2_SECONDS))
         .buildThreadGroup())
         .isEqualTo(
-            buildSimpleThreadGroup(THREAD_COUNT, 0, DURATION2_SECONDS, DURATION1_SECONDS, 0));
+            buildSimpleThreadGroup(THREAD_COUNT, 0, DURATION1_SECONDS + DURATION2_SECONDS,
+                DURATION1_SECONDS, 0));
   }
 
   @Test
@@ -184,7 +184,8 @@ public class DslThreadGroupTest {
     assertThatThreadGroup(new DslThreadGroup(null)
         .rampTo(THREAD_COUNT, Duration.ofSeconds(DURATION1_SECONDS))
         .buildThreadGroup())
-        .isEqualTo(buildSimpleThreadGroup(THREAD_COUNT, 0, 0, DURATION1_SECONDS, 0));
+        .isEqualTo(
+            buildSimpleThreadGroup(THREAD_COUNT, 0, DURATION1_SECONDS, DURATION1_SECONDS, 0));
   }
 
   @Test
