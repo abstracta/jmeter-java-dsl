@@ -1117,6 +1117,53 @@ Check [DslIfController](../../jmeter-java-dsl/src/main/java/us/abstracta/jmeter/
 
 ### Loops
 
+### Iterating over extracted values
+
+A common use case is to iterate over a list of values extracted from a previous request and execute part of the plan for each extracted value. This can be easily done using `foreachController` like in following example:
+
+```java
+package us.abstracta.jmeter.javadsl;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static us.abstracta.jmeter.javadsl.JmeterDsl.*;
+
+import java.io.IOException;
+import java.time.Duration;
+import org.junit.jupiter.api.Test;
+import us.abstracta.jmeter.javadsl.core.TestPlanStats;
+
+public class PerformanceTest {
+
+  @Test
+  public void testPerformance() throws IOException {
+    String productsIdVarName = "PRODUCT_IDS";
+    String productIdVarName = "PRODUCT_ID";
+    String productsPath = "/products";
+    TestPlanStats stats = testPlan(
+        httpDefaults().url("http://my.service"),
+        threadGroup(2, 10,
+            httpSampler(productsPath)
+                .children(
+                    jsonExtractor(productsIdVarName, "[].id")
+                        .matchNumber(-1)
+                ),
+            forEachController(productsIdVarName, productIdVarName,
+                httpSampler(productsPath + "/${" + productIdVarName + "}")
+            )
+        )
+    ).run();
+    assertThat(stats.overall().sampleTimePercentile99()).isLessThan(Duration.ofSeconds(5));
+  }
+
+}
+```
+
+::: tip
+JMeter automatically generates a variable `__jm__<loopName>__idx` with the current index of for each iteration (starting with 0), which you can use in controller children elements if needed. Default name for for each controller, when not specified, is `foreach`.
+:::
+
+Check [DslForEachController](../../jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/controllers/DslForEachController.java) for more details.
+
 #### While Controller
 
 If at any time you want to execute a given part of a test plan, inside a thread iteration, while a condition is met, then you can use `whileController` (internally using [JMeter While Controller](https://jmeter.apache.org/usermanual/component_reference.html#While_Controller)) like in following example:
@@ -1220,7 +1267,7 @@ public class PerformanceTest {
 This will result in 10 * 5 = 50 requests to the given URL for each thread in the thread group.
 
 ::: tip
-JMeter automatically generates a variable `__jm__<loopName>__idx` with the current index of while iteration (starting with 0) which you can use in children elements.
+JMeter automatically generates a variable `__jm__<loopName>__idx` with the current index of for loop iteration (starting with 0) which you can use in children elements. Default name for for loop controller, when not specified, is `for`.
 :::
 
 Check [ForLoopController](../../jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/controllers/ForLoopController.java) for more details.

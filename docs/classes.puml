@@ -190,6 +190,8 @@ package core {
 
     class DslIfController extends DslController
 
+    class DslForEachController extends DslController
+
     class DslWhileController extends DslController
 
     class ForLoopController extends DslController {
