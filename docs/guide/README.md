@@ -1117,7 +1117,7 @@ Check [DslIfController](../../jmeter-java-dsl/src/main/java/us/abstracta/jmeter/
 
 ### Loops
 
-### Iterating over extracted values
+#### Iterating over extracted values
 
 A common use case is to iterate over a list of values extracted from a previous request and execute part of the plan for each extracted value. This can be easily done using `foreachController` like in following example:
 

@@ -293,3 +293,5 @@ buildNumber.properties
 .classpath
 
 # End of https://www.toptal.com/developers/gitignore/api/jenv,java,macos,maven,eclipse,intellij+all,intellij+iml
+
+.nvmrc
