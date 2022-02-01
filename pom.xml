@@ -100,7 +100,6 @@
   </dependencies>
 
   <build>
-    <finalName>jmx2dsl</finalName>
     <pluginManagement>
       <plugins>
         <!-- We force to use latest version of surefire plugin to properly run junit5 tests -->

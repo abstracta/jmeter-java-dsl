@@ -32,6 +32,7 @@
   </dependencies>
 
   <build>
+    <finalName>jmx2dsl</finalName>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
