@@ -14,29 +14,50 @@ import static us.abstracta.jmeter.javadsl.JmeterDsl.threadGroup;
 
 import org.junit.jupiter.api.Test;
 import us.abstracta.jmeter.javadsl.JmeterDslTest;
+import us.abstracta.jmeter.javadsl.core.postprocessors.DslBoundaryExtractor.TargetField;
 
 public class DslBoundaryExtractorTest extends JmeterDslTest {
 
+  public static final String BOUNDARY_PATH = "/boundary";
+  public static final String USER_BODY_PARAMETER = "user=";
+  public static final String USER = "test";
+  public static final String USER_QUERY_PARAMETER = "?user=";
+  public static final String VARIABLE_NAME = "EXTRACTED_USER";
+
   @Test
   public void shouldExtractVariableWhenBoundaryExtractorMatchesResponse() throws Exception {
-    String path = "/boundary";
-    String userBodyParameter = "user=";
-    String user = "test";
     String bodyEnd = "\n";
-    stubFor(get(anyUrl()).willReturn(aResponse().withBody(userBodyParameter + user + bodyEnd)));
-    String userQueryParameter = "?user=";
+    stubFor(get(anyUrl()).willReturn(aResponse().withBody(USER_BODY_PARAMETER + USER + bodyEnd)));
     testPlan(
         threadGroup(1, 1,
-            httpSampler(wiremockUri + path)
+            httpSampler(wiremockUri + BOUNDARY_PATH)
                 .children(
-                    boundaryExtractor("EXTRACTED_USER", userBodyParameter, bodyEnd)
+                    boundaryExtractor(VARIABLE_NAME, USER_BODY_PARAMETER, bodyEnd)
                 ),
             httpSampler(
-                wiremockUri + path + userQueryParameter + "${EXTRACTED_USER}")
+                wiremockUri + BOUNDARY_PATH + USER_QUERY_PARAMETER + "${" + VARIABLE_NAME + "}")
         )
     ).run();
 
-    verify(getRequestedFor(urlEqualTo(path + userQueryParameter + user)));
+    verify(getRequestedFor(urlEqualTo(BOUNDARY_PATH + USER_QUERY_PARAMETER + USER)));
+  }
+
+  @Test
+  public void shouldExtractVariableWhenBoundaryExtractorMatchesResponseInHeader() throws Exception {
+    stubFor(get(anyUrl()).willReturn(
+        aResponse().withHeader("My-Header", USER_BODY_PARAMETER + USER)));
+    testPlan(
+        threadGroup(1, 1,
+            httpSampler(wiremockUri + BOUNDARY_PATH)
+                .children(
+                    boundaryExtractor(VARIABLE_NAME, USER_BODY_PARAMETER, "\n")
+                        .fieldToCheck(TargetField.RESPONSE_HEADERS)
+                ),
+            httpSampler(
+                wiremockUri + BOUNDARY_PATH + USER_QUERY_PARAMETER + "${" + VARIABLE_NAME + "}")
+        )
+    ).run();
+    verify(getRequestedFor(urlEqualTo(BOUNDARY_PATH + USER_QUERY_PARAMETER + USER)));
   }
 
 }

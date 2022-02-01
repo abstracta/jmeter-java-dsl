@@ -1,6 +1,5 @@
 package us.abstracta.jmeter.javadsl.core.postprocessors;
 
-import java.util.function.Consumer;
 import org.apache.jmeter.extractor.RegexExtractor;
 import org.apache.jmeter.extractor.gui.RegexExtractorGui;
 import org.apache.jmeter.testelement.TestElement;
@@ -108,7 +107,7 @@ public class DslRegexExtractor extends DslVariableExtractor<DslRegexExtractor> {
   protected TestElement buildTestElement() {
     RegexExtractor ret = new RegexExtractor();
     setScopeTo(ret);
-    fieldToCheck.applyTo(ret);
+    ret.setUseField(fieldToCheck.propertyValue);
     ret.setRefName(varName);
     ret.setRegex(regex);
     ret.setMatchNumber(matchNumber);
@@ -132,54 +131,51 @@ public class DslRegexExtractor extends DslVariableExtractor<DslRegexExtractor> {
      *
      * @since 0.10
      */
-    RESPONSE_BODY(RegexExtractor::useBody),
+    RESPONSE_BODY(RegexExtractor.USE_BODY),
     /**
      * Applies the regular extractor to the response body replacing all HTML escape codes.
      *
      * @since 0.10
      */
-    RESPONSE_BODY_UNESCAPED(RegexExtractor::useUnescapedBody),
+    RESPONSE_BODY_UNESCAPED(RegexExtractor.USE_BODY_UNESCAPED),
     /**
      * Applies the regular extractor to the string representation obtained from parsing the response
      * body with <a href="http://tika.apache.org/1.2/formats.html">Apache Tika</a>.
      *
      * @since 0.10
      */
-    RESPONSE_BODY_AS_DOCUMENT(RegexExtractor::useBodyAsDocument),
+    RESPONSE_BODY_AS_DOCUMENT(RegexExtractor.USE_BODY_AS_DOCUMENT),
     /**
      * Applies the regular extractor to response headers. Response headers is a string with headers
      * separated by new lines and names and values separated by colons.
      */
-    RESPONSE_HEADERS(RegexExtractor::useHeaders),
+    RESPONSE_HEADERS(RegexExtractor.USE_HDRS),
     /**
      * Applies the regular extractor to request headers. Request headers is a string with headers
      * separated by new lines and names and values separated by colons.
      */
-    REQUEST_HEADERS(RegexExtractor::useRequestHeaders),
+    REQUEST_HEADERS(RegexExtractor.USE_REQUEST_HDRS),
     /**
      * Applies the regular extractor to the request URL.
      *
      * @since 0.10
      */
-    REQUEST_URL(RegexExtractor::useUrl),
+    REQUEST_URL(RegexExtractor.USE_URL),
     /**
      * Applies the regular extractor to response code.
      */
-    RESPONSE_CODE(RegexExtractor::useCode),
+    RESPONSE_CODE(RegexExtractor.USE_CODE),
     /**
      * Applies the regular extractor to response message.
      */
-    RESPONSE_MESSAGE(RegexExtractor::useMessage);
+    RESPONSE_MESSAGE(RegexExtractor.USE_MESSAGE);
 
-    private final Consumer<RegexExtractor> applier;
+    private final String propertyValue;
 
-    TargetField(Consumer<RegexExtractor> applier) {
-      this.applier = applier;
+    TargetField(String propertyValue) {
+      this.propertyValue = propertyValue;
     }
-
-    private void applyTo(RegexExtractor re) {
-      applier.accept(re);
-    }
+    
   }
 
 }

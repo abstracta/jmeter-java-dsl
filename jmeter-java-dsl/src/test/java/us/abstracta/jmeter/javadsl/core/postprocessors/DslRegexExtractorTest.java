@@ -14,28 +14,50 @@ import static us.abstracta.jmeter.javadsl.JmeterDsl.threadGroup;
 
 import org.junit.jupiter.api.Test;
 import us.abstracta.jmeter.javadsl.JmeterDslTest;
+import us.abstracta.jmeter.javadsl.core.postprocessors.DslRegexExtractor.TargetField;
 
 public class DslRegexExtractorTest extends JmeterDslTest {
 
+  public static final String REGEX_PATH = "/regex";
+  public static final String USER_BODY_PARAMETER = "user=";
+  public static final String USER = "test";
+  public static final String USER_QUERY_PARAMETER = "?user=";
+  public static final String VARIABLE_NAME = "EXTRACTED_USER";
+
   @Test
   public void shouldExtractVariableWhenRegexExtractorMatchesResponse() throws Exception {
-    String path = "/regex";
-    String userBodyParameter = "user=";
-    String user = "test";
-    stubFor(get(anyUrl()).willReturn(aResponse().withBody(userBodyParameter + user)));
-    String userQueryParameter = "?user=";
+    stubFor(get(anyUrl()).willReturn(aResponse().withBody(USER_BODY_PARAMETER + USER)));
     testPlan(
         threadGroup(1, 1,
-            httpSampler(wiremockUri + path)
+            httpSampler(wiremockUri + REGEX_PATH)
                 .children(
-                    regexExtractor("EXTRACTED_USER", userBodyParameter + "(.*)")
+                    regexExtractor(VARIABLE_NAME, USER_BODY_PARAMETER + "(.*)")
                 ),
             httpSampler(
-                wiremockUri + path + userQueryParameter + "${EXTRACTED_USER}")
+                wiremockUri + REGEX_PATH + USER_QUERY_PARAMETER + "${" + VARIABLE_NAME + "}")
         )
     ).run();
 
-    verify(getRequestedFor(urlEqualTo(path + userQueryParameter + user)));
+    verify(getRequestedFor(urlEqualTo(REGEX_PATH + USER_QUERY_PARAMETER + USER)));
+  }
+
+  @Test
+  public void shouldExtractVariableWhenRegexExtractorMatchesResponseInHeader() throws Exception {
+    stubFor(
+        get(anyUrl()).willReturn(aResponse().withHeader("My-Header", USER_BODY_PARAMETER + USER)));
+    testPlan(
+        threadGroup(1, 1,
+            httpSampler(wiremockUri + REGEX_PATH)
+                .children(
+                    regexExtractor(VARIABLE_NAME, USER_BODY_PARAMETER + "(.*)")
+                        .fieldToCheck(DslRegexExtractor.TargetField.RESPONSE_HEADERS)
+                ),
+            httpSampler(
+                wiremockUri + REGEX_PATH + USER_QUERY_PARAMETER + "${" + VARIABLE_NAME + "}")
+        )
+    ).run();
+
+    verify(getRequestedFor(urlEqualTo(REGEX_PATH + USER_QUERY_PARAMETER + USER)));
   }
 
 }
