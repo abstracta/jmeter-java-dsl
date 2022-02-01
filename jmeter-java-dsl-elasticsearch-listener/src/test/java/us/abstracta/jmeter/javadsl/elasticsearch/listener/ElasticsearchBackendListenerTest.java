@@ -29,6 +29,7 @@ import org.elasticsearch.search.aggregations.bucket.terms.Terms.Bucket;
 import org.junit.jupiter.api.Test;
 import org.testcontainers.elasticsearch.ElasticsearchContainer;
 import us.abstracta.jmeter.javadsl.JmeterDslTest;
+import us.abstracta.jmeter.javadsl.TestResource;
 
 public class ElasticsearchBackendListenerTest extends JmeterDslTest {
 
@@ -64,8 +65,9 @@ public class ElasticsearchBackendListenerTest extends JmeterDslTest {
 
   private void createIndex(RestHighLevelClient client) throws IOException {
     client.indices().putTemplate(
-        new PutIndexTemplateRequest("jmeter").source(getResourceContents("/index-template.json"),
-            XContentType.JSON), RequestOptions.DEFAULT);
+        new PutIndexTemplateRequest("jmeter")
+            .source(new TestResource("/index-template.json").getContents(), XContentType.JSON),
+        RequestOptions.DEFAULT);
   }
 
   private Map<String, Long> findRecordedMetrics(RestHighLevelClient client)

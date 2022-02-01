@@ -16,7 +16,7 @@ import us.abstracta.jmeter.javadsl.core.threadgroups.BaseThreadGroup.ThreadGroup
  *
  * @since 0.27
  */
-public class ForLoopController extends DslController {
+public class ForLoopController extends BaseController {
 
   private final int count;
 

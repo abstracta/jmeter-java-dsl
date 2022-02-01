@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 import org.apache.jmeter.protocol.jdbc.sampler.JDBCSampler;
 import org.apache.jmeter.testbeans.gui.TestBeanGUI;
 import org.apache.jmeter.testelement.TestElement;
-import us.abstracta.jmeter.javadsl.core.testelements.DslSampler;
+import us.abstracta.jmeter.javadsl.core.testelements.BaseSampler;
 
 /**
  * Allows interacting with databases through configured JDBC connections.
@@ -23,7 +23,7 @@ import us.abstracta.jmeter.javadsl.core.testelements.DslSampler;
  * @see DslJdbcConnectionPool
  * @since 0.38
  */
-public class DslJdbcSampler extends DslSampler<DslJdbcSampler> {
+public class DslJdbcSampler extends BaseSampler<DslJdbcSampler> {
 
   private final String poolName;
   private final String query;

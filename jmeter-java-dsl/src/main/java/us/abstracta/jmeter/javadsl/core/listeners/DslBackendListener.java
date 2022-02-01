@@ -7,15 +7,13 @@ import org.apache.jmeter.testelement.property.JMeterProperty;
 import org.apache.jmeter.visualizers.backend.BackendListener;
 import org.apache.jmeter.visualizers.backend.BackendListenerClient;
 import org.apache.jmeter.visualizers.backend.BackendListenerGui;
-import us.abstracta.jmeter.javadsl.core.testelements.BaseTestElement;
-import us.abstracta.jmeter.javadsl.core.testelements.MultiLevelTestElement;
 
 /**
  * Contains common logic used by test elements that use the backend listener.
  *
  * @since 0.20
  */
-public abstract class DslBackendListener extends BaseTestElement implements MultiLevelTestElement {
+public abstract class DslBackendListener extends BaseListener {
 
   protected final String url;
   private final Class<? extends BackendListenerClient> listenerClass;

@@ -1,10 +1,16 @@
 package us.abstracta.jmeter.javadsl.core.listeners;
 
+import java.lang.reflect.Method;
+import java.util.List;
 import org.apache.jmeter.reporters.ResultCollector;
 import org.apache.jmeter.testelement.TestElement;
 import org.apache.jmeter.util.JMeterUtils;
 import org.apache.jmeter.visualizers.ViewResultsFullVisualizer;
 import org.apache.jorphan.collections.HashTree;
+import us.abstracta.jmeter.javadsl.codegeneration.MethodCall;
+import us.abstracta.jmeter.javadsl.codegeneration.MethodCallBuilder;
+import us.abstracta.jmeter.javadsl.codegeneration.MethodCallContext;
+import us.abstracta.jmeter.javadsl.codegeneration.TestElementParamBuilder;
 import us.abstracta.jmeter.javadsl.core.BuildTreeContext;
 
 /**
@@ -57,6 +63,29 @@ public class DslViewResultsTree extends DslVisualizer {
   @Override
   protected TestElement buildTestElement() {
     return new ResultCollector();
+  }
+
+  public static class CodeBuilder extends MethodCallBuilder {
+
+    public CodeBuilder(List<Method> builderMethods) {
+      super(builderMethods);
+    }
+
+    @Override
+    protected MethodCall buildMethodCall(MethodCallContext context) {
+      TestElement testElement = context.getTestElement();
+      if (!ViewResultsFullVisualizer.class.getName()
+          .equals(testElement.getPropertyAsString("TestElement.gui_class"))) {
+        return null;
+      }
+      TestElementParamBuilder paramBuilder = new TestElementParamBuilder(testElement);
+      // only apply if file is empty to use the less possible feature, instead of using exact match
+      if (!paramBuilder.stringParam(ResultCollector.FILENAME).isDefault()) {
+        return null;
+      }
+      return buildMethodCall();
+    }
+
   }
 
 }

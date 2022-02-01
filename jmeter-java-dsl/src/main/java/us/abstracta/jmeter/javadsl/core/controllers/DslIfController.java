@@ -14,19 +14,21 @@ import us.abstracta.jmeter.javadsl.core.util.PropertyScriptBuilder.PropertyScrip
  *
  * @since 0.27
  */
-public class DslIfController extends DslController {
+public class DslIfController extends BaseController {
 
-  private static final String NAME = "If Controller";
   private final DslScriptBuilder conditionBuilder;
 
   public DslIfController(String condition, List<ThreadGroupChild> children) {
-    super(NAME, IfControllerPanel.class, children);
-    this.conditionBuilder = new PropertyScriptBuilder(condition);
+    this(new PropertyScriptBuilder(condition), children);
+  }
+
+  private DslIfController(DslScriptBuilder conditionBuilder, List<ThreadGroupChild> children) {
+    super("If Controller", IfControllerPanel.class, children);
+    this.conditionBuilder = conditionBuilder;
   }
 
   public DslIfController(PropertyScript script, List<ThreadGroupChild> children) {
-    super(NAME, IfControllerPanel.class, children);
-    this.conditionBuilder = new PropertyScriptBuilder(script);
+    this(new PropertyScriptBuilder(script), children);
   }
 
   @Override

@@ -115,6 +115,52 @@ Keep in mind that you can use Java programming to modularize and create abstract
 
 Check [HTTP performance testing](#http-performance-testing) for additional details while testing HTTP services.
 
+## DSL code generation from JMX file
+
+To ease migrating existing JMeter test plans and ease learning about DSL features, the DSL provides `jmx2dsl` (download latest version from [releases page](https://github.com/abstracta/jmeter-java-dsl/releases)) command line tool which you can use to generate DSL code from existing JMX files.
+
+As an example:
+
+:::: tabs type:card
+::: tab Linux & Mac
+```bash
+jmx2dsl test-plan.jmx
+```
+:::
+::: tab Windows
+```powershell
+java -jar jmx2dsl test-plan.jmx
+```
+:::
+::::
+
+Could generate something like following output:
+
+```java
+testPlan(
+    threadGroup(2, 10,
+        httpSampler("http://my.service")
+    ),
+    jtlWriter("test.jtl")
+)
+```
+
+::: tip
+Generated DSL code only currently gets you the test plan code. You should add it to a test executed by a testing framework (like JUnit, check previous examples), required imports and dependencies (check IDEs suggestions and rest of guide listed modules) and proper assertions of expected test results.
+:::
+
+::: tip
+Review and try generated code before executing it as is. I.e: tune thread groups and iterations to 1 to give it a try.
+:::
+
+::: warning
+`jmx2dsl` is currently a **work in progress** and we are is it's first trial versions. 
+
+Only part of DSL supported features are currently converted, and for the ones code generation is implemented, only most common scenarios and properties are considered.
+
+If you find any potential improvement to code generation, **please help us by creating an [issue](https://github.com/abstracta/jmeter-java-dsl/issues) or [discussion](https://github.com/abstracta/jmeter-java-dsl/discussions)** in GitHub repository.
+:::
+
 ## Run test at scale
 
 Running a load test from one machine is not always enough, since you are limited to the machine hardware capabilities. Sometimes, is necessary to run the test using a cluster of machines to be able to generate enough load for the system under test.
@@ -2224,7 +2270,7 @@ For such cases, the preferred approach is implementing a builder class for the t
 
 ```java
 import org.apache.jmeter.testelement.TestElement;
-import us.abstracta.jmeter.javadsl.core.testelements.DslSampler;
+import us.abstracta.jmeter.javadsl.core.testelements.BaseSampler;
 
 public class DslCustomSampler extends DslSampler<DslCustomSampler> {
 

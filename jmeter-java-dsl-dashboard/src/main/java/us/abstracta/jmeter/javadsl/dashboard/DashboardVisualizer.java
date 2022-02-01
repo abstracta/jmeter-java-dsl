@@ -110,10 +110,10 @@ public class DashboardVisualizer extends DslVisualizer {
         repaintIntervalMillis);
     testElement.setListener(rePainter);
     /*
-    we need to add it to context to avoid losing reference and being null while sampling due to
-    weak reference of test element listeners
+    we need to add it to the root context to avoid losing reference and being null while sampling
+    due to weak reference of test element listeners
     */
-    getRePainters(context).add(rePainter);
+    context.getRoot().getOrCreateEntry(getClass().getSimpleName(), ArrayList::new).add(rePainter);
     return testElement;
   }
 
@@ -142,16 +142,6 @@ public class DashboardVisualizer extends DslVisualizer {
         return false;
       }
     };
-  }
-
-  private List<Visualizer> getRePainters(BuildTreeContext context) {
-    String contextKey = "DASHBOARD_REPAINTERS";
-    List<Visualizer> ret = (List<Visualizer>) context.getEntry(contextKey);
-    if (ret == null) {
-      ret = new ArrayList<>();
-      context.setEntry(contextKey, ret);
-    }
-    return ret;
   }
 
   @Override

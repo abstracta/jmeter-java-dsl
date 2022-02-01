@@ -22,7 +22,7 @@ public class DslBoundaryExtractor extends DslVariableExtractor<DslBoundaryExtrac
   private TargetField fieldToCheck = TargetField.RESPONSE_BODY;
 
   public DslBoundaryExtractor(String varName, String leftBoundary, String rightBoundary) {
-    super(varName, "Boundary Extractor", BoundaryExtractorGui.class);
+    super("Boundary Extractor", BoundaryExtractorGui.class, varName);
     this.leftBoundary = leftBoundary;
     this.rightBoundary = rightBoundary;
   }

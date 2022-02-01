@@ -8,7 +8,6 @@ import org.apache.jmeter.assertions.ResponseAssertion;
 import org.apache.jmeter.assertions.gui.AssertionGui;
 import org.apache.jmeter.testelement.TestElement;
 import us.abstracta.jmeter.javadsl.core.testelements.DslScopedTestElement;
-import us.abstracta.jmeter.javadsl.core.testelements.MultiLevelTestElement;
 
 /**
  * Allows marking a request result as success or failure by a specific result field value.
@@ -16,7 +15,7 @@ import us.abstracta.jmeter.javadsl.core.testelements.MultiLevelTestElement;
  * @since 0.11
  */
 public class DslResponseAssertion extends DslScopedTestElement<DslResponseAssertion> implements
-    MultiLevelTestElement {
+    DslAssertion {
 
   private TargetField fieldToTest = TargetField.RESPONSE_BODY;
   private boolean ignoreStatus;

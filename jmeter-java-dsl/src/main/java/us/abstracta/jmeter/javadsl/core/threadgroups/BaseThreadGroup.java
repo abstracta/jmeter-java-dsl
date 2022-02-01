@@ -1,12 +1,14 @@
 package us.abstracta.jmeter.javadsl.core.threadgroups;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import org.apache.jmeter.gui.JMeterGUIComponent;
 import org.apache.jmeter.testelement.TestElement;
 import org.apache.jmeter.testelement.property.StringProperty;
 import org.apache.jmeter.threads.AbstractThreadGroup;
 import us.abstracta.jmeter.javadsl.core.DslTestElement;
-import us.abstracta.jmeter.javadsl.core.DslTestPlan.TestPlanChild;
 import us.abstracta.jmeter.javadsl.core.testelements.TestElementContainer;
 import us.abstracta.jmeter.javadsl.core.threadgroups.BaseThreadGroup.ThreadGroupChild;
 
@@ -14,11 +16,11 @@ import us.abstracta.jmeter.javadsl.core.threadgroups.BaseThreadGroup.ThreadGroup
  * Contains common logic for all Thread Groups.
  *
  * @param <T> is the type of the thread group. Used for proper contract definition of fluent builder
- * methods.
+ *            methods.
  * @since 0.33
  */
 public abstract class BaseThreadGroup<T extends BaseThreadGroup<?>> extends
-    TestElementContainer<ThreadGroupChild> implements TestPlanChild {
+    TestElementContainer<ThreadGroupChild> implements DslThreadGroup {
 
   private SampleErrorAction sampleErrorAction = SampleErrorAction.CONTINUE;
 
@@ -31,7 +33,8 @@ public abstract class BaseThreadGroup<T extends BaseThreadGroup<?>> extends
    * Specifies what action to be taken when a sample error is detected.
    *
    * @param sampleErrorAction specifies the action to be taken on sample error. By default thread
-   * groups just ignores the error and continue with following sample in children elements.
+   *                          groups just ignores the error and continue with following sample in
+   *                          children elements.
    * @return the altered thread group to allow for fluent API usage.
    * @see SampleErrorAction
    */
@@ -94,10 +97,27 @@ public abstract class BaseThreadGroup<T extends BaseThreadGroup<?>> extends
      */
     STOP_TEST_NOW("stoptestnow");
 
+    private static final Map<String, SampleErrorAction> ACTIONS_BY_PROPERTY_VALUE = Arrays.stream(
+            values())
+        .collect(Collectors.toMap(v -> v.propertyValue, v -> v));
+
     private final String propertyValue;
 
     SampleErrorAction(String propertyValue) {
       this.propertyValue = propertyValue;
+    }
+
+    public static SampleErrorAction fromPropertyValue(String propertyValue) {
+      if (propertyValue.isEmpty()) {
+        return null;
+      }
+      SampleErrorAction ret = ACTIONS_BY_PROPERTY_VALUE.get(propertyValue);
+      if (ret == null) {
+        throw new IllegalArgumentException(
+            "Unknown " + SampleErrorAction.class.getSimpleName() + " property value: "
+                + propertyValue);
+      }
+      return ret;
     }
 
   }

@@ -25,6 +25,7 @@ import static us.abstracta.jmeter.javadsl.JmeterDsl.transaction;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.regex.Pattern;
@@ -32,10 +33,14 @@ import org.apache.http.HttpStatus;
 import org.apache.http.entity.ContentType;
 import org.apache.jmeter.protocol.http.util.HTTPConstants;
 import org.apache.jmeter.threads.JMeterVariables;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import us.abstracta.jmeter.javadsl.JmeterDslTest;
 import us.abstracta.jmeter.javadsl.TestResource;
+import us.abstracta.jmeter.javadsl.codegeneration.MethodCallBuilderTest;
+import us.abstracta.jmeter.javadsl.core.DslTestPlan;
 import us.abstracta.jmeter.javadsl.core.TestPlanStats;
+import us.abstracta.jmeter.javadsl.http.DslHttpSampler.HttpClientImpl;
 
 public class DslHttpSamplerTest extends JmeterDslTest {
 
@@ -423,6 +428,168 @@ public class DslHttpSamplerTest extends JmeterDslTest {
         + "Content-Transfer-Encoding: " + transferEncoding + CRLN
         + CRLN
         + value + CRLN;
+  }
+
+  @SuppressWarnings("unused")
+  @Nested
+  public class CodeBuilderTest extends MethodCallBuilderTest {
+
+    public DslTestPlan testPlanWithSimpleHttpGet() {
+      return testPlan(
+          threadGroup(1, 1,
+              httpSampler("http://localhost")
+          )
+      );
+    }
+
+    public DslTestPlan testPlanWithNamedHttpGet() {
+      return testPlan(
+          threadGroup(1, 1,
+              httpSampler("myRequest", "http://localhost")
+          )
+      );
+    }
+
+    public DslTestPlan testPlanWithSimpleHttpPost() {
+      return testPlan(
+          threadGroup(1, 1,
+              httpSampler("http://localhost")
+                  .post("{\"name\":\"John\"}", ContentType.APPLICATION_JSON)
+          )
+      );
+    }
+
+    public DslTestPlan testPlanWithSimpleHttpPostAndCustomContentType() {
+      return testPlan(
+          threadGroup(1, 1,
+              httpSampler("http://localhost")
+                  .post("{\"name\":\"John\"}", ContentType.create("my-content-type"))
+          )
+      );
+    }
+
+    public DslTestPlan testPlanWithSimpleHttpPut() {
+      return testPlan(
+          threadGroup(1, 1,
+              httpSampler("http://localhost")
+                  .method(HTTPConstants.PUT)
+                  .contentType(ContentType.APPLICATION_JSON)
+                  .body("{\"name\":\"John\"}")
+          )
+      );
+    }
+
+    public DslTestPlan testPlanWithCustomHttpMethod() {
+      return testPlan(
+          threadGroup(1, 1,
+              httpSampler("http://localhost")
+                  .method("${myMethod}")
+          )
+      );
+    }
+
+    public DslTestPlan testPlanWithHttpRequestAndHeaders() {
+      return testPlan(
+          threadGroup(1, 1,
+              httpSampler("http://localhost")
+                  .header("My-Header", "My-Value")
+                  .header("Other-Header", "Other-Value")
+          )
+      );
+    }
+
+    public DslTestPlan testPlanWithHttpGetAndParams() {
+      return testPlan(
+          threadGroup(1, 1,
+              httpSampler("http://localhost")
+                  .param("param%201", "value%201")
+                  .encodedParam("param%202", "value%202")
+          )
+      );
+    }
+
+    public DslTestPlan testPlanWithHttpPostAndParams() {
+      return testPlan(
+          threadGroup(1, 1,
+              httpSampler("http://localhost")
+                  .method(HTTPConstants.POST)
+                  .param("param%201", "value%201")
+                  .encodedParam("param%202", "value%202")
+          )
+      );
+    }
+
+    public DslTestPlan testPlanWithHttpPostAndBodyFile() {
+      return testPlan(
+          threadGroup(1, 1,
+              httpSampler("http://localhost")
+                  .method(HTTPConstants.POST)
+                  .contentType(ContentType.APPLICATION_JSON)
+                  .bodyFile("myFile.xml")
+          )
+      );
+    }
+
+    public DslTestPlan testPlanWithHttpPostAndMultiPart() {
+      return testPlan(
+          threadGroup(1, 1,
+              httpSampler("http://localhost")
+                  .method(HTTPConstants.POST)
+                  .bodyPart("part1", "myPart", ContentType.TEXT_PLAIN)
+                  .bodyPart("part2", "<nothing/>", ContentType.TEXT_XML)
+                  .bodyFilePart("myFile", "myFile.txt", ContentType.TEXT_PLAIN)
+                  .bodyFilePart("otherFile", "otherFile.xml", ContentType.TEXT_XML)
+          )
+      );
+    }
+
+    public DslTestPlan testPlanWithHttpPostAndStandardCharsetEncoding() {
+      return testPlan(
+          threadGroup(1, 1,
+              httpSampler("http://localhost")
+                  .post("{\"name\":\"John\"}", ContentType.APPLICATION_JSON)
+                  .encoding(StandardCharsets.ISO_8859_1)
+          )
+      );
+    }
+
+    public DslTestPlan testPlanWithHttpPostAndCustomEncoding() {
+      return testPlan(
+          threadGroup(1, 1,
+              httpSampler("http://localhost")
+                  .post("{\"name\":\"John\"}", ContentType.APPLICATION_JSON)
+                  .encoding(Charset.forName("UTF-32"))
+          )
+      );
+    }
+
+    public DslTestPlan testPlanWithHttpGetNotFollowingRedirects() {
+      return testPlan(
+          threadGroup(1, 1,
+              httpSampler("http://localhost")
+                  .followRedirects(false)
+          )
+      );
+    }
+
+    public DslTestPlan testPlanWithHttpGetAndEmbeddedResourcesDownload() {
+      return testPlan(
+          threadGroup(1, 1,
+              httpSampler("http://localhost")
+                  .downloadEmbeddedResources()
+          )
+      );
+    }
+
+    public DslTestPlan testPlanWithHttpGetAndJavaClientImpl() {
+      return testPlan(
+          threadGroup(1, 1,
+              httpSampler("http://localhost")
+                  .clientImpl(HttpClientImpl.JAVA)
+          )
+      );
+    }
+
   }
 
 }

@@ -1,15 +1,17 @@
 package us.abstracta.jmeter.javadsl.core;
 
 import java.awt.Component;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 import org.apache.jorphan.collections.HashTree;
 import us.abstracta.jmeter.javadsl.core.listeners.DslVisualizer;
 
 /**
- * Contains information shared by elements while building the test plan tree.
+ * Contains information that can be used by elements to share info
  * <p>
  * Eg: adding additional items to test plan when a particular protocol element is added.
  *
@@ -17,24 +19,43 @@ import us.abstracta.jmeter.javadsl.core.listeners.DslVisualizer;
  */
 public class BuildTreeContext {
 
-  private final HashTree root;
+  private final BuildTreeContext parent;
   private final Map<String, Object> entries = new HashMap<>();
-  private final Map<DslVisualizer, Supplier<Component>> visualizers = new LinkedHashMap<>();
+  private final List<TreeContextEndListener> endListeners = new ArrayList<>();
+  private final Map<DslVisualizer, Supplier<Component>> visualizers;
 
-  public BuildTreeContext(HashTree root) {
-    this.root = root;
+  public BuildTreeContext() {
+    this(null, new LinkedHashMap<>());
   }
 
-  public HashTree getTestPlanTree() {
-    return root.values().iterator().next();
+  private BuildTreeContext(BuildTreeContext parent,
+      Map<DslVisualizer, Supplier<Component>> visualizers) {
+    this.parent = parent;
+    this.visualizers = visualizers;
+  }
+
+  public BuildTreeContext getParent() {
+    return parent;
+  }
+
+  public BuildTreeContext getRoot() {
+    return parent == null ? this : parent.getRoot();
   }
 
   public Object getEntry(String key) {
     return entries.get(key);
   }
 
+  public <T> T getOrCreateEntry(String key, Supplier<T> supplier) {
+    return (T) entries.computeIfAbsent(key, k -> supplier.get());
+  }
+
   public void setEntry(String key, Object value) {
     entries.put(key, value);
+  }
+
+  public void addEndListener(TreeContextEndListener endListener) {
+    endListeners.add(endListener);
   }
 
   public void addVisualizer(DslVisualizer visualizer, Supplier<Component> guiBuilder) {
@@ -43,6 +64,20 @@ public class BuildTreeContext {
 
   public Map<DslVisualizer, Supplier<Component>> getVisualizers() {
     return visualizers;
+  }
+
+  public void buildChild(DslTestElement child, HashTree parentTree) {
+    new BuildTreeContext(this, visualizers).buildTreeFor(child, parentTree);
+  }
+
+  public HashTree buildTreeFor(DslTestElement element, HashTree parentTree) {
+    HashTree ret = element.buildTreeUnder(parentTree, this);
+    endListeners.forEach(l -> l.execute(this, ret));
+    return ret;
+  }
+
+  public interface TreeContextEndListener {
+    void execute(BuildTreeContext context, HashTree tree);
   }
 
 }

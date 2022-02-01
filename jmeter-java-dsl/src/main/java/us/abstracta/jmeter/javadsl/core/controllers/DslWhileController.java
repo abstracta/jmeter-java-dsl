@@ -11,31 +11,31 @@ import us.abstracta.jmeter.javadsl.core.util.PropertyScriptBuilder.PropertyScrip
 
 /**
  * Allows running part of a test plan until a condition is met.
- *
+ * <p>
  * The condition is evaluated in each iteration before and after all children elements are executed.
  * Keep this in mind in case you use conditions with side effects (like incrementing counters).
- *
+ * <p>
  * JMeter automatically creates a variable named {@code __jm__<controllerName>__idx} which contains
  * the index of the iteration starting with zero.
  *
  * @since 0.27
  */
-public class DslWhileController extends DslController {
+public class DslWhileController extends BaseController {
 
   private final DslScriptBuilder conditionBuilder;
 
   public DslWhileController(String name, String condition, List<ThreadGroupChild> children) {
-    super(solveName(name), WhileControllerGui.class, children);
-    this.conditionBuilder = new PropertyScriptBuilder(condition);
+    this(name, new PropertyScriptBuilder(condition), children);
+  }
+
+  private DslWhileController(String name, DslScriptBuilder conditionBuilder,
+      List<ThreadGroupChild> children) {
+    super(name != null ? name : "while", WhileControllerGui.class, children);
+    this.conditionBuilder = conditionBuilder;
   }
 
   public DslWhileController(String name, PropertyScript script, List<ThreadGroupChild> children) {
-    super(solveName(name), WhileControllerGui.class, children);
-    this.conditionBuilder = new PropertyScriptBuilder(script);
-  }
-
-  private static String solveName(String name) {
-    return name != null ? name : "while";
+    this(name, new PropertyScriptBuilder(script), children);
   }
 
   @Override

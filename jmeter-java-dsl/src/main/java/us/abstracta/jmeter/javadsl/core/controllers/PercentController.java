@@ -21,7 +21,7 @@ import us.abstracta.jmeter.javadsl.core.threadgroups.BaseThreadGroup.ThreadGroup
  *
  * @since 0.25
  */
-public class PercentController extends DslController {
+public class PercentController extends BaseController {
 
   private final float percent;
 

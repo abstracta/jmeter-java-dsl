@@ -1,0 +1,130 @@
+@startuml
+!include style.puml
+
+class JmeterDsl {
+  ..
+}
+
+package core {
+
+  interface DslTestElement {
+    HashTree buildTreeUnder(HashTree parent, BuildTreeContext context)
+    void showInGui()
+  }
+
+  class BuildTreeContext {
+    Map<String, Object> entries
+    Map<DslVisualizer, Supplier<Component>> visualizers
+  }
+
+  interface TreeContextEndListener {
+    void execute(BuildTreeContext context, HashTree tree)
+  }
+
+  BuildTreeContext --> "parent" BuildTreeContext
+  BuildTreeContext --> "*" TreeContextEndListener
+
+  class DslTestPlan extends TestElementContainer {
+    TestPlanStats run()
+    TestPlanStats runIn(DslJmeterEngine engine)
+    void saveAsJmx(String filePath)
+    {static} DslTestPlan fromJmx(String filePath)
+  }
+
+  interface TestPlanChild extends DslTestElement
+
+  interface DslJmeterEngine {
+    TestPlanStats run(DslTestPlan testPlan)
+  }
+
+  interface DslThreadGroup extends TestPlanChild
+
+  abstract class BaseThreadGroup extends TestElementContainer implements DslThreadGroup
+
+  class DslDefaultThreadGroup extends BaseThreadGroup {
+    List<Stage> stages
+  }
+
+  class Stage {
+      int threads
+      int iterations
+      Duration duration
+  }
+
+  interface ThreadGroupChild extends DslTestElement
+
+  package testelements {
+
+    abstract class BaseTestElement implements DslTestElement {
+      String name
+      Class guiClass
+      TestElement buildTestElement()
+      BeanInfoSupport getBeanInfo()
+    }
+
+    abstract class TestElementContainer extends BaseTestElement {
+      void addChildren(DslTestElement[] children)
+    }
+
+    class EmbeddedJmeterEngine implements DslJmeterEngine
+
+    interface DslSampler extends ThreadGroupChild
+
+    abstract class BaseSampler extends TestElementContainer implements DslSampler
+
+    interface SamplerChild extends DslTestElement
+
+    interface MultiLevelTestElement extends TestPlanChild, ThreadGroupChild, SamplerChild
+
+    TestElementContainer -up-> "*" DslTestElement
+    BaseSampler ..> SamplerChild
+
+  }
+
+  package listeners {
+
+    interface DslListener extends MultiLevelTestElement
+
+    abstract class BaseListener extends BaseTestElement implements DslListener
+
+    class JtlWriter extends BaseListener {
+      String jtlFilePath
+    }
+
+  }
+
+  package configs {
+
+    interface DslConfig extends MultiLevelTestElement
+
+    abstract class BaseConfigElement extends BaseTestElement implements DslConfig
+
+  }
+
+  DslTestPlan ..> TestPlanChild
+  BaseThreadGroup ..> ThreadGroupChild
+  DslTestPlan ..> EmbeddedJmeterEngine
+  DslDefaultThreadGroup ..> Stage
+  DslTestElement ..> BuildTreeContext
+
+}
+
+package http {
+
+  class DslHttpSampler extends BaseSampler {
+    String url
+    HttpMethod method
+    String body
+  }
+
+  class HttpHeaders extends BaseConfigElement {
+    Map<String, String> headers
+  }
+
+  DslHttpSampler --> HttpHeaders
+
+}
+
+JmeterDsl -[hidden]- core
+@enduml
+@enduml

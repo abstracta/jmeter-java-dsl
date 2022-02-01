@@ -315,8 +315,8 @@ public class BlazeMeterEngine implements DslJmeterEngine {
     JmeterEnvironment env = new JmeterEnvironment();
     try (FileOutputStream output = new FileOutputStream(jmxFile.getPath())) {
       HashTree tree = new ListedHashTree();
-      BuildTreeContext context = new BuildTreeContext(tree);
-      testPlan.buildTreeUnder(tree, context);
+      BuildTreeContext context = new BuildTreeContext();
+      context.buildTreeFor(testPlan, tree);
       env.saveTree(tree, output);
       context.getVisualizers().forEach((v, e) ->
           LOG.warn(

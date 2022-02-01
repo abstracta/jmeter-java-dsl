@@ -16,15 +16,13 @@ import org.apache.jmeter.samplers.SampleEvent;
 import org.apache.jmeter.testelement.TestElement;
 import org.apache.jmeter.util.JMeterUtils;
 import org.apache.jmeter.visualizers.SimpleDataWriter;
-import us.abstracta.jmeter.javadsl.core.testelements.BaseTestElement;
-import us.abstracta.jmeter.javadsl.core.testelements.MultiLevelTestElement;
 
 /**
  * Generates a nice HTML report at the end of test plan execution.
  *
  * @since 0.6
  */
-public class HtmlReporter extends BaseTestElement implements MultiLevelTestElement {
+public class HtmlReporter extends BaseListener {
 
   private final File reportDirectory;
 

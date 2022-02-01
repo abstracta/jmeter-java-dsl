@@ -7,7 +7,7 @@ import java.util.Collections;
 import org.apache.jmeter.control.Controller;
 import org.apache.jmeter.control.gui.AbstractControllerGui;
 import org.apache.jmeter.testelement.TestElement;
-import us.abstracta.jmeter.javadsl.core.controllers.DslController;
+import us.abstracta.jmeter.javadsl.core.controllers.BaseController;
 import us.abstracta.jmeter.javadsl.core.threadgroups.BaseThreadGroup.ThreadGroupChild;
 
 /**
@@ -15,7 +15,7 @@ import us.abstracta.jmeter.javadsl.core.threadgroups.BaseThreadGroup.ThreadGroup
  *
  * @since 0.41
  */
-public class DslControllerWrapper extends DslController implements
+public class DslControllerWrapper extends BaseController implements
     TestElementWrapper<DslControllerWrapper> {
 
   private final TestElementWrapperHelper<Controller> helper;

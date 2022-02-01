@@ -25,7 +25,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import us.abstracta.jmeter.javadsl.JmeterDslTest;
 import us.abstracta.jmeter.javadsl.TestResource;
-import us.abstracta.jmeter.javadsl.core.listeners.FileTemplateAssert;
+import us.abstracta.jmeter.javadsl.core.StringTemplate.StringTemplateAssert;
 
 public class JmeterDslCoreTest extends JmeterDslTest {
 
@@ -106,14 +106,14 @@ public class JmeterDslCoreTest extends JmeterDslTest {
         ),
         jtlWriter("results.jtl")
     ).saveAsJmx(filePath.toString());
-    FileTemplateAssert.assertThat(filePath)
-        .matches(new TestResource(TEST_PLAN_RESOURCE_PATH).getFile().toPath());
+    StringTemplateAssert.assertThat(filePath)
+        .matches(new TestResource(TEST_PLAN_RESOURCE_PATH));
   }
 
   @Test
   public void shouldSendExpectedRequestsWhenLoadPlanFromJmx(@TempDir Path tmpDir)
       throws IOException {
-    File jmxFile = tmpDir.resolve("test-plan.jxm").toFile();
+    File jmxFile = tmpDir.resolve("test-plan.jmx").toFile();
     copyJmxWithDynamicFieldsTo(jmxFile);
     DslTestPlan.fromJmx(jmxFile.getPath()).run();
     verify(postRequestedFor(anyUrl())
@@ -123,12 +123,11 @@ public class JmeterDslCoreTest extends JmeterDslTest {
   }
 
   private void copyJmxWithDynamicFieldsTo(File jmxFile) throws IOException {
-    String portXmlPart = "name=\"HTTPSampler.port\">";
-    String jmxFileContents = getResourceContents(TEST_PLAN_RESOURCE_PATH)
-        .replace(portXmlPart, portXmlPart + URI.create(wiremockUri).getPort())
-        .replace("results.jtl", new File(jmxFile.getParent(), "results.jtl").getPath());
     try (FileWriter fw = new FileWriter(jmxFile)) {
-      fw.write(jmxFileContents);
+      fw.write(new StringTemplate(new TestResource(TEST_PLAN_RESOURCE_PATH).getContents())
+          .bind("port", URI.create(wiremockUri).getPort())
+          .bind("jtlFile", new File(jmxFile.getParent(), "results.jtl").getPath())
+          .solve());
     }
   }
 

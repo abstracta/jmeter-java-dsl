@@ -1,9 +1,10 @@
 package us.abstracta.jmeter.javadsl.http;
 
+import java.lang.reflect.Method;
+import java.util.List;
 import org.apache.jmeter.protocol.http.control.CookieManager;
 import org.apache.jmeter.protocol.http.gui.CookiePanel;
 import org.apache.jmeter.testelement.TestElement;
-import us.abstracta.jmeter.javadsl.core.testelements.TestPlanSingletonChildElement;
 
 /**
  * Allows configuring cookies settings used by HTTP samplers.
@@ -16,7 +17,7 @@ import us.abstracta.jmeter.javadsl.core.testelements.TestPlanSingletonChildEleme
  *
  * @since 0.17
  */
-public class DslCookieManager extends TestPlanSingletonChildElement {
+public class DslCookieManager extends AutoEnabledHttpConfigElement {
 
   public DslCookieManager() {
     super("HTTP Cookie Manager", CookiePanel.class);
@@ -37,6 +38,14 @@ public class DslCookieManager extends TestPlanSingletonChildElement {
     CookieManager ret = new CookieManager();
     ret.setClearEachIteration(true);
     return ret;
+  }
+
+  public static class CodeBuilder extends AutoEnabledHttpConfigElement.CodeBuilder<CookieManager> {
+
+    public CodeBuilder(List<Method> builderMethods) {
+      super(CookieManager.class, builderMethods);
+    }
+
   }
 
 }

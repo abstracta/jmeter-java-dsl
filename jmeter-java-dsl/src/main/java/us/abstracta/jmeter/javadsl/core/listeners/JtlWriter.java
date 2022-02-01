@@ -1,6 +1,7 @@
 package us.abstracta.jmeter.javadsl.core.listeners;
 
 import java.io.File;
+import java.lang.reflect.Method;
 import java.nio.file.FileAlreadyExistsException;
 import java.util.Arrays;
 import java.util.Collections;
@@ -10,28 +11,31 @@ import org.apache.jmeter.samplers.SampleSaveConfiguration;
 import org.apache.jmeter.testelement.TestElement;
 import org.apache.jmeter.util.JMeterUtils;
 import org.apache.jmeter.visualizers.SimpleDataWriter;
-import us.abstracta.jmeter.javadsl.core.testelements.BaseTestElement;
-import us.abstracta.jmeter.javadsl.core.testelements.MultiLevelTestElement;
+import us.abstracta.jmeter.javadsl.codegeneration.MethodCall;
+import us.abstracta.jmeter.javadsl.codegeneration.MethodCallContext;
+import us.abstracta.jmeter.javadsl.codegeneration.MethodParam.BoolParam;
+import us.abstracta.jmeter.javadsl.codegeneration.SingleTestElementCallBuilder;
+import us.abstracta.jmeter.javadsl.codegeneration.TestElementParamBuilder;
 
 /**
  * Allows to generate a result log file (JTL) with data for each sample for a test plan, thread
  * group or sampler, depending on what level of test plan is added.
- *
+ * <p>
  * If jtlWriter is added at testPlan level it will log information about all samples in the test
  * plan, if added at thread group level it will only log samples for samplers contained within it,
  * if added as a sampler child, then only that sampler samples will be logged.
- *
+ * <p>
  * By default, this writer will use JMeter default JTL format, a csv with following fields:
  * timeStamp,elapsed,label,responseCode,responseMessage,threadName,dataType,success,failureMessage,
  * bytes,sentBytes,grpThreads,allThreads,URL,Latency,IdleTime,Connect. You can change the format to
  * XML and specify additional (or remove existing ones) fields to store with provided methods.
- *
+ * <p>
  * See <a href="http://jmeter.apache.org/usermanual/listeners.html">JMeter listeners doc</a> for
  * more details on JTL format and settings.
  *
  * @since 0.1
  */
-public class JtlWriter extends BaseTestElement implements MultiLevelTestElement {
+public class JtlWriter extends BaseListener {
 
   private final String jtlFile;
   private boolean saveAsXml;
@@ -119,15 +123,15 @@ public class JtlWriter extends BaseTestElement implements MultiLevelTestElement 
 
   /**
    * Allows setting if all or none fields are enabled when saving the JTL.
-   *
+   * <p>
    * If you enable them all, then XML format will be used.
-   *
+   * <p>
    * Take into consideration that having a JTL writer with no fields enabled makes no sense. But,
    * you may want to disable all fields to then enable specific ones, and not having to manually
    * disable each of default included fields manually. The same applies when you want most of the
    * fields except for some: in such case you can enable all and then manually disable the ones that
    * you want to exclude.
-   *
+   * <p>
    * Also take into consideration that the more fields you add to JTL writer, the more time JMeter
    * will spend on saving the information, and the more disk the file will consume. So, include
    * fields thoughtfully.
@@ -170,7 +174,7 @@ public class JtlWriter extends BaseTestElement implements MultiLevelTestElement 
 
   /**
    * Allows specifying to use XML or CSV format for saving JTL.
-   *
+   * <p>
    * Take into consideration that some fields (like requestHeaders, responseHeaders, etc.) will only
    * be saved when XML format is used.
    *
@@ -186,7 +190,7 @@ public class JtlWriter extends BaseTestElement implements MultiLevelTestElement 
   /**
    * Allows setting whether or not to include elapsed time (milliseconds spent in each sample) in
    * generated JTL.
-   *
+   * <p>
    * This is usually the most important metric to collect during a performance test, so in general
    * this should be included.
    *
@@ -202,7 +206,7 @@ public class JtlWriter extends BaseTestElement implements MultiLevelTestElement 
   /**
    * Allows setting whether or not to include response message (eg: "OK" for HTTP 200 status code)
    * in generated JTL.
-   *
+   * <p>
    * This property is usually handy to trace potential issues, specially the ones that are not
    * standard issues (like HTTPConnectionExceptions) which are not deducible from response code.
    *
@@ -218,7 +222,7 @@ public class JtlWriter extends BaseTestElement implements MultiLevelTestElement 
   /**
    * Allows setting whether or not to include success (a boolean indicating if request was success
    * or not) field in generated JTL.
-   *
+   * <p>
    * This property is usually handy to easily identify if a request failed or not (either due to
    * default JMeter logic, or due to some assertion check or post processor alteration).
    *
@@ -234,7 +238,7 @@ public class JtlWriter extends BaseTestElement implements MultiLevelTestElement 
   /**
    * Allows setting whether or not to include sent bytes count (number of bytes sent to server by
    * request) field in generated JTL.
-   *
+   * <p>
    * This property is helpful when requests are dynamically generated or when you want to easily
    * evaluate how much data/load has been transferred to the server.
    *
@@ -250,7 +254,7 @@ public class JtlWriter extends BaseTestElement implements MultiLevelTestElement 
   /**
    * Allows setting whether or not to include response file name (name of file stored by {@link
    * ResponseFileSaver}) field in generated JTL.
-   *
+   * <p>
    * This property is helpful when ResponseFileSaver is used to easily trace the request response
    * contents and don't have to include them in JTL file itself.
    *
@@ -311,7 +315,7 @@ public class JtlWriter extends BaseTestElement implements MultiLevelTestElement 
    *
    * <b>Note:</b> this will only be saved if {@link #saveAsXml(boolean)} is also set to
    * true.
-   *
+   * <p>
    * This info is handy when tracing why requests are marked as failure and exact reason.
    *
    * @param enabled specifies whether enable or disable inclusion of assertion results.
@@ -342,7 +346,7 @@ public class JtlWriter extends BaseTestElement implements MultiLevelTestElement 
   /**
    * Allows setting whether or not to include sample label (i.e.: name of the request) field in
    * generated JTL.
-   *
+   * <p>
    * In general, you should enable this field to properly identify results to associated samplers.
    *
    * @param enabled specifies whether enable or disable inclusion of sample labels.
@@ -356,7 +360,7 @@ public class JtlWriter extends BaseTestElement implements MultiLevelTestElement 
 
   /**
    * Allows setting whether or not to include thread name field in generated JTL.
-   *
+   * <p>
    * This is helpful to identify the requests generated by each thread and allow tracing
    * "correlated" requests (requests that are associated to previous requests in same thread).
    *
@@ -371,7 +375,7 @@ public class JtlWriter extends BaseTestElement implements MultiLevelTestElement 
 
   /**
    * Allows setting whether or not to include assertion failure message field in generated JTL.
-   *
+   * <p>
    * This is helpful to trace potential reason of a request being marked as failure.
    *
    * @param enabled specifies whether enable or disable inclusion of assertion failure message.
@@ -386,7 +390,7 @@ public class JtlWriter extends BaseTestElement implements MultiLevelTestElement 
   /**
    * Allows setting whether or not to include active thread counts (basically, number of concurrent
    * requests, both in the sample thread group, and in all thread groups) fields in generated JTL.
-   *
+   * <p>
    * This is helpful to know under how much load (concurrent requests) is the tested service at the
    * moment the request was done.
    *
@@ -402,7 +406,7 @@ public class JtlWriter extends BaseTestElement implements MultiLevelTestElement 
   /**
    * Allows setting whether or not to include latency time (milliseconds between the sample started
    * and first byte of response is received) field in generated JTL.
-   *
+   * <p>
    * This is usually helpful to identify how fast does the tested service takes to answer, taking
    * out the time spent in transferring response data.
    *
@@ -418,7 +422,7 @@ public class JtlWriter extends BaseTestElement implements MultiLevelTestElement 
   /**
    * Allows setting whether or not to include sample counts (total and error counts) fields in
    * generated JTL.
-   *
+   * <p>
    * In general sample count will be 1, and error count will be 0 or 1 depending on sample success
    * or failure. But there are some scenarios where these counts might be greater, for example when
    * controllers results are being included.
@@ -453,7 +457,7 @@ public class JtlWriter extends BaseTestElement implements MultiLevelTestElement 
    *
    * <b>Note:</b> this field will only be saved if {@link #saveAsXml(boolean)} is also set to
    * true.
-   *
+   * <p>
    * This is usually helpful for tracing the response obtained by each sample. Consider using {@link
    * ResponseFileSaver} to get a file for each response body.
    *
@@ -481,7 +485,7 @@ public class JtlWriter extends BaseTestElement implements MultiLevelTestElement 
 
   /**
    * Allows setting whether or not to include response codes (e.g.: 200) field in generated JTL.
-   *
+   * <p>
    * This field allows to quickly identify different reasons for failure in server (eg: bad request,
    * service temporally unavailable, etc.).
    *
@@ -510,7 +514,7 @@ public class JtlWriter extends BaseTestElement implements MultiLevelTestElement 
   /**
    * Allows setting whether or not to include received bytes count (number of bytes sent by server
    * in the response) field in generated JTL.
-   *
+   * <p>
    * This property is helpful to measure how much load is the network getting and how much
    * information is the tested service generating.
    *
@@ -525,7 +529,7 @@ public class JtlWriter extends BaseTestElement implements MultiLevelTestElement 
 
   /**
    * Allows setting whether or not to include url field in generated JTL.
-   *
+   * <p>
    * This property is helpful when URLs are dynamically generated and may vary for the sample
    * sampler
    *
@@ -541,7 +545,7 @@ public class JtlWriter extends BaseTestElement implements MultiLevelTestElement 
   /**
    * Allows setting whether or not to include connect time (milliseconds between the sample started
    * and connection is established to service to start sending request) field in generated JTL.
-   *
+   * <p>
    * This is usually helpful to identify issues in network latency when connecting or server load
    * when serving connection requests.
    *
@@ -557,7 +561,7 @@ public class JtlWriter extends BaseTestElement implements MultiLevelTestElement 
   /**
    * Allows setting whether or not to include host name (name of host that did the sample) field in
    * generated JTL.
-   *
+   * <p>
    * This particularly helpful when running JMeter in a distributed fashion to identify which node
    * the sample result is associated to.
    *
@@ -625,6 +629,74 @@ public class JtlWriter extends BaseTestElement implements MultiLevelTestElement 
   public JtlWriter withVariables(String... variables) {
     this.sampleVariables = Arrays.asList(variables);
     return this;
+  }
+
+  public static class CodeBuilder extends SingleTestElementCallBuilder<ResultCollector> {
+
+    public CodeBuilder(List<Method> builderMethods) {
+      super(ResultCollector.class, builderMethods);
+    }
+
+    @Override
+    protected MethodCall buildMethodCall(ResultCollector collector, MethodCallContext context) {
+      /*
+       this builder applies to any listener with an associated filename (view results tree,
+       simple writer, etc) and not just simple writer, to build the DSL with the least possible
+       features required and avoid include potentially unnecessary feature.
+       */
+      if (collector.getFilename().isEmpty()) {
+        return null;
+      }
+      TestElementParamBuilder paramBuilder = new TestElementParamBuilder(collector);
+      MethodCall ret = buildMethodCall(paramBuilder.stringParam(ResultCollector.FILENAME));
+      SampleSaveConfiguration config = collector.getSaveConfig();
+      if (isAllSet(config)) {
+        return ret.chain("withAllFields", new BoolParam(true, false));
+      }
+      return ret.chain("saveAsXml", new BoolParam(config.saveAsXml(), false))
+          .chain("withElapsedTime", new BoolParam(config.saveTime(), true))
+          .chain("withResponseMessage", new BoolParam(config.saveMessage(), true))
+          .chain("withSuccess", new BoolParam(config.saveSuccess(), true))
+          .chain("withSentByteCount", new BoolParam(config.saveSentBytes(), true))
+          .chain("withResponseFilename", new BoolParam(config.saveFileName(), false))
+          .chain("withEncoding", new BoolParam(config.saveEncoding(), false))
+          .chain("withIdleTime", new BoolParam(config.saveIdleTime(), true))
+          .chain("withResponseHeaders", new BoolParam(config.saveResponseHeaders(), false))
+          .chain("withAssertionResults", new BoolParam(config.saveAssertions(), true))
+          .chain("withFieldNames", new BoolParam(config.saveFieldNames(), true))
+          .chain("withLabel", new BoolParam(config.saveLabel(), true))
+          .chain("withThreadName", new BoolParam(config.saveThreadName(), true))
+          .chain("withAssertionFailureMessage",
+              new BoolParam(config.saveAssertionResultsFailureMessage(), true))
+          .chain("withActiveThreadCounts", new BoolParam(config.saveThreadCounts(), true))
+          .chain("withLatency", new BoolParam(config.saveLatency(), true))
+          .chain("withSampleAndErrorCounts", new BoolParam(config.saveSampleCount(), false))
+          .chain("withRequestHeaders", new BoolParam(config.saveRequestHeaders(), false))
+          .chain("withResponseData", new BoolParam(config.saveResponseData(), false))
+          .chain("withTimeStamp", new BoolParam(config.saveTimestamp(), true))
+          .chain("withResponseCode", new BoolParam(config.saveCode(), true))
+          .chain("withDataType", new BoolParam(config.saveDataType(), true))
+          .chain("withReceivedByteCount", new BoolParam(config.saveBytes(), true))
+          .chain("withUrl", new BoolParam(config.saveUrl(), true))
+          .chain("withConnectTime", new BoolParam(config.saveConnectTime(), true))
+          .chain("withHostname", new BoolParam(config.saveHostname(), false))
+          .chain("withSamplerData", new BoolParam(config.saveSamplerData(), false))
+          .chain("withSubResults", new BoolParam(config.saveSubresults(), true));
+    }
+
+    private boolean isAllSet(SampleSaveConfiguration config) {
+      return config.saveAsXml() && config.saveTime() && config.saveMessage() && config.saveSuccess()
+          && config.saveSentBytes() && config.saveFileName() && config.saveEncoding()
+          && config.saveIdleTime() && config.saveResponseHeaders() && config.saveAssertions()
+          && config.saveFieldNames() && config.saveLabel() && config.saveThreadName()
+          && config.saveAssertionResultsFailureMessage() && config.saveThreadCounts()
+          && config.saveLatency() && config.saveSampleCount() && config.saveRequestHeaders()
+          && config.saveResponseData() && config.saveTimestamp() && config.saveCode()
+          && config.saveDataType() && config.saveBytes() && config.saveUrl()
+          && config.saveConnectTime() && config.saveHostname() && config.saveSamplerData()
+          && config.saveHostname();
+    }
+
   }
 
 }

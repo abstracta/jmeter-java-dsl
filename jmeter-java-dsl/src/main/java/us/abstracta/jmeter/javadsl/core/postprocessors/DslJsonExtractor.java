@@ -18,7 +18,7 @@ public class DslJsonExtractor extends DslVariableExtractor<DslJsonExtractor> {
   private final String jmesPath;
 
   public DslJsonExtractor(String varName, String jmesPath) {
-    super(varName, "JSON JMESPath Extractor", JMESPathExtractorGui.class);
+    super("JSON JMESPath Extractor", JMESPathExtractorGui.class, varName);
     this.jmesPath = jmesPath;
   }
 

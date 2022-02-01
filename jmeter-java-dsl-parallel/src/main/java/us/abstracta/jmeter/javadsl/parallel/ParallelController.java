@@ -6,7 +6,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import org.apache.jmeter.testelement.TestElement;
-import us.abstracta.jmeter.javadsl.core.controllers.DslController;
+import us.abstracta.jmeter.javadsl.core.controllers.BaseController;
 import us.abstracta.jmeter.javadsl.core.threadgroups.BaseThreadGroup.ThreadGroupChild;
 
 /**
@@ -21,7 +21,7 @@ import us.abstracta.jmeter.javadsl.core.threadgroups.BaseThreadGroup.ThreadGroup
  *
  * @since 0.30
  */
-public class ParallelController extends DslController {
+public class ParallelController extends BaseController {
 
   private boolean generateParent = false;
   private Integer maxThreads;

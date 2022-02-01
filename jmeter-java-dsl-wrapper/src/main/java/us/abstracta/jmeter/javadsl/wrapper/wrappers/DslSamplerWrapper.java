@@ -6,14 +6,14 @@ import static us.abstracta.jmeter.javadsl.wrapper.wrappers.TestElementWrapperHel
 import org.apache.jmeter.samplers.Sampler;
 import org.apache.jmeter.samplers.gui.AbstractSamplerGui;
 import org.apache.jmeter.testelement.TestElement;
-import us.abstracta.jmeter.javadsl.core.testelements.DslSampler;
+import us.abstracta.jmeter.javadsl.core.testelements.BaseSampler;
 
 /**
  * Is a {@link TestElementWrapper} for JMeter samplers.
  *
  * @since 0.41
  */
-public class DslSamplerWrapper extends DslSampler<DslSamplerWrapper> implements
+public class DslSamplerWrapper extends BaseSampler<DslSamplerWrapper> implements
     TestElementWrapper<DslSamplerWrapper> {
 
   private final TestElementWrapperHelper<Sampler> helper;

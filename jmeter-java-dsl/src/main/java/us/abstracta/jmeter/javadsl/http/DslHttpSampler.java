@@ -2,34 +2,52 @@ package us.abstracta.jmeter.javadsl.http;
 
 import static us.abstracta.jmeter.javadsl.JmeterDsl.jsr223PreProcessor;
 
+import java.lang.reflect.Method;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 import org.apache.http.entity.ContentType;
 import org.apache.jmeter.config.Arguments;
+import org.apache.jmeter.protocol.http.control.Header;
+import org.apache.jmeter.protocol.http.control.HeaderManager;
 import org.apache.jmeter.protocol.http.control.gui.HttpTestSampleGui;
 import org.apache.jmeter.protocol.http.sampler.HTTPSamplerBase;
 import org.apache.jmeter.protocol.http.sampler.HTTPSamplerProxy;
 import org.apache.jmeter.protocol.http.util.HTTPArgument;
 import org.apache.jmeter.protocol.http.util.HTTPConstants;
+import org.apache.jmeter.protocol.http.util.HTTPConstantsInterface;
 import org.apache.jmeter.protocol.http.util.HTTPFileArg;
 import org.apache.jmeter.testelement.TestElement;
+import org.apache.jmeter.testelement.property.JMeterProperty;
 import org.apache.jorphan.collections.HashTree;
 import org.eclipse.jetty.http.HttpMethod;
 import org.eclipse.jetty.http.MimeTypes;
 import us.abstracta.jmeter.javadsl.JmeterDsl;
+import us.abstracta.jmeter.javadsl.codegeneration.MethodCall;
+import us.abstracta.jmeter.javadsl.codegeneration.MethodCallContext;
+import us.abstracta.jmeter.javadsl.codegeneration.MethodParam;
+import us.abstracta.jmeter.javadsl.codegeneration.MethodParam.BoolParam;
+import us.abstracta.jmeter.javadsl.codegeneration.MethodParam.IntParam;
+import us.abstracta.jmeter.javadsl.codegeneration.MethodParam.StringParam;
+import us.abstracta.jmeter.javadsl.codegeneration.SingleTestElementCallBuilder;
+import us.abstracta.jmeter.javadsl.codegeneration.TestElementParamBuilder;
 import us.abstracta.jmeter.javadsl.core.BuildTreeContext;
 import us.abstracta.jmeter.javadsl.core.preprocessors.DslJsr223PreProcessor.PreProcessorScript;
 import us.abstracta.jmeter.javadsl.core.preprocessors.DslJsr223PreProcessor.PreProcessorVars;
-import us.abstracta.jmeter.javadsl.core.testelements.DslSampler;
+import us.abstracta.jmeter.javadsl.core.testelements.BaseSampler;
 
 /**
  * Allows to configure a JMeter HTTP sampler to make HTTP requests in a test plan.
  *
  * @since 0.1
  */
-public class DslHttpSampler extends DslSampler<DslHttpSampler> {
+public class DslHttpSampler extends BaseSampler<DslHttpSampler> {
 
   private String protocol;
   private String host;
@@ -47,7 +65,7 @@ public class DslHttpSampler extends DslSampler<DslHttpSampler> {
   private HttpClientImpl clientImpl;
 
   public DslHttpSampler(String name, String url) {
-    super(buildName(name), HttpTestSampleGui.class);
+    this(name);
     if (url == null) {
       return;
     }
@@ -58,17 +76,17 @@ public class DslHttpSampler extends DslSampler<DslHttpSampler> {
     path = parsedUrl.path();
   }
 
+  private DslHttpSampler(String name) {
+    super(name != null ? name : "HTTP Request", HttpTestSampleGui.class);
+  }
+
   public DslHttpSampler(String name, Function<PreProcessorVars, String> urlSupplier) {
-    super(buildName(name), HttpTestSampleGui.class);
+    this(name);
     String variableName = "PRE_PROCESSOR_URL";
     this.path = "${" + variableName + "}";
     children(
         jsr223PreProcessor(s -> s.vars.put(variableName, urlSupplier.apply(s))
         ));
-  }
-
-  private static String buildName(String name) {
-    return name != null ? name : "HTTP Request";
   }
 
   /**
@@ -336,6 +354,20 @@ public class DslHttpSampler extends DslSampler<DslHttpSampler> {
   }
 
   /**
+   * Specifies a file to be sent as body of the request.
+   * <p>
+   * This method is useful to send binary data in request (eg: uploading an image to a server).
+   *
+   * @param filePath is path to the file to be sent as request body.
+   * @return the altered sampler to allow for fluent API usage.
+   * @since 0.44
+   */
+  public DslHttpSampler bodyFile(String filePath) {
+    files.add(new HTTPFileArg(filePath, "", ""));
+    return this;
+  }
+
+  /**
    * Allows specifying a query parameter or url encoded form body parameter.
    * <p>
    * JMeter will automatically URL encode provided parameters names and values. Use {@link
@@ -367,7 +399,9 @@ public class DslHttpSampler extends DslSampler<DslHttpSampler> {
    * @since 0.42
    */
   public DslHttpSampler encodedParam(String name, String value) {
-    arguments.add(new HTTPArgument(name, value, true));
+    HTTPArgument arg = new HTTPArgument(name, value);
+    arg.setAlwaysEncoded(false);
+    arguments.add(arg);
     return this;
   }
 
@@ -384,8 +418,10 @@ public class DslHttpSampler extends DslSampler<DslHttpSampler> {
    * @since 0.42
    */
   public DslHttpSampler bodyPart(String name, String value, ContentType contentType) {
-    arguments.add(new HTTPArgument(name, value, contentType.toString()));
     multiPart = true;
+    HTTPArgument arg = new HTTPArgument(name, value);
+    arg.setContentType(contentType.toString());
+    arguments.add(arg);
     return this;
   }
 
@@ -528,10 +564,10 @@ public class DslHttpSampler extends DslSampler<DslHttpSampler> {
   public HashTree buildTreeUnder(HashTree parent, BuildTreeContext context) {
     HashTree ret = super.buildTreeUnder(parent, context);
     if (!headers.isEmpty()) {
-      headers.buildTreeUnder(ret, context);
+      context.buildChild(headers, ret);
     }
-    new DslCookieManager().buildTreeUnder(null, context);
-    new DslCacheManager().buildTreeUnder(null, context);
+    new DslCookieManager().registerDependency(context);
+    new DslCacheManager().registerDependency(context);
     return ret;
   }
 
@@ -549,10 +585,241 @@ public class DslHttpSampler extends DslSampler<DslHttpSampler> {
      */
     HTTP_CLIENT("HttpClient4");
 
+    private static final Map<String, HttpClientImpl> IMPLS_BY_PROPERTY_VALUE = Arrays.stream(
+        values()).collect(Collectors.toMap(v -> v.propertyValue, v -> v));
+
     public final String propertyValue;
 
     HttpClientImpl(String propertyValue) {
       this.propertyValue = propertyValue;
+    }
+
+    public static HttpClientImpl fromPropertyValue(String propertyValue) {
+      if (propertyValue.isEmpty()) {
+        return null;
+      }
+      HttpClientImpl ret = IMPLS_BY_PROPERTY_VALUE.get(propertyValue);
+      if (ret == null) {
+        throw new IllegalArgumentException(
+            "Unknown " + HttpClientImpl.class.getSimpleName() + " property value: "
+                + propertyValue);
+      }
+      return ret;
+    }
+
+  }
+
+  public static class CodeBuilder extends SingleTestElementCallBuilder<HTTPSamplerProxy> {
+
+    public CodeBuilder(List<Method> builderMethods) {
+      super(HTTPSamplerProxy.class, builderMethods);
+    }
+
+    @Override
+    protected MethodCall buildMethodCall(HTTPSamplerProxy testElement,
+        MethodCallContext buildContext) {
+      TestElementParamBuilder paramBuilder = new TestElementParamBuilder(testElement);
+      StringParam name = paramBuilder.nameParam("HTTP Request");
+      StringParam protocol = paramBuilder.stringParam(HTTPSamplerBase.PROTOCOL);
+      StringParam domain = paramBuilder.stringParam(HTTPSamplerBase.DOMAIN);
+      IntParam port = paramBuilder.intParam(HTTPSamplerBase.PORT);
+      StringParam path = paramBuilder.stringParam(HTTPSamplerBase.PATH, "/");
+      StringParam url = buildUrlParam(protocol, domain, port, path);
+      MethodCall ret = buildMethodCall(name, url);
+      buildContext.findBuilder(DslCacheManager.CodeBuilder.class)
+          .registerDependency(buildContext, ret);
+      buildContext.findBuilder(DslCookieManager.CodeBuilder.class)
+          .registerDependency(buildContext, ret);
+      if (url == path) {
+        ret.chain("protocol", protocol)
+            .chain("host", domain)
+            .chain("port", port);
+      }
+      buildRequestCall(ret, testElement, buildContext);
+      return ret.chain("encoding", new EncodingParam(paramBuilder))
+          .chain("followRedirects", buildFollowRedirectsParam(paramBuilder))
+          .chain("downloadEmbeddedResources",
+              paramBuilder.boolParam(HTTPSamplerBase.IMAGE_PARSER, false))
+          .chain("clientImpl", new ClientImplParam(paramBuilder));
+    }
+
+    private StringParam buildUrlParam(StringParam protocol, StringParam domain, IntParam port,
+        StringParam path) {
+      if (!domain.isDefault()) {
+        return new StringParam(
+            (protocol.isDefault() ? "http" : protocol.getValue()) + "://"
+                + domain.getValue()
+                + (port.isDefault() ? "" : ":" + port.getValue())
+                + (path.isDefault() ? "" : path.getValue()));
+      } else {
+        return path;
+      }
+    }
+
+    private void buildRequestCall(MethodCall ret, HTTPSamplerProxy testElem,
+        MethodCallContext buildContext) {
+      TestElementParamBuilder paramBuilder = new TestElementParamBuilder(testElem);
+      HttpMethodParam method = new HttpMethodParam(paramBuilder);
+      MethodCallContext headers = buildContext.removeChild(HeaderManager.class);
+      String contentType = removeContentTypeHeader(headers);
+      Arguments args = testElem.getArguments();
+      if (!method.isDefault() && HTTPConstants.POST.equals(method.getValue().toUpperCase(Locale.US))
+          && !testElem.getUseMultipart() && contentType != null && isRawBody(args)) {
+        ret.chain("post", buildRawBody(args), new ContentTypeParam(contentType));
+        chainHeaders(ret, headers);
+        return;
+      }
+      ret.chain("method", method);
+      if (contentType != null) {
+        chainContentType(ret, contentType);
+      }
+      chainHeaders(ret, headers);
+      if (isRawBody(args)) {
+        ret.chain("body", buildRawBody(args));
+      } else if (testElem.getSendFileAsPostBody()) {
+        HTTPFileArg file = testElem.getHTTPFiles()[0];
+        if (file.getMimeType() != null && !file.getMimeType().isEmpty()) {
+          chainContentType(ret, file.getMimeType());
+        }
+        ret.chain("bodyFile", new StringParam(file.getPath()));
+      } else if (testElem.getUseMultipart()) {
+        for (JMeterProperty prop : args) {
+          HTTPArgument arg = (HTTPArgument) prop.getObjectValue();
+          ret.chain("bodyPart", new StringParam(arg.getName()), new StringParam(arg.getValue()),
+              new ContentTypeParam(arg.getContentType()));
+        }
+        for (HTTPFileArg file : testElem.getHTTPFiles()) {
+          ret.chain("bodyFilePart", new StringParam(file.getParamName()),
+              new StringParam(file.getPath()), new ContentTypeParam(file.getMimeType()));
+        }
+      } else {
+        for (JMeterProperty prop : args) {
+          HTTPArgument arg = (HTTPArgument) prop.getObjectValue();
+          if (arg.isAlwaysEncoded()) {
+            ret.chain("param", new StringParam(arg.getName()), new StringParam(arg.getValue()));
+          } else {
+            ret.chain("encodedParam", new StringParam(arg.getName()),
+                new StringParam(arg.getValue()));
+          }
+        }
+      }
+    }
+
+    private String removeContentTypeHeader(MethodCallContext context) {
+      if (context == null) {
+        return null;
+      }
+      String headerName = HTTPConstants.HEADER_CONTENT_TYPE;
+      HeaderManager headers = (HeaderManager) context.getTestElement();
+      Header header = headers.getFirstHeaderNamed(headerName);
+      headers.removeHeaderNamed(headerName);
+      return header == null ? null : header.getValue();
+    }
+
+    private boolean isRawBody(Arguments args) {
+      return args.getArgumentCount() == 1 && args.getArgument(0).getName().isEmpty();
+    }
+
+    private StringParam buildRawBody(Arguments args) {
+      return new StringParam(args.getArgument(0).getValue());
+    }
+
+    private void chainContentType(MethodCall ret, String contentType) {
+      ret.chain("contentType", new ContentTypeParam(contentType));
+    }
+
+    private void chainHeaders(MethodCall ret, MethodCallContext headers) {
+      if (headers != null) {
+        ret.reChain(headers.buildMethodCall());
+      }
+    }
+
+    private BoolParam buildFollowRedirectsParam(
+        TestElementParamBuilder paramBuilder) {
+      BoolParam follow = paramBuilder.boolParam(HTTPSamplerBase.FOLLOW_REDIRECTS, true);
+      if (!follow.isDefault()) {
+        return follow;
+      } else {
+        BoolParam auto = paramBuilder.boolParam(HTTPSamplerBase.AUTO_REDIRECTS, false);
+        return Boolean.TRUE.equals(auto.getValue()) ? new BoolParam(auto.getValue(), true) : follow;
+      }
+    }
+
+    private static class EncodingParam extends MethodParam<Charset> {
+
+      private static final Map<Charset, String> STANDARD_CHARSETS_NAMES =
+          findConstantNames(StandardCharsets.class, Charset.class, s -> true);
+
+      protected EncodingParam(TestElementParamBuilder paramBuilder) {
+        super(Charset.class, buildCharset(paramBuilder), null);
+      }
+
+      private static Charset buildCharset(TestElementParamBuilder paramBuilder) {
+        StringParam charset = paramBuilder.stringParam(HTTPSamplerBase.CONTENT_ENCODING, "");
+        return charset.isDefault() ? null : Charset.forName(charset.getValue());
+      }
+
+      @Override
+      public String buildCode() {
+        String standardCharsetName = STANDARD_CHARSETS_NAMES.get(value);
+        return standardCharsetName != null
+            ? StandardCharsets.class.getSimpleName() + "." + standardCharsetName
+            : MethodCall.forStaticMethod(Charset.class, "forName",
+                new StringParam(getValue().name())).buildCode();
+      }
+
+    }
+
+    private static class HttpMethodParam extends StringParam {
+
+      private static final Map<String, String> CONSTANT_METHODS = findConstantNames(
+          HTTPConstantsInterface.class, String.class,
+          f -> {
+            try {
+              String value = (String) f.get(null);
+              return !HTTPConstants.HTTP_1_1.equals(value) && value.equals(
+                  value.toUpperCase(Locale.US));
+            } catch (IllegalAccessException e) {
+              /*
+               this should never happen since the predicate is only applied to public static fields
+               */
+              throw new RuntimeException(e);
+            }
+          });
+
+      private HttpMethodParam(TestElementParamBuilder paramBuilder) {
+        super(paramBuilder.prop(HTTPSamplerBase.METHOD).getStringValue(), HTTPConstants.GET);
+      }
+
+      @Override
+      public boolean isDefault() {
+        return value == null || value.isEmpty() || defaultValue != null && defaultValue.equals(
+            value.toUpperCase(Locale.US));
+      }
+
+      @Override
+      public String buildCode() {
+        String constant = CONSTANT_METHODS.get(value != null ? value.toUpperCase(Locale.US) : null);
+        return constant != null ? HTTPConstants.class.getSimpleName() + "." + constant
+            : super.buildCode();
+      }
+
+    }
+
+    private static class ClientImplParam extends MethodParam<HttpClientImpl> {
+
+      protected ClientImplParam(TestElementParamBuilder paramBuilder) {
+        super(HttpClientImpl.class,
+            HttpClientImpl.fromPropertyValue(
+                paramBuilder.prop(HTTPSamplerBase.IMPLEMENTATION).getStringValue()),
+            HttpClientImpl.HTTP_CLIENT);
+      }
+
+      @Override
+      public String buildCode() {
+        return HttpClientImpl.class.getSimpleName() + "." + value.name();
+      }
+
     }
 
   }

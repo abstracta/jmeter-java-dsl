@@ -3,8 +3,6 @@ package us.abstracta.jmeter.javadsl.core.listeners;
 import org.apache.jmeter.reporters.ResultSaver;
 import org.apache.jmeter.reporters.gui.ResultSaverGui;
 import org.apache.jmeter.testelement.TestElement;
-import us.abstracta.jmeter.javadsl.core.testelements.BaseTestElement;
-import us.abstracta.jmeter.javadsl.core.testelements.MultiLevelTestElement;
 
 /**
  * Generates one file for each response of a sample/request.
@@ -20,7 +18,7 @@ import us.abstracta.jmeter.javadsl.core.testelements.MultiLevelTestElement;
  *
  * @since 0.13
  */
-public class ResponseFileSaver extends BaseTestElement implements MultiLevelTestElement {
+public class ResponseFileSaver extends BaseListener {
 
   private final String fileNamePrefix;
 

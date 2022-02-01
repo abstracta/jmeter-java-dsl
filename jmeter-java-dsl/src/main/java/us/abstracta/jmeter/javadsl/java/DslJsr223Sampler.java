@@ -14,9 +14,9 @@ import org.apache.jmeter.util.JSR223TestElement;
 import org.apache.jorphan.collections.HashTree;
 import org.slf4j.Logger;
 import us.abstracta.jmeter.javadsl.core.BuildTreeContext;
+import us.abstracta.jmeter.javadsl.core.testelements.BaseSampler.SamplerChild;
 import us.abstracta.jmeter.javadsl.core.testelements.DslJsr223TestElement;
-import us.abstracta.jmeter.javadsl.core.testelements.DslSampler.SamplerChild;
-import us.abstracta.jmeter.javadsl.core.threadgroups.BaseThreadGroup.ThreadGroupChild;
+import us.abstracta.jmeter.javadsl.core.testelements.DslSampler;
 
 /**
  * Allows sampling java APIs and custom logic.
@@ -30,7 +30,7 @@ import us.abstracta.jmeter.javadsl.core.threadgroups.BaseThreadGroup.ThreadGroup
  *
  * @since 0.22
  */
-public class DslJsr223Sampler extends DslJsr223TestElement implements ThreadGroupChild {
+public class DslJsr223Sampler extends DslJsr223TestElement implements DslSampler {
 
   private static final String DEFAULT_NAME = "JSR223 Sampler";
 
@@ -65,7 +65,7 @@ public class DslJsr223Sampler extends DslJsr223TestElement implements ThreadGrou
   @Override
   public HashTree buildTreeUnder(HashTree parent, BuildTreeContext context) {
     HashTree ret = super.buildTreeUnder(parent, context);
-    children.forEach(c -> c.buildTreeUnder(ret, context));
+    children.forEach(c -> context.buildChild(c, ret));
     return ret;
   }
 

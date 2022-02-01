@@ -1,0 +1,82 @@
+@startuml
+!include style.puml
+
+package codegeneration {
+
+  class DslCodeGenerator {
+    String generateCodeFromJmx(File file)
+  }
+
+  abstract class MethodCallBuilder {
+    abstract MethodCall buildMethodCall(MethodCallContext context)
+  }
+
+  class MethodCallContext {
+    Map<Object, Object> entries
+  }
+
+  interface MethodCallContextEndListener {
+    execute(MethodCallContext context, MethodCall call)
+  }
+
+  class MethodCall {
+    String methodName
+  }
+
+  abstract class MethodParam {
+    String name
+    Object value
+    Object defaultValue
+  }
+
+  class StringParam extends MethodParam
+
+  class NameParam extends StringParam
+
+  abstract class LiteralParam extends MethodParam
+
+  class IntParam extends LiteralParam
+
+  class LongParam extends LiteralParam
+
+  class BoolParam extends LiteralParam
+
+  class DurationParam extends MethodParam
+
+  abstract class SingleTestElementCallBuilder extends MethodCallBuilder {
+    abstract MethodCall buildMethodCall(TestElement testElement, MethodCallContext context)
+  }
+
+  class TestElementParamBuilder {
+    nameParam(String defaultName)
+    intParam(String propName, int defaultValue)
+    longParam(String propName, long defaultValue)
+    boolParam(String propName, boolean defaultValue)
+    durationParam(String propName, Duration defaultValue)
+  }
+
+  DslCodeGenerator --> MethodCallBuilder
+  DslCodeGenerator ..> MethodCallContext
+
+  MethodCall --> "chain *" MethodParam
+  MethodCall --> "children *" MethodCall
+
+  MethodCallContext --> "parent 0..1" MethodCallContext
+  MethodCallContext --> "*" MethodCallContextEndListener
+  MethodCallContext --> DslCodeGenerator
+  MethodCallContext ..> MethodCall
+
+}
+
+package org.apache.jmeter {
+
+  interface TestElement
+  class HashTree
+
+}
+
+MethodCallContext --> TestElement
+MethodCallContext --> HashTree
+TestElementParamBuilder --> TestElement
+
+@enduml

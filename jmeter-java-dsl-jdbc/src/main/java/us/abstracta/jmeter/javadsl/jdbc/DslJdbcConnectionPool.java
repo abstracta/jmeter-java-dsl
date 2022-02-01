@@ -9,14 +9,14 @@ import java.util.Optional;
 import org.apache.jmeter.protocol.jdbc.config.DataSourceElement;
 import org.apache.jmeter.testbeans.gui.TestBeanGUI;
 import org.apache.jmeter.testelement.TestElement;
-import us.abstracta.jmeter.javadsl.core.configs.DslConfigElement;
+import us.abstracta.jmeter.javadsl.core.configs.BaseConfigElement;
 
 /**
  * Defines a JDBC connection pool used by other elements to interact with a database.
  *
  * @since 0.38
  */
-public class DslJdbcConnectionPool extends DslConfigElement {
+public class DslJdbcConnectionPool extends BaseConfigElement {
 
   private static final Map<Integer, String> TRANSACTION_ISOLATION_TO_PROPERTY_VALUE =
       buildTransactionIsolationToPropertyValueMapping();

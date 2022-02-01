@@ -6,8 +6,11 @@ import static us.abstracta.jmeter.javadsl.JmeterDsl.testPlan;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.threadGroup;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.transaction;
 
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import us.abstracta.jmeter.javadsl.JmeterDslTest;
+import us.abstracta.jmeter.javadsl.codegeneration.MethodCallBuilderTest;
+import us.abstracta.jmeter.javadsl.core.DslTestPlan;
 import us.abstracta.jmeter.javadsl.core.TestPlanStats;
 
 public class DslTransactionControllerTest extends JmeterDslTest {
@@ -38,6 +41,37 @@ public class DslTransactionControllerTest extends JmeterDslTest {
         )
     ).run();
     assertThat(stats.overall().samplesCount()).isEqualTo(1);
+  }
+
+  @SuppressWarnings("unused")
+  @Nested
+  public class CodeBuilderTest extends MethodCallBuilderTest {
+
+    public DslTestPlan testPlanWithSimpleTransaction() {
+      return testPlan(
+          threadGroup(1, 1,
+              transaction("test",
+                  httpSampler("http://localhost"),
+                  httpSampler("http://mysite.com")
+              )
+          )
+      );
+    }
+
+    public DslTestPlan testPlanWithTransactionAndNonDefaultFlags() {
+      return testPlan(
+          threadGroup(1, 1,
+              transaction("test")
+                  .generateParentSample(true)
+                  .includeTimersAndProcessorsTime(true)
+                  .children(
+                      httpSampler("http://localhost"),
+                      httpSampler("http://mysite.com")
+                  )
+          )
+      );
+    }
+
   }
 
 }

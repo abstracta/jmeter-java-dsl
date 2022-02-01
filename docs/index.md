@@ -9,7 +9,7 @@ features:
 - title: 💪 JMeter ecosystem & community
   details: Use the most popular performance tool and take advantage of wide support of protocols and tools.
 - title: 😎 Built-in features & extensibility
-  details: Built-in additional features which ease usage and using it in CI/CD pipelines. 
+  details: Built-in additional features which ease usage (like <a href="guide/#dsl-code-generation-from-jmx-file">jmx2dsl</a>)  and CI/CD pipelines integration. 
 ---
 
 ## Example

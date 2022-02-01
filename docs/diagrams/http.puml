@@ -1,0 +1,45 @@
+@startuml
+!include style.puml
+
+package http {
+
+  class DslHttpSampler {
+    String url
+    HttpMethod method
+    String body
+  }
+
+  class HttpHeaders {
+    Map<String, String> headers
+  }
+
+  abstract class AutoEnabledHttpConfigElement {
+    boolean enabled
+  }
+
+  class DslCacheManager extends AutoEnabledHttpConfigElement
+
+  class DslCookieManager extends AutoEnabledHttpConfigElement
+
+  class DslHttpDefaults
+
+  DslHttpSampler --> HttpHeaders
+
+}
+
+package core {
+  abstract class BaseConfigElement
+  abstract class BaseSampler
+}
+
+package codegeneration {
+}
+
+DslHttpSampler --|> BaseSampler
+HttpHeaders --|> BaseConfigElement
+AutoEnabledHttpConfigElement --|> BaseConfigElement
+DslHttpDefaults --|> BaseConfigElement
+http ..> core
+http ..> codegeneration
+
+@enduml

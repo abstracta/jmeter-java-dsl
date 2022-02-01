@@ -31,9 +31,9 @@ import us.abstracta.jmeter.javadsl.core.preprocessors.DslJsr223PreProcessor;
 import us.abstracta.jmeter.javadsl.core.preprocessors.DslJsr223PreProcessor.PreProcessorScript;
 import us.abstracta.jmeter.javadsl.core.preprocessors.DslJsr223PreProcessor.PreProcessorVars;
 import us.abstracta.jmeter.javadsl.core.threadgroups.BaseThreadGroup.ThreadGroupChild;
+import us.abstracta.jmeter.javadsl.core.threadgroups.DslDefaultThreadGroup;
 import us.abstracta.jmeter.javadsl.core.threadgroups.DslSetupThreadGroup;
 import us.abstracta.jmeter.javadsl.core.threadgroups.DslTeardownThreadGroup;
-import us.abstracta.jmeter.javadsl.core.threadgroups.DslThreadGroup;
 import us.abstracta.jmeter.javadsl.core.threadgroups.RpsThreadGroup;
 import us.abstracta.jmeter.javadsl.core.timers.DslUniformRandomTimer;
 import us.abstracta.jmeter.javadsl.core.util.PropertyScriptBuilder.PropertyScript;
@@ -86,9 +86,9 @@ public class JmeterDsl {
    *                   children elements until it stops.
    * @param children   contains the test elements that each thread will execute in each iteration.
    * @return the thread group instance.
-   * @see DslThreadGroup
+   * @see DslDefaultThreadGroup
    */
-  public static DslThreadGroup threadGroup(int threads, int iterations,
+  public static DslDefaultThreadGroup threadGroup(int threads, int iterations,
       ThreadGroupChild... children) {
     return threadGroup(null, threads, iterations, children);
   }
@@ -101,9 +101,9 @@ public class JmeterDsl {
    *
    * @see #threadGroup(int, int, ThreadGroupChild...)
    */
-  public static DslThreadGroup threadGroup(String name, int threads, int iterations,
+  public static DslDefaultThreadGroup threadGroup(String name, int threads, int iterations,
       ThreadGroupChild... children) {
-    return new DslThreadGroup(name, threads, iterations, Arrays.asList(children));
+    return new DslDefaultThreadGroup(name, threads, iterations, Arrays.asList(children));
   }
 
   /**
@@ -119,7 +119,7 @@ public class JmeterDsl {
    * @see ThreadGroup
    * @since 0.5
    */
-  public static DslThreadGroup threadGroup(int threads, Duration duration,
+  public static DslDefaultThreadGroup threadGroup(int threads, Duration duration,
       ThreadGroupChild... children) {
     return threadGroup(null, threads, duration, children);
   }
@@ -133,18 +133,19 @@ public class JmeterDsl {
    * @see #threadGroup(int, Duration, ThreadGroupChild...)
    * @since 0.5
    */
-  public static DslThreadGroup threadGroup(String name, int threads, Duration duration,
+  public static DslDefaultThreadGroup threadGroup(String name, int threads, Duration duration,
       ThreadGroupChild... children) {
-    return new DslThreadGroup(name, threads, duration, Arrays.asList(children));
+    return new DslDefaultThreadGroup(name, threads, duration, Arrays.asList(children));
   }
 
   /**
    * Builds a new thread group without any thread configuration.
    * <p>
    * This method should be used as starting point for creating complex test thread profiles (like
-   * spike, or incremental tests) in combination with {@link DslThreadGroup#holdFor(Duration)},
-   * {@link DslThreadGroup#rampTo(int, Duration)} and {@link DslThreadGroup#rampToAndHold(int,
-   * Duration, Duration)}.
+   * spike, or incremental tests) in combination with
+   * {@link DslDefaultThreadGroup#holdFor(Duration)},
+   * {@link DslDefaultThreadGroup#rampTo(int, Duration)} and
+   * {@link DslDefaultThreadGroup#rampToAndHold(int, Duration, Duration)}.
    * <p>
    * Eg:
    * <pre>{@code
@@ -163,8 +164,8 @@ public class JmeterDsl {
    * @return the thread group instance.
    * @since 0.18
    */
-  public static DslThreadGroup threadGroup() {
-    return new DslThreadGroup(null);
+  public static DslDefaultThreadGroup threadGroup() {
+    return new DslDefaultThreadGroup(null);
   }
 
   /**
@@ -175,8 +176,8 @@ public class JmeterDsl {
    * @see #threadGroup()
    * @since 0.18
    */
-  public static DslThreadGroup threadGroup(String name) {
-    return new DslThreadGroup(name);
+  public static DslDefaultThreadGroup threadGroup(String name) {
+    return new DslDefaultThreadGroup(name);
   }
 
   /**

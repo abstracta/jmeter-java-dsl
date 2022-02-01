@@ -14,10 +14,14 @@ import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import org.apache.http.entity.ContentType;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import us.abstracta.jmeter.javadsl.JmeterDslTest;
 import us.abstracta.jmeter.javadsl.TestResource;
+import us.abstracta.jmeter.javadsl.codegeneration.MethodCallBuilderTest;
+import us.abstracta.jmeter.javadsl.core.DslTestPlan;
+import us.abstracta.jmeter.javadsl.core.StringTemplate.StringTemplateAssert;
 
 public class JtlWriterTest extends JmeterDslTest {
 
@@ -107,8 +111,8 @@ public class JtlWriterTest extends JmeterDslTest {
 
   private void assertFileMatchesTemplate(Path resultsFilePath, String templateName)
       throws IOException {
-    FileTemplateAssert.assertThat(resultsFilePath)
-        .matches(new TestResource(templateName).getFile().toPath());
+    StringTemplateAssert.assertThat(resultsFilePath)
+        .matches(new TestResource(templateName));
   }
 
   @Test
@@ -143,6 +147,68 @@ public class JtlWriterTest extends JmeterDslTest {
         )
     ).run();
     assertFileMatchesTemplate(resultsFilePath, "/jtl-with-custom-variable.template.csv");
+  }
+
+  @SuppressWarnings("unused")
+  @Nested
+  public class CodeBuilderTest extends MethodCallBuilderTest {
+
+    public DslTestPlan simpleTestPlanWithJtlWriterAndDefaultSaves() {
+      return testPlan(
+          threadGroup(1, 1,
+              httpSampler("http://localhost")
+          ),
+          jtlWriter("results.jtl")
+      );
+    }
+
+    public DslTestPlan simpleTestPlanWithJtlWriterSavingAllFields() {
+      return testPlan(
+          threadGroup(1, 1,
+              httpSampler("http://localhost")
+          ),
+          jtlWriter("results.jtl")
+              .withAllFields(true)
+      );
+    }
+
+    public DslTestPlan simpleTestPlanWithJtlWriterAndSavingNonDefaultFields() {
+      return testPlan(
+          threadGroup(1, 1,
+              httpSampler("http://localhost")
+          ),
+          jtlWriter("results.jtl")
+              .saveAsXml(true)
+              .withElapsedTime(false)
+              .withResponseMessage(false)
+              .withSuccess(false)
+              .withSentByteCount(false)
+              .withResponseFilename(true)
+              .withEncoding(true)
+              .withIdleTime(false)
+              .withResponseHeaders(true)
+              .withAssertionResults(false)
+              .withFieldNames(false)
+              .withLabel(false)
+              .withThreadName(false)
+              .withAssertionFailureMessage(false)
+              .withActiveThreadCounts(false)
+              .withLatency(false)
+              .withSampleAndErrorCounts(true)
+              .withRequestHeaders(true)
+              .withResponseData(true)
+              .withTimeStamp(false)
+              .withResponseCode(false)
+              .withDataType(false)
+              .withReceivedByteCount(false)
+              .withUrl(false)
+              .withConnectTime(false)
+              .withHostname(true)
+              .withSamplerData(true)
+              .withSubResults(false)
+      );
+    }
+
   }
 
 }

@@ -10,7 +10,6 @@ import org.apache.jmeter.threads.JMeterVariables;
 import org.apache.jmeter.util.JSR223TestElement;
 import org.slf4j.Logger;
 import us.abstracta.jmeter.javadsl.core.testelements.DslJsr223TestElement;
-import us.abstracta.jmeter.javadsl.core.testelements.MultiLevelTestElement;
 
 /**
  * Allows running custom logic before executing a sampler.
@@ -25,7 +24,7 @@ import us.abstracta.jmeter.javadsl.core.testelements.MultiLevelTestElement;
  *
  * @since 0.7
  */
-public class DslJsr223PreProcessor extends DslJsr223TestElement implements MultiLevelTestElement {
+public class DslJsr223PreProcessor extends DslJsr223TestElement implements DslPreProcessor {
 
   private static final String DEFAULT_NAME = "JSR223 PreProcessor";
 

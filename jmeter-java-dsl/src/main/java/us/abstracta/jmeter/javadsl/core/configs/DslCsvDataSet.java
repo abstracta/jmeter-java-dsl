@@ -26,7 +26,7 @@ import org.apache.jmeter.testelement.TestElement;
  *
  * @since 0.24
  */
-public class DslCsvDataSet extends DslConfigElement {
+public class DslCsvDataSet extends BaseConfigElement {
 
   private final String file;
   private String delimiter = ",";

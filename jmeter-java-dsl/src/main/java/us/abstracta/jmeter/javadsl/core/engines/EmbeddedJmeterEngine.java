@@ -68,18 +68,19 @@ public class EmbeddedJmeterEngine implements DslJmeterEngine {
   protected TestPlanStats runInEnv(DslTestPlan testPlan, JmeterEnvironment env) {
     JMeterUtils.getJMeterProperties().putAll(props);
     HashTree rootTree = new ListedHashTree();
-    BuildTreeContext buildContext = new BuildTreeContext(rootTree);
-    HashTree testPlanTree = testPlan.buildTreeUnder(rootTree, buildContext);
+    BuildTreeContext buildContext = new BuildTreeContext();
+    HashTree testPlanTree = buildContext.buildTreeFor(testPlan, rootTree);
 
     TestPlanStats stats = new TestPlanStats(EmbeddedStatsSummary::new);
     addStatsCollector(testPlanTree, stats);
     testPlanTree.add(new ResultCollector(new Summariser()));
 
     List<Future<Void>> closedVisualizers = Collections.emptyList();
-    if (!buildContext.getVisualizers().isEmpty()) {
+    Map<DslVisualizer, Supplier<Component>> visualizers = buildContext.getVisualizers();
+    if (!visualizers.isEmpty()) {
       // this is required for proper visualization of labels and messages from resources bundle
       env.initLocale();
-      closedVisualizers = showVisualizers(buildContext.getVisualizers());
+      closedVisualizers = showVisualizers(visualizers);
     }
     Runnable testRunner = buildTestRunner(testPlanTree, rootTree);
     /*

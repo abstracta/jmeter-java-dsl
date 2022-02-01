@@ -4,7 +4,6 @@ import org.apache.jmeter.testelement.TestElement;
 import org.apache.jmeter.timers.UniformRandomTimer;
 import org.apache.jmeter.timers.gui.UniformRandomTimerGui;
 import us.abstracta.jmeter.javadsl.core.testelements.BaseTestElement;
-import us.abstracta.jmeter.javadsl.core.testelements.MultiLevelTestElement;
 
 /**
  * Allows specifying JMeter Uniform Random Timers which pause the thread with a random time with
@@ -20,7 +19,7 @@ import us.abstracta.jmeter.javadsl.core.testelements.MultiLevelTestElement;
  *
  * @since 0.16
  */
-public class DslUniformRandomTimer extends BaseTestElement implements MultiLevelTestElement {
+public class DslUniformRandomTimer extends BaseTestElement implements DslTimer {
 
   private final long minimumMillis;
   private final long maximumMillis;

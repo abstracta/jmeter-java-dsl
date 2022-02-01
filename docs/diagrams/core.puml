@@ -1,8 +1,5 @@
 @startuml
-
-skinparam monochrome true
-hide empty members
-hide circle
+!include style.puml
 
 class JmeterDsl {
   ..
@@ -16,10 +13,16 @@ package core {
   }
 
   class BuildTreeContext {
-    HashTree root
     Map<String, Object> entries
     Map<DslVisualizer, Supplier<Component>> visualizers
   }
+
+  interface TreeContextEndListener {
+    void execute(BuildTreeContext context, HashTree tree)
+  }
+
+  BuildTreeContext --> "parent" BuildTreeContext
+  BuildTreeContext --> "*" TreeContextEndListener
 
   class DslTestPlan {
     TestPlanStats run()
@@ -46,11 +49,9 @@ package core {
       void addChildren(DslTestElement[] children)
     }
 
-    abstract class TestPlanSingletonChildElement extends BaseTestElement implements TestPlanChild {
-      boolean enabled
-    }
+    interface DslSampler
 
-    abstract class DslSampler extends TestElementContainer
+    abstract class BaseSampler extends TestElementContainer implements DslSampler
 
     interface SamplerChild extends DslTestElement
 
@@ -81,7 +82,9 @@ package core {
 
   package threadgroups {
 
-    abstract class BaseThreadGroup extends TestElementContainer implements TestPlanChild {
+    interface DslThreadGroup extends TestPlanChild
+
+    abstract class BaseThreadGroup extends TestElementContainer implements DslThreadGroup {
       SampleErrorAction sampleErrorAction
     }
 
@@ -95,7 +98,7 @@ package core {
       STOP_TEST_NOW
     }
 
-    class DslThreadGroup extends BaseThreadGroup {
+    class DslDefaultThreadGroup extends BaseThreadGroup {
       List<Stage> stages
     }
 
@@ -156,9 +159,11 @@ package core {
 
   package configs {
 
-    abstract class DslConfigElement extends BaseTestElement implements MultiLevelTestElement
+    interface DslConfig extends MultiLevelTestElement
 
-    class DslCsvDataSet extends DslConfigElement {
+    abstract class BaseConfigElement extends BaseTestElement implements DslConfig
+
+    class DslCsvDataSet extends BaseConfigElement {
       String file
       String delimiter
       String encoding
@@ -180,21 +185,23 @@ package core {
 
   package controllers {
 
-    abstract class DslController extends TestElementContainer implements ThreadGroupChild
+    interface DslController extends ThreadGroupChild
 
-    class DslTransactionController extends DslController
+    abstract class BaseController extends TestElementContainer implements DslController
 
-    class PercentController extends DslController {
+    class DslTransactionController extends BaseController
+
+    class PercentController extends BaseController {
       float percent
     }
 
-    class DslIfController extends DslController
+    class DslIfController extends BaseController
 
-    class DslForEachController extends DslController
+    class DslForEachController extends BaseController
 
-    class DslWhileController extends DslController
+    class DslWhileController extends BaseController
 
-    class ForLoopController extends DslController {
+    class ForLoopController extends BaseController {
       int count
     }
 
@@ -202,7 +209,9 @@ package core {
 
   package preprocessors {
 
-    class DslJsr223PreProcessor extends DslJsr223TestElement implements MultiLevelTestElement
+    interface DslPreProcessor extends MultiLevelTestElement
+
+    class DslJsr223PreProcessor extends DslJsr223TestElement implements DslPreProcessor
 
     interface PreProcessorScript extends Jsr223Script
 
@@ -212,13 +221,15 @@ package core {
 
   package postprocessors {
 
-    class DslJsr223PostProcessor extends DslJsr223TestElement implements MultiLevelTestElement
+    interface DslPostProcessor extends MultiLevelTestElement
+
+    class DslJsr223PostProcessor extends DslJsr223TestElement implements DslPostProcessor
 
     interface PostProcessorScript extends Jsr223Script
 
     class PostProcessorVars extends Jsr223ScriptVars
 
-    abstract class DslVariableExtractor extends DslScopedTestElement implements MultiLevelTestElement {
+    abstract class DslVariableExtractor extends DslScopedTestElement implements DslPostProcessor {
       String varName
       int matchNumber
       String defaultValue
@@ -258,7 +269,9 @@ package core {
 
   package assertions {
 
-    class DslResponseAssertion extends DslScopedTestElement {
+    interface DslAssertion extends MultiLevelTestElement
+
+    class DslResponseAssertion extends DslScopedTestElement implements DslAssertion {
       AssertionTargetField fieldToTest
       boolean ignoreStatus
       String[] testStrings
@@ -292,7 +305,9 @@ package core {
 
   package timers {
 
-    class DslUniformRandomTimer extends BaseTestElement implements MultiLevelTestElement {
+    interface DslTimer extends MultiLevelTestElement
+
+    class DslUniformRandomTimer extends BaseTestElement implements DslTimer {
       long minimumMillis
       long maximumMillis
     }
@@ -301,19 +316,23 @@ package core {
 
   package listeners {
 
-    class JtlWriter extends BaseTestElement implements MultiLevelTestElement {
+    interface DslListener extends MultiLevelTestElement
+
+    abstract class BaseListener extends BaseTestElement implements DslListener
+
+    class JtlWriter extends BaseListener {
       String jtlFilePath
     }
 
-    class ResponseFileSaver extends BaseTestElement implements MultiLevelTestElement {
+    class ResponseFileSaver extends BaseListener {
       String fileNamePrefix
     }
 
-    class HtmlReporter extends BaseTestElement implements MultiLevelTestElement {
+    class HtmlReporter extends BaseListener {
       File reportDirectory
     }
 
-    abstract class DslBackendListener extends BaseTestElement implements MultiLevelTestElement {
+    abstract class DslBackendListener extends BaseListener {
       String url
       Class listenerClass
       int queueSize
@@ -325,11 +344,11 @@ package core {
       String title
     }
 
+    abstract class DslVisualizer extends BaseListener
+
     class DslViewResultsTree extends DslVisualizer {
       int resultsLimit
     }
-
-    abstract class DslVisualizer extends BaseTestElement implements MultiLevelTestElement
 
   }
 
@@ -385,37 +404,24 @@ package core {
 
 }
 
+package org.apache.jmeter {
+  class HashTree
+  interface TestElement
+}
+
 package http {
-
-  class DslHttpSampler extends DslSampler {
-    String url
-    HttpMethod method
-    String body
-  }
-
-  class HttpHeaders extends BaseTestElement implements MultiLevelTestElement {
-    Map<String, String> headers
-  }
-
-  class DslCacheManager extends TestPlanSingletonChildElement
-
-  class DslCookieManager extends TestPlanSingletonChildElement
-
-  class DslHttpDefaults extends DslConfigElement {
-  }
-
-  DslHttpSampler --> HttpHeaders
-
 }
 
 package java {
-
-  class DslJsr223Sampler extends DslJsr223TestElement implements ThreadGroupChild
-
-  DslJsr223Sampler ..> SamplerChild
-
 }
 
-JmeterDsl -[hidden]- core
+package codegeneration {
+}
+
+JmeterDsl ..> core
+JmeterDsl ..> http
+JmeterDsl ..> java
+core ..> codegeneration
+core ..> org.apache.jmeter
 
 @enduml

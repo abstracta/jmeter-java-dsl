@@ -5,7 +5,7 @@ import org.apache.jmeter.config.ConfigTestElement;
 import org.apache.jmeter.protocol.http.config.gui.HttpDefaultsGui;
 import org.apache.jmeter.protocol.http.sampler.HTTPSamplerBase;
 import org.apache.jmeter.testelement.TestElement;
-import us.abstracta.jmeter.javadsl.core.configs.DslConfigElement;
+import us.abstracta.jmeter.javadsl.core.configs.BaseConfigElement;
 import us.abstracta.jmeter.javadsl.http.DslHttpSampler.HttpClientImpl;
 
 /**
@@ -18,7 +18,7 @@ import us.abstracta.jmeter.javadsl.http.DslHttpSampler.HttpClientImpl;
  * @see DslHttpSampler
  * @since 0.39
  */
-public class DslHttpDefaults extends DslConfigElement {
+public class DslHttpDefaults extends BaseConfigElement {
 
   private String url;
   private Charset encoding;

@@ -1,9 +1,10 @@
 package us.abstracta.jmeter.javadsl.http;
 
+import java.lang.reflect.Method;
+import java.util.List;
 import org.apache.jmeter.protocol.http.control.CacheManager;
 import org.apache.jmeter.protocol.http.gui.CacheManagerGui;
 import org.apache.jmeter.testelement.TestElement;
-import us.abstracta.jmeter.javadsl.core.testelements.TestPlanSingletonChildElement;
 
 /**
  * Allows configuring caching behavior used by HTTP samplers.
@@ -16,7 +17,7 @@ import us.abstracta.jmeter.javadsl.core.testelements.TestPlanSingletonChildEleme
  *
  * @since 0.17
  */
-public class DslCacheManager extends TestPlanSingletonChildElement {
+public class DslCacheManager extends AutoEnabledHttpConfigElement {
 
   public DslCacheManager() {
     super("HTTP Cache Manager", CacheManagerGui.class);
@@ -38,6 +39,14 @@ public class DslCacheManager extends TestPlanSingletonChildElement {
     ret.setUseExpires(true);
     ret.setClearEachIteration(true);
     return ret;
+  }
+
+  public static class CodeBuilder extends AutoEnabledHttpConfigElement.CodeBuilder<CacheManager> {
+
+    public CodeBuilder(List<Method> builderMethods) {
+      super(CacheManager.class, builderMethods);
+    }
+
   }
 
 }

@@ -22,7 +22,7 @@ public class DslRegexExtractor extends DslVariableExtractor<DslRegexExtractor> {
   private TargetField fieldToCheck = TargetField.RESPONSE_BODY;
 
   public DslRegexExtractor(String varName, String regex) {
-    super(varName, "Regular Expression Extractor", RegexExtractorGui.class);
+    super("Regular Expression Extractor", RegexExtractorGui.class, varName);
     this.regex = regex;
   }
 

@@ -1,6 +1,8 @@
 package us.abstracta.jmeter.javadsl.http;
 
-import java.util.HashMap;
+import java.lang.reflect.Method;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import org.apache.http.entity.ContentType;
 import org.apache.jmeter.protocol.http.control.Header;
@@ -8,10 +10,15 @@ import org.apache.jmeter.protocol.http.control.HeaderManager;
 import org.apache.jmeter.protocol.http.gui.HeaderPanel;
 import org.apache.jmeter.protocol.http.util.HTTPConstants;
 import org.apache.jmeter.testelement.TestElement;
+import org.apache.jmeter.testelement.property.CollectionProperty;
+import org.apache.jmeter.testelement.property.JMeterProperty;
 import org.eclipse.jetty.http.HttpHeader;
 import org.eclipse.jetty.http.MimeTypes;
-import us.abstracta.jmeter.javadsl.core.testelements.BaseTestElement;
-import us.abstracta.jmeter.javadsl.core.testelements.MultiLevelTestElement;
+import us.abstracta.jmeter.javadsl.codegeneration.MethodCall;
+import us.abstracta.jmeter.javadsl.codegeneration.MethodCallContext;
+import us.abstracta.jmeter.javadsl.codegeneration.MethodParam.StringParam;
+import us.abstracta.jmeter.javadsl.codegeneration.SingleTestElementCallBuilder;
+import us.abstracta.jmeter.javadsl.core.configs.BaseConfigElement;
 
 /**
  * Allows specifying HTTP headers (through an underlying JMeter HttpHeaderManager) to be used by
@@ -27,9 +34,9 @@ import us.abstracta.jmeter.javadsl.core.testelements.MultiLevelTestElement;
  *
  * @since 0.1
  */
-public class HttpHeaders extends BaseTestElement implements MultiLevelTestElement {
+public class HttpHeaders extends BaseConfigElement {
 
-  private final Map<String, String> headers = new HashMap<>();
+  private final Map<String, String> headers = new LinkedHashMap<>();
 
   public HttpHeaders() {
     super("HTTP Header Manager", HeaderPanel.class);
@@ -41,7 +48,7 @@ public class HttpHeaders extends BaseTestElement implements MultiLevelTestElemen
    * To specify multiple headers just invoke this method several times with the different header
    * names and values.
    *
-   * @param name of the HTTP header.
+   * @param name  of the HTTP header.
    * @param value of the HTTP header.
    * @return the altered HttpHeaders to allow for fluent API usage.
    */
@@ -84,6 +91,30 @@ public class HttpHeaders extends BaseTestElement implements MultiLevelTestElemen
     HeaderManager ret = new HeaderManager();
     headers.forEach((name, value) -> ret.add(new Header(name, value)));
     return ret;
+  }
+
+  public static class CodeBuilder extends SingleTestElementCallBuilder<HeaderManager> {
+
+    public CodeBuilder(List<Method> builderMethods) {
+      super(HeaderManager.class, builderMethods);
+    }
+
+    @Override
+    protected MethodCall buildMethodCall(HeaderManager testElement, MethodCallContext context) {
+      MethodCall ret = buildMethodCall();
+      for (JMeterProperty prop : (CollectionProperty) testElement.getProperty(
+          HeaderManager.HEADERS)) {
+        Header header = (Header) prop.getObjectValue();
+        if (HTTPConstants.HEADER_CONTENT_TYPE.equals(header.getName())) {
+          ret.chain("contentType", new ContentTypeParam(header.getValue()));
+        } else {
+          ret.chain("header", new StringParam(header.getName()),
+              new StringParam(header.getValue()));
+        }
+      }
+      return ret;
+    }
+
   }
 
 }

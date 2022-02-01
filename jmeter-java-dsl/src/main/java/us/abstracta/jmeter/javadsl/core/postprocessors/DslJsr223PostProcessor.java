@@ -10,7 +10,6 @@ import org.apache.jmeter.threads.JMeterVariables;
 import org.apache.jmeter.util.JSR223TestElement;
 import org.slf4j.Logger;
 import us.abstracta.jmeter.javadsl.core.testelements.DslJsr223TestElement;
-import us.abstracta.jmeter.javadsl.core.testelements.MultiLevelTestElement;
 
 /**
  * Allows running custom logic after getting a sample result.
@@ -24,7 +23,7 @@ import us.abstracta.jmeter.javadsl.core.testelements.MultiLevelTestElement;
  *
  * @since 0.6
  */
-public class DslJsr223PostProcessor extends DslJsr223TestElement implements MultiLevelTestElement {
+public class DslJsr223PostProcessor extends DslJsr223TestElement implements DslPostProcessor {
 
   private static final String DEFAULT_NAME = "JSR223 PostProcessor";
 

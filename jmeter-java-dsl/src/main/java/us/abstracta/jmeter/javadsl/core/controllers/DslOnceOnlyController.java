@@ -14,7 +14,7 @@ import us.abstracta.jmeter.javadsl.core.threadgroups.BaseThreadGroup;
  *
  * @since 0.34
  */
-public class DslOnceOnlyController extends DslController {
+public class DslOnceOnlyController extends BaseController {
 
   public DslOnceOnlyController(List<BaseThreadGroup.ThreadGroupChild> children) {
     super("Once Only Controller", OnceOnlyControllerGui.class, children);

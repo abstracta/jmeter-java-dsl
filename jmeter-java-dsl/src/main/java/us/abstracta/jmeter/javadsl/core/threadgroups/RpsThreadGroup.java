@@ -241,7 +241,7 @@ public class RpsThreadGroup extends BaseThreadGroup<RpsThreadGroup> {
     HashTree ret = parent.add(buildConfiguredTestElement());
     HashTree timerParent = counting == EventType.ITERATIONS ? ret.add(buildTestAction()) : ret;
     timerParent.add(buildTimer());
-    children.forEach(c -> c.buildTreeUnder(ret, context));
+    children.forEach(c -> context.buildChild(c, ret));
     return ret;
   }
 

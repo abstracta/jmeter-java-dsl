@@ -7,15 +7,13 @@ import org.apache.jorphan.collections.HashTree;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import us.abstracta.jmeter.javadsl.core.BuildTreeContext;
-import us.abstracta.jmeter.javadsl.core.testelements.BaseTestElement;
-import us.abstracta.jmeter.javadsl.core.testelements.MultiLevelTestElement;
 
 /**
  * Provides general logic for listeners which show some live information in Swing window.
  *
  * @since 0.23
  */
-public abstract class DslVisualizer extends BaseTestElement implements MultiLevelTestElement {
+public abstract class DslVisualizer extends BaseListener {
 
   private static final Logger LOG = LoggerFactory.getLogger(DslVisualizer.class);
 

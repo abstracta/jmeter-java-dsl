@@ -6,8 +6,11 @@ import static us.abstracta.jmeter.javadsl.JmeterDsl.resultsTreeVisualizer;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.testPlan;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.threadGroup;
 
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
+import us.abstracta.jmeter.javadsl.codegeneration.MethodCallBuilderTest;
+import us.abstracta.jmeter.javadsl.core.DslTestPlan;
 
 public class DslViewResultsTreeTest extends DslVisualizerTest {
 
@@ -23,6 +26,21 @@ public class DslViewResultsTreeTest extends DslVisualizerTest {
         ),
         frame -> frame.tree().target().getRowCount() > 0,
         frame -> assertThat(frame.tree().valueAt(0)).isEqualTo("HTTP Request"), testInfo);
+  }
+
+  @SuppressWarnings("unused")
+  @Nested
+  public class CodeBuilderTest extends MethodCallBuilderTest {
+
+    public DslTestPlan testPlanWithResultsTreeVisualizer() {
+      return testPlan(
+          threadGroup(1, 1,
+              httpSampler("http://localhost")
+          ),
+          resultsTreeVisualizer()
+      );
+    }
+
   }
 
 }

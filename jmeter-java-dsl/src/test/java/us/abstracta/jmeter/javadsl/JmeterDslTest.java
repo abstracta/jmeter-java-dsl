@@ -1,18 +1,11 @@
 package us.abstracta.jmeter.javadsl;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.any;
 import static com.github.tomakehurst.wiremock.client.WireMock.anyUrl;
 
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.junit5.WireMockRuntimeInfo;
 import com.github.tomakehurst.wiremock.junit5.WireMockTest;
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
@@ -43,19 +36,6 @@ public abstract class JmeterDslTest {
     expectedStats.put(SAMPLE_1_LABEL, (long) TEST_ITERATIONS);
     expectedStats.put(SAMPLE_2_LABEL, (long) TEST_ITERATIONS);
     return expectedStats;
-  }
-
-  protected String getFileContents(Path filePath) throws IOException {
-    return String.join("\n", Files.readAllLines(filePath, StandardCharsets.UTF_8));
-  }
-
-  protected String getResourceContents(String resourcePath) throws IOException {
-    try {
-      return new String(Files.readAllBytes(Paths.get(getClass().getResource(resourcePath).toURI())),
-          StandardCharsets.UTF_8);
-    } catch (URISyntaxException e) {
-      throw new RuntimeException(e);
-    }
   }
 
   protected Map<String, Long> extractCounts(TestPlanStats stats) {

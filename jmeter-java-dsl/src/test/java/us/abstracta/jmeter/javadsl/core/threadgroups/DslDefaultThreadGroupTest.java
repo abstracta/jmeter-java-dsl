@@ -20,11 +20,14 @@ import org.apache.jmeter.testelement.TestElement;
 import org.apache.jmeter.testelement.property.JMeterProperty;
 import org.apache.jmeter.threads.ThreadGroup;
 import org.assertj.core.api.AbstractAssert;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import us.abstracta.jmeter.javadsl.codegeneration.MethodCallBuilderTest;
+import us.abstracta.jmeter.javadsl.core.DslTestPlan;
 import us.abstracta.jmeter.javadsl.core.TestPlanStats;
 import us.abstracta.jmeter.javadsl.core.threadgroups.BaseThreadGroup.SampleErrorAction;
 
-public class DslThreadGroupTest {
+public class DslDefaultThreadGroupTest {
 
   private static final int DURATION1_SECONDS = 10;
   private static final int DURATION2_SECONDS = 15;
@@ -34,7 +37,7 @@ public class DslThreadGroupTest {
 
   @Test
   public void shouldBuildSimpleThreadGroupWhenBuildTestElementWithThreadsAndIterations() {
-    assertThat(new DslThreadGroup(null, THREAD_COUNT, ITERATIONS,
+    assertThat(new DslDefaultThreadGroup(null, THREAD_COUNT, ITERATIONS,
         Collections.emptyList()).buildThreadGroup())
         .isEqualTo(buildSimpleThreadGroup(THREAD_COUNT, ITERATIONS, 0, 0, 0));
   }
@@ -92,7 +95,7 @@ public class DslThreadGroupTest {
 
   @Test
   public void shouldBuildSimpleThreadGroupWhenBuildTestElementWithHoldRampAndIterations() {
-    assertThatThreadGroup(new DslThreadGroup(null)
+    assertThatThreadGroup(new DslDefaultThreadGroup(null)
         .holdFor(Duration.ofSeconds(DURATION1_SECONDS))
         .rampTo(THREAD_COUNT, Duration.ofSeconds(DURATION2_SECONDS))
         .holdIterating(ITERATIONS)
@@ -103,7 +106,7 @@ public class DslThreadGroupTest {
 
   @Test
   public void shouldBuildSimpleThreadGroupWhenBuildTestElementWithRampAndIterations() {
-    assertThatThreadGroup(new DslThreadGroup(null)
+    assertThatThreadGroup(new DslDefaultThreadGroup(null)
         .rampTo(THREAD_COUNT, Duration.ofSeconds(DURATION1_SECONDS))
         .holdIterating(ITERATIONS)
         .buildThreadGroup())
@@ -112,7 +115,7 @@ public class DslThreadGroupTest {
 
   @Test
   public void shouldBuildSimpleThreadGroupWhenBuildTestElementWithHoldAndRampWithZeroDurationAndIterations() {
-    assertThatThreadGroup(new DslThreadGroup(null)
+    assertThatThreadGroup(new DslDefaultThreadGroup(null)
         .holdFor(Duration.ofSeconds(DURATION1_SECONDS))
         .rampTo(THREAD_COUNT, Duration.ZERO)
         .holdIterating(ITERATIONS)
@@ -122,7 +125,7 @@ public class DslThreadGroupTest {
 
   @Test
   public void shouldBuildSimpleThreadGroupWhenBuildTestElementWithRampWithZeroDurationAndIterations() {
-    assertThatThreadGroup(new DslThreadGroup(null)
+    assertThatThreadGroup(new DslDefaultThreadGroup(null)
         .rampTo(THREAD_COUNT, Duration.ZERO)
         .holdIterating(ITERATIONS)
         .buildThreadGroup())
@@ -131,7 +134,7 @@ public class DslThreadGroupTest {
 
   @Test
   public void shouldBuildSimpleThreadGroupWhenBuildTestElementWithHoldAndRamp() {
-    assertThatThreadGroup(new DslThreadGroup(null)
+    assertThatThreadGroup(new DslDefaultThreadGroup(null)
         .holdFor(Duration.ofSeconds(DURATION1_SECONDS))
         .rampTo(THREAD_COUNT, Duration.ofSeconds(DURATION2_SECONDS))
         .buildThreadGroup())
@@ -142,7 +145,7 @@ public class DslThreadGroupTest {
 
   @Test
   public void shouldBuildSimpleThreadGroupWhenBuildTestElementWithRamp() {
-    assertThatThreadGroup(new DslThreadGroup(null)
+    assertThatThreadGroup(new DslDefaultThreadGroup(null)
         .rampTo(THREAD_COUNT, Duration.ofSeconds(DURATION1_SECONDS))
         .buildThreadGroup())
         .isEqualTo(
@@ -152,14 +155,14 @@ public class DslThreadGroupTest {
   @Test
   public void shouldBuildSimpleThreadGroupWhenBuildTestElementWithThreadsAndDuration() {
     assertThatThreadGroup(
-        new DslThreadGroup(null, THREAD_COUNT, Duration.ofSeconds(DURATION1_SECONDS),
+        new DslDefaultThreadGroup(null, THREAD_COUNT, Duration.ofSeconds(DURATION1_SECONDS),
             Collections.emptyList()).buildThreadGroup())
         .isEqualTo(buildSimpleThreadGroup(THREAD_COUNT, 0, DURATION1_SECONDS, 0, 0));
   }
 
   @Test
   public void shouldBuildSimpleThreadGroupWhenHoldAndRampAndHoldDuration() {
-    assertThatThreadGroup(new DslThreadGroup(null)
+    assertThatThreadGroup(new DslDefaultThreadGroup(null)
         .holdFor(Duration.ofSeconds(DURATION1_SECONDS))
         .rampTo(THREAD_COUNT, Duration.ofSeconds(DURATION2_SECONDS))
         .holdFor(Duration.ofSeconds(DURATION3_SECONDS))
@@ -170,7 +173,7 @@ public class DslThreadGroupTest {
 
   @Test
   public void shouldBuildSimpleThreadGroupWhenRampAndHoldDuration() {
-    assertThatThreadGroup(new DslThreadGroup(null)
+    assertThatThreadGroup(new DslDefaultThreadGroup(null)
         .rampTo(THREAD_COUNT, Duration.ofSeconds(DURATION1_SECONDS))
         .holdFor(Duration.ofSeconds(DURATION2_SECONDS))
         .buildThreadGroup())
@@ -181,7 +184,7 @@ public class DslThreadGroupTest {
 
   @Test
   public void shouldBuildSimpleThreadGroupWhenRamp() {
-    assertThatThreadGroup(new DslThreadGroup(null)
+    assertThatThreadGroup(new DslDefaultThreadGroup(null)
         .rampTo(THREAD_COUNT, Duration.ofSeconds(DURATION1_SECONDS))
         .buildThreadGroup())
         .isEqualTo(
@@ -190,14 +193,14 @@ public class DslThreadGroupTest {
 
   @Test
   public void shouldBuildSimpleThreadGroupWhenNoStages() {
-    assertThatThreadGroup(new DslThreadGroup(null)
+    assertThatThreadGroup(new DslDefaultThreadGroup(null)
         .buildThreadGroup())
         .isEqualTo(buildSimpleThreadGroup(1, 1, 0, 0, 0));
   }
 
   @Test
   public void shouldThrowIllegalStateExceptionWhenIterationAfterIteration() {
-    assertThrows(IllegalStateException.class, () -> new DslThreadGroup(null)
+    assertThrows(IllegalStateException.class, () -> new DslDefaultThreadGroup(null)
         .rampTo(THREAD_COUNT, Duration.ZERO)
         .holdIterating(ITERATIONS)
         .holdIterating(ITERATIONS));
@@ -205,7 +208,7 @@ public class DslThreadGroupTest {
 
   @Test
   public void shouldThrowIllegalStateExceptionWhenIterationInNonSimpleThreadGroup() {
-    assertThrows(IllegalStateException.class, () -> new DslThreadGroup(null)
+    assertThrows(IllegalStateException.class, () -> new DslDefaultThreadGroup(null)
         .rampTo(THREAD_COUNT, Duration.ZERO)
         .rampTo(0, Duration.ZERO)
         .holdIterating(ITERATIONS));
@@ -213,7 +216,7 @@ public class DslThreadGroupTest {
 
   @Test
   public void shouldThrowIllegalStateExceptionWhenRampAfterIteration() {
-    assertThrows(IllegalStateException.class, () -> new DslThreadGroup(null)
+    assertThrows(IllegalStateException.class, () -> new DslDefaultThreadGroup(null)
         .rampTo(THREAD_COUNT, Duration.ZERO)
         .holdIterating(ITERATIONS)
         .rampTo(0, Duration.ZERO));
@@ -221,13 +224,13 @@ public class DslThreadGroupTest {
 
   @Test
   public void shouldThrowIllegalArgumentExceptionWhenRampWithNegativeThreads() {
-    assertThrows(IllegalArgumentException.class, () -> new DslThreadGroup(null)
+    assertThrows(IllegalArgumentException.class, () -> new DslDefaultThreadGroup(null)
         .rampTo(-1, Duration.ZERO));
   }
 
   @Test
   public void shouldBuildUltimateThreadGroupWhenRampUpAndDown() {
-    assertThatThreadGroup(new DslThreadGroup(null)
+    assertThatThreadGroup(new DslDefaultThreadGroup(null)
         .rampTo(THREAD_COUNT, Duration.ofSeconds(DURATION1_SECONDS))
         .rampTo(0, Duration.ofSeconds(DURATION2_SECONDS))
         .buildThreadGroup())
@@ -255,7 +258,7 @@ public class DslThreadGroupTest {
   @Test
   public void shouldBuildUltimateThreadGroupWhenComplexProfile() {
     Duration d = Duration.ofSeconds(10);
-    DslThreadGroup threadGroup = new DslThreadGroup(null)
+    DslDefaultThreadGroup threadGroup = new DslDefaultThreadGroup(null)
         .holdFor(d)
         .rampToAndHold(3, d, d)
         .rampToAndHold(2, d, d)
@@ -286,6 +289,176 @@ public class DslThreadGroupTest {
             )
     ).run();
     assertThat(stats.overall().samplesCount()).isEqualTo(THREAD_COUNT);
+  }
+
+  @SuppressWarnings("unused")
+  @Nested
+  public class CodeBuilderTest extends MethodCallBuilderTest {
+
+    public DslTestPlan simpleIterationsThreadGroup() {
+      return testPlan(
+          threadGroup(1, 1,
+              httpSampler("http://localhost"),
+              httpSampler("http://myhost")
+          )
+      );
+    }
+
+    public DslTestPlan simpleNamedIterationsThreadGroup() {
+      return testPlan(
+          threadGroup("myThreads", 1, 1,
+              httpSampler("http://localhost"),
+              httpSampler("http://myhost")
+          )
+      );
+    }
+
+    public DslTestPlan simpleDurationThreadGroup() {
+      return testPlan(
+          threadGroup(1, Duration.ofSeconds(1),
+              httpSampler("http://localhost"),
+              httpSampler("http://myhost")
+          )
+      );
+    }
+
+    public DslTestPlan simpleNamedDurationThreadGroup() {
+      return testPlan(
+          threadGroup("myThreads", 1, Duration.ofSeconds(1),
+              httpSampler("http://localhost")
+          )
+      );
+    }
+
+    public DslTestPlan simpleThreadGroupWithRampAndIterations() {
+      return testPlan(
+          threadGroup()
+              .rampTo(1, Duration.ofSeconds(2))
+              .holdIterating(1)
+              .children(
+                  httpSampler("http://localhost"),
+                  httpSampler("http://myhost")
+              )
+      );
+    }
+
+    public DslTestPlan simpleThreadGroupWithRampAndDuration() {
+      return testPlan(
+          threadGroup()
+              .rampToAndHold(1, Duration.ofSeconds(2), Duration.ofSeconds(1))
+              .children(
+                  httpSampler("http://localhost"),
+                  httpSampler("http://myhost")
+              )
+      );
+    }
+
+    public DslTestPlan simpleThreadGroupWithDelayAndIterations() {
+      return testPlan(
+          threadGroup()
+              .holdFor(Duration.ofSeconds(1))
+              .rampTo(1, Duration.ZERO)
+              .holdIterating(1)
+              .children(
+                  httpSampler("http://localhost"),
+                  httpSampler("http://myhost")
+              )
+      );
+    }
+
+    public DslTestPlan simpleThreadGroupWithDelayAndDuration() {
+      return testPlan(
+          threadGroup()
+              .holdFor(Duration.ofSeconds(1))
+              .rampToAndHold(1, Duration.ZERO, Duration.ofSeconds(1))
+              .children(
+                  httpSampler("http://localhost"),
+                  httpSampler("http://myhost")
+              )
+      );
+    }
+
+    public DslTestPlan simpleThreadGroupWithRampDelayAndIterations() {
+      return testPlan(
+          threadGroup()
+              .holdFor(Duration.ofSeconds(1))
+              .rampTo(1, Duration.ofSeconds(2))
+              .holdIterating(1)
+              .children(
+                  httpSampler("http://localhost"),
+                  httpSampler("http://myhost")
+              )
+      );
+    }
+
+    public DslTestPlan simpleThreadGroupWithRampDelayAndDuration() {
+      return testPlan(
+          threadGroup()
+              .holdFor(Duration.ofSeconds(1))
+              .rampToAndHold(1, Duration.ofSeconds(2), Duration.ofSeconds(1))
+              .children(
+                  httpSampler("http://localhost"),
+                  httpSampler("http://myhost")
+              )
+      );
+    }
+
+    public DslTestPlan simpleNamedThreadGroupWithRampAndDelay() {
+      return testPlan(
+          threadGroup("myThreads")
+              .holdFor(Duration.ofSeconds(1))
+              .rampTo(1, Duration.ofSeconds(2))
+              .holdIterating(1)
+              .children(
+                  httpSampler("http://localhost"),
+                  httpSampler("http://myhost")
+              )
+      );
+    }
+
+    /*
+     this test uses as ramp duration difference of threads to avoid rounding issues in conversions
+     of schedules.
+     */
+    public DslTestPlan complexThreadGroup() {
+      return testPlan(
+          threadGroup("myThreads")
+              .holdFor(Duration.ofSeconds(1))
+              .rampTo(3, Duration.ofSeconds(3))
+              .rampTo(2, Duration.ofSeconds(1))
+              .rampToAndHold(5, Duration.ofSeconds(3), Duration.ofSeconds(4))
+              .rampTo(10, Duration.ofSeconds(5))
+              .rampToAndHold(3, Duration.ofSeconds(7), Duration.ofSeconds(8))
+              .rampTo(0, Duration.ofSeconds(3))
+              .children(
+                  httpSampler("http://localhost"),
+                  httpSampler("http://myhost")
+              )
+      );
+    }
+
+    public DslTestPlan simpleThreadGroupWithErrorAction() {
+      return testPlan(
+          threadGroup(1, 1,
+              httpSampler("http://localhost"),
+              httpSampler("http://myhost")
+          ).sampleErrorAction(SampleErrorAction.STOP_TEST)
+      );
+    }
+
+    public DslTestPlan complexThreadGroupWithErrorAction() {
+      return testPlan(
+          threadGroup("myThreads")
+              .rampTo(3, Duration.ofSeconds(3))
+              .rampTo(0, Duration.ofSeconds(1))
+              .sampleErrorAction(SampleErrorAction.STOP_TEST)
+              .children(
+                  httpSampler("http://localhost"),
+                  httpSampler("http://myhost")
+              )
+      );
+    }
+
   }
 
 }
