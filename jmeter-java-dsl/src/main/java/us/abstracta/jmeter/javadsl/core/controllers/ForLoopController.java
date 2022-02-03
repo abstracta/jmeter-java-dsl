@@ -18,9 +18,9 @@ import us.abstracta.jmeter.javadsl.core.threadgroups.BaseThreadGroup.ThreadGroup
  */
 public class ForLoopController extends BaseController {
 
-  private final int count;
+  private final String count;
 
-  public ForLoopController(String name, int count, List<ThreadGroupChild> children) {
+  public ForLoopController(String name, String count, List<ThreadGroupChild> children) {
     super(name != null ? name : "for", LoopControlPanel.class, children);
     this.count = count;
   }
