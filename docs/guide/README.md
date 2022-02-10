@@ -154,7 +154,7 @@ Review and try generated code before executing it as is. I.e: tune thread groups
 :::
 
 ::: warning
-`jmx2dsl` is currently a **work in progress** and we are is it's first trial versions. 
+`jmx2dsl` is currently a **work in progress** and it is in it's first trial versions. 
 
 Only part of DSL supported features are currently converted, and for the ones code generation is implemented, only most common scenarios and properties are considered.
 
