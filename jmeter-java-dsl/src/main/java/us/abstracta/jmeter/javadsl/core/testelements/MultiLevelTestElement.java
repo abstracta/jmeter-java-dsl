@@ -1,7 +1,7 @@
 package us.abstracta.jmeter.javadsl.core.testelements;
 
 import us.abstracta.jmeter.javadsl.core.DslTestPlan.TestPlanChild;
-import us.abstracta.jmeter.javadsl.core.testelements.BaseSampler.SamplerChild;
+import us.abstracta.jmeter.javadsl.core.samplers.BaseSampler.SamplerChild;
 import us.abstracta.jmeter.javadsl.core.threadgroups.BaseThreadGroup.ThreadGroupChild;
 
 /**

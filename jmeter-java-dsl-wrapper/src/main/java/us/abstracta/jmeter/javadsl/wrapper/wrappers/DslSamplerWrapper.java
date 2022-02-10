@@ -6,7 +6,7 @@ import static us.abstracta.jmeter.javadsl.wrapper.wrappers.TestElementWrapperHel
 import org.apache.jmeter.samplers.Sampler;
 import org.apache.jmeter.samplers.gui.AbstractSamplerGui;
 import org.apache.jmeter.testelement.TestElement;
-import us.abstracta.jmeter.javadsl.core.testelements.BaseSampler;
+import us.abstracta.jmeter.javadsl.core.samplers.BaseSampler;
 
 /**
  * Is a {@link TestElementWrapper} for JMeter samplers.

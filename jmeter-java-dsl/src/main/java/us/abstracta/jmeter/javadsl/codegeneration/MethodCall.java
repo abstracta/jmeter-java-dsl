@@ -20,7 +20,7 @@ import us.abstracta.jmeter.javadsl.core.controllers.DslController;
 import us.abstracta.jmeter.javadsl.core.listeners.DslListener;
 import us.abstracta.jmeter.javadsl.core.postprocessors.DslPostProcessor;
 import us.abstracta.jmeter.javadsl.core.preprocessors.DslPreProcessor;
-import us.abstracta.jmeter.javadsl.core.testelements.DslSampler;
+import us.abstracta.jmeter.javadsl.core.samplers.DslSampler;
 import us.abstracta.jmeter.javadsl.core.testelements.MultiLevelTestElement;
 import us.abstracta.jmeter.javadsl.core.threadgroups.DslThreadGroup;
 import us.abstracta.jmeter.javadsl.core.timers.DslTimer;

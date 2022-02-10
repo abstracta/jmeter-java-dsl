@@ -40,7 +40,7 @@ import us.abstracta.jmeter.javadsl.codegeneration.TestElementParamBuilder;
 import us.abstracta.jmeter.javadsl.core.BuildTreeContext;
 import us.abstracta.jmeter.javadsl.core.preprocessors.DslJsr223PreProcessor.PreProcessorScript;
 import us.abstracta.jmeter.javadsl.core.preprocessors.DslJsr223PreProcessor.PreProcessorVars;
-import us.abstracta.jmeter.javadsl.core.testelements.BaseSampler;
+import us.abstracta.jmeter.javadsl.core.samplers.BaseSampler;
 
 /**
  * Allows to configure a JMeter HTTP sampler to make HTTP requests in a test plan.

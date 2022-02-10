@@ -49,13 +49,7 @@ package core {
       void addChildren(DslTestElement[] children)
     }
 
-    interface DslSampler
-
-    abstract class BaseSampler extends TestElementContainer implements DslSampler
-
-    interface SamplerChild extends DslTestElement
-
-    interface MultiLevelTestElement extends TestPlanChild, SamplerChild
+    interface MultiLevelTestElement extends TestPlanChild
 
     abstract class DslJsr223TestElement extends BaseTestElement {
       String language
@@ -76,7 +70,6 @@ package core {
     DslScopedTestElement ..> Scope
     TestElementContainer -up-> "*" DslTestElement
     DslJsr223TestElement --> DslScriptBuilder
-    DslSampler ..> SamplerChild
 
   }
 
@@ -204,6 +197,20 @@ package core {
     class ForLoopController extends BaseController {
       int count
     }
+
+  }
+
+  package samplers {
+
+    interface DslSampler
+
+    abstract class BaseSampler extends TestElementContainer implements DslSampler
+
+    interface SamplerChild extends DslTestElement
+
+    DslSampler ..> SamplerChild
+
+    class DslDummySampler extends BaseSampler
 
   }
 
@@ -399,6 +406,7 @@ package core {
   DslTestPlan -up-|> TestElementContainer
   DslSampler .up.|> ThreadGroupChild
   MultiLevelTestElement .up.|> ThreadGroupChild
+  MultiLevelTestElement .up.|> SamplerChild
   DslIfController --> PropertyScriptBuilder
   DslWhileController --> PropertyScriptBuilder
 

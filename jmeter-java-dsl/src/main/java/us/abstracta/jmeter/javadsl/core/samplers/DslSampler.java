@@ -1,4 +1,4 @@
-package us.abstracta.jmeter.javadsl.core.testelements;
+package us.abstracta.jmeter.javadsl.core.samplers;
 
 import us.abstracta.jmeter.javadsl.core.threadgroups.BaseThreadGroup.ThreadGroupChild;
 

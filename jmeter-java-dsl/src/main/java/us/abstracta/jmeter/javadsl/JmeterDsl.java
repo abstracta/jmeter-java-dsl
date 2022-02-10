@@ -30,6 +30,7 @@ import us.abstracta.jmeter.javadsl.core.postprocessors.DslRegexExtractor;
 import us.abstracta.jmeter.javadsl.core.preprocessors.DslJsr223PreProcessor;
 import us.abstracta.jmeter.javadsl.core.preprocessors.DslJsr223PreProcessor.PreProcessorScript;
 import us.abstracta.jmeter.javadsl.core.preprocessors.DslJsr223PreProcessor.PreProcessorVars;
+import us.abstracta.jmeter.javadsl.core.samplers.DslDummySampler;
 import us.abstracta.jmeter.javadsl.core.threadgroups.BaseThreadGroup.ThreadGroupChild;
 import us.abstracta.jmeter.javadsl.core.threadgroups.DslDefaultThreadGroup;
 import us.abstracta.jmeter.javadsl.core.threadgroups.DslSetupThreadGroup;
@@ -142,10 +143,9 @@ public class JmeterDsl {
    * Builds a new thread group without any thread configuration.
    * <p>
    * This method should be used as starting point for creating complex test thread profiles (like
-   * spike, or incremental tests) in combination with
-   * {@link DslDefaultThreadGroup#holdFor(Duration)},
-   * {@link DslDefaultThreadGroup#rampTo(int, Duration)} and
-   * {@link DslDefaultThreadGroup#rampToAndHold(int, Duration, Duration)}.
+   * spike, or incremental tests) in combination with holdFor, rampTo and rampToAndHold {@link
+   * DslDefaultThreadGroup} methods.
+   *
    * <p>
    * Eg:
    * <pre>{@code
@@ -826,6 +826,41 @@ public class JmeterDsl {
    */
   public static DslJsr223Sampler jsr223Sampler(String name, SamplerScript script) {
     return new DslJsr223Sampler(name, script);
+  }
+
+  /**
+   * Builds a JMeter plugin Dummy Sampler which allows emulating a sampler easing testing other
+   * parts of a test plan (like extractors, controllers conditions, etc).
+   * <p>
+   * Usually you would replace an existing sampler with this one, to test some extractor or test
+   * plan complex behavior (like controllers conditions), and once you have verified that the rest
+   * of the plan works as expected, you place back the original sampler that makes actual
+   * interactions to a server.
+   * <p>
+   * By default, this sampler, in contrast to the JMeter plugin Dummy Sampler, does not simulate
+   * response time. This helps speeding up the debug and tracing process while using it.
+   *
+   * @param responseBody specifies the response body to be included in generated sample results.
+   * @return the dummy sampler for further configuration and usage in test plan.
+   * @see DslDummySampler
+   * @since 0.46
+   */
+  public static DslDummySampler dummySampler(String responseBody) {
+    return dummySampler(null, responseBody);
+  }
+
+  /**
+   * Same as {@link #dummySampler(String)} but allowing to set a name on the sampler.
+   * <p>
+   * Setting the name of the sampler allows better simulation the final use case when dummy sampler
+   * is replaced by actual/final sampler, when sample results are reported in stats, logs, etc.
+   *
+   * @see DslDummySampler
+   * @see #dummySampler(String)
+   * @since 0.46
+   */
+  public static DslDummySampler dummySampler(String name, String responseBody) {
+    return new DslDummySampler(name, responseBody);
   }
 
   /**

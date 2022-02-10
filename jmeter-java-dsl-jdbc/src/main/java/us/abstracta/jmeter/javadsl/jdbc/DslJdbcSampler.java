@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 import org.apache.jmeter.protocol.jdbc.sampler.JDBCSampler;
 import org.apache.jmeter.testbeans.gui.TestBeanGUI;
 import org.apache.jmeter.testelement.TestElement;
-import us.abstracta.jmeter.javadsl.core.testelements.BaseSampler;
+import us.abstracta.jmeter.javadsl.core.samplers.BaseSampler;
 
 /**
  * Allows interacting with databases through configured JDBC connections.

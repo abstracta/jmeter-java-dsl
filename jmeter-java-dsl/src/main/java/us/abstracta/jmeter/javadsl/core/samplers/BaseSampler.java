@@ -1,15 +1,16 @@
-package us.abstracta.jmeter.javadsl.core.testelements;
+package us.abstracta.jmeter.javadsl.core.samplers;
 
 import java.util.Collections;
 import org.apache.jmeter.gui.JMeterGUIComponent;
 import us.abstracta.jmeter.javadsl.core.DslTestElement;
+import us.abstracta.jmeter.javadsl.core.testelements.TestElementContainer;
 import us.abstracta.jmeter.javadsl.core.threadgroups.BaseThreadGroup.ThreadGroupChild;
 import us.abstracta.jmeter.javadsl.http.DslHttpSampler;
 
 /**
  * Hosts common logic to all samplers.
  * <p>
- * In particular it specifies that samplers are {@link ThreadGroupChild} and {@link
+ * In particular, it specifies that samplers are {@link ThreadGroupChild} and {@link
  * TestElementContainer} containing {@link SamplerChild}.
  * <p>
  * For an example of an implementation of a sampler check {@link DslHttpSampler}.
