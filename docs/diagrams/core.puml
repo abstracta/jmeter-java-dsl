@@ -210,7 +210,16 @@ package core {
 
     DslSampler ..> SamplerChild
 
-    class DslDummySampler extends BaseSampler
+    class DslDummySampler extends BaseSampler {
+      String responseBody
+      boolean successful
+      String responseCode
+      String responseMessage
+      Duration responseTime
+      boolean simulateResponseTime
+      String url
+      String requestBody
+    }
 
   }
 
@@ -270,6 +279,13 @@ package core {
 
     class DslJsonExtractor extends DslVariableExtractor {
       String jmesPath
+    }
+
+    class DslDebugPostProcessor extends BaseTestElement implements DslPostProcessor {
+      boolean includeSamplerProperties
+      boolean includeVariables
+      boolean includeJmeterProperties
+      boolean includeSystemProperties
     }
 
   }

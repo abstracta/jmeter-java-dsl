@@ -23,6 +23,7 @@ import us.abstracta.jmeter.javadsl.core.listeners.InfluxDbBackendListener;
 import us.abstracta.jmeter.javadsl.core.listeners.JtlWriter;
 import us.abstracta.jmeter.javadsl.core.listeners.ResponseFileSaver;
 import us.abstracta.jmeter.javadsl.core.postprocessors.DslBoundaryExtractor;
+import us.abstracta.jmeter.javadsl.core.postprocessors.DslDebugPostProcessor;
 import us.abstracta.jmeter.javadsl.core.postprocessors.DslJsonExtractor;
 import us.abstracta.jmeter.javadsl.core.postprocessors.DslJsr223PostProcessor;
 import us.abstracta.jmeter.javadsl.core.postprocessors.DslJsr223PostProcessor.PostProcessorScript;
@@ -938,7 +939,7 @@ public class JmeterDsl {
    * This method provides a simple default implementation with required settings, but more settings
    * are provided by returned DslRegexExtractor.
    * <p>
-   * By default when regex is not matched, no variable will be created or modified. On the other
+   * By default, when regex is not matched, no variable will be created or modified. On the other
    * hand when the regex matches it will by default store the first capturing group (part of
    * expression between parenthesis) of the first match for the regular expression.
    *
@@ -965,7 +966,7 @@ public class JmeterDsl {
    * This method provides a simple default implementation with required settings, but more settings
    * are provided by returned DslBoundaryExtractor.
    * <p>
-   * By default when no match is found, no variable will be created or modified. On the other hand,
+   * By default, when no match is found, no variable will be created or modified. On the other hand,
    * when a match is found, it will by default store the first match.
    *
    * @param variableName  is the name of the variable to be used to store the extracted value to.
@@ -988,7 +989,7 @@ public class JmeterDsl {
    * This method provides a simple default implementation with required settings, but more settings
    * are provided by returned DslJsonExtractor.
    * <p>
-   * By default when no match is found, no variable will be created or modified. On the other hand,
+   * By default, when no match is found, no variable will be created or modified. On the other hand,
    * when a match is found, it will by default store the first match.
    *
    * @param variableName is the name of the variable to be used to store the extracted value to.
@@ -1000,6 +1001,24 @@ public class JmeterDsl {
    */
   public static DslJsonExtractor jsonExtractor(String variableName, String jmesPath) {
     return new DslJsonExtractor(variableName, jmesPath);
+  }
+
+  /**
+   * Builds a Debug post processor which is helpful to collect debugging information from test plans
+   * executions.
+   * <p>
+   * This element is particularly helpful to collect JMeter variables and debug extractors during or
+   * after a test plan execution.
+   * <p>
+   * Created Debug post processor is configured by default to only include JMeter variables, which
+   * covers most common usages and keeps memory and disk usage low.
+   *
+   * @return the post processor for further configuration and usage in test plan.
+   * @see DslDebugPostProcessor
+   * @since 0.47
+   */
+  public static DslDebugPostProcessor debugPostProcessor() {
+    return new DslDebugPostProcessor();
   }
 
   /**
