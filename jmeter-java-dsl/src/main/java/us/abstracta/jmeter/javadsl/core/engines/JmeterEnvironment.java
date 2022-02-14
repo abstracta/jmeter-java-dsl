@@ -8,12 +8,12 @@ import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.Properties;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import kg.apc.jmeter.timers.functions.TSTFeedback;
+import kg.apc.jmeter.samplers.DummySampler;
 import org.apache.jmeter.functions.EvalFunction;
 import org.apache.jmeter.save.SaveService;
 import org.apache.jmeter.util.JMeterUtils;
@@ -38,21 +38,39 @@ public class JmeterEnvironment {
     File binDir = new File(homeDir, BIN_DIR);
     binDir.deleteOnExit();
     installConfig(binDir);
-    Properties props = JMeterUtils
-        .getProperties(new File(binDir, JMETER_PROPS_FILE_NAME).getPath());
-    /*
-     include functions and components jars paths so jmeter search methods can find classes in
-     such jars
-     */
-    props.setProperty("search_paths",
-        buildJarPathsFromClasses(EvalFunction.class, BackendListenerClient.class,
-            TSTFeedback.class));
+    JMeterUtils.getProperties(new File(binDir, JMETER_PROPS_FILE_NAME).getPath());
   }
 
-  private String buildJarPathsFromClasses(Class<?>... classes) {
-    return Arrays.stream(classes)
+  public void updateSearchPath(HashTree tree) {
+    Set<Class<?>> classes = findTestElementClasses(tree);
+    /*
+    this is required since test plans don't directly reference function classes which are in a
+    separate jar
+     */
+    classes.add(EvalFunction.class);
+    /*
+    This is required since JMeter GUI breaks when it doesn't find a loaded timer, assertion, etc.
+    And BackendListenerClient components jar contains main JMeter components which avoid this issue.
+     */
+    classes.add(BackendListenerClient.class);
+    /*
+    This is required since no sampler is included in core jmeter package that has no order,
+    and such condition breaks JMeter GUI
+     */
+    classes.add(DummySampler.class);
+    Set<String> jarPaths = classes.stream()
         .map(this::getClassJarPath)
-        .collect(Collectors.joining(";"));
+        .collect(Collectors.toSet());
+    JMeterUtils.getJMeterProperties().setProperty("search_paths", String.join(";", jarPaths));
+  }
+
+  private Set<Class<?>> findTestElementClasses(HashTree tree) {
+    Set<Class<?>> ret = new HashSet<>();
+    for (Object elem : tree.list()) {
+      ret.add(elem.getClass());
+      ret.addAll(findTestElementClasses(tree.getTree(elem)));
+    }
+    return ret;
   }
 
   private String getClassJarPath(Class<?> theClass) {

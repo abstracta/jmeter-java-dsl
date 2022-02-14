@@ -70,6 +70,7 @@ public class EmbeddedJmeterEngine implements DslJmeterEngine {
     HashTree rootTree = new ListedHashTree();
     BuildTreeContext buildContext = new BuildTreeContext();
     HashTree testPlanTree = buildContext.buildTreeFor(testPlan, rootTree);
+    env.updateSearchPath(testPlanTree);
 
     TestPlanStats stats = new TestPlanStats(EmbeddedStatsSummary::new);
     addStatsCollector(testPlanTree, stats);

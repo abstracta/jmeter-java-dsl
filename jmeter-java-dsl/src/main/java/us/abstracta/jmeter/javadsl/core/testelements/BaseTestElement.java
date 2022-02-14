@@ -10,6 +10,7 @@ import java.beans.PropertyDescriptor;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.time.Duration;
+import java.util.concurrent.CountDownLatch;
 import java.util.function.Supplier;
 import javax.swing.JFrame;
 import javax.swing.WindowConstants;
@@ -105,9 +106,14 @@ public abstract class BaseTestElement implements DslTestElement {
     try {
       // this is required for proper visualization of labels and messages from resources bundle
       new JmeterEnvironment().initLocale();
-      showTestElementGui(() -> buildTestElementGui(buildConfiguredTestElement()), null);
+      CountDownLatch countDownLatch = new CountDownLatch(1);
+      showTestElementGui(() -> buildTestElementGui(buildConfiguredTestElement()),
+          countDownLatch::countDown);
+      countDownLatch.await();
     } catch (IOException e) {
       throw new RuntimeException(e);
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
     }
   }
 

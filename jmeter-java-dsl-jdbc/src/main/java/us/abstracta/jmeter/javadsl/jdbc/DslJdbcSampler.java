@@ -34,7 +34,7 @@ public class DslJdbcSampler extends BaseSampler<DslJdbcSampler> {
   private QueryType queryType;
 
   public DslJdbcSampler(String name, String poolName, String query) {
-    super(name != null ? name : "", TestBeanGUI.class);
+    super(name != null ? name : "JDBC Request", TestBeanGUI.class);
     this.poolName = poolName;
     this.query = query;
   }

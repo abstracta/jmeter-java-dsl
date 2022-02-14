@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.concurrent.TimeoutException;
 import org.apache.jmeter.config.Arguments;
 import org.apache.jmeter.control.gui.TestPlanGui;
+import org.apache.jmeter.exceptions.IllegalUserActionException;
 import org.apache.jmeter.testelement.TestElement;
 import org.apache.jmeter.testelement.TestPlan;
 import org.apache.jorphan.collections.HashTree;
@@ -21,6 +22,7 @@ import us.abstracta.jmeter.javadsl.codegeneration.TestElementParamBuilder;
 import us.abstracta.jmeter.javadsl.core.DslTestPlan.TestPlanChild;
 import us.abstracta.jmeter.javadsl.core.engines.EmbeddedJmeterEngine;
 import us.abstracta.jmeter.javadsl.core.engines.JmeterEnvironment;
+import us.abstracta.jmeter.javadsl.core.engines.JmeterGui;
 import us.abstracta.jmeter.javadsl.core.testelements.TestElementContainer;
 import us.abstracta.jmeter.javadsl.core.threadgroups.DslDefaultThreadGroup;
 
@@ -97,6 +99,21 @@ public class DslTestPlan extends TestElementContainer<TestPlanChild> {
   public TestPlanStats runIn(DslJmeterEngine engine)
       throws IOException, InterruptedException, TimeoutException {
     return engine.run(this);
+  }
+
+  @Override
+  public void showInGui() {
+    try {
+      JmeterGui gui = new JmeterGui();
+      HashTree tree = new ListedHashTree();
+      new BuildTreeContext().buildTreeFor(this, tree);
+      gui.load(tree);
+      gui.awaitClose();
+    } catch (IOException | IllegalUserActionException e) {
+      throw new RuntimeException(e);
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+    }
   }
 
   /**

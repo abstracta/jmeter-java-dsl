@@ -59,8 +59,8 @@ public class DslScriptBuilder {
 
   public String build() {
     return scriptString != null ? scriptString
-        : "// It is currently not supported to run scripts defined in Java code in JMeter GUI or"
-            + " non Embedded Engine (eg: BlazeMeter).\n"
+        : "// It is currently not supported to run scripts defined in Java code in non embedded "
+            + "JMeter Engine (eg: BlazeMeter, standalone JMeter GUI, etc).\n"
             + buildScriptString(registerScriptProperty(), varsClass, varsNameMapping);
   }
 

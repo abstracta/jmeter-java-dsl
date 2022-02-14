@@ -30,7 +30,6 @@ public class ParallelControllerTest extends JmeterDslTest {
         )
     ).run();
     assertThat(stats.duration()).isLessThan(Duration.ofMillis(responseTimeMillis * 2));
-
   }
 
 }
