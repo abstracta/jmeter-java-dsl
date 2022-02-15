@@ -57,4 +57,21 @@ public class DslHttpDefaultsTest extends JmeterDslTest {
     verify(getRequestedFor(urlPathEqualTo("/")));
   }
 
+  @Test
+  public void shouldUseDefaultSettingsWhenHttpDefaultWithIndividualUrlComponents()
+      throws Exception {
+    String path = "/get";
+    testPlan(
+        httpDefaults()
+            .protocol("http")
+            .host("localhost")
+            .port(wiremockServer.getHttpPort())
+            .path(path),
+        threadGroup(1, 1,
+            httpSampler((String) null)
+        )
+    ).run();
+    verify(getRequestedFor(urlPathEqualTo(path)));
+  }
+
 }

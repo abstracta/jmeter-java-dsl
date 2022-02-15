@@ -20,7 +20,10 @@ import us.abstracta.jmeter.javadsl.http.DslHttpSampler.HttpClientImpl;
  */
 public class DslHttpDefaults extends BaseConfigElement {
 
-  private String url;
+  private String protocol;
+  private String host;
+  private String port;
+  private String path;
   private Charset encoding;
   private boolean downloadEmbeddedResources;
   private HttpClientImpl clientImpl;
@@ -43,7 +46,91 @@ public class DslHttpDefaults extends BaseConfigElement {
    * @return the HTTP Defaults instance for further configuration or usage.
    */
   public DslHttpDefaults url(String url) {
-    this.url = url;
+    /*
+    url is decomposed and not just set on path, to allow in samplers to override just path and
+    reuse other default settings
+    */
+    JmeterUrl parsedUrl = JmeterUrl.valueOf(url);
+    protocol = parsedUrl.protocol();
+    host = parsedUrl.host();
+    port = parsedUrl.port();
+    path = parsedUrl.path();
+    return this;
+  }
+
+  /**
+   * Specifies the default protocol (eg: HTTP, HTTPS) to be used in the HTTP samplers.
+   * <p>
+   * You can specify entire url through {@link #url(String)}, but this method allows you to only
+   * specify protocol when you need to override some other default, or just want that all samplers
+   * use same default protocol.
+   * <p>
+   * In general prefer using java variables and methods, to get shorter and more maintainable code,
+   * and use this method sparingly.
+   *
+   * @param protocol contains protocol value to be used (e.g.: http, https, etc).
+   * @return the HTTP Defaults instance for further configuration or usage.
+   * @since 0.49
+   */
+  public DslHttpDefaults protocol(String protocol) {
+    this.protocol = protocol;
+    return this;
+  }
+
+  /**
+   * Specifies the default server host (domain) to be used in the HTTP samplers.
+   * <p>
+   * You can specify entire url through {@link #url(String)}, but this method allows you to only
+   * specify host (and not protocol) when you need to override some other default, or just want that
+   * all samplers use same default host.
+   * <p>
+   * In general prefer using java variables and methods, to get shorter and more maintainable code,
+   * and use this method sparingly.
+   *
+   * @param host contains server name without protocol (no http/https) and path.
+   * @return the HTTP Defaults instance for further configuration or usage.
+   * @since 0.49
+   */
+  public DslHttpDefaults host(String host) {
+    this.host = host;
+    return this;
+  }
+
+  /**
+   * Specifies the default port to be used in the HTTP samplers.
+   * <p>
+   * You can specify entire url through {@link #url(String)}, but this method allows you to only
+   * specify port (and not protocol or host) when you need to override some other default, or just
+   * want that all samplers use same default port.
+   * <p>
+   * In general prefer using java variables and methods, to get shorter and more maintainable code,
+   * and use this method sparingly.
+   *
+   * @param port contains port value to be used.
+   * @return the HTTP Defaults instance for further configuration or usage.
+   * @since 0.49
+   */
+  public DslHttpDefaults port(int port) {
+    this.port = String.valueOf(port);
+    return this;
+  }
+
+  /**
+   * Specifies the default URL path to be used in the HTTP samplers.
+   * <p>
+   * You can specify entire url through {@link #url(String)}, but this method allows you to only
+   * specify path (and not protocol, host or port) when you need to override some other default, or
+   * just want that all samplers use same path.
+   * <p>
+   * In general prefer using java variables and methods, to get shorter and more maintainable code,
+   * and use this method sparingly.
+   *
+   * @param path contains URL path to be used by samplers.
+   * @return the HTTP Defaults instance for further configuration or usage.
+   * @since 0.49
+   */
+  public DslHttpDefaults path(String path) {
+    this.path = path;
     return this;
   }
 
@@ -92,16 +179,17 @@ public class DslHttpDefaults extends BaseConfigElement {
   @Override
   protected TestElement buildTestElement() {
     ConfigTestElement ret = new ConfigTestElement();
-    if (url != null) {
-      /*
-       url is decomposed and not just set on path, to allow in samplers to override just path and
-       reuse other default settings
-       */
-      JmeterUrl parsedUrl = JmeterUrl.valueOf(url);
-      ret.setProperty(HTTPSamplerBase.PROTOCOL, parsedUrl.protocol());
-      ret.setProperty(HTTPSamplerBase.DOMAIN, parsedUrl.host());
-      ret.setProperty(HTTPSamplerBase.PORT, parsedUrl.port());
-      ret.setProperty(HTTPSamplerBase.PATH, parsedUrl.path());
+    if (protocol != null) {
+      ret.setProperty(HTTPSamplerBase.PROTOCOL, protocol);
+    }
+    if (host != null) {
+      ret.setProperty(HTTPSamplerBase.DOMAIN, host);
+    }
+    if (port != null) {
+      ret.setProperty(HTTPSamplerBase.PORT, port);
+    }
+    if (path != null) {
+      ret.setProperty(HTTPSamplerBase.PATH, path);
     }
     if (encoding != null) {
       ret.setProperty(HTTPSamplerBase.CONTENT_ENCODING, encoding.toString());
