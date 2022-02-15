@@ -14,6 +14,7 @@ import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import kg.apc.jmeter.samplers.DummySampler;
+import kg.apc.jmeter.timers.functions.TSTFeedback;
 import org.apache.jmeter.functions.EvalFunction;
 import org.apache.jmeter.save.SaveService;
 import org.apache.jmeter.util.JMeterUtils;
@@ -44,10 +45,15 @@ public class JmeterEnvironment {
   public void updateSearchPath(HashTree tree) {
     Set<Class<?>> classes = findTestElementClasses(tree);
     /*
-    this is required since test plans don't directly reference function classes which are in a
+    This is required since test plans don't directly reference function classes which are in a
     separate jar
      */
     classes.add(EvalFunction.class);
+    /*
+    This is required since JMeter loads functions in static instance only once, and if a test does
+    not use this function but a later one does, then the function will not be loaded for later one.
+     */
+    classes.add(TSTFeedback.class);
     /*
     This is required since JMeter GUI breaks when it doesn't find a loaded timer, assertion, etc.
     And BackendListenerClient components jar contains main JMeter components which avoid this issue.
