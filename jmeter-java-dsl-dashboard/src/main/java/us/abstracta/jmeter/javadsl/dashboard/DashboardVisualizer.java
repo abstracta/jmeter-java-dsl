@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
-import java.util.function.Supplier;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import kg.apc.charting.GraphPanelChart;
@@ -169,8 +168,8 @@ public class DashboardVisualizer extends DslVisualizer {
   }
 
   @Override
-  public void showTestElementGui(Supplier<Component> guiBuilder, Runnable closeListener) {
-    showFrameWith(guiBuilder.get(), "Dashboard", 1080, 600, closeListener);
+  public void showTestElementGui(Component guiComponent, Runnable closeListener) {
+    showFrameWith(guiComponent, "Dashboard", 1080, 600, closeListener);
   }
 
   @Override
