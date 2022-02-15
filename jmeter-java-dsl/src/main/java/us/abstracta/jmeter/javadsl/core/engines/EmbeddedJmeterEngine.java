@@ -1,8 +1,11 @@
 package us.abstracta.jmeter.javadsl.core.engines;
 
+import java.awt.BorderLayout;
 import java.awt.Component;
 import java.io.IOException;
+import java.net.URL;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -12,6 +15,10 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JPanel;
+import javax.swing.JToolBar;
 import org.apache.jmeter.engine.StandardJMeterEngine;
 import org.apache.jmeter.reporters.ResultCollector;
 import org.apache.jmeter.reporters.Summariser;
@@ -77,13 +84,13 @@ public class EmbeddedJmeterEngine implements DslJmeterEngine {
     testPlanTree.add(new ResultCollector(new Summariser()));
 
     List<Future<Void>> closedVisualizers = Collections.emptyList();
+    TestRunner testRunner = buildTestRunner(testPlanTree, rootTree);
     Map<DslVisualizer, Supplier<Component>> visualizers = buildContext.getVisualizers();
     if (!visualizers.isEmpty()) {
       // this is required for proper visualization of labels and messages from resources bundle
       env.initLocale();
-      closedVisualizers = showVisualizers(visualizers);
+      closedVisualizers = showVisualizers(visualizers, testRunner);
     }
-    Runnable testRunner = buildTestRunner(testPlanTree, rootTree);
     /*
      we register the start and end of test since calculating it from sample results may be
      inaccurate when timers or post processors are used outside of transactions, since such time
@@ -118,20 +125,79 @@ public class EmbeddedJmeterEngine implements DslJmeterEngine {
     testPlanTree.add(statsVisualizer);
   }
 
-  protected Runnable buildTestRunner(HashTree testPlanTree, HashTree rootTree) {
+  protected TestRunner buildTestRunner(HashTree testPlanTree, HashTree rootTree) {
     StandardJMeterEngine engine = new StandardJMeterEngine();
     engine.configure(rootTree);
-    return engine;
+    return new TestRunner() {
+
+      @Override
+      public void runTest() {
+        engine.run();
+      }
+
+      @Override
+      public void stop() {
+        engine.stopTest();
+      }
+
+    };
   }
 
-  private List<Future<Void>> showVisualizers(Map<DslVisualizer, Supplier<Component>> visualizers) {
+  public abstract static class TestRunner {
+
+    private final List<Runnable> listeners = new ArrayList<>();
+
+    public void run() {
+      try {
+        runTest();
+      } finally {
+        listeners.forEach(Runnable::run);
+      }
+    }
+
+    protected abstract void runTest();
+
+    public abstract void stop();
+
+    public void addEndListener(Runnable listener) {
+      listeners.add(listener);
+    }
+
+  }
+
+  private List<Future<Void>> showVisualizers(Map<DslVisualizer, Supplier<Component>> visualizers,
+      TestRunner testRunner) {
     return visualizers.entrySet().stream()
         .map(e -> {
           CompletableFuture<Void> closedVisualizer = new CompletableFuture<>();
-          e.getKey().showTestElementGui(e.getValue(), () -> closedVisualizer.complete(null));
+          Component guiComponent = e.getValue().get();
+          JPanel panel = new JPanel();
+          panel.setLayout(new BorderLayout());
+          panel.add(buildToolbar(testRunner), BorderLayout.NORTH);
+          panel.add(guiComponent, BorderLayout.CENTER);
+          e.getKey().showTestElementGui(panel, () -> closedVisualizer.complete(null));
           return closedVisualizer;
         })
         .collect(Collectors.toList());
+  }
+
+  private Component buildToolbar(TestRunner testRunner) {
+    JToolBar toolbar = new JToolBar();
+    toolbar.add(buildStopButton(testRunner));
+    return toolbar;
+  }
+
+  private JButton buildStopButton(TestRunner testRunner) {
+    URL iconResource = JMeterUtils.class.getClassLoader()
+        .getResource("org/apache/jmeter/images/toolbar/22x22/road-sign-us-stop.png");
+    JButton button = new JButton(new ImageIcon(iconResource));
+    button.setToolTipText("stop test plan");
+    button.addActionListener(e -> {
+      button.setEnabled(false);
+      testRunner.stop();
+    });
+    testRunner.addEndListener(() -> button.setEnabled(false));
+    return button;
   }
 
   public void awaitAllClosedVisualizers(List<Future<Void>> closedVisualizers) {

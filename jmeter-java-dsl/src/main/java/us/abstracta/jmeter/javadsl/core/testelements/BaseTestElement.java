@@ -11,7 +11,6 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.time.Duration;
 import java.util.concurrent.CountDownLatch;
-import java.util.function.Supplier;
 import javax.swing.JFrame;
 import javax.swing.WindowConstants;
 import org.apache.jmeter.gui.JMeterGUIComponent;
@@ -107,7 +106,7 @@ public abstract class BaseTestElement implements DslTestElement {
       // this is required for proper visualization of labels and messages from resources bundle
       new JmeterEnvironment().initLocale();
       CountDownLatch countDownLatch = new CountDownLatch(1);
-      showTestElementGui(() -> buildTestElementGui(buildConfiguredTestElement()),
+      showTestElementGui(buildTestElementGui(buildConfiguredTestElement()),
           countDownLatch::countDown);
       countDownLatch.await();
     } catch (IOException e) {
@@ -133,8 +132,8 @@ public abstract class BaseTestElement implements DslTestElement {
     }
   }
 
-  public void showTestElementGui(Supplier<Component> guiBuilder, Runnable closeListener) {
-    showFrameWith(guiBuilder.get(), name, 800, 600, closeListener);
+  public void showTestElementGui(Component guiComponent, Runnable closeListener) {
+    showFrameWith(guiComponent, name, 800, 600, closeListener);
   }
 
   protected void showFrameWith(Component content, String title, int width, int height,

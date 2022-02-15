@@ -108,7 +108,7 @@ public class DistributedJmeterEngine extends EmbeddedJmeterEngine {
   }
 
   @Override
-  protected Runnable buildTestRunner(HashTree testPlanTree,
+  protected TestRunner buildTestRunner(HashTree testPlanTree,
       HashTree rootTree) {
     JMeterUtils.setProperty("client.rmi.localport", String.valueOf(basePort));
     EnginesEndListener endListener = new EnginesEndListener(stopEngines);
@@ -118,13 +118,23 @@ public class DistributedJmeterEngine extends EmbeddedJmeterEngine {
     distributedRunner.setStdErr(System.err);
     distributedRunner.init(hosts, rootTree);
     endListener.setStartedRemoteEngines(new ArrayList<>(distributedRunner.getEngines()));
-    return () -> {
-      distributedRunner.start();
-      try {
-        endListener.await();
-      } catch (InterruptedException e) {
-        Thread.interrupted();
+    return new TestRunner() {
+
+      @Override
+      public void runTest() {
+        distributedRunner.start();
+        try {
+          endListener.await();
+        } catch (InterruptedException e) {
+          Thread.interrupted();
+        }
       }
+
+      @Override
+      public void stop() {
+        distributedRunner.stop();
+      }
+
     };
   }
 
