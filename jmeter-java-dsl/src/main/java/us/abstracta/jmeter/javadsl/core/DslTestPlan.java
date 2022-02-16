@@ -104,9 +104,12 @@ public class DslTestPlan extends TestElementContainer<TestPlanChild> {
   @Override
   public void showInGui() {
     try {
-      JmeterGui gui = new JmeterGui();
       HashTree tree = new ListedHashTree();
       new BuildTreeContext().buildTreeFor(this, tree);
+      JmeterEnvironment env = new JmeterEnvironment();
+      env.initLocale();
+      env.updateSearchPath(tree);
+      JmeterGui gui = new JmeterGui();
       gui.load(tree);
       gui.awaitClose();
     } catch (IOException | IllegalUserActionException e) {

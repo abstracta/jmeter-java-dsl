@@ -30,8 +30,8 @@ public abstract class DslVisualizerTest extends JmeterDslTest {
 
   private static final FailureScreenshotTaker SCREENSHOT_TAKER = new FailureScreenshotTaker(
       buildGuiScreenshotsFolder());
-  private Robot robot;
-  private ExecutorService executor;
+  protected Robot robot;
+  protected ExecutorService executor;
 
   private static File buildGuiScreenshotsFolder() {
     File ret = Paths.get("target", "surefire-reports", "failed-gui-tests").toFile();
@@ -99,7 +99,7 @@ public abstract class DslVisualizerTest extends JmeterDslTest {
 
   }
 
-  private void saveScreenshot(TestInfo testInfo) {
+  protected void saveScreenshot(TestInfo testInfo) {
     String testName = testInfo.getTestClass()
         .map(c -> c.getSimpleName() + ".")
         .orElse("")

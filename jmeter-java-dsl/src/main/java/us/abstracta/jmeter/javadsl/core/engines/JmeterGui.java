@@ -37,12 +37,9 @@ import org.apache.jorphan.gui.JMeterUIDefaults;
 /* Most of this logic has been extracted and adapted from org.apache.jmeter.JMeter class */
 public class JmeterGui {
 
-  private final JmeterEnvironment env;
   private final CountDownLatch closeLatch = new CountDownLatch(1);
 
   public JmeterGui() throws IOException {
-    env = new JmeterEnvironment();
-    env.initLocale();
     initLookAndFeel();
     loadUiResources();
     openFrame();
@@ -67,11 +64,7 @@ public class JmeterGui {
     treeListener.setActionHandler(actionRouter);
     GuiPackage.initInstance(treeListener, treeModel);
     MainFrame frame = new MainFrame(treeModel, treeListener);
-    ComponentUtil.centerComponentInWindow(frame, 80);
-    frame.setVisible(true);
-    frame.toFront();
     frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-    actionRouter.actionPerformed(new ActionEvent(frame, 1, ActionNames.ADD_ALL));
     frame.addWindowListener(new WindowAdapter() {
       @Override
       public void windowClosed(WindowEvent e) {
@@ -79,10 +72,13 @@ public class JmeterGui {
         closeLatch.countDown();
       }
     });
+    ComponentUtil.centerComponentInWindow(frame, 80);
+    frame.setVisible(true);
+    frame.toFront();
+    actionRouter.actionPerformed(new ActionEvent(frame, 1, ActionNames.ADD_ALL));
   }
 
   public void load(HashTree tree) throws IllegalUserActionException {
-    env.updateSearchPath(tree);
     Load.insertLoadedTree(1, tree);
   }
 
