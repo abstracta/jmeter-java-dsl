@@ -104,10 +104,10 @@ public class DslTestPlan extends TestElementContainer<TestPlanChild> {
   @Override
   public void showInGui() {
     try {
-      HashTree tree = new ListedHashTree();
-      new BuildTreeContext().buildTreeFor(this, tree);
       JmeterEnvironment env = new JmeterEnvironment();
       env.initLocale();
+      HashTree tree = new ListedHashTree();
+      new BuildTreeContext().buildTreeFor(this, tree);
       env.updateSearchPath(tree);
       JmeterGui gui = new JmeterGui();
       gui.load(tree);
