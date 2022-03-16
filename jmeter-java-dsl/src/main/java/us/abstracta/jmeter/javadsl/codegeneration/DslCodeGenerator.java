@@ -17,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import us.abstracta.jmeter.javadsl.JmeterDsl;
 import us.abstracta.jmeter.javadsl.core.DslTestElement;
+import us.abstracta.jmeter.javadsl.core.controllers.DslRecordingController;
 import us.abstracta.jmeter.javadsl.core.engines.JmeterEnvironment;
 import us.abstracta.jmeter.javadsl.core.testelements.BaseTestElement;
 
@@ -40,6 +41,7 @@ public class DslCodeGenerator {
 
   public DslCodeGenerator() {
     addBuildersFrom(JmeterDsl.class);
+    addBuilders(new DslRecordingController.CodeBuilder());
   }
 
   /**
@@ -70,6 +72,19 @@ public class DslCodeGenerator {
    */
   public void addBuildersFrom(Class<?>... dslClasses) {
     builders.addAll(findCallBuilders(dslClasses));
+  }
+
+  /**
+   * Allows registering MethodCallBuilders that are not associated to a DSL builder method.
+   * <p>
+   * This is helpful when some element has no DSL builder method counterpart, but still there is a
+   * way to convert the element (eg: ignoring it all together, only converting children, etc).
+   *
+   * @param builders list of MethodCallBuilders to register into the generator.
+   * @since 0.50
+   */
+  public void addBuilders(MethodCallBuilder... builders) {
+    this.builders.addAll(Arrays.asList(builders));
   }
 
   private List<MethodCallBuilder> findCallBuilders(Class<?>... dslClasses) {

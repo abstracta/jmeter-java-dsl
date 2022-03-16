@@ -43,7 +43,7 @@ public abstract class BaseTestElement implements DslTestElement {
 
   private static final Logger LOG = LoggerFactory.getLogger(BaseTestElement.class);
 
-  protected final String name;
+  protected String name;
   protected Class<? extends JMeterGUIComponent> guiClass;
 
   protected BaseTestElement(String name, Class<? extends JMeterGUIComponent> guiClass) {

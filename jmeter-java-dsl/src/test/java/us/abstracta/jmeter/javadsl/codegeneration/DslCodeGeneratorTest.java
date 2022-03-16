@@ -24,13 +24,19 @@ public class DslCodeGeneratorTest {
         .isEqualTo(new TestResource("/simple-sample.jsh").getContents());
   }
 
-  @NotNull
   private File solveTemplateResource(String resourcePath, Path tempDir) throws IOException {
     String templateContents = new StringTemplate(new TestResource(resourcePath).getContents())
         .solve();
     Path solvedTemplate = tempDir.resolve("test-plan.jmx");
     Files.write(solvedTemplate, templateContents.getBytes(StandardCharsets.UTF_8));
     return solvedTemplate.toFile();
+  }
+
+  @Test
+  public void shouldWriteExpectedTestPlanDslWhenRecordedJmxIsProvided() throws Exception {
+    assertThat(new DslCodeGenerator()
+        .generateCodeFromJmx(new TestResource("/recorded.jmx").getFile()))
+        .isEqualTo(new TestResource("/recorded.jsh").getContents());
   }
 
 }

@@ -71,6 +71,18 @@ public class MethodCallContext {
   }
 
   /**
+   * Gets the root context associated to the test plan.
+   * <p>
+   * This is useful when some data has to only be processed once and at root of the test plan build
+   * context.
+   *
+   * @return the parent context. Null is returned if the current context is the root context.
+   */
+  public MethodCallContext getRoot() {
+    return parent == null ? this : parent.getRoot();
+  }
+
+  /**
    * Gets the JMeter test plan subtree of children elements of current context test element.
    * <p>
    * This is useful when some alteration or inspection is required in the tree before other builder
@@ -170,7 +182,6 @@ public class MethodCallContext {
         .filter(TestElement::isEnabled)
         .map(c -> new MethodCallContext(c, childrenThree.getTree(c), this,
             codeGenerator).buildMethodCall())
-        .filter(c -> !c.isEmptyCall())
         .collect(Collectors.toList());
   }
 
@@ -209,6 +220,7 @@ public class MethodCallContext {
   }
 
   public interface MethodCallContextEndListener {
+
     void execute(MethodCallContext context, MethodCall call);
   }
 

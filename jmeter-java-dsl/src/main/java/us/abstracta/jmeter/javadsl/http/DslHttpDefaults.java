@@ -1,10 +1,17 @@
 package us.abstracta.jmeter.javadsl.http;
 
+import java.lang.reflect.Method;
 import java.nio.charset.Charset;
+import java.util.List;
 import org.apache.jmeter.config.ConfigTestElement;
 import org.apache.jmeter.protocol.http.config.gui.HttpDefaultsGui;
 import org.apache.jmeter.protocol.http.sampler.HTTPSamplerBase;
 import org.apache.jmeter.testelement.TestElement;
+import us.abstracta.jmeter.javadsl.codegeneration.MethodCall;
+import us.abstracta.jmeter.javadsl.codegeneration.MethodCallBuilder;
+import us.abstracta.jmeter.javadsl.codegeneration.MethodCallContext;
+import us.abstracta.jmeter.javadsl.codegeneration.MethodParam.StringParam;
+import us.abstracta.jmeter.javadsl.codegeneration.TestElementParamBuilder;
 import us.abstracta.jmeter.javadsl.core.configs.BaseConfigElement;
 import us.abstracta.jmeter.javadsl.http.DslHttpSampler.HttpClientImpl;
 
@@ -202,6 +209,45 @@ public class DslHttpDefaults extends BaseConfigElement {
       ret.setProperty(HTTPSamplerBase.IMPLEMENTATION, clientImpl.propertyValue);
     }
     return ret;
+  }
+
+  public static class CodeBuilder extends MethodCallBuilder {
+
+    public CodeBuilder(List<Method> builderMethods) {
+      super(builderMethods);
+    }
+
+    @Override
+    protected MethodCall buildMethodCall(MethodCallContext context) {
+      TestElementParamBuilder paramBuilder = new TestElementParamBuilder(context.getTestElement());
+      if (!HttpDefaultsGui.class.getName()
+          .equals(paramBuilder.stringParam(TestElement.GUI_CLASS).getValue())) {
+        return null;
+      }
+      MethodCall ret = buildMethodCall();
+      StringParam protocol = paramBuilder.stringParam(HTTPSamplerBase.PROTOCOL);
+      StringParam host = paramBuilder.stringParam(HTTPSamplerBase.DOMAIN);
+      StringParam port = paramBuilder.stringParam(HTTPSamplerBase.PORT);
+      StringParam path = paramBuilder.stringParam(HTTPSamplerBase.PATH, "/");
+
+      if (!protocol.isDefault() && !host.isDefault()) {
+        ret.chain("url", new StringParam(
+            protocol.getValue() + "://" + host.getValue() + (port.isDefault() ? ""
+                : ":" + port.getValue()) + (path.isDefault() ? "" : path.getValue())));
+      } else {
+        ret.chain("protocol", protocol)
+            .chain("host", host)
+            .chain("port", port)
+            .chain("path", path);
+      }
+
+      ret.chain("encoding", new EncodingParam(paramBuilder))
+          .chain("downloadEmbeddedResources",
+              paramBuilder.boolParam(HTTPSamplerBase.IMAGE_PARSER, false))
+          .chain("clientImpl", new ClientImplParam(paramBuilder));
+      return ret;
+    }
+
   }
 
 }

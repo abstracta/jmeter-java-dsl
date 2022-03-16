@@ -10,6 +10,7 @@ import us.abstracta.jmeter.javadsl.core.DslTestPlan;
 import us.abstracta.jmeter.javadsl.core.DslTestPlan.TestPlanChild;
 import us.abstracta.jmeter.javadsl.core.assertions.DslResponseAssertion;
 import us.abstracta.jmeter.javadsl.core.configs.DslCsvDataSet;
+import us.abstracta.jmeter.javadsl.core.configs.DslVariables;
 import us.abstracta.jmeter.javadsl.core.controllers.DslForEachController;
 import us.abstracta.jmeter.javadsl.core.controllers.DslIfController;
 import us.abstracta.jmeter.javadsl.core.controllers.DslOnceOnlyController;
@@ -761,6 +762,20 @@ public class JmeterDsl {
    */
   public static DslCacheManager httpCache() {
     return new DslCacheManager();
+  }
+
+  /**
+   * Builds a DslVariables that allows to easily initialize or update JMeter variables.
+   * <p>
+   * This internally uses User Defined Variables when placed as test plan child and JSR223 Samplers
+   * otherwise.
+   *
+   * @return the DslVariables instance to define variables values and using it in a test plan.
+   * @see DslVariables
+   * @since 0.50
+   */
+  public static DslVariables vars() {
+    return new DslVariables();
   }
 
   /**

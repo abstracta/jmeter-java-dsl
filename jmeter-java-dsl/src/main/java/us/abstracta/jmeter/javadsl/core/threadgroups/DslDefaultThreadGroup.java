@@ -686,7 +686,7 @@ public class DslDefaultThreadGroup extends BaseThreadGroup<DslDefaultThreadGroup
     }
 
     @Override
-    public String buildCode() {
+    public String buildCode(String indent) {
       return SampleErrorAction.class.getSimpleName() + "." + value.name();
     }
 

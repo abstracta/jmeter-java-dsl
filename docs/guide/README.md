@@ -1805,6 +1805,127 @@ When requesting embedded resources of an HTML response, prefer using `downloadEm
 
 Check [ParallelController](../../jmeter-java-dsl-parallel/src/main/java/us/abstracta/jmeter/javadsl/parallel/ParallelController.java) for additional info.
 
+## JMeter variables & properties
+
+### Variables
+
+In general, when you want to reuse a certain value of your script, you can use, and is the preferred way, just to use Java variables. In some cases though, you might need to pre initialize some JMeter thread variable (for example to later be used in an `ifController`) or easily update its value without having to use a jsr223 element for that. For these cases the DSL provides the `vars()` method. 
+
+Here is an example:
+
+```java
+import static us.abstracta.jmeter.javadsl.JmeterDsl.*;
+
+import org.junit.jupiter.api.Test;
+
+public class PerformanceTest {
+
+  @Test
+  public void testPerformance() throws Exception {
+    String pageVarName = "PAGE";
+    String firstPage = "1";
+    String endPage = "END";
+    testPlan(
+        vars()
+            .set(pageVarName, firstPage),
+        threadGroup(2, 10,
+            ifController(s -> !s.vars.get(pageVarName).equals(endPage),
+                httpSampler("http://my.service/accounts?page=${" + pageVarName +"}")
+                    .children(
+                        regexExtractor(pageVarName, "next=.*?page=(\\d+)")
+                            .defaultValue(endPage)
+                    )
+            ),
+            ifController(s -> s.vars.get(pageVarName).equals(endPage),
+                vars()
+                    .set(pageVarName, firstPage)
+            )
+        )
+    ).run();
+  }
+
+}
+```
+
+::: warning
+For special consideration of existing JMeter users:
+
+`vars()` internally uses JMeter User Defined Variables (aka UDV) when placed as test plan child, but a JSR223 sampler otherwise. This decision avoids several non-intuitive behaviors of JMeter UDV which are listed in red blocks in [the JMeter component documentation](https://jmeter.apache.org/usermanual/component_reference.html#User_Defined_Variables). 
+
+Internally using a JSR223 sampler, allows DSL users to properly scope a variable to where it is placed (eg: defining a variable in one thread has no effect on other threads or thread groups), set the value when actually needed (not just at the beginning of test plan execution), and support cross-variable references (i.e.: if `var1=test` and `var2=${var1}`, then value of `var2` would be solved to `test`).
+
+When `vars()` is located as direct child of the test plan, due to usage of UDV, declared variables will be available to all thread groups and no variable cross-reference is supported.
+:::
+
+Check [DslVariables](../../jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/configs/DslVariables.java) for more details.
+
+### Properties
+
+You might reach a point where you want to pass some parameter to test plan or want to share some object or data that is available for all threads to use. In such scenarios you can use JMeter properties.
+
+JMeter properties are basically a map of keys and values, that is accessible to all threads. To access them you can use `${__P(PROPERTY_NAME)}` or equivalent `${__property(PROPERTY_NAME)` inside almost any string, `props['PROPERTY_NAME']` inside groovy scripts or `props.get("PROPERTY_NAME")` in lambda expressions.
+
+To set them, you can use `prop()` method included in `EmbeddedJmeterEngine` like in following example:
+
+```java
+import static us.abstracta.jmeter.javadsl.JmeterDsl.*;
+
+import org.junit.jupiter.api.Test;
+import us.abstracta.jmeter.javadsl.core.engines.EmbeddedJmeterEngine;
+
+public class PerformanceTest {
+
+  @Test
+  public void testProperties() {
+    testPlan(
+        threadGroup(1, 1,
+            httpSampler("http://myservice.test/${__P(MY_PROP)}")
+        )
+    ).runIn(new EmbeddedJmeterEngine()
+        .prop("MY_PROP", "MY_VAL"));
+  }
+
+}
+```
+
+Or you can set them in groovy or java code, like in following example:
+
+```java
+import static us.abstracta.jmeter.javadsl.JmeterDsl.*;
+
+import org.junit.jupiter.api.Test;
+
+public class PerformanceTest {
+
+  @Test
+  public void testProperties() {
+    testPlan(
+        threadGroup(1, 1,
+            jsr223Sampler("props.put('MY_PROP', 'MY_VAL')"),
+            httpSampler("http://myservice.test/${__P(MY_PROP)}")
+        )
+    ).run();
+  }
+
+}
+```
+
+::: tip
+You can put any object (not just strings) in properties, but only strings can be accessed via `${__P(PROPERTY_NAME)}` and `${__property(PROPERTY_NAME)}`.
+
+Being able to put any kind of object allows you to do very powerful stuff, like implementing a custom cache, or injecting some custom logic to test plan.
+:::
+
+::: tip
+You can also specify properties though JVM system properties either by setting JVM parameter `-D` or using `System.setProperty()` method.
+
+When properties are set as JVM system properties, they are not accessible via `props[PROPERTY_NAME]` or `props.get("PROPERTY_NAME")`. If you need to access them from groovy or java code, then use `props.getProperty("PROPERTY_NAME")` instead.
+:::
+
+::: warning
+JMeter properties can currently only be used with `EmbeddedJmeterEngine`, so use them sparingly and prefer other mechanisms when available.
+:::
+
 ## Protocols
 
 ### HTTP performance testing
@@ -2318,73 +2439,6 @@ Using java code (lambdas) will only work with embedded JMeter engine (no support
 `jsr223Sampler` is very powerful, but also makes code and test plan harder to maintain (as with any custom code) compared to using JMeter built-in samplers. So, in general, prefer using JMeter provided samplers if they are enough for the task at hand, and use `jsr223Sampler` sparingly.
 
 Check [DslJsr223Sampler](../../jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/java/DslJsr223Sampler.java) for more details and additional options.
-
-## JMeter properties
-
-You might reach a point where you want to pass some parameter to test plan or want to share some object or data that is available for all threads to use. In such scenarios you can use JMeter properties.
-
-JMeter properties are basically a map of keys and values, that is accessible to all threads. To access them you can use `${__P(PROPERTY_NAME)}` or equivalent `${__property(PROPERTY_NAME)` inside almost any string, `props['PROPERTY_NAME']` inside groovy scripts or `props.get("PROPERTY_NAME")` in lambda expressions.
-
-To set them, you can use `prop()` method included in `EmbeddedJmeterEngine` like in following example:
-
-```java
-import static us.abstracta.jmeter.javadsl.JmeterDsl.*;
-
-import org.junit.jupiter.api.Test;
-import us.abstracta.jmeter.javadsl.core.engines.EmbeddedJmeterEngine;
-
-public class PerformanceTest {
-
-  @Test
-  public void testProperties() {
-    testPlan(
-        threadGroup(1, 1,
-            httpSampler("http://myservice.test/${__P(MY_PROP)}")
-        )
-    ).runIn(new EmbeddedJmeterEngine()
-        .prop("MY_PROP", "MY_VAL"));
-  }
-
-}
-```
-
-Or you can set them in groovy or java code, like in following example:
-
-```java
-import static us.abstracta.jmeter.javadsl.JmeterDsl.*;
-
-import org.junit.jupiter.api.Test;
-
-public class PerformanceTest {
-
-  @Test
-  public void testProperties() {
-    testPlan(
-        threadGroup(1, 1,
-            jsr223Sampler("props.put('MY_PROP', 'MY_VAL')"),
-            httpSampler("http://myservice.test/${__P(MY_PROP)}")
-        )
-    ).run();
-  }
-
-}
-```
-
-::: tip
-You can put any object (not just strings) in properties, but only strings can be accessed via `${__P(PROPERTY_NAME)}` and `${__property(PROPERTY_NAME)}`.
-
-Being able to put any kind of object allows you to do very powerful stuff, like implementing a custom cache, or injecting some custom logic to test plan.
-:::
-
-::: tip
-You can also specify properties though JVM system properties either by setting JVM parameter `-D` or using `System.setProperty()` method.
-
-When properties are set as JVM system properties, they are not accessible via `props[PROPERTY_NAME]` or `props.get("PROPERTY_NAME")`. If you need to access them from groovy or java code, then use `props.getProperty("PROPERTY_NAME")` instead.
-:::
-
-::: warning
-JMeter properties can currently only be used with `EmbeddedJmeterEngine`, so use them sparingly and prefer other mechanisms when available.
-:::
 
 ## Custom or yet not supported test elements
 

@@ -4,7 +4,6 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -14,16 +13,7 @@ import us.abstracta.jmeter.javadsl.codegeneration.MethodParam.ChildrenParam;
 import us.abstracta.jmeter.javadsl.core.BuildTreeContext;
 import us.abstracta.jmeter.javadsl.core.DslTestElement;
 import us.abstracta.jmeter.javadsl.core.DslTestPlan;
-import us.abstracta.jmeter.javadsl.core.assertions.DslAssertion;
-import us.abstracta.jmeter.javadsl.core.configs.DslConfig;
-import us.abstracta.jmeter.javadsl.core.controllers.DslController;
-import us.abstracta.jmeter.javadsl.core.listeners.DslListener;
-import us.abstracta.jmeter.javadsl.core.postprocessors.DslPostProcessor;
-import us.abstracta.jmeter.javadsl.core.preprocessors.DslPreProcessor;
-import us.abstracta.jmeter.javadsl.core.samplers.DslSampler;
 import us.abstracta.jmeter.javadsl.core.testelements.MultiLevelTestElement;
-import us.abstracta.jmeter.javadsl.core.threadgroups.DslThreadGroup;
-import us.abstracta.jmeter.javadsl.core.timers.DslTimer;
 
 /**
  * Represents a method call, it's parameters and chained invocations.
@@ -36,49 +26,23 @@ import us.abstracta.jmeter.javadsl.core.timers.DslTimer;
 public class MethodCall {
 
   private static final String INDENT = "  ";
-  private static final Class<?>[][] EXECUTION_ORDERS = new Class[][]{
-      {DslConfig.class},
-      {DslPreProcessor.class},
-      {DslTimer.class},
-      {DslThreadGroup.class, DslController.class, DslSampler.class},
-      {DslPostProcessor.class},
-      {DslAssertion.class},
-      {DslListener.class}
-  };
-  private static final MethodCall EMPTY_CALL = new MethodCall(null, Object.class);
+  private static final MethodCall EMPTY_METHOD_CALL = new EmptyMethodCall();
 
-  private final String methodName;
+  protected final String methodName;
   private final Class<?> returnType;
-  private final int executionOrder;
-  private final Class<?> childrenType;
-  private final List<MethodParam<?>> params;
-  private final List<MethodCall> children = new ArrayList<>();
-  private final List<MethodCall> chain = new ArrayList<>();
-  // this is used to cache children method and avoid having to look it up in each request for child
   private MethodCall childrenMethod;
+  private ChildrenParam<?> childrenParam;
+  private final List<MethodParam<?>> params;
+  private final List<MethodCall> chain = new ArrayList<>();
 
-  private MethodCall(String methodName, Class<?> returnType, MethodParam<?>... params) {
+  protected MethodCall(String methodName, Class<?> returnType, MethodParam<?>... params) {
     this.methodName = methodName;
     this.returnType = returnType;
-    this.executionOrder = findExecutionOrder(returnType);
     this.params = Arrays.asList(params);
     if (params.length > 0 && params[params.length - 1] instanceof ChildrenParam) {
-      int lastParamIndex = params.length - 1;
-      childrenType = params[lastParamIndex].getType();
       childrenMethod = this;
-    } else {
-      this.childrenType = null;
+      childrenParam = (ChildrenParam<?>) params[params.length - 1];
     }
-  }
-
-  private static int findExecutionOrder(Class<?> returnType) {
-    for (int i = 0; i < EXECUTION_ORDERS.length; i++) {
-      if (Arrays.stream(EXECUTION_ORDERS[i])
-          .anyMatch(c -> c.isAssignableFrom(returnType))) {
-        return i;
-      }
-    }
-    return -1;
   }
 
   protected static MethodCall from(Method method, MethodParam<?>... params) {
@@ -125,23 +89,7 @@ public class MethodCall {
     }
   }
 
-  /**
-   * Generates a new method call which is ignored when trying to add it as child of another method.
-   * <p>
-   * This is useful when you know a code generator does support generating code for a given element
-   * but no call has to be included in DSL code. Eg: httpCache().
-   *
-   * @return the empty call instance.
-   */
-  public static MethodCall emptyCall() {
-    return EMPTY_CALL;
-  }
-
-  protected boolean isEmptyCall() {
-    return this == EMPTY_CALL;
-  }
-
-  protected static MethodCall buildUnsupported() {
+  public static MethodCall buildUnsupported() {
     return new MethodCall("unsupported", UnsupportedTestElement.class);
   }
 
@@ -159,6 +107,35 @@ public class MethodCall {
     public void showInGui() {
     }
 
+  }
+
+  /**
+   * Generates a method call that should be ignored (no code should be generated).
+   * <p>
+   * This is helpful when some MethodCallBuilder supports a given test element conversion, but no
+   * associated generated DSL code should be included.
+   *
+   * @return the empty method call.
+   */
+  public static MethodCall emptyCall() {
+    return EMPTY_METHOD_CALL;
+  }
+
+  private static class EmptyMethodCall extends MethodCall {
+
+    protected EmptyMethodCall() {
+      super(null, MultiLevelTestElement.class);
+    }
+
+    @Override
+    public String buildCode(String indent) {
+      return "";
+    }
+
+  }
+
+  public Class<?> getReturnType() {
+    return returnType;
   }
 
   /**
@@ -181,25 +158,14 @@ public class MethodCall {
   public MethodCall child(MethodCall child) {
     if (childrenMethod == null) {
       childrenMethod = findChildrenMethod();
-    }
-    Class<?> childrenType = childrenMethod.childrenType.getComponentType();
-    if (!childrenType.isAssignableFrom(child.returnType)) {
-      throw new IllegalArgumentException("Trying to add a child of type " + child.returnType
-          + " that is not compatible with the declared ones for the method " + methodName + ": "
-          + childrenType);
-    }
-    childrenMethod.children.add(child);
-    if (childrenMethod != this
-        && (chain.isEmpty() || chain.get(chain.size() - 1) != childrenMethod)) {
       chain.add(childrenMethod);
+      childrenParam = (ChildrenParam<?>) childrenMethod.params.get(0);
     }
+    childrenParam.addChild(child);
     return childrenMethod;
   }
 
   private MethodCall findChildrenMethod() {
-    if (childrenType != null) {
-      return this;
-    }
     Method childrenMethod = null;
     Class<?> methodHolder = returnType;
     while (childrenMethod == null && methodHolder != Object.class) {
@@ -215,8 +181,22 @@ public class MethodCall {
           + "This might be due to unexpected test plan structure or missing method in test element"
           + ". Please create an issue in GitHub repository if you find any of these cases.");
     }
-    return new MethodCall(childrenMethod.getName(), childrenMethod.getReturnType(),
-        new ChildrenParam<>(childrenMethod.getParameterTypes()[0]));
+    return new ChildrenMethodCall(childrenMethod);
+  }
+
+  private static class ChildrenMethodCall extends MethodCall {
+
+    protected ChildrenMethodCall(Method method) {
+      super(method.getName(), method.getReturnType(),
+          new ChildrenParam<>(method.getParameterTypes()[0]));
+    }
+
+    @Override
+    protected String buildCode(String indent) {
+      String paramsCode = buildParamsCode(indent + INDENT);
+      return paramsCode.isEmpty() ? "" : methodName + "(" + paramsCode + indent + ")";
+    }
+
   }
 
   /**
@@ -339,45 +319,44 @@ public class MethodCall {
     return buildCode("");
   }
 
-  private String buildCode(String indent) {
+  protected String buildCode(String indent) {
     StringBuilder ret = new StringBuilder();
     ret.append(methodName)
         .append("(");
-    ret.append(params.stream()
-        .filter(p -> !p.isIgnored() && !(p instanceof ChildrenParam))
-        .map(MethodParam::buildCode)
-        .collect(Collectors.joining(", ")));
     String childIndent = indent + INDENT;
-    List<MethodCall> children = this.children.stream()
-        // order elements to provide the most intuitive representation and ease tests
-        .sorted(Comparator.comparing(c -> c.executionOrder))
-        .collect(Collectors.toList());
-    if (!children.isEmpty()) {
-      if (ret.charAt(ret.length() - 1) != '(') {
-        ret.append(",");
-      }
-      ret.append("\n")
-          .append(childIndent);
-      ret.append(children.stream()
-          .map(c -> c.buildCode(childIndent))
-          .collect(Collectors.joining(",\n" + childIndent))
-      );
-      ret.append("\n")
-          .append(indent);
+    String paramsCode = buildParamsCode(childIndent);
+    ret.append(paramsCode);
+    boolean hasChildren = paramsCode.endsWith("\n");
+    if (hasChildren) {
+      ret.append(indent);
     }
     ret.append(")");
-    if (!chain.isEmpty()) {
-      if (children.isEmpty()) {
+    String chainedCode = buildChainedCode(childIndent);
+    if (!chainedCode.isEmpty()) {
+      if (!hasChildren) {
         ret.append("\n")
             .append(childIndent);
       }
       ret.append(".");
-      ret.append(chain.stream()
-          .map(c -> c.buildCode(childIndent))
-          .collect(Collectors.joining("\n" + childIndent + "."))
-      );
+      ret.append(chainedCode);
     }
     return ret.toString();
+  }
+
+  protected String buildParamsCode(String indent) {
+    String ret = params.stream()
+        .filter(p -> !p.isIgnored())
+        .map(p -> p.buildCode(indent))
+        .filter(s -> !s.isEmpty())
+        .collect(Collectors.joining(", "));
+    return ret.replace(", \n", ",\n").replaceAll("\n\\s*\n", "\n");
+  }
+
+  private String buildChainedCode(String indent) {
+    return chain.stream()
+        .map(c -> c.buildCode(indent))
+        .filter(s -> !s.isEmpty())
+        .collect(Collectors.joining("\n" + indent + "."));
   }
 
 }

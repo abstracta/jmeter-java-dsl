@@ -3,10 +3,23 @@ package us.abstracta.jmeter.javadsl.codegeneration;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import us.abstracta.jmeter.javadsl.core.assertions.DslAssertion;
+import us.abstracta.jmeter.javadsl.core.configs.DslConfig;
+import us.abstracta.jmeter.javadsl.core.configs.DslVariables;
+import us.abstracta.jmeter.javadsl.core.controllers.DslController;
+import us.abstracta.jmeter.javadsl.core.listeners.DslListener;
+import us.abstracta.jmeter.javadsl.core.postprocessors.DslPostProcessor;
+import us.abstracta.jmeter.javadsl.core.preprocessors.DslPreProcessor;
+import us.abstracta.jmeter.javadsl.core.samplers.DslSampler;
+import us.abstracta.jmeter.javadsl.core.threadgroups.DslThreadGroup;
+import us.abstracta.jmeter.javadsl.core.timers.DslTimer;
 
 /**
  * Generates code for a MethodCall parameter.
@@ -21,7 +34,7 @@ public abstract class MethodParam<T> {
 
   protected final T value;
   protected final T defaultValue;
-  private final Class<T> paramType;
+  protected final Class<T> paramType;
 
   protected MethodParam(Class<T> paramType, T value, T defaultValue) {
     this.paramType = paramType;
@@ -61,7 +74,7 @@ public abstract class MethodParam<T> {
     return false;
   }
 
-  protected abstract String buildCode();
+  protected abstract String buildCode(String indent);
 
   protected static <T> Map<T, String> findConstantNames(Class<?> constantsHolderClass,
       Class<T> constantClass, Predicate<Field> filter) {
@@ -120,7 +133,7 @@ public abstract class MethodParam<T> {
     }
 
     @Override
-    public String buildCode() {
+    public String buildCode(String indent) {
       return "\"" + value.replaceAll("[\\\\\"\n\t\r]", "\\\\$0") + "\"";
     }
 
@@ -139,7 +152,7 @@ public abstract class MethodParam<T> {
     }
 
     @Override
-    public String buildCode() {
+    public String buildCode(String indent) {
       return String.valueOf(value);
     }
 
@@ -200,7 +213,7 @@ public abstract class MethodParam<T> {
     }
 
     @Override
-    public String buildCode() {
+    public String buildCode(String indent) {
       return value.isZero() ? Duration.class.getSimpleName() + ".ZERO"
           : MethodCall.forStaticMethod(Duration.class, "ofSeconds",
               new LongParam(value.getSeconds())).buildCode();
@@ -218,6 +231,19 @@ public abstract class MethodParam<T> {
    */
   public static class ChildrenParam<T> extends MethodParam<T> {
 
+    private static final Class<?>[][] EXECUTION_ORDERS = new Class[][]{
+        {DslVariables.class},
+        {DslConfig.class},
+        {DslPreProcessor.class},
+        {DslTimer.class},
+        {DslThreadGroup.class, DslController.class, DslSampler.class},
+        {DslPostProcessor.class},
+        {DslAssertion.class},
+        {DslListener.class}
+    };
+
+    private final List<MethodCall> children = new ArrayList<>();
+
     public ChildrenParam(Class<T> childrenClass) {
       super(checkChildrenType(childrenClass), null, null);
     }
@@ -232,8 +258,35 @@ public abstract class MethodParam<T> {
     }
 
     @Override
-    public String buildCode() {
-      throw new UnsupportedOperationException();
+    public String buildCode(String indent) {
+      List<MethodCall> childrenCalls = children.stream()
+          // order elements to provide the most intuitive representation and ease tests
+          .sorted(Comparator.comparing(c -> findExecutionOrder(c.getReturnType())))
+          .collect(Collectors.toList());
+      String ret = childrenCalls.stream()
+          .map(c -> c.buildCode(indent))
+          .filter(s -> !s.isEmpty())
+          .collect(Collectors.joining(",\n" + indent));
+      return ret.isEmpty() ? ret : "\n" + indent + ret + "\n";
+    }
+
+    private static int findExecutionOrder(Class<?> returnType) {
+      for (int i = 0; i < EXECUTION_ORDERS.length; i++) {
+        if (Arrays.stream(EXECUTION_ORDERS[i])
+            .anyMatch(c -> c.isAssignableFrom(returnType))) {
+          return i;
+        }
+      }
+      return -1;
+    }
+
+    public void addChild(MethodCall child) {
+      Class<?> childrenType = paramType.getComponentType();
+      if (!childrenType.isAssignableFrom(child.getReturnType())) {
+        throw new IllegalArgumentException("Trying to add a child of type " + child.getReturnType()
+            + " that is not compatible with the declared ones : " + childrenType);
+      }
+      children.add(child);
     }
 
   }

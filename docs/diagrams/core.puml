@@ -172,6 +172,10 @@ package core {
       THREAD
     }
 
+    class DslVariables extends BaseConfigElement {
+      Map<String, String> vars
+    }
+
     DslCsvDataSet ..> Sharing
 
   }

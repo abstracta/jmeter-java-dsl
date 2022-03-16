@@ -4,7 +4,6 @@ import static us.abstracta.jmeter.javadsl.JmeterDsl.jsr223PreProcessor;
 
 import java.lang.reflect.Method;
 import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -31,7 +30,6 @@ import org.eclipse.jetty.http.MimeTypes;
 import us.abstracta.jmeter.javadsl.JmeterDsl;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodCall;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodCallContext;
-import us.abstracta.jmeter.javadsl.codegeneration.MethodParam;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodParam.BoolParam;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodParam.IntParam;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodParam.StringParam;
@@ -745,31 +743,6 @@ public class DslHttpSampler extends BaseSampler<DslHttpSampler> {
       }
     }
 
-    private static class EncodingParam extends MethodParam<Charset> {
-
-      private static final Map<Charset, String> STANDARD_CHARSETS_NAMES =
-          findConstantNames(StandardCharsets.class, Charset.class, s -> true);
-
-      protected EncodingParam(TestElementParamBuilder paramBuilder) {
-        super(Charset.class, buildCharset(paramBuilder), null);
-      }
-
-      private static Charset buildCharset(TestElementParamBuilder paramBuilder) {
-        StringParam charset = paramBuilder.stringParam(HTTPSamplerBase.CONTENT_ENCODING, "");
-        return charset.isDefault() ? null : Charset.forName(charset.getValue());
-      }
-
-      @Override
-      public String buildCode() {
-        String standardCharsetName = STANDARD_CHARSETS_NAMES.get(value);
-        return standardCharsetName != null
-            ? StandardCharsets.class.getSimpleName() + "." + standardCharsetName
-            : MethodCall.forStaticMethod(Charset.class, "forName",
-                new StringParam(getValue().name())).buildCode();
-      }
-
-    }
-
     private static class HttpMethodParam extends StringParam {
 
       private static final Map<String, String> CONSTANT_METHODS = findConstantNames(
@@ -798,26 +771,10 @@ public class DslHttpSampler extends BaseSampler<DslHttpSampler> {
       }
 
       @Override
-      public String buildCode() {
+      public String buildCode(String indent) {
         String constant = CONSTANT_METHODS.get(value != null ? value.toUpperCase(Locale.US) : null);
         return constant != null ? HTTPConstants.class.getSimpleName() + "." + constant
-            : super.buildCode();
-      }
-
-    }
-
-    private static class ClientImplParam extends MethodParam<HttpClientImpl> {
-
-      protected ClientImplParam(TestElementParamBuilder paramBuilder) {
-        super(HttpClientImpl.class,
-            HttpClientImpl.fromPropertyValue(
-                paramBuilder.prop(HTTPSamplerBase.IMPLEMENTATION).getStringValue()),
-            HttpClientImpl.HTTP_CLIENT);
-      }
-
-      @Override
-      public String buildCode() {
-        return HttpClientImpl.class.getSimpleName() + "." + value.name();
+            : super.buildCode(indent);
       }
 
     }

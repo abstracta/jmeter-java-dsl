@@ -39,7 +39,11 @@ public class BuildTreeContext {
   }
 
   public BuildTreeContext getRoot() {
-    return parent == null ? this : parent.getRoot();
+    return isRoot() ? this : parent.getRoot();
+  }
+
+  public boolean isRoot() {
+    return parent == null;
   }
 
   public Object getEntry(String key) {

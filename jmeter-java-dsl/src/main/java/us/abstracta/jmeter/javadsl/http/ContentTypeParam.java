@@ -17,7 +17,7 @@ public class ContentTypeParam extends MethodParam<ContentType> {
   }
 
   @Override
-  public String buildCode() {
+  public String buildCode(String indent) {
     String contentTypeName = findConstantName(value);
     if (contentTypeName != null) {
       return ContentType.class.getSimpleName() + "." + contentTypeName;
