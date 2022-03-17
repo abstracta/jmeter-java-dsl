@@ -66,6 +66,10 @@ dependencies {
 :::
 ::::
 
+::: tip
+[Here](https://github.com/abstracta/jmeter-java-dsl-sample) is a sample project in case you want to start one from scratch.
+:::
+
 ## Simple HTTP test plan
 
 To generate HTTP requests just use provided `httpSampler`.

@@ -51,6 +51,5 @@ public class PerformanceTest {
 }
 ```
 
-
-
+[Here](https://github.com/abstracta/jmeter-java-dsl-sample) is a sample project in case you want to start one from scratch.
 
