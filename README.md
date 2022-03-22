@@ -4,6 +4,8 @@ Simple Java API to run performance tests, using [JMeter] as engine, in a Git and
 
 If you like this project, **please give it a star :star:!** This helps the project be more visible, gain relevance and encourages us to invest more effort in new features.
 
+Please join [discord server](https://discord.gg/WNSn5hqmSd) or create GitHub [issues](https://github.com/abstracta/jmeter-java-dsl/issues) and [discussions](https://github.com/abstracta/jmeter-java-dsl/discussions) to be part of the community and clear out doubts, get latest news, propose ideas, report issues, etc.
+
 ## Usage
 
 If you use [maven](https://maven.apache.org/what-is-maven.html), just include following dependency:
@@ -68,10 +70,12 @@ Check more about the motivation and analysis of alternatives [here](https://abst
 
 ## Contributing & Requesting features
 
-Currently, the project only covers the basic, but most used, features when implementing JMeter performance tests. 
-The idea is to evaluate if the community (you) is interested in using the library, and if so, implement new features as the community request them, covering at some point most of JMeter (and plugins) features. 
-In order to accomplish this, we need you to **please create an issue for any particular feature or need that you have**.
+Currently, the project covers the most used features required when implementing JMeter performance tests, but not everything the JMeter supports/provides. 
 
-We would also really appreciate pull requests. Check the [CONTRIBUTING](CONTRIBUTING.md) guide for an explanation of main library components and how can you extend the library.
+We invest in development of DSL according to community's (your) interest, which we evaluate reviewing GitHub stars evolution, features requests and contributions. 
+
+To keep improving the DSL we need you to **please create an issue for any particular feature or need that you have**.
+
+We also really appreciate pull requests. Check the [CONTRIBUTING](CONTRIBUTING.md) guide for an explanation of main library components and how can you extend the library.
 
 [JMeter]: http://jmeter.apache.org/

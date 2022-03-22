@@ -45,7 +45,6 @@ module.exports = {
    * ref：https://v1.vuepress.vuejs.org/theme/default-theme-config.html
    */
   themeConfig: {
-    repo: REPO_URL,
     logo: '/logo.svg',
     editLinks: false,
     docsDir: '',
@@ -59,7 +58,16 @@ module.exports = {
       {
           text: 'Motivation',
           link: '/motivation/',
-        }
+      },
+      {
+        link: "https://discord.gg/WNSn5hqmSd",
+        // custom defined property that uses font awesome. Remember adding also to library in enhanceApp.js
+        icon: ['fab', 'discord']
+      },
+      {
+        link: "https://github.com/abstracta/jmeter-java-dsl",
+        icon: ['fab', 'github']
+      }
     ]
   },
 
