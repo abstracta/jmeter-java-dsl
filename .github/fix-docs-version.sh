@@ -9,7 +9,7 @@ VERSION=$1
 update_file_versions() {
   local VERSION="$1"
   local FILE="$2"
-  sed -i "s/jmeter-java-dsl\(.*\):.*'/jmeter-java-dsl\1:${VERSION}'/g" "${FILE}"
+  sed -i "s/jmeter-java-dsl\([^ :]*\):[0-9.]\+/jmeter-java-dsl\1:${VERSION}/g" "${FILE}"
   sed -i "/jmeter-java-dsl.*<\/artifactId>$/{N;s/jmeter-java-dsl\(.*\)<\/artifactId>\n  <version>.*<\/version>/jmeter-java-dsl\1<\/artifactId>\n  <version>${VERSION}<\/version>/}" "${FILE}"
 }
 

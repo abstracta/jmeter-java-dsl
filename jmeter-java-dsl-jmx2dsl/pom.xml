@@ -4,7 +4,7 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <properties>
-    <picocli.version>4.6.2</picocli.version>
+    <picocli.version>4.6.3</picocli.version>
   </properties>
 
   <parent>
@@ -28,6 +28,13 @@
       <groupId>info.picocli</groupId>
       <artifactId>picocli</artifactId>
       <version>${picocli.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>us.abstracta.jmeter</groupId>
+      <artifactId>jmeter-java-dsl</artifactId>
+      <type>test-jar</type>
+      <version>${project.version}</version>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 
@@ -114,7 +121,7 @@
                     <exclude>bin/report-template/**</exclude>
                     <exclude>**/Log4j2Plugins.dat</exclude>
                     <exclude>META-INF/MANIFEST.MF</exclude>
-                    <exclude>META-INF/LICENSE</exclude>
+                    <exclude>META-INF/LICENSE**</exclude>
                     <exclude>META-INF/NOTICE**</exclude>
                     <exclude>META-INF/DEPENDENCIES**</exclude>
                     <exclude>META-INF/*.SF</exclude>
@@ -133,22 +140,6 @@
                 </transformer>
               </transformers>
             </configuration>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <groupId>org.skife.maven</groupId>
-        <artifactId>really-executable-jar-maven-plugin</artifactId>
-        <version>1.5.0</version>
-        <configuration>
-          <programFile>jmx2dsl</programFile>
-        </configuration>
-        <executions>
-          <execution>
-            <phase>package</phase>
-            <goals>
-              <goal>really-executable-jar</goal>
-            </goals>
           </execution>
         </executions>
       </plugin>

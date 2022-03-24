@@ -121,19 +121,19 @@ Check [HTTP performance testing](#http-performance-testing) for additional detai
 
 ## DSL code generation from JMX file
 
-To ease migrating existing JMeter test plans and ease learning about DSL features, the DSL provides `jmx2dsl` (download latest version from [releases page](https://github.com/abstracta/jmeter-java-dsl/releases)) command line tool which you can use to generate DSL code from existing JMX files.
+To ease migrating existing JMeter test plans and ease learning about DSL features, the DSL provides `jmx2dsl` (download latest version from [releases page](https://github.com/abstracta/jmeter-java-dsl/releases) or use [jbang](https://www.jbang.dev/documentation/guide/latest/index.html)) command line tool which you can use to generate DSL code from existing JMX files.
 
 As an example:
 
 :::: tabs type:card
-::: tab Linux & Mac
+::: tab Java
 ```bash
-jmx2dsl test-plan.jmx
+java -jar jmx2dsl.jar test-plan.jmx
 ```
 :::
-::: tab Windows
-```powershell
-java -jar jmx2dsl test-plan.jmx
+::: tab Jbang
+```bash
+jbang us.abstracta.jmeter:jmeter-java-dsl-jmx2dsl:0.44 test-plan.jmx
 ```
 :::
 ::::

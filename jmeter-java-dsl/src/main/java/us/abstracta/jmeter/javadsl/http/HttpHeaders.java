@@ -12,8 +12,6 @@ import org.apache.jmeter.protocol.http.util.HTTPConstants;
 import org.apache.jmeter.testelement.TestElement;
 import org.apache.jmeter.testelement.property.CollectionProperty;
 import org.apache.jmeter.testelement.property.JMeterProperty;
-import org.eclipse.jetty.http.HttpHeader;
-import org.eclipse.jetty.http.MimeTypes;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodCall;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodCallContext;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodParam.StringParam;
@@ -54,19 +52,6 @@ public class HttpHeaders extends BaseConfigElement {
    */
   public HttpHeaders header(String name, String value) {
     headers.put(name, value);
-    return this;
-  }
-
-  /**
-   * Allows to easily specify the Content-Type HTTP header.
-   *
-   * @param contentType value to use as Content-Type header.
-   * @return the altered HttpHeaders to allow for fluent API usage.
-   * @deprecated as of 0.42 use {@link #contentType(ContentType)} instead.
-   */
-  @Deprecated
-  public HttpHeaders contentType(MimeTypes.Type contentType) {
-    headers.put(HttpHeader.CONTENT_TYPE.toString(), contentType.toString());
     return this;
   }
 
