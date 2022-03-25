@@ -2328,7 +2328,7 @@ public class PerformanceTest {
         "DELETE FROM products WHERE name = '" + productName + "'")
         .timeout(Duration.ofSeconds(10));
     TestPlanStats stats = testPlan(
-        jdbcConnectionPool(jdbcPoolName, Driver.class, "")
+        jdbcConnectionPool(jdbcPoolName, Driver.class, "jdbc:postgresql://localhost/my_db")
             .user("user")
             .password("pass"),
         setupThreadGroup(

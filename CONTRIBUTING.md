@@ -115,7 +115,7 @@ Additionally, the project uses checkstyle for enforcing code consistency and con
           myElement(requiredPropVal, child)
         
           myElement(elemName, requiredPropVal, child)
-      ```
+        ```
 6. Implement tests that verify the expected behavior of the test element in a test plan execution. This way, you verify that you properly initialize JMeter properties and that your interpretation of the test element properties and behavior is right.
    * Check [DslHttpSamplerTest](jmeter-java-dsl/src/test/java/us/abstracta/jmeter/javadsl/http/DslHttpSamplerTest.java) for some sample test cases.
 7. Add a nested `CodeBuilder` class extending [MethodCallBuilder], implementing necessary logic to generated DSL code from JMeter test element.
