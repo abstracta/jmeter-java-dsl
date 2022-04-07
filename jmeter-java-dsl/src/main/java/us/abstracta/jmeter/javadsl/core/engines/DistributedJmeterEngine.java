@@ -126,7 +126,7 @@ public class DistributedJmeterEngine extends EmbeddedJmeterEngine {
         try {
           endListener.await();
         } catch (InterruptedException e) {
-          Thread.interrupted();
+          Thread.currentThread().interrupt();
         }
       }
 

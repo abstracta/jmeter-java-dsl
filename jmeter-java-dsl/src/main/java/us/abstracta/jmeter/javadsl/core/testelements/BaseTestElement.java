@@ -156,6 +156,16 @@ public abstract class BaseTestElement implements DslTestElement {
     frame.setVisible(true);
   }
 
+  protected void showAndWaitFrameWith(Component content, String title, int width, int height) {
+    CountDownLatch countDownLatch = new CountDownLatch(1);
+    showFrameWith(content, title, width, height, countDownLatch::countDown);
+    try {
+      countDownLatch.await();
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+    }
+  }
+
   protected static long durationToSeconds(Duration duration) {
     return Math.round(Math.ceil((double) duration.toMillis() / 1000));
   }

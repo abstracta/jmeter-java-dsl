@@ -293,7 +293,7 @@ public class RpsThreadGroup extends BaseThreadGroup<RpsThreadGroup> {
       chart.add(0, schedules.get(0).fromRps);
       schedules.forEach(s -> chart.add(s.durationSecs * 1000, s.toRps));
     }
-    showFrameWith(chart, name + " timeline", 800, 300, null);
+    showAndWaitFrameWith(chart, name + " timeline", 800, 300);
   }
 
 }

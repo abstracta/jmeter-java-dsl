@@ -3,8 +3,10 @@ package us.abstracta.jmeter.javadsl.core.listeners;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.DirectoryNotEmptyException;
+import java.nio.file.DirectoryStream;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.apache.jmeter.JMeter;
 import org.apache.jmeter.report.config.ConfigurationException;
@@ -38,7 +40,10 @@ public class HtmlReporter extends BaseListener {
   }
 
   private boolean isEmptyDirectory(File reportDirectory) throws IOException {
-    return !Files.newDirectoryStream(reportDirectory.toPath()).iterator().hasNext();
+    try (DirectoryStream<Path> dirContentsStream = Files.newDirectoryStream(
+        reportDirectory.toPath())) {
+      return !dirContentsStream.iterator().hasNext();
+    }
   }
 
   @Override

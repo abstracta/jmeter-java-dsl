@@ -694,7 +694,7 @@ public class JtlWriter extends BaseListener {
           && config.saveResponseData() && config.saveTimestamp() && config.saveCode()
           && config.saveDataType() && config.saveBytes() && config.saveUrl()
           && config.saveConnectTime() && config.saveHostname() && config.saveSamplerData()
-          && config.saveHostname();
+          && config.saveSubresults();
     }
 
   }

@@ -463,7 +463,7 @@ public class DslDefaultThreadGroup extends BaseThreadGroup<DslDefaultThreadGroup
     SingleSeriesTimelinePanel chart = new SingleSeriesTimelinePanel("Threads");
     chart.add(0, 0);
     stages.forEach(s -> chart.add(s.duration.toMillis(), s.threadCount));
-    showFrameWith(chart, name + " threads timeline", 800, 300, null);
+    showAndWaitFrameWith(chart, name + " threads timeline", 800, 300);
   }
 
   public static class CodeBuilder extends MethodCallBuilder {

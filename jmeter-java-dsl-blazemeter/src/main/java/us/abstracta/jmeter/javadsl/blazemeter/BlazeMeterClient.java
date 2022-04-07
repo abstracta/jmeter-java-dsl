@@ -66,7 +66,7 @@ public class BlazeMeterClient {
   }
 
   private OkHttpClient buildHttpClient(String token) {
-    int tokenSeparatorIndex = token.indexOf(":");
+    int tokenSeparatorIndex = token.indexOf(':');
     if (tokenSeparatorIndex < 0) {
       throw new IllegalArgumentException(
           "BlazeMeter token does not match with expected format: <apikey>:<secretKey>");

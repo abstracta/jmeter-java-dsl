@@ -211,7 +211,7 @@ public class EmbeddedJmeterEngine implements DslJmeterEngine {
       }
     } catch (InterruptedException e) {
       //just stop waiting for visualizers and reset interrupted flag
-      Thread.interrupted();
+      Thread.currentThread().interrupt();
     }
   }
 
