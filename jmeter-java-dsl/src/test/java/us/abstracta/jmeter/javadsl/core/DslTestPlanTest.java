@@ -42,7 +42,7 @@ public class DslTestPlanTest extends DslVisualizerTest {
       saveScreenshot(testInfo);
       throw e;
     } finally {
-      frame.close();
+      frame.cleanUp();
     }
   }
 

@@ -54,26 +54,28 @@ public abstract class DslVisualizerTest extends JmeterDslTest {
 
   @AfterEach
   public void teardown() {
-    robot.cleanUp();
-    executor.shutdownNow();
+    if (robot != null) {
+      robot.cleanUp();
+    }
+    if (executor != null) {
+      executor.shutdownNow();
+    }
   }
 
   public void testVisualizerTestPlan(DslTestPlan testPlan,
-      ResultsReceivedCondition resultsCondition, VisualizerAssertion assertion, TestInfo testInfo)
-      throws Exception {
-    int timeoutSeconds = 30;
-    Future<TestPlanStats> result = executor.submit(testPlan::run);
+      ResultsReceivedCondition resultsCondition, VisualizerAssertion assertion, TestInfo testInfo) {
+    executor.submit(testPlan::run);
     FrameFixture frame = WindowFinder.findFrame(JFrame.class)
         .using(robot);
     try {
+      int timeoutSeconds = 30;
       awaitResultsReceived(resultsCondition, timeoutSeconds, frame);
       assertion.assertVisualizer(frame);
     } catch (Exception | AssertionError e) {
       saveScreenshot(testInfo);
       throw e;
     } finally {
-      frame.close();
-      result.get(timeoutSeconds, TimeUnit.SECONDS);
+      frame.cleanUp();
     }
   }
 

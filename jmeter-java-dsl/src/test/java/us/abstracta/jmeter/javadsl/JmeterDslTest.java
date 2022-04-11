@@ -9,8 +9,16 @@ import com.github.tomakehurst.wiremock.junit5.WireMockTest;
 import java.util.HashMap;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.ClassOrderer;
+import org.junit.jupiter.api.TestClassOrder;
 import us.abstracta.jmeter.javadsl.core.TestPlanStats;
 
+/*
+We force the order to avoid nested classes tests stopping wiremock and then parent tests failing.
+This issue, for some reason, manifests only when running single class tests like:
+mvn -e clean test -am -pl jmeter-java-dsl -Dtest=DslViewResultsTreeTest\*
+ */
+@TestClassOrder(ClassOrderer.ClassName.class)
 @WireMockTest
 public abstract class JmeterDslTest {
 

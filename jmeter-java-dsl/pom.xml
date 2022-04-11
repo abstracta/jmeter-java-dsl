@@ -71,12 +71,6 @@
       <version>0.8</version>
     </dependency>
     <dependency>
-      <groupId>org.eclipse.jetty</groupId>
-      <artifactId>jetty-http</artifactId>
-      <!-- same version as wiremock dependency -->
-      <version>9.4.44.v20210927</version>
-    </dependency>
-    <dependency>
       <groupId>org.apache.httpcomponents</groupId>
       <artifactId>httpcore</artifactId>
       <!-- same version as JMeter dependency -->
