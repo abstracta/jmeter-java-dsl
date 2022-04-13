@@ -170,4 +170,11 @@ public abstract class BaseTestElement implements DslTestElement {
     return Math.round(Math.ceil((double) duration.toMillis() / 1000));
   }
 
+  public String getName() {
+    return name;
+  }
+
+  public Class<? extends JMeterGUIComponent> getGuiClass() {
+    return guiClass;
+  }
 }
