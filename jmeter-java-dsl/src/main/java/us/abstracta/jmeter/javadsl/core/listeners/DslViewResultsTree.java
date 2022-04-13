@@ -8,8 +8,8 @@ import org.apache.jmeter.util.JMeterUtils;
 import org.apache.jmeter.visualizers.ViewResultsFullVisualizer;
 import org.apache.jorphan.collections.HashTree;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodCall;
-import us.abstracta.jmeter.javadsl.codegeneration.MethodCallBuilder;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodCallContext;
+import us.abstracta.jmeter.javadsl.codegeneration.SingleGuiClassCallBuilder;
 import us.abstracta.jmeter.javadsl.codegeneration.TestElementParamBuilder;
 import us.abstracta.jmeter.javadsl.core.BuildTreeContext;
 
@@ -65,24 +65,24 @@ public class DslViewResultsTree extends DslVisualizer {
     return new ResultCollector();
   }
 
-  public static class CodeBuilder extends MethodCallBuilder {
+  public static class CodeBuilder extends SingleGuiClassCallBuilder {
 
     public CodeBuilder(List<Method> builderMethods) {
-      super(builderMethods);
+      super(ViewResultsFullVisualizer.class, builderMethods);
+    }
+
+    @Override
+    public boolean matches(MethodCallContext context) {
+      if (!super.matches(context)) {
+        return false;
+      }
+      TestElementParamBuilder paramBuilder = new TestElementParamBuilder(context.getTestElement());
+      // only apply if file is empty to use the less possible feature, instead of using exact match
+      return paramBuilder.stringParam(ResultCollector.FILENAME).isDefault();
     }
 
     @Override
     protected MethodCall buildMethodCall(MethodCallContext context) {
-      TestElement testElement = context.getTestElement();
-      if (!ViewResultsFullVisualizer.class.getName()
-          .equals(testElement.getPropertyAsString("TestElement.gui_class"))) {
-        return null;
-      }
-      TestElementParamBuilder paramBuilder = new TestElementParamBuilder(testElement);
-      // only apply if file is empty to use the less possible feature, instead of using exact match
-      if (!paramBuilder.stringParam(ResultCollector.FILENAME).isDefault()) {
-        return null;
-      }
       return buildMethodCall();
     }
 

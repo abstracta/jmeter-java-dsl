@@ -8,9 +8,9 @@ import org.apache.jmeter.protocol.http.config.gui.HttpDefaultsGui;
 import org.apache.jmeter.protocol.http.sampler.HTTPSamplerBase;
 import org.apache.jmeter.testelement.TestElement;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodCall;
-import us.abstracta.jmeter.javadsl.codegeneration.MethodCallBuilder;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodCallContext;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodParam.StringParam;
+import us.abstracta.jmeter.javadsl.codegeneration.SingleGuiClassCallBuilder;
 import us.abstracta.jmeter.javadsl.codegeneration.TestElementParamBuilder;
 import us.abstracta.jmeter.javadsl.core.configs.BaseConfigElement;
 import us.abstracta.jmeter.javadsl.http.DslHttpSampler.HttpClientImpl;
@@ -211,20 +211,16 @@ public class DslHttpDefaults extends BaseConfigElement {
     return ret;
   }
 
-  public static class CodeBuilder extends MethodCallBuilder {
+  public static class CodeBuilder extends SingleGuiClassCallBuilder {
 
     public CodeBuilder(List<Method> builderMethods) {
-      super(builderMethods);
+      super(HttpDefaultsGui.class, builderMethods);
     }
 
     @Override
     protected MethodCall buildMethodCall(MethodCallContext context) {
-      TestElementParamBuilder paramBuilder = new TestElementParamBuilder(context.getTestElement());
-      if (!HttpDefaultsGui.class.getName()
-          .equals(paramBuilder.stringParam(TestElement.GUI_CLASS).getValue())) {
-        return null;
-      }
       MethodCall ret = buildMethodCall();
+      TestElementParamBuilder paramBuilder = new TestElementParamBuilder(context.getTestElement());
       StringParam protocol = paramBuilder.stringParam(HTTPSamplerBase.PROTOCOL);
       StringParam host = paramBuilder.stringParam(HTTPSamplerBase.DOMAIN);
       StringParam port = paramBuilder.stringParam(HTTPSamplerBase.PORT);

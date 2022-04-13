@@ -5,7 +5,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import org.apache.jmeter.testelement.TestElement;
@@ -152,8 +151,8 @@ public class MethodCallContext {
   public MethodCall buildMethodCall() {
     try {
       MethodCall ret = codeGenerator.getBuilders().stream()
+          .filter(b -> b.matches(this))
           .map(b -> b.buildMethodCall(this))
-          .filter(Objects::nonNull)
           .findAny()
           .orElseGet(() -> {
             LOG.warn("No builder found for {}. " + UNSUPPORTED_USAGE_WARNING, testElement);

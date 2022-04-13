@@ -33,12 +33,20 @@ public abstract class MethodCallBuilder {
   }
 
   /**
-   * Generates the method call instance for the particular DSL test element.
+   * Allows checking if this builder can build method calls for the given context.
    * <p>
-   * This method is invoked in every registered MethodCallBuilder, until one is found that doesn't
-   * return null. You have to take this into consideration if you implement a MethodCallBuilder
-   * since you should return null for every JMeter test plan tree node test element for which your
-   * MethodCallBuilder doesn't have to apply.
+   * This method is invoked in every registered MethodCallBuilder, until one is found that matches.
+   *
+   * @param context provides information used to determine if a method call might be created by this
+   *                builder. For example: JMeter test plan tree node test element, parent context, a
+   *                map of entries to host custom information, etc.
+   * @return true if this builder knows how to build a method call for the context, false otherwise.
+   * @since 0.52
+   */
+  public abstract boolean matches(MethodCallContext context);
+
+  /**
+   * Generates the method call instance for the particular DSL test element.
    * <p>
    * You can check {@link us.abstracta.jmeter.javadsl.core.DslTestPlan.CodeBuilder} to get an idea
    * of how a general implementation of this method looks like
@@ -50,8 +58,7 @@ public abstract class MethodCallBuilder {
    * @param context provides all information that might be required to generate the method call. For
    *                example: JMeter test plan tree node test element, parent context, a map of
    *                entries to host custom information, etc.
-   * @return generated method call for the DSL test element, or null if the method call builder does
-   * not apply to the given context (test plan tree).
+   * @return generated method call for the DSL test element.
    */
   protected abstract MethodCall buildMethodCall(MethodCallContext context);
 

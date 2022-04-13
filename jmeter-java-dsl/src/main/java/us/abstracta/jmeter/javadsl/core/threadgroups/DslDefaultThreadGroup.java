@@ -473,18 +473,23 @@ public class DslDefaultThreadGroup extends BaseThreadGroup<DslDefaultThreadGroup
     }
 
     @Override
+    public boolean matches(MethodCallContext context) {
+      TestElement testElement = context.getTestElement();
+      return testElement.getClass() == ThreadGroup.class
+          || testElement.getClass() == UltimateThreadGroup.class;
+    }
+
+    @Override
     protected MethodCall buildMethodCall(MethodCallContext context) {
-      MethodCall ret = null;
+      MethodCall ret;
       TestElement testElement = context.getTestElement();
       TestElementParamBuilder paramBuilder = new TestElementParamBuilder(testElement);
       if (testElement.getClass() == ThreadGroup.class) {
         ret = buildSimpleThreadGroupMethodCall(paramBuilder);
-      } else if (testElement.getClass() == UltimateThreadGroup.class) {
+      } else {
         ret = buildUltimateThreadGroupMethodCall(paramBuilder);
       }
-      if (ret != null) {
-        ret.chain("sampleErrorAction", new SampleErrorActionMethodParam(paramBuilder));
-      }
+      ret.chain("sampleErrorAction", new SampleErrorActionMethodParam(paramBuilder));
       return ret;
     }
 

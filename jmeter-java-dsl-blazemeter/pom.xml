@@ -20,6 +20,7 @@
 
   <properties>
     <retrofit.version>2.9.0</retrofit.version>
+    <jackson.version>2.13.2</jackson.version>
   </properties>
 
   <dependencies>
@@ -44,9 +45,19 @@
       <version>1.0.1</version>
     </dependency>
     <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
+      <version>2.13.2.2</version>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-annotations</artifactId>
+      <version>${jackson.version}</version>
+    </dependency>
+    <dependency>
       <groupId>com.fasterxml.jackson.datatype</groupId>
       <artifactId>jackson-datatype-jsr310</artifactId>
-      <version>2.13.2</version>
+      <version>${jackson.version}</version>
     </dependency>
   </dependencies>
 
