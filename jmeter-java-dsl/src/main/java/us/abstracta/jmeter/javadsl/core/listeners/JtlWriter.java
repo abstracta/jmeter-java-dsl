@@ -638,15 +638,20 @@ public class JtlWriter extends BaseListener {
     }
 
     @Override
-    protected MethodCall buildMethodCall(ResultCollector collector, MethodCallContext context) {
-      /*
-       this builder applies to any listener with an associated filename (view results tree,
-       simple writer, etc) and not just simple writer, to build the DSL with the least possible
-       features required and avoid include potentially unnecessary feature.
-       */
-      if (collector.getFilename().isEmpty()) {
-        return null;
+    public boolean matches(MethodCallContext context) {
+      if (!super.matches(context)) {
+        return false;
       }
+      /*
+       We use this approach instead of ResultCollector.getFilename, to avoid JMeter
+       property resolution solving to empty interfering with conversion.
+       */
+      TestElementParamBuilder paramBuilder = new TestElementParamBuilder(context.getTestElement());
+      return !paramBuilder.stringParam(ResultCollector.FILENAME).isDefault();
+    }
+
+    @Override
+    protected MethodCall buildMethodCall(ResultCollector collector, MethodCallContext context) {
       TestElementParamBuilder paramBuilder = new TestElementParamBuilder(collector);
       MethodCall ret = buildMethodCall(paramBuilder.stringParam(ResultCollector.FILENAME));
       SampleSaveConfiguration config = collector.getSaveConfig();
