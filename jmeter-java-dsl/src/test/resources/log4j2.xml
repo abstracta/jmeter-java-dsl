@@ -12,5 +12,6 @@
     <Logger name="org.eclipse.jetty" level="WARN"/>
     <Logger name="org.apache.jmeter" level="WARN"/>
     <Logger name="org.apache.jmeter.gui.util.MenuFactory" level="DEBUG"/>
+    <Logger name="us.abstracta.jmeter.javadsl.TestExecutionLogger" level="DEBUG"/>
   </Loggers>
 </Configuration>
