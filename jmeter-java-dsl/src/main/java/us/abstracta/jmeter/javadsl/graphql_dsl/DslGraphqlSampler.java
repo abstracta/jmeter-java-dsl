@@ -17,11 +17,13 @@ public class DslGraphqlSampler extends DslHttpSampler {
     public DslGraphqlSampler(String name, String url) {
         super(name, url);
         this.contentType(ContentType.APPLICATION_JSON);
+        this.method("POST");
     }
 
     public DslGraphqlSampler(String url) {
         super(null, url);
         this.contentType(ContentType.APPLICATION_JSON);
+        this.method("POST");
     }
 
     private void updateBody() {
@@ -48,6 +50,12 @@ public class DslGraphqlSampler extends DslHttpSampler {
     @Override
     public DslGraphqlSampler method(String method) {
         super.method(method);
+        return this;
+    }
+
+    @Override
+    public DslHttpSampler contentType(ContentType contentType) {
+        super.contentType(contentType);
         return this;
     }
 
