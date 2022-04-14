@@ -15,13 +15,7 @@ public class DslGraphqlSampler extends DslHttpSampler {
   private final HashMap<String, Object> variables = new HashMap<>();
 
   public DslGraphqlSampler(String name, String url) {
-    super(name, url);
-    this.contentType(ContentType.APPLICATION_JSON);
-    this.method("POST");
-  }
-
-  public DslGraphqlSampler(String url) {
-    super(null, url);
+    super(name != null ? name : "GraphQL Request", url);
     this.contentType(ContentType.APPLICATION_JSON);
     this.method("POST");
   }
@@ -60,7 +54,7 @@ public class DslGraphqlSampler extends DslHttpSampler {
   }
 
   public static DslGraphqlSampler graphqlSampler(String url) {
-    return new DslGraphqlSampler(url);
+    return new DslGraphqlSampler(null, url);
   }
 
   public static DslGraphqlSampler graphqlSampler(String name, String url) {
