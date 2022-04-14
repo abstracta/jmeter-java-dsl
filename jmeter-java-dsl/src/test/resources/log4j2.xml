@@ -11,5 +11,6 @@
     </Root>
     <Logger name="org.eclipse.jetty" level="WARN"/>
     <Logger name="org.apache.jmeter" level="WARN"/>
+    <Logger name="org.apache.jmeter.gui.util.MenuFactory" level="DEBUG"/>
   </Loggers>
 </Configuration>
