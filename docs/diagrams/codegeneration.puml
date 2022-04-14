@@ -8,6 +8,7 @@ package codegeneration {
   }
 
   abstract class MethodCallBuilder {
+    abstract boolean matches(MethodCallContext context)
     abstract MethodCall buildMethodCall(MethodCallContext context)
   }
 
@@ -49,6 +50,9 @@ package codegeneration {
 
   abstract class SingleTestElementCallBuilder extends MethodCallBuilder {
     abstract MethodCall buildMethodCall(TestElement testElement, MethodCallContext context)
+  }
+
+  abstract class SingleGuiClassCallBuilder extends MethodCallBuilder {
   }
 
   class TestElementParamBuilder {

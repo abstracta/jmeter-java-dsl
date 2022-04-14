@@ -62,24 +62,16 @@
     <module>jmeter-java-dsl-jdbc</module>
     <module>jmeter-java-dsl-wrapper</module>
     <module>jmeter-java-dsl-jmx2dsl</module>
+    <module>jmeter-java-dsl-graphql</module>
   </modules>
 
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>org.assertj</groupId>
-        <artifactId>assertj-swing-junit</artifactId>
-        <version>3.17.1</version>
-      </dependency>
-      <dependency>
-        <groupId>com.github.caciocavallosilano</groupId>
-        <artifactId>cacio-tta</artifactId>
-        <version>1.10</version>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
-
   <dependencies>
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-api</artifactId>
+      <version>${junit.version}</version>
+      <scope>test</scope>
+    </dependency>
     <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter-engine</artifactId>
@@ -93,8 +85,39 @@
       <scope>test</scope>
     </dependency>
     <dependency>
+      <groupId>org.assertj</groupId>
+      <artifactId>assertj-swing-junit</artifactId>
+      <version>3.17.1</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>com.github.caciocavallosilano</groupId>
       <artifactId>cacio-tta</artifactId>
+      <version>1.10</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.junit.platform</groupId>
+      <artifactId>junit-platform-commons</artifactId>
+      <version>1.8.2</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.junit-pioneer</groupId>
+      <artifactId>junit-pioneer</artifactId>
+      <version>1.5.0</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.github.tomakehurst</groupId>
+      <artifactId>wiremock-jre8</artifactId>
+      <version>${wiremock.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.github.javaparser</groupId>
+      <artifactId>javaparser-core</artifactId>
+      <version>3.24.0</version>
       <scope>test</scope>
     </dependency>
   </dependencies>

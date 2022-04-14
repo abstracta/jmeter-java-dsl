@@ -10,6 +10,7 @@ import picocli.CommandLine.Command;
 import picocli.CommandLine.IVersionProvider;
 import picocli.CommandLine.Parameters;
 import us.abstracta.jmeter.javadsl.codegeneration.DslCodeGenerator;
+import us.abstracta.jmeter.javadsl.graphql.DslGraphqlSampler;
 
 @Command(name = "jmx2dsl", mixinStandardHelpOptions = true,
     versionProvider = Jmx2Dsl.ManifestVersionProvider.class,
@@ -24,7 +25,9 @@ public class Jmx2Dsl implements Callable<Integer> {
 
   @Override
   public Integer call() throws Exception {
-    System.out.println(new DslCodeGenerator().generateCodeFromJmx(jmxFile));
+    DslCodeGenerator codeGenerator = new DslCodeGenerator()
+        .addBuildersFrom(DslGraphqlSampler.class);
+    System.out.println(codeGenerator.generateCodeFromJmx(jmxFile));
     return 0;
   }
 

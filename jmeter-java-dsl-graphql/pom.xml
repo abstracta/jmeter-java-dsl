@@ -4,15 +4,15 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>us.abstracta.jmeter</groupId>
     <artifactId>jmeter-java-dsl-parent</artifactId>
+    <groupId>us.abstracta.jmeter</groupId>
     <version>0.1-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
-  <artifactId>jmeter-java-dsl-parallel</artifactId>
 
-  <name>${project.artifactId}</name>
-  <description>Module which includes parallel controller plugin.</description>
+  <artifactId>jmeter-java-dsl-graphql</artifactId>
+  <description>Module which includes test elements to simplify generating GraphQL requests.
+  </description>
 
   <dependencies>
     <dependency>
@@ -21,23 +21,10 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>com.blazemeter</groupId>
-      <artifactId>jmeter-parallel</artifactId>
-      <version>0.11</version>
-      <exclusions>
-        <exclusion>
-          <groupId>javax.servlet</groupId>
-          <artifactId>servlet-api</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.slf4j</groupId>
-          <artifactId>slf4j-nop</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.apache.jmeter</groupId>
-          <artifactId>jorphan</artifactId>
-        </exclusion>
-      </exclusions>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
+      <!-- same version as JMeter dependency -->
+      <version>2.10.5</version>
     </dependency>
     <dependency>
       <groupId>us.abstracta.jmeter</groupId>

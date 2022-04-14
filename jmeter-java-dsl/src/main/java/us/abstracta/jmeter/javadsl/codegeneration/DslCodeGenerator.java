@@ -40,8 +40,8 @@ public class DslCodeGenerator {
   private final List<MethodCallBuilder> builders = new ArrayList<>();
 
   public DslCodeGenerator() {
-    addBuildersFrom(JmeterDsl.class);
-    addBuilders(new DslRecordingController.CodeBuilder());
+    builders.addAll(findCallBuilders(JmeterDsl.class));
+    builders.add(new DslRecordingController.CodeBuilder());
   }
 
   /**
@@ -69,9 +69,11 @@ public class DslCodeGenerator {
    * MethodCallBuilder instances, to generate code for.
    *
    * @param dslClasses are the classes containing builder methods.
+   * @return the DslCodeGenerator instance for further configuration or usage.
    */
-  public void addBuildersFrom(Class<?>... dslClasses) {
+  public DslCodeGenerator addBuildersFrom(Class<?>... dslClasses) {
     builders.addAll(findCallBuilders(dslClasses));
+    return this;
   }
 
   /**
@@ -81,10 +83,12 @@ public class DslCodeGenerator {
    * way to convert the element (eg: ignoring it all together, only converting children, etc).
    *
    * @param builders list of MethodCallBuilders to register into the generator.
+   * @return the DslCodeGenerator instance for further configuration or usage.
    * @since 0.50
    */
-  public void addBuilders(MethodCallBuilder... builders) {
+  public DslCodeGenerator addBuilders(MethodCallBuilder... builders) {
     this.builders.addAll(Arrays.asList(builders));
+    return this;
   }
 
   private List<MethodCallBuilder> findCallBuilders(Class<?>... dslClasses) {

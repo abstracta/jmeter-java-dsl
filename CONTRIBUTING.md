@@ -35,7 +35,7 @@ This is implemented by DslTestElement nested companion classes named CodeBuilder
 
 Whenever you implement a new DslTestElement, you should implement a nested CodeBuilder class to provide proper conversion from JMeter test plan files (jmx files) to DSL code.
 
-Check [DslTestPlan] for an example code builder, and [MethodCallBuilder] for additional details on how to implement one.
+Check [DslTestPlan] for an example code builder, and [MethodCallBuilder] for additional details on how to implement one and consider using [SingleTestElementCallBuilder] or [SingleGuiClassCallBuilder] as base classes which simplify most of the scenarios.
 
 ## Test runs
 
@@ -118,19 +118,20 @@ Additionally, the project uses checkstyle for enforcing code consistency and con
         ```
 6. Implement tests that verify the expected behavior of the test element in a test plan execution. This way, you verify that you properly initialize JMeter properties and that your interpretation of the test element properties and behavior is right.
    * Check [DslHttpSamplerTest](jmeter-java-dsl/src/test/java/us/abstracta/jmeter/javadsl/http/DslHttpSamplerTest.java) for some sample test cases.
-7. Add a nested `CodeBuilder` class extending [MethodCallBuilder], implementing necessary logic to generated DSL code from JMeter test element.
+7. Add a nested `CodeBuilder` class extending [SingleTestElementCodeBuilder], [SingleGuiClassCodeBuilder] or if neither of the two is enough, then consider extending [MethodCallBuilder].
+   * Implementing on it necessary logic to generated DSL code from JMeter test element.
    * Check [DslTestPlan] for an example code builder and [MethodCallBuilder] for additional details on how to implement them.
    * Implement tests for the code builder.
      * The DSL provides abstract class [MethodCallBuilderTest](jmeter-java-dsl/src/test/java/us/abstracta/jmeter/javadsl/codegeneration/MethodCallBuilderTest.java) that provides common logic for testing builders. 
      * MethodCallBuilderTest included logic gets all methods in the MethodCallBuilderTest subclass that return a DslTestPlan instance, generates a jmx for each of them, generates DSL code for each of generated JMX, and compares the test code to the generated one, which should be the same.
      * In MethodCallBuilderTest defined tests you should not use methods for abstracting duplicate logic between tests (nor variables or constants for literals). Code duplication in this case is acceptable and expected.
      * Check [DslTestPlanTest](jmeter-java-dsl/src/test/java/us/abstracta/jmeter/javadsl/core/DslTestPlanTest.java) for some tests examples.
-8. Run `mvn clean package` and fix any potential code styling issues or failing tests.
-9. Add section in [user guide](docs/guide/README.md) describing the new feature. Consider running `yarn install` and `yarn dev` (this requires node 14 and yarn installed on your machine) to run a local server for docs, where you can review that new changes are properly showing.  
-10. Commit changes to git, using as a comment a subject line that describes general changes, and if necessary, some additional details describing the reason why the change is necessary.
-11. Submit a pull request to the repository including a meaningful name.
-12. Check GitHub Actions execution to verify that no test fail on CI pipeline.
-13. When the PR is merged and release is triggered. Enjoy the pleasure and proud of contributing with an OSS tool :). 
+9. Run `mvn clean package` and fix any potential code styling issues or failing tests.
+10. Add section in [user guide](docs/guide/README.md) describing the new feature. Consider running `yarn install` and `yarn dev` (this requires node 14 and yarn installed on your machine) to run a local server for docs, where you can review that new changes are properly showing.  
+11. Commit changes to git, using as a comment a subject line that describes general changes, and if necessary, some additional details describing the reason why the change is necessary.
+12. Submit a pull request to the repository including a meaningful name.
+13. Check GitHub Actions execution to verify that no test fail on CI pipeline.
+14. When the PR is merged and release is triggered. Enjoy the pleasure and proud of contributing with an OSS tool :). 
 
 ## General coding guidelines
 
@@ -195,4 +196,6 @@ Or, check existing code. It contains embedded documentation with additional deta
 [HttpHeaders]: jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/http/HttpHeaders.java
 [JtlWriter]: jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/listeners/JtlWriter.java
 [MethodCallBuilder]:jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/codegeneration/MethodCallBuilder.java
+[SingleTestElementCallBuilder]:jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/codegeneration/SingleTestElementCallBuilder.java
+[SingleGuiClassCallBuilder]:jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/codegeneration/SingleGuiClassCallBuilder.java
 [Core classes section]: #core-classes

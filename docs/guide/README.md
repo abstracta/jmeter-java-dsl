@@ -1932,7 +1932,7 @@ JMeter properties can currently only be used with `EmbeddedJmeterEngine`, so use
 
 ## Protocols
 
-### HTTP performance testing
+### HTTP
 
 Throughout this guide, several examples have been shown for simple cases of HTTP requests (mainly how to do gets and posts), but the DSL provides additional features that you might need to be aware.
 
@@ -2254,6 +2254,94 @@ public class PerformanceTest {
 
 }
 ```
+
+### GraphQL
+
+When you want to test a GraphQL service, having properly set each field in HTTP request and know exact syntax can quickly start becoming tedious. For this purpose jmeter-java-dsl provide `graphqlSampler`. To use it you need to include this dependency:
+
+:::: tabs type:card
+::: tab Maven
+```xml
+<dependency>
+  <groupId>us.abstracta.jmeter</groupId>
+  <artifactId>jmeter-java-dsl-graphql</artifactId>
+  <version>0.52</version>
+  <scope>test</scope>
+</dependency>
+```
+:::
+::: tab Gradle
+```groovy
+testImplementation 'us.abstracta.jmeter:jmeter-java-dsl-graphql:0.52'
+```
+:::
+::::
+
+And then you can make simple GraphQL requests like this:
+
+```java
+import static us.abstracta.jmeter.javadsl.JmeterDsl.*;
+import static us.abstracta.jmeter.javadsl.graphql.DslGraphqlSampler.*;
+
+import org.junit.jupiter.api.Test;
+
+public class PerformanceTest {
+
+  @Test
+  public void test() throws Exception {
+    String url = "https://myservice.com";
+    testPlan(
+        threadGroup(1, 1,
+            graphqlSampler(url, "{user(id: 1) {name}}"),
+            graphqlSampler(url, "query UserQuery($id: Int) { user(id: $id) {name}}")
+                .operationName("UserQuery")
+                .variable("id", 2)
+        )
+    ).run();
+  }
+
+}
+```
+
+::: tip
+GraphQL Sampler is based on HTTP Sampler, so all test element that affect HTTP Samplers, like `httpHeaders`, `httpCookies`, `httpDefaults` and JMeter properties, also affect GraphQL sampler.
+:::
+
+::: warning
+`grapqlSampler` sets by default `application/json` `Content-Type` header. 
+
+This has been done to ease most common use case and to avoid users the common pitfall of missing the proper content type header value.
+
+If you need to modify `graphqlSampler` content type to be other than `application/json`, then you can use `contentType` method, potentially parameterizing it to reuse the same value in multiple samplers like in following example:
+
+```java
+import static us.abstracta.jmeter.javadsl.JmeterDsl.*;
+import static us.abstracta.jmeter.javadsl.graphql.DslGraphqlSampler.*;
+
+import org.apache.http.entity.ContentType;
+import org.junit.jupiter.api.Test;
+import us.abstracta.jmeter.javadsl.graphql.DslGraphqlSampler;
+
+public class PerformanceTest {
+
+  private DslGraphqlSampler myGraphqlRequest(String query) {
+    return graphqlSampler("https://myservice.com", query)
+        .contentType(ContentType.create("myContentType"));
+  }
+
+  @Test
+  public void test() throws Exception {
+    testPlan(
+        threadGroup(1, 1,
+            myGraphqlRequest("{user(id: 1) {name}}"),
+            myGraphqlRequest("{user(id: 5) {address}}")
+        )
+    ).run();
+  }
+
+}
+```
+:::
 
 
 ### JDBC and databases interactions

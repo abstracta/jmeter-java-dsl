@@ -3,8 +3,11 @@
 
 package http {
 
-  class DslHttpSampler {
+  abstract class DslBaseHttpSampler  {
     String url
+  }
+
+  class DslHttpSampler extends DslBaseHttpSampler {
     HttpMethod method
     String body
   }
@@ -23,7 +26,7 @@ package http {
 
   class DslHttpDefaults
 
-  DslHttpSampler --> HttpHeaders
+  DslBaseHttpSampler --> HttpHeaders
 
 }
 
@@ -35,7 +38,7 @@ package core {
 package codegeneration {
 }
 
-DslHttpSampler --|> BaseSampler
+DslBaseHttpSampler --|> BaseSampler
 HttpHeaders --|> BaseConfigElement
 AutoEnabledHttpConfigElement --|> BaseConfigElement
 DslHttpDefaults --|> BaseConfigElement

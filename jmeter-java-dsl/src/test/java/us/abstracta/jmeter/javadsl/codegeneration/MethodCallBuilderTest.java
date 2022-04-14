@@ -28,6 +28,11 @@ public abstract class MethodCallBuilderTest {
 
   @TempDir
   public Path tempDir;
+  protected final DslCodeGenerator codeGenerator;
+
+  protected MethodCallBuilderTest() {
+    codeGenerator = new DslCodeGenerator();
+  }
 
   private Stream<Arguments> findCodeBuilderTests() {
     Map<String, Method> methods = extractBuilderTestMethods();
@@ -74,7 +79,7 @@ public abstract class MethodCallBuilderTest {
       String methodCode) throws Exception {
     Path jmxPath = tempDir.resolve("test.jmx");
     ((DslTestPlan) builderMethod.invoke(this)).saveAsJmx(jmxPath.toString());
-    assertThat(buildMethodBodyWith(new DslCodeGenerator().generateCodeFromJmx(jmxPath.toFile())))
+    assertThat(buildMethodBodyWith(codeGenerator.generateCodeFromJmx(jmxPath.toFile())))
         .isEqualTo(methodCode);
   }
 

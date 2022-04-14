@@ -25,6 +25,11 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
+      <groupId>us.abstracta.jmeter</groupId>
+      <artifactId>jmeter-java-dsl-graphql</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
       <groupId>info.picocli</groupId>
       <artifactId>picocli</artifactId>
       <version>${picocli.version}</version>
