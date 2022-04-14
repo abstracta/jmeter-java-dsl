@@ -24,7 +24,7 @@
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-databind</artifactId>
       <!-- same version as JMeter dependency -->
-      <version>2.10.5</version>
+      <version>2.12.6.1</version>
     </dependency>
     <dependency>
       <groupId>us.abstracta.jmeter</groupId>
