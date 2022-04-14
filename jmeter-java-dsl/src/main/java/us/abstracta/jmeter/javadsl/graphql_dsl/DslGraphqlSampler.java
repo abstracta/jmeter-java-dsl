@@ -62,4 +62,8 @@ public class DslGraphqlSampler extends DslHttpSampler {
     public static DslGraphqlSampler graphqlSampler(String url) {
         return new DslGraphqlSampler(url);
     }
+
+    public static DslGraphqlSampler graphqlSampler(String name, String url) {
+        return new DslGraphqlSampler(name, url);
+    }
 }
