@@ -21,7 +21,7 @@ public class DslOnceOnlyController extends BaseController {
   }
 
   @Override
-  protected TestElement buildTestElement() {
+  public TestElement buildTestElement() {
     return new OnceOnlyController();
   }
 

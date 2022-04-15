@@ -334,7 +334,7 @@ public class DslJdbcSampler extends BaseSampler<DslJdbcSampler> {
   }
 
   @Override
-  protected TestElement buildTestElement() {
+  public TestElement buildTestElement() {
     JDBCSampler ret = new JDBCSampler();
     ret.setQueryType(getQueryType().propertyValue);
     ret.setDataSource(poolName);

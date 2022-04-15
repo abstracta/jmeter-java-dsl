@@ -32,7 +32,7 @@ public class DslUniformRandomTimer extends BaseTestElement implements DslTimer {
   }
 
   @Override
-  protected TestElement buildTestElement() {
+  public TestElement buildTestElement() {
     UniformRandomTimer urt = new UniformRandomTimer();
     urt.setRange(maximumMillis - minimumMillis);
     urt.setDelay(String.valueOf(minimumMillis));

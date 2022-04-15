@@ -145,7 +145,7 @@ public class DslCsvDataSet extends BaseConfigElement {
   }
 
   @Override
-  protected TestElement buildTestElement() {
+  public TestElement buildTestElement() {
     return randomOrder ? buildRandomCsvDataSet() : buildSimpleCsvDataSet();
   }
 

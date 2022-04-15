@@ -103,7 +103,7 @@ public class DslDebugPostProcessor extends BaseTestElement implements DslPostPro
   }
 
   @Override
-  protected TestElement buildTestElement() {
+  public TestElement buildTestElement() {
     DebugPostProcessor ret = new DebugPostProcessor();
     ret.setDisplayJMeterVariables(includeVariables);
     ret.setDisplaySamplerProperties(includeSamplerProperties);

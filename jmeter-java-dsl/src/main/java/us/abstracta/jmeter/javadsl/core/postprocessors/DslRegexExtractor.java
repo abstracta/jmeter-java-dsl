@@ -104,7 +104,7 @@ public class DslRegexExtractor extends DslVariableExtractor<DslRegexExtractor> {
   }
 
   @Override
-  protected TestElement buildTestElement() {
+  public TestElement buildTestElement() {
     RegexExtractor ret = new RegexExtractor();
     setScopeTo(ret);
     ret.setUseField(fieldToCheck.propertyValue);

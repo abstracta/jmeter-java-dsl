@@ -129,7 +129,7 @@ public class DslDummySampler extends BaseSampler<DslDummySampler> {
   }
 
   @Override
-  protected TestElement buildTestElement() {
+  public TestElement buildTestElement() {
     DummySampler ret = new DummySampler();
     DummyElement dummy = ret.getDummy();
     dummy.setResponseData(responseBody);

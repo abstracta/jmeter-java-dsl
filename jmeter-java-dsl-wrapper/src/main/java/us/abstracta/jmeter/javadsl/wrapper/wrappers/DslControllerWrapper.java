@@ -43,7 +43,7 @@ public class DslControllerWrapper extends BaseController implements
   }
 
   @Override
-  protected TestElement buildTestElement() {
+  public TestElement buildTestElement() {
     return helper.buildTestElement();
   }
 

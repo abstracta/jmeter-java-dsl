@@ -153,7 +153,7 @@ public class DslJdbcConnectionPool extends BaseConfigElement {
   }
 
   @Override
-  protected TestElement buildTestElement() {
+  public TestElement buildTestElement() {
     DataSourceElement ret = new DataSourceElement();
     ret.setDataSource(name);
     ret.setDriver(driverClass.getName());

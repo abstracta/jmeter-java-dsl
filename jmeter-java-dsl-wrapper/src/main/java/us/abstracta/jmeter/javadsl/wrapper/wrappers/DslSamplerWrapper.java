@@ -29,7 +29,7 @@ public class DslSamplerWrapper extends BaseSampler<DslSamplerWrapper> implements
   }
 
   @Override
-  protected TestElement buildTestElement() {
+  public TestElement buildTestElement() {
     return helper.buildTestElement();
   }
 

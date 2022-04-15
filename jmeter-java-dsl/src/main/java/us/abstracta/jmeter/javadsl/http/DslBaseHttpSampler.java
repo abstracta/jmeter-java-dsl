@@ -158,7 +158,7 @@ public abstract class DslBaseHttpSampler<T extends DslBaseHttpSampler<?>> extend
   }
 
   @Override
-  protected TestElement buildTestElement() {
+  public TestElement buildTestElement() {
     HTTPSamplerProxy ret = new HTTPSamplerProxy();
     if (protocol != null) {
       ret.setProtocol(protocol);

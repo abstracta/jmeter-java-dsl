@@ -31,7 +31,7 @@ public class DslForEachController extends BaseController {
   }
 
   @Override
-  protected TestElement buildTestElement() {
+  public TestElement buildTestElement() {
     ForeachController ret = new ForeachController();
     ret.setInputVal(varsPrefix);
     ret.setReturnVal(iterationVarName);

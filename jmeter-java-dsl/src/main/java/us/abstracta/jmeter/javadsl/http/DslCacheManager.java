@@ -34,7 +34,7 @@ public class DslCacheManager extends AutoEnabledHttpConfigElement {
   }
 
   @Override
-  protected TestElement buildTestElement() {
+  public TestElement buildTestElement() {
     CacheManager ret = new CacheManager();
     ret.setUseExpires(true);
     ret.setClearEachIteration(true);

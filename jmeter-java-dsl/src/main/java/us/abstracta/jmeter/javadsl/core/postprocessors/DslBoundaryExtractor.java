@@ -82,7 +82,7 @@ public class DslBoundaryExtractor extends DslVariableExtractor<DslBoundaryExtrac
   }
 
   @Override
-  protected TestElement buildTestElement() {
+  public TestElement buildTestElement() {
     BoundaryExtractor ret = new BoundaryExtractor();
     setScopeTo(ret);
     ret.setUseField(fieldToCheck.propertyValue);

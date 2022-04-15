@@ -184,7 +184,7 @@ public class DslHttpDefaults extends BaseConfigElement {
   }
 
   @Override
-  protected TestElement buildTestElement() {
+  public TestElement buildTestElement() {
     ConfigTestElement ret = new ConfigTestElement();
     if (protocol != null) {
       ret.setProperty(HTTPSamplerBase.PROTOCOL, protocol);

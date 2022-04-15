@@ -34,7 +34,7 @@ public class DslCookieManager extends AutoEnabledHttpConfigElement {
   }
 
   @Override
-  protected TestElement buildTestElement() {
+  public TestElement buildTestElement() {
     CookieManager ret = new CookieManager();
     ret.setClearEachIteration(true);
     return ret;

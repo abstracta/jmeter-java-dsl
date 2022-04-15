@@ -78,7 +78,7 @@ public abstract class BaseTestElement implements DslTestElement {
     return ret;
   }
 
-  protected abstract TestElement buildTestElement();
+  public abstract TestElement buildTestElement();
 
   private static void loadBeanProperties(TestElement bean) {
     try {

@@ -49,7 +49,7 @@ public abstract class DslJsr223TestElement extends BaseTestElement {
   }
 
   @Override
-  protected TestElement buildTestElement() {
+  public TestElement buildTestElement() {
     JSR223TestElement ret = buildJsr223TestElement();
     ret.setScriptLanguage(language);
     ret.setScript(scriptBuilder.build());

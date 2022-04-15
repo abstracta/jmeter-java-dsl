@@ -54,7 +54,7 @@ public abstract class BaseThreadGroup<T extends BaseThreadGroup<?>> extends
   }
 
   @Override
-  protected TestElement buildTestElement() {
+  public TestElement buildTestElement() {
     TestElement ret = buildThreadGroup();
     ret.setProperty(
         new StringProperty(AbstractThreadGroup.ON_SAMPLE_ERROR, sampleErrorAction.propertyValue));

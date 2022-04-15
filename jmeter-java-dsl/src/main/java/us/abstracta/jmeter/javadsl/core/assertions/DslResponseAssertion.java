@@ -216,7 +216,7 @@ public class DslResponseAssertion extends DslScopedTestElement<DslResponseAssert
   }
 
   @Override
-  protected TestElement buildTestElement() {
+  public TestElement buildTestElement() {
     ResponseAssertion ret = new ResponseAssertion();
     setScopeTo(ret);
     fieldToTest.applyTo(ret);

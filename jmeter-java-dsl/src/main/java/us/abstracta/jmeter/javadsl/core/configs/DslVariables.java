@@ -67,7 +67,7 @@ public class DslVariables extends BaseConfigElement {
   }
 
   @Override
-  protected TestElement buildTestElement() {
+  public TestElement buildTestElement() {
     Arguments ret = new Arguments();
     for (Map.Entry<String, String> entry : vars.entrySet()) {
       ret.addArgument(entry.getKey(), entry.getValue());

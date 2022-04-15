@@ -70,7 +70,7 @@ public class DslTestPlan extends TestElementContainer<TestPlanChild> {
   }
 
   @Override
-  protected TestElement buildTestElement() {
+  public TestElement buildTestElement() {
     TestPlan ret = new TestPlan();
     ret.setUserDefinedVariables(new Arguments());
     ret.setTearDownOnShutdown(this.tearDownAfterMainThreadsShutDown);

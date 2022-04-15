@@ -61,7 +61,7 @@ public class DslViewResultsTree extends DslVisualizer {
   }
 
   @Override
-  protected TestElement buildTestElement() {
+  public TestElement buildTestElement() {
     return new ResultCollector();
   }
 

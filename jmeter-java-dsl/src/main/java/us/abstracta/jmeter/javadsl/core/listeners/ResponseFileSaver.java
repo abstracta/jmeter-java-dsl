@@ -28,7 +28,7 @@ public class ResponseFileSaver extends BaseListener {
   }
 
   @Override
-  protected TestElement buildTestElement() {
+  public TestElement buildTestElement() {
     ResultSaver ret = new ResultSaver();
     ret.setFilename(fileNamePrefix);
     return ret;

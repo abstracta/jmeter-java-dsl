@@ -72,7 +72,7 @@ public class HttpHeaders extends BaseConfigElement {
   }
 
   @Override
-  protected TestElement buildTestElement() {
+  public TestElement buildTestElement() {
     HeaderManager ret = new HeaderManager();
     headers.forEach((name, value) -> ret.add(new Header(name, value)));
     return ret;

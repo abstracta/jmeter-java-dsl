@@ -23,7 +23,7 @@ public class DslRecordingController extends BaseController {
   }
 
   @Override
-  protected TestElement buildTestElement() {
+  public TestElement buildTestElement() {
     throw new UnsupportedOperationException();
   }
 

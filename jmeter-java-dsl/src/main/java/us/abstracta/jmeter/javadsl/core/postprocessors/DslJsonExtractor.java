@@ -62,7 +62,7 @@ public class DslJsonExtractor extends DslVariableExtractor<DslJsonExtractor> {
   }
 
   @Override
-  protected TestElement buildTestElement() {
+  public TestElement buildTestElement() {
     JMESPathExtractor ret = new JMESPathExtractor();
     setScopeTo(ret);
     ret.setRefName(varName);

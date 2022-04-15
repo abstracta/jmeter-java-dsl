@@ -39,7 +39,7 @@ public class DslWhileController extends BaseController {
   }
 
   @Override
-  protected TestElement buildTestElement() {
+  public TestElement buildTestElement() {
     WhileController ret = new WhileController();
     String condition = conditionBuilder.build();
     ret.setCondition(condition);

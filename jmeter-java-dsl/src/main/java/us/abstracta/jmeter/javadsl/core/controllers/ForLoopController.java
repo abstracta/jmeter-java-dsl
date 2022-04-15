@@ -26,7 +26,7 @@ public class ForLoopController extends BaseController {
   }
 
   @Override
-  protected TestElement buildTestElement() {
+  public TestElement buildTestElement() {
     LoopController ret = new LoopController();
     ret.setLoops(count);
     return ret;

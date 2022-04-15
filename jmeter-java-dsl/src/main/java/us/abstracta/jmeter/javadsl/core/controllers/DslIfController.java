@@ -32,7 +32,7 @@ public class DslIfController extends BaseController {
   }
 
   @Override
-  protected TestElement buildTestElement() {
+  public TestElement buildTestElement() {
     IfController ret = new IfController();
     ret.setUseExpression(true);
     String condition = conditionBuilder.build();

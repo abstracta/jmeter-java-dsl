@@ -83,7 +83,7 @@ public class DslTransactionController extends BaseController {
   }
 
   @Override
-  protected TestElement buildTestElement() {
+  public TestElement buildTestElement() {
     TransactionController ret = new TransactionController();
     ret.setGenerateParentSample(generateParentSample);
     // we can't use setIncludeTimers since it ignores true values

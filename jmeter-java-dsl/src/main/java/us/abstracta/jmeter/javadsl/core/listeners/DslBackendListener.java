@@ -42,7 +42,7 @@ public abstract class DslBackendListener extends BaseListener {
   }
 
   @Override
-  protected TestElement buildTestElement() {
+  public TestElement buildTestElement() {
     BackendListener ret = new BackendListener();
     ret.setClassname(listenerClass.getName());
     ret.setQueueSize(String.valueOf(queueSize));

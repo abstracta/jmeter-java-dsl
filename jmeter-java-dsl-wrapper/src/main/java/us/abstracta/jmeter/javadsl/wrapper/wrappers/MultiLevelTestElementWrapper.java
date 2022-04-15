@@ -32,7 +32,7 @@ public class MultiLevelTestElementWrapper extends BaseTestElement implements Mul
   }
 
   @Override
-  protected TestElement buildTestElement() {
+  public TestElement buildTestElement() {
     return helper.buildTestElement();
   }
 

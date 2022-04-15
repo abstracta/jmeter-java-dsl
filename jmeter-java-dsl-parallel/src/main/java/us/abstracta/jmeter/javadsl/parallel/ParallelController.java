@@ -128,7 +128,7 @@ public class ParallelController extends BaseController {
   }
 
   @Override
-  protected TestElement buildTestElement() {
+  public TestElement buildTestElement() {
     ParallelSampler ret = new ParallelSampler();
     ret.setGenerateParent(generateParent);
     if (maxThreads != null) {

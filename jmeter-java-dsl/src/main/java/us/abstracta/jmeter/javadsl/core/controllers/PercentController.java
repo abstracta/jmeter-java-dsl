@@ -31,7 +31,7 @@ public class PercentController extends BaseController {
   }
 
   @Override
-  protected TestElement buildTestElement() {
+  public TestElement buildTestElement() {
     ThroughputController ret = new ThroughputController();
     ret.setStyle(ThroughputController.BYPERCENT);
     ret.setPercentThroughput(percent);

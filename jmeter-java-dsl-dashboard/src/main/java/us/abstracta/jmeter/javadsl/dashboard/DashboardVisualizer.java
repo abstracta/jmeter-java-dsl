@@ -144,7 +144,7 @@ public class DashboardVisualizer extends DslVisualizer {
   }
 
   @Override
-  protected TestElement buildTestElement() {
+  public TestElement buildTestElement() {
     return null;
   }
 
