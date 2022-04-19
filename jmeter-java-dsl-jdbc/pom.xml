@@ -26,6 +26,13 @@
       <artifactId>ApacheJMeter_jdbc</artifactId>
       <version>${jmeter.version}</version>
     </dependency>
+    <!-- override jmeter dependency to avoid dependency vulnerabilities -->
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-dbcp2</artifactId>
+      <version>2.9.0</version>
+    </dependency>
+
     <dependency>
       <groupId>us.abstracta.jmeter</groupId>
       <artifactId>jmeter-java-dsl</artifactId>
