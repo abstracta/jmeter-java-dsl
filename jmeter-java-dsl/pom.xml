@@ -88,6 +88,33 @@
       <!-- same version as JMeter dependency -->
       <version>3.6.1</version>
     </dependency>
+
+    <dependency>
+      <groupId>org.junit-pioneer</groupId>
+      <artifactId>junit-pioneer</artifactId>
+      <version>1.5.0</version>
+      <scope>test</scope>
+    </dependency>
+    <!-- Following 2 jetty libs are specified to avoid conflicts with transitive dependencies
+    included by junit-pioneer-->
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-api</artifactId>
+      <version>${junit.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.junit.platform</groupId>
+      <artifactId>junit-platform-commons</artifactId>
+      <version>1.8.2</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.github.tomakehurst</groupId>
+      <artifactId>wiremock-jre8</artifactId>
+      <version>${wiremock.version}</version>
+      <scope>test</scope>
+    </dependency>
     <dependency>
       <groupId>org.testcontainers</groupId>
       <artifactId>influxdb</artifactId>
@@ -99,6 +126,30 @@
       <artifactId>influxdb-java</artifactId>
       <version>2.22</version>
       <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.assertj</groupId>
+      <artifactId>assertj-swing-junit</artifactId>
+      <version>3.17.1</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.github.javaparser</groupId>
+      <artifactId>javaparser-core</artifactId>
+      <version>3.24.0</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>kg.apc</groupId>
+      <artifactId>jmeter-plugins-wsc</artifactId>
+      <version>0.2</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.slf4j</groupId>
+          <artifactId>slf4j-nop</artifactId>
+        </exclusion>
+      </exclusions>
+      <scope>compile</scope>
     </dependency>
   </dependencies>
 

@@ -11,13 +11,7 @@ import us.abstracta.jmeter.javadsl.core.DslTestPlan.TestPlanChild;
 import us.abstracta.jmeter.javadsl.core.assertions.DslResponseAssertion;
 import us.abstracta.jmeter.javadsl.core.configs.DslCsvDataSet;
 import us.abstracta.jmeter.javadsl.core.configs.DslVariables;
-import us.abstracta.jmeter.javadsl.core.controllers.DslForEachController;
-import us.abstracta.jmeter.javadsl.core.controllers.DslIfController;
-import us.abstracta.jmeter.javadsl.core.controllers.DslOnceOnlyController;
-import us.abstracta.jmeter.javadsl.core.controllers.DslTransactionController;
-import us.abstracta.jmeter.javadsl.core.controllers.DslWhileController;
-import us.abstracta.jmeter.javadsl.core.controllers.ForLoopController;
-import us.abstracta.jmeter.javadsl.core.controllers.PercentController;
+import us.abstracta.jmeter.javadsl.core.controllers.*;
 import us.abstracta.jmeter.javadsl.core.listeners.DslViewResultsTree;
 import us.abstracta.jmeter.javadsl.core.listeners.HtmlReporter;
 import us.abstracta.jmeter.javadsl.core.listeners.InfluxDbBackendListener;
@@ -1273,6 +1267,10 @@ public class JmeterDsl {
    */
   public static DslCsvDataSet csvDataSet(String csvFile) {
     return new DslCsvDataSet(csvFile);
+  }
+
+  public static DslWeightedSwitchController dslWeightedSwitchController() {
+    return new DslWeightedSwitchController();
   }
 
 }
