@@ -143,12 +143,18 @@ public class DslDefaultThreadGroup extends BaseThreadGroup<DslDefaultThreadGroup
     if (threadCount < 0) {
       throw new IllegalArgumentException("Thread count must be >=0");
     }
-    if (!stages.isEmpty() && getLastStage().duration == null) {
+    if (isLastStageHoldingForIterations()) {
       throw new IllegalStateException(
-          "Ramping up/down after holding for iterations is not supported");
+          "Ramping up/down after holding for iterations is not supported. "
+              + "If you used constructor with iterations, consider using "
+              + "threadGroup().rampTo(X, Y).holdForIterations(Z) instead");
     }
     stages.add(new Stage(threadCount, duration));
     return this;
+  }
+
+  private boolean isLastStageHoldingForIterations() {
+    return !stages.isEmpty() && getLastStage().duration == null;
   }
 
   private Stage getLastStage() {
@@ -170,6 +176,10 @@ public class DslDefaultThreadGroup extends BaseThreadGroup<DslDefaultThreadGroup
    * @since 0.18
    */
   public DslDefaultThreadGroup holdFor(Duration duration) {
+    if (isLastStageHoldingForIterations()) {
+      throw new IllegalStateException(
+          "Holding for duration after holding for iterations is not supported.");
+    }
     int threadsCount = stages.isEmpty() ? 0 : getLastStage().threadCount;
     stages.add(new Stage(threadsCount, duration));
     return this;
