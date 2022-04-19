@@ -10,7 +10,7 @@ Transfer-Encoding: chunked
 Content-Type: application/json; charset=UTF-8
 Content-Length: 13
 Host: localhost:{{\d+}}
-User-Agent: Apache-HttpClient/4.5.12 (Java/{{[\w\.]+}})
+User-Agent: Apache-HttpClient/{{[\w\.]+}} (Java/{{[\w\.]+}})
 </requestHeader>
   <responseData class="java.lang.String">Non-TEXT response data, cannot record: ()</responseData>
   <responseFile class="java.lang.String"></responseFile>
