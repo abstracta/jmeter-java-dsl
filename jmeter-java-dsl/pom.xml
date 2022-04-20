@@ -74,7 +74,7 @@
       <groupId>org.apache.httpcomponents</groupId>
       <artifactId>httpcore</artifactId>
       <!-- same version as JMeter dependency -->
-      <version>4.4.13</version>
+      <version>4.4.15</version>
     </dependency>
     <dependency>
       <groupId>commons-io</groupId>
