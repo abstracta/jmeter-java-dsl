@@ -73,7 +73,7 @@
     <dependency>
       <groupId>org.apache.httpcomponents</groupId>
       <artifactId>httpcore</artifactId>
-      <!-- same version as JMeter dependency -->
+      <!-- JMeter dependency version with patch upgrade -->
       <version>4.4.15</version>
     </dependency>
     <dependency>
