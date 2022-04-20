@@ -13,6 +13,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * DSL wrapper for {@link WeightedSwitchController}
+ */
 public class DslWeightedSwitchController extends BaseController {
 
   private final PowerTableModel model;
@@ -32,33 +35,60 @@ public class DslWeightedSwitchController extends BaseController {
     wsc = new WeightedSwitchController();
   }
 
-
-  private void addToModel(Long probability, BaseTestElement element, Boolean enabled) throws IllegalArgumentException {
+  /**
+   * Internal method to add TestElement to {@link WeightedSwitchController} model
+   *
+   * Checks that total sum of weights will not exceed 100 considering the new element
+   *
+   * @param weight  weight of new TestElement in the model
+   * @param element the new TestElement
+   * @param enabled flag to set TestElement enabled or not
+   *
+   * @throws IllegalArgumentException throws exception if total sum of weights exceed 100
+   */
+  private void addToModel(Long weight, BaseTestElement element, Boolean enabled) throws IllegalArgumentException {
 
     List<Long> weights = this.model.getData().getColumnAsObjectArray("Weight")
         .stream()
-        .map(
-            x -> Long.parseLong(x.toString())
-        ).collect(
-            Collectors.toList()
-        );
+        .map(x -> Long.parseLong(x.toString()))
+        .collect(Collectors.toList());
 
-    if (weights.stream().reduce(0L, Long::sum) + probability <= 100) {
-      this.model.addRow(new String[]{element.getName(), probability.toString(), enabled.toString()});
+    if (weights.stream().reduce(0L, Long::sum) + weight <= 100) {
+      this.model.addRow(new String[]{element.getName(), weight.toString(), enabled.toString()});
       this.children.add((ThreadGroupChild) element);
     } else {
-      throw new IllegalArgumentException("Total sum of probabilities should be less or equal 100");
+      throw new IllegalArgumentException("Total sum of weights should be less or equal 100");
     }
 
   }
 
-  public DslWeightedSwitchController add(Long probability, BaseTestElement element) {
-    this.addToModel(probability, element, true);
+
+  /**
+   * Method adds test element to model with enabling it by default
+   *
+   * Uses internal method {@link #addToModel(Long, BaseTestElement, Boolean)}
+   * to add test element to {@link WeightedSwitchController} internal model
+   *
+   * @param weight  relative fraction of total requests number for TestElement
+   * @param element any test element that will be executed
+   * @return the controller instance for further configuration and usage
+   */
+  public DslWeightedSwitchController add(Long weight, BaseTestElement element) {
+    this.addToModel(weight, element, true);
     return this;
   }
 
-  public DslWeightedSwitchController add(Long probability, BaseTestElement element, Boolean enabled) {
-    this.addToModel(probability, element, enabled);
+
+  /**
+   * Same as {@link #add(Long, BaseTestElement)} but allows to set the enabled flag
+   *
+   * @param weight  relative fraction of total requests number for TestElement
+   * @param element any test element that will be executed
+   * @param enabled flag to set element enable ot not
+   * @return the controller instance for further configuration and usage
+   */
+  public DslWeightedSwitchController add(Long weight, BaseTestElement element, Boolean enabled) {
+    this.addToModel(weight, element, enabled);
     return this;
   }
 

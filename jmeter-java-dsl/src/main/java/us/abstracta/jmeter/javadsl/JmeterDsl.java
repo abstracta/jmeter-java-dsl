@@ -1269,6 +1269,14 @@ public class JmeterDsl {
     return new DslCsvDataSet(csvFile);
   }
 
+
+  /**
+   * Builds a DslWeightedSwitchController which wraps logic of BlazeMeter WeightedSwitchController.
+   * <p>
+   * @see DslWeightedSwitchController
+   * @return the Weighted SwitchController
+   * @since 0.53
+   */
   public static DslWeightedSwitchController dslWeightedSwitchController() {
     return new DslWeightedSwitchController();
   }
