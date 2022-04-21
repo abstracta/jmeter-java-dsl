@@ -1488,6 +1488,48 @@ public class DslOnceOnlyControllerTest extends JmeterDslTest {
 
 Check [DslOnceOnlyController](../../jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/controllers/DslOnceOnlyController.java) for more details.
 
+### Weighted Switch Controller
+In some cases you need to generate requests randomly chosen by its weight in profile. For that purpose you can use `weightedSwitchCotroller`.
+This controller chooses one of its children on every iteration based on their weight in model.
+
+During each iteration controller checks the relation of every child's executions to total number of children executions, than compare these fractions to weights set in the model and chooses one with maximum difference 
+
+For an example: 
+* We have a model with these weights `[10,20,30,40]` - total is 100, fractions are `[0.1, 0.2, 0.3, 0.4]`.
+* On current iteration we have that numbers of executions `[1,1,1,1]` - total is 4, fractions are `[0.25, 0.25, 0.25, 0.25]`.
+* Diffs are `[-0.15, -0.05, 0.05, 0.15]`, so the controller will choose the 4th child.
+
+Here is a code example:
+```java
+import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.Test;
+
+import java.io.IOException;
+import java.time.Duration;
+
+import us.abstracta.jmeter.javadsl.controllers.WeightedSwitchController;
+import us.abstracta.jmeter.javadsl.core.TestPlanStats;
+import static us.abstracta.jmeter.javadsl.JmeterDsl.*;
+
+public class PerformanceTest {
+
+  @Test
+  public void testPerformance() throws IOException {
+    TestPlanStats stats = testPlan(
+      threadGroup(2, 10,
+        weightedSwitchController()
+          .add(10, httpSampler("https://myservice/1"))
+          .add(20, httpSampler("https://myservice/2"))
+          .add(30, httpSampler("https://myservice/3"))
+          .add(40, httpSampler("https://myservice/4"))
+      )
+    ).run();
+    assertThat(stats.overall().sampleTimePercentile99()).isLessThan(Duration.ofSeconds(5));
+  }
+}
+```
+
+
 ### Provide Request Parameters Programmatically per Request
 
 With the standard DSL you can provide static values to request parameters, such as a body. However, you may also want to be able to modify your requests for each call. This is common in cases where your request creates something that must have unique values.

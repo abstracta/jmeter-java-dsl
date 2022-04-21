@@ -20,7 +20,7 @@ public class WeightedSwitchControllerTest extends JmeterDslTest {
 
     TestPlanStats stats = testPlan(
         threadGroup(threads, iterations,
-            dslWeightedSwitchController()
+            weightedSwitchController()
                 .add(weight1, httpSampler(SAMPLE_1_LABEL, wiremockUri))
                 .add(weight2, httpSampler(SAMPLE_2_LABEL, wiremockUri))
         )
@@ -34,7 +34,7 @@ public class WeightedSwitchControllerTest extends JmeterDslTest {
     long weight1 = 50;
     long weight2 = 60;
     try {
-      dslWeightedSwitchController()
+      weightedSwitchController()
           .add(weight1, httpSampler(SAMPLE_1_LABEL, wiremockUri))
           .add(weight2, httpSampler(SAMPLE_2_LABEL, wiremockUri));
     } catch (Exception e) {
