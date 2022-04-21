@@ -94,10 +94,10 @@ public class DslWeightedSwitchController extends BaseController {
 
   /**
    * Allows specifying children test elements which don't have an explicit weight associated.
-   * <p/>
+   * <p>
    * This is method should mainly be used to add elements which weight does not affect like
    * listeners, timers, assertions, pre- and post-processors and config elements.
-   *
+   * <p>
    * <b>Note:</b> If a sampler or controller is added with this method, it's weight will default to
    * 100.
    *
