@@ -1284,7 +1284,7 @@ public class JmeterDsl {
    * @return the Weighted SwitchController
    * @since 0.53
    */
-  public static DslWeightedSwitchController dslWeightedSwitchController() {
+  public static DslWeightedSwitchController weightedSwitchController() {
     return new DslWeightedSwitchController();
   }
 
