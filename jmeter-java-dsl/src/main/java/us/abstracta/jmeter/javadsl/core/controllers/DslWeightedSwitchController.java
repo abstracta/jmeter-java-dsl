@@ -122,7 +122,8 @@ public class DslWeightedSwitchController extends BaseController {
     for (ThreadGroupChild child : children) {
       HashTree childTree = context.buildChild(child, ret);
       if (child instanceof WeightedChild) {
-        addWeightedChildToModel(getChildName(ret, childTree), ((WeightedChild) child).weight, model);
+        addWeightedChildToModel(getChildName(ret, childTree), ((WeightedChild) child).weight,
+            model);
       } else if (child instanceof DslSampler || child instanceof DslController) {
         addWeightedChildToModel(getChildName(ret, childTree), DEFAULT_WEIGHT, model);
       }

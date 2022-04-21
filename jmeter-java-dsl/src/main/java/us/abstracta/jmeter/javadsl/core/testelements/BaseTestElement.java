@@ -170,9 +170,30 @@ public abstract class BaseTestElement implements DslTestElement {
     return Math.round(Math.ceil((double) duration.toMillis() / 1000));
   }
 
+  /**
+   * Allows getting the initial name assigned to the test element.
+   *
+   * @return the name associated to the test element.
+   * @since 0.51
+   * @deprecated in 0.53 to simplify and reduce API, and it's original need (for weighted switch
+   * controller) has been fulfilled in other ways. Additionally, solve name while building tree
+   * which makes this name not always accurate.
+   */
+  @Deprecated
+  public String getName() {
+    return name;
+  }
 
-
+  /**
+   * Allows getting the initial JMeter GUI class name associated to the test element.
+   *
+   * @return the JMeter GUI class associated to the test element.
+   * @since 0.51
+   * @deprecated in 0.53 to simplify and reduce API and due to not clear need.
+   */
+  @Deprecated
   public Class<? extends JMeterGUIComponent> getGuiClass() {
     return guiClass;
   }
+
 }
