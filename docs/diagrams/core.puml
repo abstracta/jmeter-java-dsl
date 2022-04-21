@@ -192,6 +192,10 @@ package core {
       float percent
     }
 
+    class DslWeightedSwitchController extends BaseController {
+      Map<ThreadGroupChild, Long> weightedChildren
+    }
+
     class DslIfController extends BaseController
 
     class DslForEachController extends BaseController

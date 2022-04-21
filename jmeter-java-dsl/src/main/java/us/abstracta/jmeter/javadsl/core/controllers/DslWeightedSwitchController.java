@@ -2,126 +2,152 @@ package us.abstracta.jmeter.javadsl.core.controllers;
 
 import com.blazemeter.jmeter.control.WeightedSwitchController;
 import com.blazemeter.jmeter.control.WeightedSwitchControllerGui;
+import java.util.ArrayList;
 import org.apache.jmeter.gui.util.PowerTableModel;
 import org.apache.jmeter.testelement.TestElement;
 import org.apache.jorphan.collections.HashTree;
 import us.abstracta.jmeter.javadsl.core.BuildTreeContext;
-import us.abstracta.jmeter.javadsl.core.testelements.BaseTestElement;
+import us.abstracta.jmeter.javadsl.core.samplers.DslSampler;
 import us.abstracta.jmeter.javadsl.core.threadgroups.BaseThreadGroup.ThreadGroupChild;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-
 /**
- * DSL wrapper for {@link WeightedSwitchController}
- * More information about it here:
- * <a href=https://github.com/Blazemeter/jmeter-bzm-plugins/blob/master/wsc/WeightedSwitchController.md>WeightedSwitchController docs</a>
- *
- * During each iteration controller checks the relation of every child's executions
- * to total number of children executions, than compare these fractions to weights set in the model
- * and chooses one with maximum difference
- *
- * For an example we have a model with these weights [10,20,30,40] - total is 100, fractions are [1/10, 1/5, 3/10, 2/5],
- * on current iteration we have that numbers of executions [1,1,1,1] - total is 4, fractions are [1/4, 1/4, 1/4, 1/4]
- * diffs are [-0.15, -0.05, 0.05, 0.15], so the controller will choose the 4th child.
+ * Selects a child in each iteration according to specified relative weights.
+ * <p>
+ * Internally this uses <a href="https://github.com/Blazemeter/jmeter-bzm-plugins/blob/master/wsc/WeightedSwitchController.md">
+ * BlazeMeter Weighted Switch Controller plugin</a>.
+ * <p>
+ * This controller is handy when you want part of the test plan to act in a probabilistic manner
+ * switching between different alternatives.
+ * <p>
+ * If you configure for example children weights with (50, child1), (100, child2), (50, child3) and
+ * 10 iterations, then you will get this execution: child2, child1, child3, child2, child2, child1,
+ * child3, child2, child2, child1.
  *
  * @since 0.53
  */
 public class DslWeightedSwitchController extends BaseController {
 
-  private final PowerTableModel model;
-  private final WeightedSwitchController wsc;
+  public static final long DEFAULT_WEIGHT = 100;
 
   public DslWeightedSwitchController() {
-    super("Weighted Switch Controller",
-        WeightedSwitchControllerGui.class,
-        new ArrayList<>()
-    );
+    super("Weighted Switch Controller", WeightedSwitchControllerGui.class, new ArrayList<>());
+  }
 
-    model = new PowerTableModel(
-        new String[]{"Name", "Weight", "Enabled"},
-        new Class[]{String.class, String.class, String.class}
-    );
+  /* we provide two separate methods instead of one just for ThreadGroupChild to only allow users
+  specifying weights for elements that make sense */
 
-    wsc = new WeightedSwitchController();
+  /**
+   * Adds a child to the controller with a configured weight for selecting it in iterations.
+   *
+   * @param weight is the weight to assign to this particular element for execution in iterations.
+   *               Keep in mind that if you use {@link #children(ThreadGroupChild...)} to add
+   *               samplers or controllers, their default assigned weight will be 100.
+   * @param child  is the element to add as controller child that will be selected for execution
+   *               during iterations according to given weight.
+   * @return the altered controller for further configuration and usage.
+   */
+  public DslWeightedSwitchController child(long weight, DslController child) {
+    return addWeightedChild(weight, child);
   }
 
   /**
-   * Internal method to add TestElement to {@link WeightedSwitchController} model
+   * Adds a child to the controller with a configured weight for selecting it in iterations.
    *
-   * Checks that total sum of weights will not exceed 100 considering the new element
-   *
-   * @param weight  weight of new TestElement in the model
-   * @param element the new TestElement
-   * @param enabled flag to set TestElement enabled or not
-   *
-   * @throws IllegalArgumentException throws exception if total sum of weights exceed 100
+   * @param weight is the weight to assign to this particular element for execution in iterations.
+   *               Keep in mind that if you use {@link #children(ThreadGroupChild...)} to add
+   *               samplers or controllers, their default assigned weight will be 100.
+   * @param child  is the element to add as controller child that will be selected for execution
+   *               during iterations according to given weight.
+   * @return the altered controller for further configuration and usage.
    */
-  private void addToModel(Long weight, BaseTestElement element, Boolean enabled) throws IllegalArgumentException {
+  public DslWeightedSwitchController child(long weight, DslSampler child) {
+    return addWeightedChild(weight, child);
+  }
 
-    List<Long> weights = this.model.getData().getColumnAsObjectArray("Weight")
-        .stream()
-        .map(x -> Long.parseLong(x.toString()))
-        .collect(Collectors.toList());
+  private DslWeightedSwitchController addWeightedChild(long weight, ThreadGroupChild child) {
+    children.add(new WeightedChild(weight, child));
+    return this;
+  }
 
-    if (weights.stream().reduce(0L, Long::sum) + weight <= 100) {
-      HashTree ret = new HashTree();
-      BuildTreeContext ctx = new BuildTreeContext();
+  private static class WeightedChild implements ThreadGroupChild {
 
-      ctx.buildTreeFor(element, ret);
+    private final long weight;
+    private final ThreadGroupChild element;
 
-      TestElement te = (TestElement) ret.getArray()[0];
+    private WeightedChild(long weight,
+        ThreadGroupChild element) {
+      this.weight = weight;
+      this.element = element;
+    }
 
-      this.model.addRow(new String[]{te.getName(), weight.toString(), enabled.toString()});
-      this.children.add((ThreadGroupChild) element);
-    } else {
-      throw new IllegalArgumentException("Total sum of weights should be less or equal 100");
+    @Override
+    public HashTree buildTreeUnder(HashTree parent, BuildTreeContext context) {
+      return element.buildTreeUnder(parent, context);
+    }
+
+    @Override
+    public void showInGui() {
+      element.showInGui();
     }
 
   }
 
-
   /**
-   * Method adds test element to model with enabling it by default
+   * Allows specifying children test elements which don't have an explicit weight associated.
+   * <p/>
+   * This is method should mainly be used to add elements which weight does not affect like
+   * listeners, timers, assertions, pre- and post-processors and config elements.
    *
-   * Uses internal method {@link #addToModel(Long, BaseTestElement, Boolean)}
-   * to add test element to {@link WeightedSwitchController} internal model
+   * <b>Note:</b> If a sampler or controller is added with this method, it's weight will default to
+   * 100.
    *
-   * @param weight  relative fraction of total requests number for TestElement
-   * @param element any test element that will be executed
-   * @return the controller instance for further configuration and usage
+   * @param children list of test elements to add as children of this controller.
+   * @return the altered controller for further configuration and usage.
    */
-  public DslWeightedSwitchController add(Long weight, BaseTestElement element) {
-    this.addToModel(weight, element, true);
+  public DslWeightedSwitchController children(ThreadGroupChild... children) {
+    addChildren(children);
     return this;
   }
-
-
-  /**
-   * Same as {@link #add(Long, BaseTestElement)} but allows to set the enabled flag
-   *
-   * @param weight  relative fraction of total requests number for TestElement
-   * @param element any test element that will be executed
-   * @param enabled flag to set element enable ot not
-   * @return the controller instance for further configuration and usage
-   */
-  public DslWeightedSwitchController add(Long weight, BaseTestElement element, Boolean enabled) {
-    this.addToModel(weight, element, enabled);
-    return this;
-  }
-
 
   @Override
   public TestElement buildTestElement() {
-    wsc.setData(model);
-    HashTree ret = new HashTree();
-    BuildTreeContext ctx = new BuildTreeContext();
-    children.forEach(c -> ctx.buildChild(c, ret));
-    for (Object te : ret.list()) {
-      wsc.addTestElement((TestElement) te);
+    return new WeightedSwitchController();
+  }
+
+  @Override
+  public HashTree buildTreeUnder(HashTree parent, BuildTreeContext context) {
+    WeightedSwitchController controller = (WeightedSwitchController) buildConfiguredTestElement();
+    HashTree ret = parent.add(controller);
+    PowerTableModel model = buildDataModel();
+    for (ThreadGroupChild child : children) {
+      HashTree childTree = context.buildChild(child, ret);
+      if (child instanceof WeightedChild) {
+        addWeightedChildToModel(getChildName(ret, childTree), ((WeightedChild) child).weight, model);
+      } else if (child instanceof DslSampler || child instanceof DslController) {
+        addWeightedChildToModel(getChildName(ret, childTree), DEFAULT_WEIGHT, model);
+      }
     }
-    return wsc;
+    controller.setData(model);
+    return ret;
+  }
+
+  private String getChildName(HashTree tree, HashTree child) {
+    return tree.list().stream()
+        .filter(t -> tree.getTree(t) == child)
+        .map(t -> ((TestElement) t).getName())
+        .findAny()
+        .orElseThrow(IllegalStateException::new);
+  }
+
+  private PowerTableModel buildDataModel() {
+    return new PowerTableModel(
+        new String[]{"Name", WeightedSwitchController.WEIGHTS, "Enabled"},
+        new Class[]{String.class, String.class, String.class}
+    );
+  }
+
+  private void addWeightedChildToModel(String name, long weight, PowerTableModel model) {
+    model.addRow(new String[]{name, String.valueOf(weight), "true"});
   }
 
 }

@@ -1488,47 +1488,6 @@ public class DslOnceOnlyControllerTest extends JmeterDslTest {
 
 Check [DslOnceOnlyController](../../jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/controllers/DslOnceOnlyController.java) for more details.
 
-### Weighted Switch Controller
-In some cases you need to generate requests randomly chosen by its weight in profile. For that purpose you can use `weightedSwitchCotroller`.
-This controller chooses one of its children on every iteration based on their weight in model.
-
-During each iteration controller checks the relation of every child's executions to total number of children executions, than compare these fractions to weights set in the model and chooses one with maximum difference 
-
-For an example: 
-* We have a model with these weights `[10,20,30,40]` - total is 100, fractions are `[0.1, 0.2, 0.3, 0.4]`.
-* On current iteration we have that numbers of executions `[1,1,1,1]` - total is 4, fractions are `[0.25, 0.25, 0.25, 0.25]`.
-* Diffs are `[-0.15, -0.05, 0.05, 0.15]`, so the controller will choose the 4th child.
-
-Here is a code example:
-```java
-import static org.assertj.core.api.Assertions.assertThat;
-import org.junit.jupiter.api.Test;
-
-import java.io.IOException;
-import java.time.Duration;
-
-import us.abstracta.jmeter.javadsl.controllers.WeightedSwitchController;
-import us.abstracta.jmeter.javadsl.core.TestPlanStats;
-import static us.abstracta.jmeter.javadsl.JmeterDsl.*;
-
-public class PerformanceTest {
-
-  @Test
-  public void testPerformance() throws IOException {
-    TestPlanStats stats = testPlan(
-      threadGroup(2, 10,
-        weightedSwitchController()
-          .add(10, httpSampler("https://myservice/1"))
-          .add(20, httpSampler("https://myservice/2"))
-          .add(30, httpSampler("https://myservice/3"))
-          .add(40, httpSampler("https://myservice/4"))
-      )
-    ).run();
-    assertThat(stats.overall().sampleTimePercentile99()).isLessThan(Duration.ofSeconds(5));
-  }
-}
-```
-
 
 ### Provide Request Parameters Programmatically per Request
 
@@ -1788,6 +1747,40 @@ public class PerformanceTest {
 ```
 
 Check [PercentController](../../jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/controllers/PercentController.java) for more details.
+
+### Switch between test plan parts with given probability
+
+In some cases you need to switch, in part of the test plan, between different the behaviors assigning to them different probabilities. The main difference of this need with previous one, is that in each iteration you have to execute one of the parts, while in previous case you might get multiple or no part executed on a given iteration. 
+
+For this scenario you can use `weightedSwitchCotroller`, like in this example:
+
+```java
+import static org.assertj.core.api.Assertions.assertThat;
+import static us.abstracta.jmeter.javadsl.JmeterDsl.*;
+
+import java.io.IOException;
+import java.time.Duration;
+import org.junit.jupiter.api.Test;
+import us.abstracta.jmeter.javadsl.core.TestPlanStats;
+
+public class PerformanceTest {
+
+  @Test
+  public void testPerformance() throws IOException {
+    TestPlanStats stats = testPlan(
+        threadGroup(2, 10,
+            weightedSwitchController()
+                .child(30, httpSampler("https://myservice/1")) // will run 30/(30+20)=60% of the iterations
+                .child(20, httpSampler("https://myservice/2")) // will run 20/(30+20)=40% of the iterations
+        )
+    ).run();
+    assertThat(stats.overall().sampleTimePercentile99()).isLessThan(Duration.ofSeconds(5));
+  }
+
+}
+```
+
+[DslWeightedSwitchController](../../jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/controllers/DslWeightedSwitchController.java) for more details.
 
 ### Parallel requests
 

@@ -15,10 +15,10 @@ import us.abstracta.jmeter.javadsl.core.controllers.DslForEachController;
 import us.abstracta.jmeter.javadsl.core.controllers.DslIfController;
 import us.abstracta.jmeter.javadsl.core.controllers.DslOnceOnlyController;
 import us.abstracta.jmeter.javadsl.core.controllers.DslTransactionController;
+import us.abstracta.jmeter.javadsl.core.controllers.DslWeightedSwitchController;
 import us.abstracta.jmeter.javadsl.core.controllers.DslWhileController;
 import us.abstracta.jmeter.javadsl.core.controllers.ForLoopController;
 import us.abstracta.jmeter.javadsl.core.controllers.PercentController;
-import us.abstracta.jmeter.javadsl.core.controllers.DslWeightedSwitchController;
 import us.abstracta.jmeter.javadsl.core.listeners.DslViewResultsTree;
 import us.abstracta.jmeter.javadsl.core.listeners.HtmlReporter;
 import us.abstracta.jmeter.javadsl.core.listeners.InfluxDbBackendListener;
@@ -650,6 +650,21 @@ public class JmeterDsl {
   }
 
   /**
+   * Builds a Controller which executes in each iteration choosing one child according to given
+   * weights.
+   * <p>
+   * Internally this uses <a href="https://github.com/Blazemeter/jmeter-bzm-plugins/blob/master/wsc/WeightedSwitchController.md">
+   * BlazeMeter Weighted Switch Controller plugin</a>.
+   *
+   * @return the controller instance for further configuration and usage.
+   * @see DslWeightedSwitchController
+   * @since 0.53
+   */
+  public static DslWeightedSwitchController weightedSwitchController() {
+    return new DslWeightedSwitchController();
+  }
+
+  /**
    * Builds an HTTP Request sampler to sample HTTP requests.
    *
    * @param url specifies URL the HTTP Request sampler will hit.
@@ -1274,18 +1289,6 @@ public class JmeterDsl {
    */
   public static DslCsvDataSet csvDataSet(String csvFile) {
     return new DslCsvDataSet(csvFile);
-  }
-
-
-  /**
-   * Builds a DslWeightedSwitchController which wraps logic of BlazeMeter WeightedSwitchController.
-   * <p>
-   * @see DslWeightedSwitchController
-   * @return the Weighted SwitchController
-   * @since 0.53
-   */
-  public static DslWeightedSwitchController weightedSwitchController() {
-    return new DslWeightedSwitchController();
   }
 
 }
