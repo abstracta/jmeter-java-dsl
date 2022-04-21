@@ -15,6 +15,18 @@ import java.util.stream.Collectors;
 
 /**
  * DSL wrapper for {@link WeightedSwitchController}
+ * More information about it here:
+ * <a href=https://github.com/Blazemeter/jmeter-bzm-plugins/blob/master/wsc/WeightedSwitchController.md>WeightedSwitchController docs</a>
+ *
+ * During each iteration controller checks the relation of every child's executions
+ * to total number of children executions, than compare these fractions to weights set in the model
+ * and chooses one with maximum difference
+ *
+ * For an example we have a model with these weights [10,20,30,40] - total is 100, fractions are [1/10, 1/5, 3/10, 2/5],
+ * on current iteration we have that numbers of executions [1,1,1,1] - total is 4, fractions are [1/4, 1/4, 1/4, 1/4]
+ * diffs are [-0.15, -0.05, 0.05, 0.15], so the controller will choose the 4th child.
+ *
+ * @since 0.53
  */
 public class DslWeightedSwitchController extends BaseController {
 
@@ -54,7 +66,14 @@ public class DslWeightedSwitchController extends BaseController {
         .collect(Collectors.toList());
 
     if (weights.stream().reduce(0L, Long::sum) + weight <= 100) {
-      this.model.addRow(new String[]{element.getName(), weight.toString(), enabled.toString()});
+      HashTree ret = new HashTree();
+      BuildTreeContext ctx = new BuildTreeContext();
+
+      ctx.buildTreeFor(element, ret);
+
+      TestElement te = (TestElement) ret.getArray()[0];
+
+      this.model.addRow(new String[]{te.getName(), weight.toString(), enabled.toString()});
       this.children.add((ThreadGroupChild) element);
     } else {
       throw new IllegalArgumentException("Total sum of weights should be less or equal 100");
@@ -91,6 +110,7 @@ public class DslWeightedSwitchController extends BaseController {
     this.addToModel(weight, element, enabled);
     return this;
   }
+
 
   @Override
   public TestElement buildTestElement() {
