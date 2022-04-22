@@ -344,7 +344,7 @@ public class DslHttpSamplerTest extends JmeterDslTest {
         threadGroup(1, 1,
             httpSampler(wiremockUri)
                 .param(PARAM1_NAME, PARAM1_VALUE)
-                .encodedParam(PARAM2_NAME, PARAM2_VALUE)
+                .rawParam(PARAM2_NAME, PARAM2_VALUE)
         )
     ).run();
     verify(getRequestedFor(
@@ -371,7 +371,7 @@ public class DslHttpSamplerTest extends JmeterDslTest {
             httpSampler(wiremockUri)
                 .method(HTTPConstants.POST)
                 .param(PARAM1_NAME, PARAM1_VALUE)
-                .encodedParam(PARAM2_NAME, PARAM2_VALUE)
+                .rawParam(PARAM2_NAME, PARAM2_VALUE)
         )
     ).run();
     verify(postRequestedFor(anyUrl())
@@ -503,7 +503,7 @@ public class DslHttpSamplerTest extends JmeterDslTest {
           threadGroup(1, 1,
               httpSampler("http://localhost")
                   .param("param%201", "value%201")
-                  .encodedParam("param%202", "value%202")
+                  .rawParam("param%202", "value%202")
           )
       );
     }
@@ -514,7 +514,7 @@ public class DslHttpSamplerTest extends JmeterDslTest {
               httpSampler("http://localhost")
                   .method(HTTPConstants.POST)
                   .param("param%201", "value%201")
-                  .encodedParam("param%202", "value%202")
+                  .rawParam("param%202", "value%202")
           )
       );
     }

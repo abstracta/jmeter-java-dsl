@@ -199,7 +199,8 @@ public class DslGraphqlSampler extends DslBaseHttpSampler<DslGraphqlSampler> {
 
   /*
    until jmeter 5.5 is released (which fixes this issue:
-   https://bz.apache.org/bugzilla/show_bug.cgi?id=65108) we need custom serialization.
+   https://bz.apache.org/bugzilla/show_bug.cgi?id=65108) we need custom serialization instead of
+   GraphQLRequestParamUtils.toPostBodyString.
    */
   private String buildGraphqlBody(String jsonVariables) {
     Map<String, Object> ret = new LinkedHashMap<>();
