@@ -7,6 +7,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.verify;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.testPlan;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.threadGroup;
+import static us.abstracta.jmeter.javadsl.JmeterDsl.vars;
 import static us.abstracta.jmeter.javadsl.graphql.DslGraphqlSampler.graphqlSampler;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -64,8 +65,6 @@ public class DslGraphqlSamplerTest extends JmeterDslTest {
         )
     ).run();
     verify(postRequestedFor(anyUrl())
-        .withHeader(HTTPConstants.HEADER_CONTENT_TYPE,
-            equalTo(ContentType.APPLICATION_JSON.toString()))
         .withRequestBody(equalToJson(buildRequestBody(operationName, null))));
   }
 
@@ -86,13 +85,11 @@ public class DslGraphqlSamplerTest extends JmeterDslTest {
         )
     ).run();
     verify(postRequestedFor(anyUrl())
-        .withHeader(HTTPConstants.HEADER_CONTENT_TYPE,
-            equalTo(ContentType.APPLICATION_JSON.toString()))
         .withRequestBody(equalToJson(buildRequestBody(null, vars))));
   }
 
   @Test
-  public void shouldSendGraphqlQueryWithVariablesWhenGraphqlSamplerWithRawVariables()
+  public void shouldSendGraphqlQueryWithVariablesWhenGraphqlSamplerWithVariablesJson()
       throws Exception {
     LinkedHashMap<String, Object> vars = new LinkedHashMap<>();
     vars.put("var1", 1);
@@ -102,13 +99,30 @@ public class DslGraphqlSamplerTest extends JmeterDslTest {
     testPlan(
         threadGroup(1, 1,
             graphqlSampler(wiremockUri, QUERY)
-                .variables(OBJECT_MAPPER.writeValueAsString(vars))
+                .variablesJson(OBJECT_MAPPER.writeValueAsString(vars))
         )
     ).run();
     verify(postRequestedFor(anyUrl())
-        .withHeader(HTTPConstants.HEADER_CONTENT_TYPE,
-            equalTo(ContentType.APPLICATION_JSON.toString()))
         .withRequestBody(equalToJson(buildRequestBody(null, vars))));
+  }
+
+  @Test
+  public void shouldSendGraphqlQueryWithVariablesWhenGraphqlSamplerWithRawVariable()
+      throws Exception {
+    String jmeterVarName = "MY_VAR";
+    int varValue = 1;
+    String graphqlVarName = "var1";
+    testPlan(
+        vars()
+            .set(jmeterVarName, String.valueOf(varValue)),
+        threadGroup(1, 1,
+            graphqlSampler(wiremockUri, QUERY)
+                .rawVariable(graphqlVarName, "${" + jmeterVarName + "}")
+        )
+    ).run();
+    verify(postRequestedFor(anyUrl())
+        .withRequestBody(equalToJson(
+            buildRequestBody(null, Collections.singletonMap(graphqlVarName, varValue)))));
   }
 
   @Nested
@@ -126,7 +140,7 @@ public class DslGraphqlSamplerTest extends JmeterDslTest {
       );
     }
 
-    public DslTestPlan testPlanWithGraphqlAndSimpleVariables() {
+    public DslTestPlan testPlanWithGraphqlAndOperationAndSimpleVariables() {
       return testPlan(
           threadGroup(1, 1,
               graphqlSampler("http://localhost", "{ user(id: 1){ name } }")
@@ -140,5 +154,26 @@ public class DslGraphqlSamplerTest extends JmeterDslTest {
       );
     }
 
+    public DslTestPlan testPlanWithGraphqlAndVariablesJson() {
+      return testPlan(
+          vars()
+              .set("MY_VARS", "{\"var\": 1}"),
+          threadGroup(1, 1,
+              graphqlSampler("http://localhost", "{ user(id: 1){ name } }")
+                  .variablesJson("${MY_VARS}")
+          )
+      );
+    }
+
+    public DslTestPlan testPlanWithGraphqlAndRawVariable() {
+      return testPlan(
+          threadGroup(1, 1,
+              graphqlSampler("http://localhost", "{ user(id: 1){ name } }")
+                  .rawVariable("var", "[1,2,3]")
+          )
+      );
+    }
+
   }
+
 }

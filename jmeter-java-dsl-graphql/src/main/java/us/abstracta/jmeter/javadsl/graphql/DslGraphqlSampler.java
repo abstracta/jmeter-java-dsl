@@ -3,6 +3,7 @@ package us.abstracta.jmeter.javadsl.graphql;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.util.RawValue;
 import java.lang.reflect.Method;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -14,13 +15,11 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 import org.apache.http.entity.ContentType;
 import org.apache.jmeter.config.Arguments;
-import org.apache.jmeter.protocol.http.config.GraphQLRequestParams;
 import org.apache.jmeter.protocol.http.config.gui.GraphQLUrlConfigGui;
 import org.apache.jmeter.protocol.http.control.HeaderManager;
 import org.apache.jmeter.protocol.http.control.gui.GraphQLHTTPSamplerGui;
 import org.apache.jmeter.protocol.http.sampler.HTTPSamplerBase;
 import org.apache.jmeter.protocol.http.sampler.HTTPSamplerProxy;
-import org.apache.jmeter.protocol.http.util.GraphQLRequestParamUtils;
 import org.apache.jmeter.protocol.http.util.HTTPArgument;
 import org.apache.jmeter.protocol.http.util.HTTPConstants;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodCall;
@@ -43,10 +42,11 @@ public class DslGraphqlSampler extends DslBaseHttpSampler<DslGraphqlSampler> {
 
   private static final String DEFAULT_NAME = "GraphQL HTTP Request";
   private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+
   private final String query;
   private String operationName;
   private final Map<String, Object> variables = new LinkedHashMap<>();
-  private String varsJson;
+  private String variablesJson;
 
   public DslGraphqlSampler(String name, String url, String query) {
     super(name != null ? name : DEFAULT_NAME, url, GraphQLHTTPSamplerGui.class);
@@ -103,7 +103,7 @@ public class DslGraphqlSampler extends DslBaseHttpSampler<DslGraphqlSampler> {
    * @param value specifies the value associated to the variable. This value is serialized into
    *              json, so for non-primitive values (int, long, boolean, float, double, string,
    *              etc.) make sure they can be properly serialized by jackson library or use {@link
-   *              #variables(String)} method instead.
+   *              #rawVariable(String, String)} or {@link #variables(String)} method instead.
    * @return the sampler instance for further configuration or usage.
    * @throws IllegalArgumentException when provided value object can't be serialized by jackson.
    */
@@ -122,6 +122,39 @@ public class DslGraphqlSampler extends DslBaseHttpSampler<DslGraphqlSampler> {
   }
 
   /**
+   * Allows specifying variables values which should not be escaped in final JSON string.
+   * <p>
+   * This method is handy when you want to use JMeter expressions for ints, longs, booleans, floats
+   * and doubles (which should not include quotes in final json) and when you want to specify
+   * complex json strings like arrays & objects.
+   *
+   * @param name  specifies the name of the variable.
+   * @param value the raw JSON string part to be set as variable value.
+   * @return the sampler instance for further configuration or usage.
+   * @since 0.54
+   */
+  public DslGraphqlSampler rawVariable(String name, String value) {
+    this.variables.put(name, new RawValue(value));
+    return this;
+  }
+
+  /**
+   * Allows specifying variables in a string in JSON format as JMeter sampler does.
+   * <p>
+   * In general prefer using {@link #variable(String, Object)} instead, which is simpler, and avoids
+   * potential format issues. Use this method in corner cases when {@link #variable(String, Object)}
+   * is a limiting factor.
+   *
+   * @param variables specifies all variables to be sent in GraphQL request in JSON Object format.
+   * @return the sampler instance for further configuration or usage.
+   * @see #variable(String, Object)
+   * @deprecated as of 0.54 use {@link #variablesJson(String)} instead.
+   */
+  public DslGraphqlSampler variables(String variables) {
+    return variablesJson(variables);
+  }
+
+  /**
    * Allows specifying variables in a string in JSON format as JMeter sampler does.
    * <p>
    * In general prefer using {@link #variable(String, Object)} instead, which is simpler, and avoids
@@ -132,27 +165,26 @@ public class DslGraphqlSampler extends DslBaseHttpSampler<DslGraphqlSampler> {
    * @return the sampler instance for further configuration or usage.
    * @see #variable(String, Object)
    */
-  public DslGraphqlSampler variables(String variables) {
-    this.varsJson = variables;
+  public DslGraphqlSampler variablesJson(String variables) {
+    this.variablesJson = variables;
     return this;
   }
 
   @Override
   public HTTPSamplerProxy configureHttpTestElement(HTTPSamplerProxy elem) {
-    String varsJson = buildVariablesJson();
     elem.setMethod(HTTPConstants.POST);
     elem.setProperty(GraphQLUrlConfigGui.OPERATION_NAME, operationName);
     elem.setProperty(GraphQLUrlConfigGui.QUERY, query);
-    elem.setProperty(GraphQLUrlConfigGui.VARIABLES, varsJson);
     elem.setProperty(HTTPSamplerBase.POST_BODY_RAW, false);
-    elem.setArguments(buildArguments(varsJson));
+    String varsJson = buildVariablesJson();
+    elem.setProperty(GraphQLUrlConfigGui.VARIABLES, varsJson);
+    elem.setArguments(buildHttpArguments(buildGraphqlBody(varsJson)));
     return elem;
-
   }
 
   private String buildVariablesJson() {
-    if (varsJson != null) {
-      return varsJson;
+    if (variablesJson != null) {
+      return variablesJson;
     } else if (variables.isEmpty()) {
       return "";
     } else {
@@ -165,10 +197,26 @@ public class DslGraphqlSampler extends DslBaseHttpSampler<DslGraphqlSampler> {
     }
   }
 
-  private Arguments buildArguments(String jsonVariables) {
+  /*
+   until jmeter 5.5 is released (which fixes this issue:
+   https://bz.apache.org/bugzilla/show_bug.cgi?id=65108) we need custom serialization.
+   */
+  private String buildGraphqlBody(String jsonVariables) {
+    Map<String, Object> ret = new LinkedHashMap<>();
+    ret.put("operationName", operationName);
+    if (!jsonVariables.trim().isEmpty()) {
+      ret.put("variables", new RawValue(jsonVariables));
+    }
+    ret.put("query", query);
+    try {
+      return OBJECT_MAPPER.writeValueAsString(ret);
+    } catch (JsonProcessingException e) {
+      throw new RuntimeException("Cannot serialize JSON for POST body string", e);
+    }
+  }
+
+  private Arguments buildHttpArguments(String body) {
     Arguments args = new Arguments();
-    String body = GraphQLRequestParamUtils.toPostBodyString(
-        new GraphQLRequestParams(operationName, query, jsonVariables));
     HTTPArgument arg = new HTTPArgument("", body, false);
     arg.setAlwaysEncoded(false);
     args.addArgument(arg);
@@ -197,14 +245,12 @@ public class DslGraphqlSampler extends DslBaseHttpSampler<DslGraphqlSampler> {
       if (!vars.isDefault()) {
         try {
           JsonNode varsNode = OBJECT_MAPPER.readValue(vars.getValue(), JsonNode.class);
-          boolean simpleVars = iterator2Stream(varsNode.fields())
-              .allMatch(v -> v.getValue().isValueNode());
-          if (!varsNode.isObject() || !simpleVars) {
+          if (!varsNode.isObject()) {
             chainRawVariables(ret, vars);
             return;
           }
           iterator2Stream(varsNode.fields())
-              .forEach(var -> ret.chain("variable",
+              .forEach(var -> ret.chain(var.getValue().isValueNode() ? "variable" : "rawVariable",
                   new StringParam(var.getKey()), new JsonValueParam(var.getValue())));
         } catch (JsonProcessingException e) {
           chainRawVariables(ret, vars);
@@ -223,7 +269,7 @@ public class DslGraphqlSampler extends DslBaseHttpSampler<DslGraphqlSampler> {
     }
 
     private void chainRawVariables(MethodCall ret, StringParam vars) {
-      ret.chain("variables", vars);
+      ret.chain("variablesJson", vars);
     }
 
     private <T> Stream<T> iterator2Stream(Iterator<T> iterator) {
@@ -244,7 +290,20 @@ public class DslGraphqlSampler extends DslBaseHttpSampler<DslGraphqlSampler> {
       @Override
       protected String buildCode(String indent) {
         JsonNode node = (JsonNode) value;
-        return node.isTextual() ? new StringParam(node.textValue()).buildCode("") : node.asText();
+        if (node.isValueNode()) {
+          return node.isTextual() ? string2Code(node.textValue()) : node.asText();
+        } else {
+          try {
+            return string2Code(OBJECT_MAPPER.writeValueAsString(value));
+          } catch (JsonProcessingException e) {
+            // this should never happen since value was parsed from json.
+            throw new RuntimeException(e);
+          }
+        }
+      }
+
+      private String string2Code(String value) {
+        return new StringParam(value).buildCode("");
       }
 
     }
