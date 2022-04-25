@@ -29,7 +29,7 @@ import org.elasticsearch.search.aggregations.bucket.terms.Terms.Bucket;
 import org.junit.jupiter.api.Test;
 import org.testcontainers.elasticsearch.ElasticsearchContainer;
 import us.abstracta.jmeter.javadsl.JmeterDslTest;
-import us.abstracta.jmeter.javadsl.TestResource;
+import us.abstracta.jmeter.javadsl.core.util.TestResource;
 
 public class ElasticsearchBackendListenerTest extends JmeterDslTest {
 

@@ -11,7 +11,7 @@ import java.nio.file.Path;
 import org.apache.jmeter.samplers.SampleResult;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
-import us.abstracta.jmeter.javadsl.TestResource;
+import us.abstracta.jmeter.javadsl.core.util.TestResource;
 import us.abstracta.jmeter.javadsl.core.listeners.JtlWriter;
 
 public class DslJsr223SamplerTest {

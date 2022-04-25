@@ -1,4 +1,4 @@
-package us.abstracta.jmeter.javadsl;
+package us.abstracta.jmeter.javadsl.core.util;
 
 import java.io.File;
 import java.io.IOException;
