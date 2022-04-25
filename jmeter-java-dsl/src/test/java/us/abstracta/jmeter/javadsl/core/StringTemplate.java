@@ -17,7 +17,7 @@ import org.assertj.core.internal.Diff;
 import org.assertj.core.internal.Failures;
 import org.assertj.core.util.diff.Chunk;
 import org.assertj.core.util.diff.Delta;
-import us.abstracta.jmeter.javadsl.TestResource;
+import us.abstracta.jmeter.javadsl.core.util.TestResource;
 
 public class StringTemplate {
 
