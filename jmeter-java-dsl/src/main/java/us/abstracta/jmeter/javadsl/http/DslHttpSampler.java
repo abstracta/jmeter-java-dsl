@@ -165,8 +165,8 @@ public class DslHttpSampler extends DslBaseHttpSampler<DslHttpSampler> {
    * Allows specifying a query parameter or url encoded form body parameter.
    * <p>
    * JMeter will automatically URL encode provided parameters names and values. Use {@link
-   * #encodedParam(String, String)} to send parameters values which are already encoded and should
-   * be sent as is by JMeter.
+   * #rawParam(String, String)} to send parameters values which are already encoded and should be
+   * sent as is by JMeter.
    * <p>
    * JMeter will use provided parameter in query string if method is GET, DELETE or OPTIONS,
    * otherwise it will use them in url encoded form body.
@@ -191,8 +191,21 @@ public class DslHttpSampler extends DslBaseHttpSampler<DslHttpSampler> {
    *
    * @see #param(String, String)
    * @since 0.42
+   * @deprecated as of 0.54 use {@link #rawParam(String, String)} instead which avoids some
+   * confusion.
    */
   public DslHttpSampler encodedParam(String name, String value) {
+    return rawParam(name, value);
+  }
+
+  /**
+   * Same as {@link #param(String, String)} but param name and value will be sent with no additional
+   * encoding.
+   *
+   * @see #param(String, String)
+   * @since 0.54
+   */
+  public DslHttpSampler rawParam(String name, String value) {
     HTTPArgument arg = new HTTPArgument(name, value);
     arg.setAlwaysEncoded(false);
     arguments.add(arg);
@@ -203,7 +216,7 @@ public class DslHttpSampler extends DslBaseHttpSampler<DslHttpSampler> {
    * Specifies a part of a multipart form body.
    * <p>
    * In general, samplers should not use this method in combination with {@link #param(String,
-   * String)} or {@link #encodedParam(String, String)}.
+   * String)} or {@link #rawParam(String, String)}.
    *
    * @param name        specifies the name of the part.
    * @param value       specifies the string to be sent in the part.
@@ -439,7 +452,7 @@ public class DslHttpSampler extends DslBaseHttpSampler<DslHttpSampler> {
           if (arg.isAlwaysEncoded()) {
             ret.chain("param", new StringParam(arg.getName()), new StringParam(arg.getValue()));
           } else {
-            ret.chain("encodedParam", new StringParam(arg.getName()),
+            ret.chain("rawParam", new StringParam(arg.getName()),
                 new StringParam(arg.getValue()));
           }
         }

@@ -41,7 +41,6 @@ import us.abstracta.jmeter.javadsl.core.threadgroups.DslTeardownThreadGroup;
 import us.abstracta.jmeter.javadsl.core.threadgroups.RpsThreadGroup;
 import us.abstracta.jmeter.javadsl.core.timers.DslUniformRandomTimer;
 import us.abstracta.jmeter.javadsl.core.util.PropertyScriptBuilder.PropertyScript;
-import us.abstracta.jmeter.javadsl.core.util.TestResource;
 import us.abstracta.jmeter.javadsl.http.DslCacheManager;
 import us.abstracta.jmeter.javadsl.http.DslCookieManager;
 import us.abstracta.jmeter.javadsl.http.DslHttpDefaults;
@@ -1287,17 +1286,6 @@ public class JmeterDsl {
    */
   public static DslWeightedSwitchController weightedSwitchController() {
     return new DslWeightedSwitchController();
-  }
-
-
-  /**
-   * Builds a {@link TestResource} that is wrapper for files in /src/test/resources folder
-   * @param path name or path of file
-   * @return the TestResource object
-   * @since 0.54
-   */
-  public static TestResource testResource(String path) {
-    return new TestResource(path);
   }
 
 }

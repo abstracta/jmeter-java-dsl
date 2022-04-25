@@ -29,7 +29,7 @@ To use the DSL just include it in your project:
 <dependency>
   <groupId>us.abstracta.jmeter</groupId>
   <artifactId>jmeter-java-dsl</artifactId>
-  <version>0.52.1</version>
+  <version>0.53</version>
   <scope>test</scope>
 </dependency>
 ```
@@ -50,7 +50,7 @@ class JmeterRule implements ComponentMetadataRule {
 
 dependencies {
     ...
-    testImplementation 'us.abstracta.jmeter:jmeter-java-dsl:0.52.1'
+    testImplementation 'us.abstracta.jmeter:jmeter-java-dsl:0.53'
     components {
         withModule("org.apache.jmeter:ApacheJMeter_core", JmeterRule)
         withModule("org.apache.jmeter:ApacheJMeter_java", JmeterRule)
@@ -133,7 +133,7 @@ java -jar jmx2dsl.jar test-plan.jmx
 :::
 ::: tab Jbang
 ```bash
-jbang us.abstracta.jmeter:jmeter-java-dsl-jmx2dsl:0.52.1 test-plan.jmx
+jbang us.abstracta.jmeter:jmeter-java-dsl-jmx2dsl:0.53 test-plan.jmx
 ```
 :::
 ::::
@@ -179,14 +179,14 @@ By including following module as dependency:
 <dependency>
   <groupId>us.abstracta.jmeter</groupId>
   <artifactId>jmeter-java-dsl-blazemeter</artifactId>
-  <version>0.52.1</version>
+  <version>0.53</version>
   <scope>test</scope>
 </dependency>
 ```
 :::
 ::: tab Gradle
 ```groovy
-testImplementation 'us.abstracta.jmeter:jmeter-java-dsl-blazemeter:0.52.1'
+testImplementation 'us.abstracta.jmeter:jmeter-java-dsl-blazemeter:0.53'
 ```
 :::
 ::::
@@ -852,7 +852,7 @@ To use the module, you will need to include following dependency in your project
 <dependency>
   <groupId>us.abstracta.jmeter</groupId>
   <artifactId>jmeter-java-dsl-elasticsearch-listener</artifactId>
-  <version>0.52.1</version>
+  <version>0.53</version>
   <scope>test</scope>
 </dependency>
 ```
@@ -865,7 +865,7 @@ maven { url 'https://jitpack.io' }
 
 And the dependency:
 ```groovy
-testImplementation 'us.abstracta.jmeter:jmeter-java-dsl-elasticsearch-listener:0.52.1'
+testImplementation 'us.abstracta.jmeter:jmeter-java-dsl-elasticsearch-listener:0.53'
 ```
 
 :::
@@ -965,14 +965,14 @@ To use it, you need to add following dependency:
 <dependency>
   <groupId>us.abstracta.jmeter</groupId>
   <artifactId>jmeter-java-dsl-dashboard</artifactId>
-  <version>0.52.1</version>
+  <version>0.53</version>
   <scope>test</scope>
 </dependency>
 ```
 :::
 ::: tab Gradle
 ```groovy
-testImplementation 'us.abstracta.jmeter:jmeter-java-dsl-dashboard:0.52.1'
+testImplementation 'us.abstracta.jmeter:jmeter-java-dsl-dashboard:0.53'
 ```
 :::
 ::::
@@ -1488,47 +1488,6 @@ public class DslOnceOnlyControllerTest extends JmeterDslTest {
 
 Check [DslOnceOnlyController](../../jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/controllers/DslOnceOnlyController.java) for more details.
 
-### Weighted Switch Controller
-In some cases you need to generate requests randomly chosen by its weight in profile. For that purpose you can use `weightedSwitchCotroller`.
-This controller chooses one of its children on every iteration based on their weight in model.
-
-During each iteration controller checks the relation of every child's executions to total number of children executions, than compare these fractions to weights set in the model and chooses one with maximum difference 
-
-For an example: 
-* We have a model with these weights `[10,20,30,40]` - total is 100, fractions are `[0.1, 0.2, 0.3, 0.4]`.
-* On current iteration we have that numbers of executions `[1,1,1,1]` - total is 4, fractions are `[0.25, 0.25, 0.25, 0.25]`.
-* Diffs are `[-0.15, -0.05, 0.05, 0.15]`, so the controller will choose the 4th child.
-
-Here is a code example:
-```java
-import static org.assertj.core.api.Assertions.assertThat;
-import org.junit.jupiter.api.Test;
-
-import java.io.IOException;
-import java.time.Duration;
-
-import us.abstracta.jmeter.javadsl.controllers.WeightedSwitchController;
-import us.abstracta.jmeter.javadsl.core.TestPlanStats;
-import static us.abstracta.jmeter.javadsl.JmeterDsl.*;
-
-public class PerformanceTest {
-
-  @Test
-  public void testPerformance() throws IOException {
-    TestPlanStats stats = testPlan(
-      threadGroup(2, 10,
-        weightedSwitchController()
-          .add(10, httpSampler("https://myservice/1"))
-          .add(20, httpSampler("https://myservice/2"))
-          .add(30, httpSampler("https://myservice/3"))
-          .add(40, httpSampler("https://myservice/4"))
-      )
-    ).run();
-    assertThat(stats.overall().sampleTimePercentile99()).isLessThan(Duration.ofSeconds(5));
-  }
-}
-```
-
 
 ### Provide Request Parameters Programmatically per Request
 
@@ -1789,6 +1748,40 @@ public class PerformanceTest {
 
 Check [PercentController](../../jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/controllers/PercentController.java) for more details.
 
+### Switch between test plan parts with given probability
+
+In some cases you need to switch, in part of the test plan, between different the behaviors assigning to them different probabilities. The main difference of this need with previous one, is that in each iteration you have to execute one of the parts, while in previous case you might get multiple or no part executed on a given iteration. 
+
+For this scenario you can use `weightedSwitchCotroller`, like in this example:
+
+```java
+import static org.assertj.core.api.Assertions.assertThat;
+import static us.abstracta.jmeter.javadsl.JmeterDsl.*;
+
+import java.io.IOException;
+import java.time.Duration;
+import org.junit.jupiter.api.Test;
+import us.abstracta.jmeter.javadsl.core.TestPlanStats;
+
+public class PerformanceTest {
+
+  @Test
+  public void testPerformance() throws IOException {
+    TestPlanStats stats = testPlan(
+        threadGroup(2, 10,
+            weightedSwitchController()
+                .child(30, httpSampler("https://myservice/1")) // will run 30/(30+20)=60% of the iterations
+                .child(20, httpSampler("https://myservice/2")) // will run 20/(30+20)=40% of the iterations
+        )
+    ).run();
+    assertThat(stats.overall().sampleTimePercentile99()).isLessThan(Duration.ofSeconds(5));
+  }
+
+}
+```
+
+[DslWeightedSwitchController](../../jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/controllers/DslWeightedSwitchController.java) for more details.
+
 ### Parallel requests
 
 JMeter provides two main ways for running requests in parallel: thread groups and http samplers downloading embedded resources in parallel. But in some cases is necessary to run requests in parallel which can't be properly modeled with previously mentioned scenarios. For such cases you can use `paralleController` which allows using the [Parallel Controller plugin](https://github.com/Blazemeter/jmeter-bzm-plugins/blob/master/parallel/Parallel.md) to execute a given set of requests in parallel (while in a JMeter thread iteration step).
@@ -1801,14 +1794,14 @@ To use it, add following dependency to your project:
 <dependency>
   <groupId>us.abstracta.jmeter</groupId>
   <artifactId>jmeter-java-dsl-parallel</artifactId>
-  <version>0.52.1</version>
+  <version>0.53</version>
   <scope>test</scope>
 </dependency>
 ```
 :::
 ::: tab Gradle
 ```groovy
-testImplementation 'us.abstracta.jmeter:jmeter-java-dsl-dashboard:0.52.1'
+testImplementation 'us.abstracta.jmeter:jmeter-java-dsl-dashboard:0.53'
 ```
 :::
 ::::
@@ -2307,14 +2300,14 @@ When you want to test a GraphQL service, having properly set each field in HTTP 
 <dependency>
   <groupId>us.abstracta.jmeter</groupId>
   <artifactId>jmeter-java-dsl-graphql</artifactId>
-  <version>0.52.1</version>
+  <version>0.53</version>
   <scope>test</scope>
 </dependency>
 ```
 :::
 ::: tab Gradle
 ```groovy
-testImplementation 'us.abstracta.jmeter:jmeter-java-dsl-graphql:0.52.1'
+testImplementation 'us.abstracta.jmeter:jmeter-java-dsl-graphql:0.53'
 ```
 :::
 ::::
@@ -2400,14 +2393,14 @@ Including following dependency in your project:
 <dependency>
   <groupId>us.abstracta.jmeter</groupId>
   <artifactId>jmeter-java-dsl-jdbc</artifactId>
-  <version>0.52.1</version>
+  <version>0.53</version>
   <scope>test</scope>
 </dependency>
 ```
 :::
 ::: tab Gradle
 ```groovy
-testImplementation 'us.abstracta.jmeter:jmeter-java-dsl-jdbc:0.52.1'
+testImplementation 'us.abstracta.jmeter:jmeter-java-dsl-jdbc:0.53'
 ```
 :::
 ::::
@@ -2648,14 +2641,14 @@ Include the module on your project:
 <dependency>
   <groupId>us.abstracta.jmeter</groupId>
   <artifactId>jmeter-java-dsl-wrapper</artifactId>
-  <version>0.52.1</version>
+  <version>0.53</version>
   <scope>test</scope>
 </dependency>
 ```
 :::
 ::: tab Gradle
 ```groovy
-testImplementation 'us.abstracta.jmeter:jmeter-java-dsl-wrapper:0.52.1'
+testImplementation 'us.abstracta.jmeter:jmeter-java-dsl-wrapper:0.53'
 ```
 :::
 ::::

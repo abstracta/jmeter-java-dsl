@@ -70,8 +70,8 @@ public class BuildTreeContext {
     return visualizers;
   }
 
-  public void buildChild(DslTestElement child, HashTree parentTree) {
-    new BuildTreeContext(this, visualizers).buildTreeFor(child, parentTree);
+  public HashTree buildChild(DslTestElement child, HashTree parentTree) {
+    return new BuildTreeContext(this, visualizers).buildTreeFor(child, parentTree);
   }
 
   public HashTree buildTreeFor(DslTestElement element, HashTree parentTree) {
