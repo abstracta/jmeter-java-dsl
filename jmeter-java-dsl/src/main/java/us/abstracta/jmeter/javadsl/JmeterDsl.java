@@ -15,10 +15,10 @@ import us.abstracta.jmeter.javadsl.core.controllers.DslForEachController;
 import us.abstracta.jmeter.javadsl.core.controllers.DslIfController;
 import us.abstracta.jmeter.javadsl.core.controllers.DslOnceOnlyController;
 import us.abstracta.jmeter.javadsl.core.controllers.DslTransactionController;
+import us.abstracta.jmeter.javadsl.core.controllers.DslWeightedSwitchController;
 import us.abstracta.jmeter.javadsl.core.controllers.DslWhileController;
 import us.abstracta.jmeter.javadsl.core.controllers.ForLoopController;
 import us.abstracta.jmeter.javadsl.core.controllers.PercentController;
-import us.abstracta.jmeter.javadsl.core.controllers.DslWeightedSwitchController;
 import us.abstracta.jmeter.javadsl.core.listeners.DslViewResultsTree;
 import us.abstracta.jmeter.javadsl.core.listeners.HtmlReporter;
 import us.abstracta.jmeter.javadsl.core.listeners.InfluxDbBackendListener;
@@ -1276,12 +1276,11 @@ public class JmeterDsl {
     return new DslCsvDataSet(csvFile);
   }
 
-
   /**
    * Builds a DslWeightedSwitchController which wraps logic of BlazeMeter WeightedSwitchController.
    * <p>
-   * @see DslWeightedSwitchController
    * @return the Weighted SwitchController
+   * @see DslWeightedSwitchController
    * @since 0.53
    */
   public static DslWeightedSwitchController weightedSwitchController() {
