@@ -1289,6 +1289,13 @@ public class JmeterDsl {
     return new DslWeightedSwitchController();
   }
 
+
+  /**
+   * Builds a {@link TestResource} that is wrapper for files in /src/test/resources folder
+   * @param path name or path of file
+   * @return the TestResource object
+   * @since 0.54
+   */
   public static TestResource testResource(String path) {
     return new TestResource(path);
   }
