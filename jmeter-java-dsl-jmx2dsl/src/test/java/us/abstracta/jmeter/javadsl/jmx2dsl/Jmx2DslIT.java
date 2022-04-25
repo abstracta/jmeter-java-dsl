@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import org.junit.jupiter.api.Test;
-import us.abstracta.jmeter.javadsl.core.util.TestResource;
+import us.abstracta.jmeter.javadsl.util.TestResource;
 
 public class Jmx2DslIT {
 
@@ -15,11 +15,11 @@ public class Jmx2DslIT {
   public void shouldGetConvertedFileWhenConvert() throws Exception {
     Process p = new ProcessBuilder()
         .command("java", "-jar", "target/jmx2dsl.jar",
-            new TestResource("/test-plan.jmx").getFile().getPath())
+            new TestResource("test-plan.jmx").filePath())
         .start();
     String output = processOutput2String(p);
     p.waitFor();
-    assertThat(output).isEqualTo(new TestResource("/testPlan.jsh").getContents());
+    assertThat(output).isEqualTo(new TestResource("testPlan.jsh").contents());
   }
 
   private String processOutput2String(Process p) throws IOException {

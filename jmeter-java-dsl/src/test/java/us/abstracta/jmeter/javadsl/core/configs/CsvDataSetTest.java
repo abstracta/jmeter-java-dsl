@@ -8,6 +8,7 @@ import static us.abstracta.jmeter.javadsl.JmeterDsl.csvDataSet;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.httpSampler;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.jsr223Sampler;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.testPlan;
+import static us.abstracta.jmeter.javadsl.JmeterDsl.testResource;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.threadGroup;
 
 import com.github.tomakehurst.wiremock.matching.RequestPatternBuilder;
@@ -16,13 +17,12 @@ import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import us.abstracta.jmeter.javadsl.JmeterDslTest;
-import us.abstracta.jmeter.javadsl.core.util.TestResource;
 import us.abstracta.jmeter.javadsl.core.configs.DslCsvDataSet.Sharing;
+import us.abstracta.jmeter.javadsl.util.TestResource;
 
 public class CsvDataSetTest extends JmeterDslTest {
 
-  public static final String DEFAULT_CSV_FILE = new TestResource(
-      "/dataset-with-headers.csv").getFile().getPath();
+  public static final TestResource DEFAULT_CSV_FILE = testResource("dataset-with-headers.csv");
 
   @Test
   public void shouldGetVariableValuesFromCsvWhenCsvDataSetWithDefaultSettings()
@@ -57,7 +57,7 @@ public class CsvDataSetTest extends JmeterDslTest {
   public void shouldGetVariableValuesFromCsvWhenCsvWithAlternateFormat()
       throws Exception {
     testPlan(
-        csvDataSet(new TestResource("/dataset-with-alt-format.csv").getFile().getPath())
+        csvDataSet(testResource("dataset-with-alt-format.csv"))
             .delimiter("\\t")
             .encoding(StandardCharsets.UTF_8.name())
             .variableNames("VAR1", "VAR2"),
@@ -121,7 +121,8 @@ public class CsvDataSetTest extends JmeterDslTest {
   }
 
   @Test
-  public void shouldNotShareDataBetweenThreadsGroupsWhenCsvWithSharingByThreadGroup() throws Exception {
+  public void shouldNotShareDataBetweenThreadsGroupsWhenCsvWithSharingByThreadGroup()
+      throws Exception {
     testPlan(
         csvDataSet(DEFAULT_CSV_FILE)
             .sharedIn(Sharing.THREAD_GROUP),
@@ -136,7 +137,8 @@ public class CsvDataSetTest extends JmeterDslTest {
   }
 
   @Test
-  public void shouldNotShareDataBetweenThreadsInSameGroupWhenCsvWithSharingByThread() throws Exception {
+  public void shouldNotShareDataBetweenThreadsInSameGroupWhenCsvWithSharingByThread()
+      throws Exception {
     testPlan(
         csvDataSet(DEFAULT_CSV_FILE)
             .sharedIn(Sharing.THREAD),
@@ -152,7 +154,7 @@ public class CsvDataSetTest extends JmeterDslTest {
       throws Exception {
     List<String> vals = new ArrayList<>();
     testPlan(
-        csvDataSet(new TestResource("/dataset-long.csv").getFile().getPath())
+        csvDataSet(testResource("dataset-long.csv").file().getPath())
             .randomOrder(),
         threadGroup(1, 10,
             jsr223Sampler(s -> vals.add(s.vars.get("VAR")))

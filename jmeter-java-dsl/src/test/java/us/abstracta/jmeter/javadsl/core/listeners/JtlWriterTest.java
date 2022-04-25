@@ -7,6 +7,7 @@ import static us.abstracta.jmeter.javadsl.JmeterDsl.httpSampler;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.jsr223PostProcessor;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.jtlWriter;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.testPlan;
+import static us.abstracta.jmeter.javadsl.JmeterDsl.testResource;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.threadGroup;
 
 import java.io.IOException;
@@ -18,7 +19,6 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import us.abstracta.jmeter.javadsl.JmeterDslTest;
-import us.abstracta.jmeter.javadsl.core.util.TestResource;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodCallBuilderTest;
 import us.abstracta.jmeter.javadsl.core.DslTestPlan;
 import us.abstracta.jmeter.javadsl.core.StringTemplate.StringTemplateAssert;
@@ -106,13 +106,13 @@ public class JtlWriterTest extends JmeterDslTest {
             httpSampler(wiremockUri)
         )
     ).run();
-    assertFileMatchesTemplate(resultsFilePath, "/default-jtl.template.csv");
+    assertFileMatchesTemplate(resultsFilePath, "default-jtl.template.csv");
   }
 
   private void assertFileMatchesTemplate(Path resultsFilePath, String templateName)
       throws IOException {
     StringTemplateAssert.assertThat(resultsFilePath)
-        .matches(new TestResource(templateName));
+        .matches(testResource(templateName));
   }
 
   @Test
@@ -130,7 +130,7 @@ public class JtlWriterTest extends JmeterDslTest {
             httpSampler(wiremockUri)
         )
     ).run();
-    assertFileMatchesTemplate(resultsFilePath, "/complete-jtl.template.xml");
+    assertFileMatchesTemplate(resultsFilePath, "complete-jtl.template.xml");
   }
 
   @Test
@@ -146,7 +146,7 @@ public class JtlWriterTest extends JmeterDslTest {
                 )
         )
     ).run();
-    assertFileMatchesTemplate(resultsFilePath, "/jtl-with-custom-variable.template.csv");
+    assertFileMatchesTemplate(resultsFilePath, "jtl-with-custom-variable.template.csv");
   }
 
   @SuppressWarnings("unused")

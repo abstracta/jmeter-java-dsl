@@ -4,6 +4,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.jsr223Sampler;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.jtlWriter;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.testPlan;
+import static us.abstracta.jmeter.javadsl.JmeterDsl.testResource;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.threadGroup;
 
 import java.nio.charset.StandardCharsets;
@@ -11,7 +12,6 @@ import java.nio.file.Path;
 import org.apache.jmeter.samplers.SampleResult;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
-import us.abstracta.jmeter.javadsl.core.util.TestResource;
 import us.abstracta.jmeter.javadsl.core.listeners.JtlWriter;
 
 public class DslJsr223SamplerTest {
@@ -42,7 +42,7 @@ public class DslJsr223SamplerTest {
 
   private void assertThatJtlContentIsExpectedForCustomSample(Path resultsFilePath) {
     assertThat(resultsFilePath.toFile())
-        .hasSameTextualContentAs(new TestResource("/custom-sample-jtl.xml").getFile());
+        .hasSameTextualContentAs(testResource("custom-sample-jtl.xml").file());
   }
 
   @Test

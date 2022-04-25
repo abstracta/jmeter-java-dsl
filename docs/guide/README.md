@@ -1965,6 +1965,33 @@ When properties are set as JVM system properties, they are not accessible via `p
 JMeter properties can currently only be used with `EmbeddedJmeterEngine`, so use them sparingly and prefer other mechanisms when available.
 :::
 
+## Test Resources
+
+When working with tests in maven projects, even gradle in some scenarios, is usually necessary to use files hosted in `src/test/resources`. For example csv files for `csvDataSet`, some file to be used by an `httpSampler`, some json for comparison, etc. The DSL provides `testResource` as a handy shortcut for such scenarios. Here is a simple example:
+
+```java
+import static us.abstracta.jmeter.javadsl.JmeterDsl.*;
+
+import java.io.IOException;
+import org.junit.jupiter.api.Test;
+
+public class PerformanceTest {
+
+  @Test
+  public void testProperties() throws IOException {
+    testPlan(
+        csvDataSet(testResource("users.csv")), // gets users info from src/test/resources/users.csv
+        threadGroup(1, 1,
+            httpSampler("http://myservice.test/users/${USER_ID}")
+        )
+    ).run();
+  }
+
+}
+```
+
+Check [TestResource](../../jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/util/TestResource.java) for some further details.
+
 ## Protocols
 
 ### HTTP

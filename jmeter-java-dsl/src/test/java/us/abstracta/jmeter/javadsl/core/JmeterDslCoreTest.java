@@ -10,6 +10,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.httpSampler;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.jtlWriter;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.testPlan;
+import static us.abstracta.jmeter.javadsl.JmeterDsl.testResource;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.threadGroup;
 
 import java.io.File;
@@ -24,12 +25,12 @@ import org.apache.jmeter.protocol.http.util.HTTPConstants;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import us.abstracta.jmeter.javadsl.JmeterDslTest;
-import us.abstracta.jmeter.javadsl.core.util.TestResource;
 import us.abstracta.jmeter.javadsl.core.StringTemplate.StringTemplateAssert;
+import us.abstracta.jmeter.javadsl.util.TestResource;
 
 public class JmeterDslCoreTest extends JmeterDslTest {
 
-  private static final String TEST_PLAN_RESOURCE_PATH = "/test-plan.template.jmx";
+  private static final String TEST_PLAN_RESOURCE_PATH = "test-plan.template.jmx";
 
   @Test
   public void shouldSendRequestsToServerWhenSimpleHttpTestPlan() throws IOException {
@@ -107,7 +108,7 @@ public class JmeterDslCoreTest extends JmeterDslTest {
         jtlWriter("results.jtl")
     ).saveAsJmx(filePath.toString());
     StringTemplateAssert.assertThat(filePath)
-        .matches(new TestResource(TEST_PLAN_RESOURCE_PATH));
+        .matches(testResource(TEST_PLAN_RESOURCE_PATH));
   }
 
   @Test
@@ -124,7 +125,7 @@ public class JmeterDslCoreTest extends JmeterDslTest {
 
   private void copyJmxWithDynamicFieldsTo(File jmxFile) throws IOException {
     try (FileWriter fw = new FileWriter(jmxFile)) {
-      fw.write(new StringTemplate(new TestResource(TEST_PLAN_RESOURCE_PATH).getContents())
+      fw.write(new StringTemplate(testResource(TEST_PLAN_RESOURCE_PATH).contents())
           .bind("port", URI.create(wiremockUri).getPort())
           .bind("jtlFile", new File(jmxFile.getParent(), "results.jtl").getPath())
           .solve());

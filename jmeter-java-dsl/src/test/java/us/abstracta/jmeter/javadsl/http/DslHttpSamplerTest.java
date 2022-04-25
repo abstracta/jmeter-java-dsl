@@ -19,6 +19,7 @@ import static us.abstracta.jmeter.javadsl.JmeterDsl.httpHeaders;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.httpSampler;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.jsr223PreProcessor;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.testPlan;
+import static us.abstracta.jmeter.javadsl.JmeterDsl.testResource;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.threadGroup;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.transaction;
 
@@ -36,11 +37,11 @@ import org.apache.jmeter.threads.JMeterVariables;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import us.abstracta.jmeter.javadsl.JmeterDslTest;
-import us.abstracta.jmeter.javadsl.core.util.TestResource;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodCallBuilderTest;
 import us.abstracta.jmeter.javadsl.core.DslTestPlan;
 import us.abstracta.jmeter.javadsl.core.TestPlanStats;
 import us.abstracta.jmeter.javadsl.http.DslHttpSampler.HttpClientImpl;
+import us.abstracta.jmeter.javadsl.util.TestResource;
 
 public class DslHttpSamplerTest extends JmeterDslTest {
 
@@ -386,7 +387,7 @@ public class DslHttpSamplerTest extends JmeterDslTest {
     String part1Value = "value1";
     ContentType part1Encoding = ContentType.TEXT_PLAIN.withCharset(StandardCharsets.US_ASCII);
     String part2Name = "part2";
-    TestResource part2Resource = new TestResource("/custom-sample-jtl.xml");
+    TestResource part2Resource = testResource("custom-sample-jtl.xml");
     ContentType part2Encoding = ContentType.TEXT_XML;
 
     testPlan(
@@ -394,7 +395,7 @@ public class DslHttpSamplerTest extends JmeterDslTest {
             httpSampler(wiremockUri)
                 .method(HTTPConstants.POST)
                 .bodyPart(part1Name, part1Value, part1Encoding)
-                .bodyFilePart(part2Name, part2Resource.getFile().getPath(), part2Encoding)
+                .bodyFilePart(part2Name, part2Resource.filePath(), part2Encoding)
         )
     ).run();
     verify(postRequestedFor(anyUrl())
@@ -414,8 +415,8 @@ public class DslHttpSamplerTest extends JmeterDslTest {
         + Pattern.quote(buildBodyPart(part1Name, null, part1Value, part1Encoding, "8bit"))
         + separatorPattern + CRLN
         + Pattern.quote(
-        buildBodyPart(part2Name, part2Resource.getFile().getName(),
-            part2Resource.getContents() + "\n",
+        buildBodyPart(part2Name, part2Resource.file().getName(),
+            part2Resource.contents() + "\n",
             part2Encoding, "binary"))
         + separatorPattern + "--" + CRLN;
   }

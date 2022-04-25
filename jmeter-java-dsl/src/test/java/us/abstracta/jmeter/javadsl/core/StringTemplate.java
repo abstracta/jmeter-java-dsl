@@ -17,7 +17,7 @@ import org.assertj.core.internal.Diff;
 import org.assertj.core.internal.Failures;
 import org.assertj.core.util.diff.Chunk;
 import org.assertj.core.util.diff.Delta;
-import us.abstracta.jmeter.javadsl.core.util.TestResource;
+import us.abstracta.jmeter.javadsl.util.TestResource;
 
 public class StringTemplate {
 
@@ -118,7 +118,7 @@ public class StringTemplate {
 
     public StringTemplateAssert matches(TestResource template) throws IOException {
       String actualContent = getFileContents(actual);
-      String templateContents = template.getContents();
+      String templateContents = template.contents();
       if (!new StringTemplate(templateContents).matches(actualContent)) {
         List<Delta<String>> diffs = diff
             .diff(actual, templateContents, StandardCharsets.UTF_8).stream()

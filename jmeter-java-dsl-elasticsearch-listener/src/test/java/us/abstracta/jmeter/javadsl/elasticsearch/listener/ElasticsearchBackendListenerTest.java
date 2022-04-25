@@ -3,6 +3,7 @@ package us.abstracta.jmeter.javadsl.elasticsearch.listener;
 import static org.assertj.core.api.Assertions.assertThat;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.httpSampler;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.testPlan;
+import static us.abstracta.jmeter.javadsl.JmeterDsl.testResource;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.threadGroup;
 import static us.abstracta.jmeter.javadsl.elasticsearch.listener.ElasticsearchBackendListener.elasticsearchListener;
 
@@ -29,7 +30,6 @@ import org.elasticsearch.search.aggregations.bucket.terms.Terms.Bucket;
 import org.junit.jupiter.api.Test;
 import org.testcontainers.elasticsearch.ElasticsearchContainer;
 import us.abstracta.jmeter.javadsl.JmeterDslTest;
-import us.abstracta.jmeter.javadsl.core.util.TestResource;
 
 public class ElasticsearchBackendListenerTest extends JmeterDslTest {
 
@@ -66,7 +66,7 @@ public class ElasticsearchBackendListenerTest extends JmeterDslTest {
   private void createIndex(RestHighLevelClient client) throws IOException {
     client.indices().putTemplate(
         new PutIndexTemplateRequest("jmeter")
-            .source(new TestResource("/index-template.json").getContents(), XContentType.JSON),
+            .source(testResource("index-template.json").contents(), XContentType.JSON),
         RequestOptions.DEFAULT);
   }
 

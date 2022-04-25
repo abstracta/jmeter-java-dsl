@@ -7,25 +7,24 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
-import us.abstracta.jmeter.javadsl.core.util.TestResource;
 import us.abstracta.jmeter.javadsl.core.StringTemplate;
+import us.abstracta.jmeter.javadsl.util.TestResource;
 
 public class DslCodeGeneratorTest {
 
   @Test
   public void shouldWriteExpectedTestPlanDslWhenSimpleJmxIsProvided(@TempDir Path tempDir)
       throws Exception {
-    File solvedTemplate = solveTemplateResource("/test-plan.template.jmx", tempDir);
+    File solvedTemplate = solveTemplateResource("test-plan.template.jmx", tempDir);
     assertThat(new DslCodeGenerator()
         .generateCodeFromJmx(solvedTemplate))
-        .isEqualTo(new TestResource("/simple-sample.jsh").getContents());
+        .isEqualTo(new TestResource("simple-sample.jsh").contents());
   }
 
   private File solveTemplateResource(String resourcePath, Path tempDir) throws IOException {
-    String templateContents = new StringTemplate(new TestResource(resourcePath).getContents())
+    String templateContents = new StringTemplate(new TestResource(resourcePath).contents())
         .solve();
     Path solvedTemplate = tempDir.resolve("test-plan.jmx");
     Files.write(solvedTemplate, templateContents.getBytes(StandardCharsets.UTF_8));
@@ -35,8 +34,8 @@ public class DslCodeGeneratorTest {
   @Test
   public void shouldWriteExpectedTestPlanDslWhenRecordedJmxIsProvided() throws Exception {
     assertThat(new DslCodeGenerator()
-        .generateCodeFromJmx(new TestResource("/recorded.jmx").getFile()))
-        .isEqualTo(new TestResource("/recorded.jsh").getContents());
+        .generateCodeFromJmx(new TestResource("recorded.jmx").file()))
+        .isEqualTo(new TestResource("recorded.jsh").contents());
   }
 
 }

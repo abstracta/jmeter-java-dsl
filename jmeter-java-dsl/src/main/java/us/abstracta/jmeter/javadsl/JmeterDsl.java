@@ -48,6 +48,7 @@ import us.abstracta.jmeter.javadsl.http.DslHttpSampler;
 import us.abstracta.jmeter.javadsl.http.HttpHeaders;
 import us.abstracta.jmeter.javadsl.java.DslJsr223Sampler;
 import us.abstracta.jmeter.javadsl.java.DslJsr223Sampler.SamplerScript;
+import us.abstracta.jmeter.javadsl.util.TestResource;
 
 /**
  * This is the main class to be imported from any code using JMeter DSL.
@@ -647,6 +648,21 @@ public class JmeterDsl {
    */
   public static PercentController percentController(float percent, ThreadGroupChild... children) {
     return new PercentController(percent, Arrays.asList(children));
+  }
+
+  /**
+   * Builds a Controller which executes in each iteration choosing one child according to given
+   * weights.
+   * <p>
+   * Internally this uses <a href="https://github.com/Blazemeter/jmeter-bzm-plugins/blob/master/wsc/WeightedSwitchController.md">
+   * BlazeMeter Weighted Switch Controller plugin</a>.
+   *
+   * @return the controller instance for further configuration and usage.
+   * @see DslWeightedSwitchController
+   * @since 0.53
+   */
+  public static DslWeightedSwitchController weightedSwitchController() {
+    return new DslWeightedSwitchController();
   }
 
   /**
@@ -1277,14 +1293,31 @@ public class JmeterDsl {
   }
 
   /**
-   * Builds a DslWeightedSwitchController which wraps logic of BlazeMeter WeightedSwitchController.
-   * <p>
-   * @return the Weighted SwitchController
-   * @see DslWeightedSwitchController
-   * @since 0.53
+   * Same as {@link #csvDataSet(String)} but easing usage of test resources.
+   *
+   * @param resource test resource to use as input file for the CSV data set.
+   * @return the CSV Data Set instance for further configuration and usage.
+   * @see #csvDataSet(String)
+   * @since 0.54
    */
-  public static DslWeightedSwitchController weightedSwitchController() {
-    return new DslWeightedSwitchController();
+  public static DslCsvDataSet csvDataSet(TestResource resource) {
+    return new DslCsvDataSet(resource.filePath());
+  }
+
+  /**
+   * Allows easy usage of test resources like the ones in {@code src/test/resource} in maven
+   * projects.
+   *
+   * @param resourcePath path to locate the resource. For example, in a maven project to create a
+   *                     resource to file {@code "src/test/resources/csvs/my-csv.csv"} you need to
+   *                     use {@code testResource("csvs/my-csv.csv")}.
+   * @return the test resource.
+   * @throws IllegalArgumentException when no file can be located for provided resource path
+   * @see TestResource
+   * @since 0.54
+   */
+  public static TestResource testResource(String resourcePath) throws IllegalArgumentException {
+    return new TestResource(resourcePath);
   }
 
 }

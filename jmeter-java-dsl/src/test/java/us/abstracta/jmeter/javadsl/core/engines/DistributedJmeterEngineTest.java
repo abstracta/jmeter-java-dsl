@@ -3,6 +3,7 @@ package us.abstracta.jmeter.javadsl.core.engines;
 import static org.assertj.core.api.Assertions.assertThat;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.httpSampler;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.testPlan;
+import static us.abstracta.jmeter.javadsl.JmeterDsl.testResource;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.threadGroup;
 
 import java.io.Closeable;
@@ -15,7 +16,6 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import us.abstracta.jmeter.javadsl.JmeterDslTest;
-import us.abstracta.jmeter.javadsl.core.util.TestResource;
 import us.abstracta.jmeter.javadsl.core.TestPlanStats;
 
 public class DistributedJmeterEngineTest extends JmeterDslTest {
@@ -23,7 +23,7 @@ public class DistributedJmeterEngineTest extends JmeterDslTest {
   @Test
   public void shouldGetExpectedCountWhenRunTestInRemoteEngine() throws Exception {
     String keystoreFileName = "rmi_keystore.jks";
-    File keystoreResource = new TestResource("/" + keystoreFileName).getFile();
+    File keystoreResource = testResource(keystoreFileName).file();
     JmeterEnvironment env = new JmeterEnvironment();
     try (TempFileCopy ignored = new TempFileCopy(keystoreResource, new File(keystoreFileName))) {
       RemoteJMeterEngineImpl.startServer(RmiUtils.getRmiRegistryPort());
