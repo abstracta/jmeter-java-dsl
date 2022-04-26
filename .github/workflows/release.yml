@@ -83,3 +83,9 @@ jobs:
           token: ${{ secrets.ACTIONS_TOKEN }}
       - name: update version in sample project
         run: .github/update-sample-version.sh ${{ env.dsl_version }}
+      - name: Discord notification
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+        uses: Ilshidur/action-discord@master
+        with:
+          args: 'A new release is out! Check it at {{ EVENT_PAYLOAD.release.html_url }}.'
