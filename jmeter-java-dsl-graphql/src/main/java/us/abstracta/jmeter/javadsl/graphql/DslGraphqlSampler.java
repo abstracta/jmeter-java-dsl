@@ -126,7 +126,7 @@ public class DslGraphqlSampler extends DslBaseHttpSampler<DslGraphqlSampler> {
    * <p>
    * This method is handy when you want to use JMeter expressions for ints, longs, booleans, floats
    * and doubles (which should not include quotes in final json) and when you want to specify
-   * complex json strings like arrays & objects.
+   * complex json strings like arrays &amp; objects.
    *
    * @param name  specifies the name of the variable.
    * @param value the raw JSON string part to be set as variable value.

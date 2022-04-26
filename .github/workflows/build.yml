@@ -16,6 +16,6 @@ jobs:
           distribution: temurin
           java-version: 8
       - name: Run maven tests
-        run: mvn --batch-mode --no-transfer-progress clean test
+        run: mvn --batch-mode --no-transfer-progress clean install
         env:
           BZ_TOKEN: ${{ secrets.BZ_TOKEN }}

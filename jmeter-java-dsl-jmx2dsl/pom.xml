@@ -82,7 +82,6 @@
                   <exclude>com.fifesoft:rsyntaxtextarea</exclude>
                   <exclude>xalan:*</exclude>
                   <exclude>net.sf.saxon:Saxon-HE</exclude>
-                  <exclude>com.fasterxml.jackson.core:*</exclude>
                   <exclude>com.formdev:svgSalamander</exclude>
                   <exclude>com.github.weisj:darklaf-*</exclude>
                   <exclude>net.java.dev.jna:jna</exclude>

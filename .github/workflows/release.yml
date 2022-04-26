@@ -23,7 +23,7 @@ jobs:
       - name: set maven project version
         run: mvn --batch-mode --no-transfer-progress versions:set -DnewVersion=${{ env.dsl_version }} --settings .github/settings.xml
       - name: package release
-        run: mvn --batch-mode --no-transfer-progress clean package --settings .github/settings.xml
+        run: mvn --batch-mode --no-transfer-progress clean install --settings .github/settings.xml
         env:
           BZ_TOKEN: ${{ secrets.BZ_TOKEN }}
       - name: Upload jmeter-java-dsl.jar to release
