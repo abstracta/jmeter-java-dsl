@@ -2026,7 +2026,7 @@ httpSampler("http://my.service")
   .post(s -> buildRequestBody(s.vars), Type.TEXT_PLAIN)
 httpSampler("http://my.service")
   .body(s -> buildRequestBody(s.vars))
-httpSampler(s -> buildRequestUrl(s.vars))
+httpSampler(s -> buildRequestUrl(s.vars)) // buildRequestUrl is just an example of a custom method you could implement with your own logic
 ```
 
 ::: warning
