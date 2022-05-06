@@ -13,6 +13,7 @@ import us.abstracta.jmeter.javadsl.codegeneration.MethodParam.StringParam;
 import us.abstracta.jmeter.javadsl.codegeneration.SingleGuiClassCallBuilder;
 import us.abstracta.jmeter.javadsl.codegeneration.TestElementParamBuilder;
 import us.abstracta.jmeter.javadsl.core.configs.BaseConfigElement;
+import us.abstracta.jmeter.javadsl.http.DslBaseHttpSampler.BaseHttpSamplerCodeBuilder;
 import us.abstracta.jmeter.javadsl.http.DslHttpSampler.HttpClientImpl;
 
 /**
@@ -32,6 +33,9 @@ public class DslHttpDefaults extends BaseConfigElement {
   private String port;
   private String path;
   private Charset encoding;
+  private String proxyUrl;
+  private String proxyUser;
+  private String proxyPassword;
   private boolean downloadEmbeddedResources;
   private HttpClientImpl clientImpl;
 
@@ -168,12 +172,46 @@ public class DslHttpDefaults extends BaseConfigElement {
   }
 
   /**
+   * Allows specifying a proxy through which all http requests will be sent to their final
+   * destination.
+   * <p>
+   * This is usually helpful when you need to use a proxy to access the internet when all access is
+   * behind and enterprise proxy (due to security measures) or when you want to intercept requests
+   * for further analysis or modification by other tools like fiddler or mitmproxy.
+   * <p>
+   * If your proxy requires authentication check {@link #proxy(String, String, String)}.
+   *
+   * @param url specifies the proxy url. For example http://myproxy:8181.
+   * @return the config element for further configuration or usage.
+   */
+  public DslHttpDefaults proxy(String url) {
+    this.proxyUrl = url;
+    return this;
+  }
+
+  /**
+   * Same as {@link #proxy(String)} but allowing also to specify proxy credentials.
+   *
+   * @param url      specifies the proxy url. For example http://myproxy:8181.
+   * @param username specifies the username used to authenticate with the proxy.
+   * @param password specifies the password used to authenticate with the proxy.
+   * @return the config element for further configuration or usage.
+   * @see #proxy(String)
+   */
+  public DslHttpDefaults proxy(String url, String username, String password) {
+    this.proxyUrl = url;
+    this.proxyUser = username;
+    this.proxyPassword = password;
+    return this;
+  }
+
+  /**
    * Allows specifying which http client implementation to use by default for HTTP samplers.
    * <p>
    * This can be overwritten by {@link DslHttpSampler#clientImpl(HttpClientImpl)}.
    *
-   * @param clientImpl the HTTP client implementation to use. If none is specified, then {@link
-   *                   DslHttpSampler.HttpClientImpl#HTTP_CLIENT} is used.
+   * @param clientImpl the HTTP client implementation to use. If none is specified, then
+   *                   {@link DslHttpSampler.HttpClientImpl#HTTP_CLIENT} is used.
    * @return the HTTP Defaults instance for further configuration or usage.
    * @see DslHttpSampler.HttpClientImpl
    * @see DslHttpSampler#clientImpl(HttpClientImpl)
@@ -201,6 +239,18 @@ public class DslHttpDefaults extends BaseConfigElement {
     if (encoding != null) {
       ret.setProperty(HTTPSamplerBase.CONTENT_ENCODING, encoding.toString());
     }
+    if (proxyUrl != null) {
+      JmeterUrl parsedUrl = JmeterUrl.valueOf(proxyUrl);
+      ret.setProperty(HTTPSamplerBase.PROXYSCHEME, parsedUrl.protocol());
+      ret.setProperty(HTTPSamplerBase.PROXYHOST, parsedUrl.host());
+      ret.setProperty(HTTPSamplerBase.PROXYPORT, parsedUrl.port());
+      if (proxyUser != null) {
+        ret.setProperty(HTTPSamplerBase.PROXYUSER, proxyUser);
+      }
+      if (proxyPassword != null) {
+        ret.setProperty(HTTPSamplerBase.PROXYPASS, proxyPassword);
+      }
+    }
     if (downloadEmbeddedResources) {
       ret.setProperty(HTTPSamplerBase.IMAGE_PARSER, true);
       ret.setProperty(HTTPSamplerBase.CONCURRENT_DWN, true);
@@ -227,9 +277,8 @@ public class DslHttpDefaults extends BaseConfigElement {
       StringParam path = paramBuilder.stringParam(HTTPSamplerBase.PATH, "/");
 
       if (!protocol.isDefault() && !host.isDefault()) {
-        ret.chain("url", new StringParam(
-            protocol.getValue() + "://" + host.getValue() + (port.isDefault() ? ""
-                : ":" + port.getValue()) + (path.isDefault() ? "" : path.getValue())));
+        ret.chain("url", BaseHttpSamplerCodeBuilder.buildUrlParam(protocol,
+            host, port, path));
       } else {
         ret.chain("protocol", protocol)
             .chain("host", host)

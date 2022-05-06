@@ -5,6 +5,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.getRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.verify;
+import static org.assertj.core.api.Assertions.assertThat;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.httpDefaults;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.httpSampler;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.testPlan;
@@ -72,6 +73,46 @@ public class DslHttpDefaultsTest extends JmeterDslTest {
         )
     ).run();
     verify(getRequestedFor(urlPathEqualTo(path)));
+  }
+
+  @Test
+  public void shouldSendRequestThroughProxyWhenProxyIsConfiguredInConfig() throws Exception {
+    ProxyServer proxy = new ProxyServer();
+    try {
+      proxy.start();
+      testPlan(
+          httpDefaults()
+              .proxy(proxy.url()),
+          threadGroup(1, 1,
+              httpSampler(wiremockUri)
+          )
+      ).run();
+      assertThat(proxy.proxiedRequest()).isTrue();
+    } finally {
+      proxy.stop();
+    }
+  }
+
+  @Test
+  public void shouldSendRequestThroughProxyWithAuthWhenProxyIsConfiguredInConfigWithAuth()
+      throws Exception {
+    String username = "testUser";
+    String password = "testPassword";
+    ProxyServer proxy = new ProxyServer()
+        .auth(username, password);
+    try {
+      proxy.start();
+      testPlan(
+          httpDefaults()
+              .proxy(proxy.url(), username, password),
+          threadGroup(1, 1,
+              httpSampler(wiremockUri)
+          )
+      ).run();
+      assertThat(proxy.proxiedRequest()).isTrue();
+    } finally {
+      proxy.stop();
+    }
   }
 
 }

@@ -86,12 +86,16 @@ public class JmeterUrl {
 
   @Override
   public String toString() {
-    return "JmeterUrl{" +
-        "protocol='" + protocol + '\'' +
-        ", host='" + host + '\'' +
-        ", port='" + port + '\'' +
-        ", path='" + path + '\'' +
-        '}';
+    if (isNullOrEmpty(host)) {
+      return path;
+    } else {
+      return (isNullOrEmpty(protocol) ? "http" : protocol) + SCHEME_DELIMITER + host
+          + (isNullOrEmpty(port) ? "" : ":" + port) + (isNullOrEmpty(path) ? "" : path);
+    }
+  }
+
+  boolean isNullOrEmpty(String str) {
+    return str == null || str.isEmpty();
   }
 
 }

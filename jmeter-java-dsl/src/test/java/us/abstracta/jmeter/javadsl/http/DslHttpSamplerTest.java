@@ -431,6 +431,44 @@ public class DslHttpSamplerTest extends JmeterDslTest {
         + value + CRLN;
   }
 
+  @Test
+  public void shouldSendRequestThroughProxyWhenProxyIsConfiguredInSampler() throws Exception {
+    ProxyServer proxy = new ProxyServer();
+    try {
+      proxy.start();
+      testPlan(
+          threadGroup(1, 1,
+              httpSampler(wiremockUri)
+                  .proxy(proxy.url())
+          )
+      ).run();
+      assertThat(proxy.proxiedRequest()).isTrue();
+    } finally {
+      proxy.stop();
+    }
+  }
+
+  @Test
+  public void shouldSendRequestThroughProxyWithAuthWhenProxyIsConfiguredInSamplerWithAuth()
+      throws Exception {
+    String username = "testUser";
+    String password = "testPassword";
+    ProxyServer proxy = new ProxyServer()
+        .auth(username, password);
+    try {
+      proxy.start();
+      testPlan(
+          threadGroup(1, 1,
+              httpSampler(wiremockUri)
+                  .proxy(proxy.url(), username, password)
+          )
+      ).run();
+      assertThat(proxy.proxiedRequest()).isTrue();
+    } finally {
+      proxy.stop();
+    }
+  }
+
   @SuppressWarnings("unused")
   @Nested
   public class CodeBuilderTest extends MethodCallBuilderTest {
@@ -587,6 +625,24 @@ public class DslHttpSamplerTest extends JmeterDslTest {
           threadGroup(1, 1,
               httpSampler("http://localhost")
                   .clientImpl(HttpClientImpl.JAVA)
+          )
+      );
+    }
+
+    public DslTestPlan testPlanWithHttpGetAndProxyWithoutAuth() {
+      return testPlan(
+          threadGroup(1, 1,
+              httpSampler("http://localhost")
+                  .proxy("http://localhost:8181")
+          )
+      );
+    }
+
+    public DslTestPlan testPlanWithHttpGetAndProxyWithAuth() {
+      return testPlan(
+          threadGroup(1, 1,
+              httpSampler("http://localhost")
+                  .proxy("http://localhost:8181", "user", "password")
           )
       );
     }

@@ -39,6 +39,9 @@ public abstract class DslBaseHttpSampler<T extends DslBaseHttpSampler<?>> extend
   private String protocol;
   private String host;
   private String port;
+  private String proxyUrl;
+  private String proxyUser;
+  private String proxyPassword;
 
   public DslBaseHttpSampler(String name, String url, Class<? extends JMeterGUIComponent> guiClass) {
     super(name, guiClass);
@@ -130,9 +133,9 @@ public abstract class DslBaseHttpSampler<T extends DslBaseHttpSampler<?>> extend
    * <p>
    * <b>WARNING:</b> As this method internally uses
    * {@link JmeterDsl#jsr223PreProcessor(PreProcessorScript)}, same limitations and considerations
-   * apply. Check its documentation. To avoid such limitations you may use {@link #header(String,
-   * String)} with a JMeter variable instead, and dynamically set the variable with {@link
-   * JmeterDsl#jsr223PreProcessor(String)}.
+   * apply. Check its documentation. To avoid such limitations you may use
+   * {@link #header(String, String)} with a JMeter variable instead, and dynamically set the
+   * variable with {@link JmeterDsl#jsr223PreProcessor(String)}.
    *
    * @param name          of the HTTP header.
    * @param valueSupplier builds the header value.
@@ -157,6 +160,40 @@ public abstract class DslBaseHttpSampler<T extends DslBaseHttpSampler<?>> extend
     return (T) this;
   }
 
+  /**
+   * Allows specifying a proxy through which all http requests will be sent to their final
+   * destination.
+   * <p>
+   * This is usually helpful when you need to use a proxy to access the internet when all access is
+   * behind and enterprise proxy (due to security measures) or when you want to intercept requests
+   * for further analysis or modification by other tools like fiddler or mitmproxy.
+   * <p>
+   * If your proxy requires authentication check {@link #proxy(String, String, String)}.
+   *
+   * @param url specifies the proxy url. For example http://myproxy:8181.
+   * @return the http sampler for further configuration or usage.
+   */
+  public T proxy(String url) {
+    this.proxyUrl = url;
+    return (T) this;
+  }
+
+  /**
+   * Same as {@link #proxy(String)} but allowing also to specify proxy credentials.
+   *
+   * @param url      specifies the proxy url. For example http://myproxy:8181.
+   * @param username specifies the username used to authenticate with the proxy.
+   * @param password specifies the password used to authenticate with the proxy.
+   * @return the http sampler for further configuration or usage.
+   * @see #proxy(String)
+   */
+  public T proxy(String url, String username, String password) {
+    this.proxyUrl = url;
+    this.proxyUser = username;
+    this.proxyPassword = password;
+    return (T) this;
+  }
+
   @Override
   protected TestElement buildTestElement() {
     HTTPSamplerProxy ret = new HTTPSamplerProxy();
@@ -175,6 +212,18 @@ public abstract class DslBaseHttpSampler<T extends DslBaseHttpSampler<?>> extend
     }
     if (path != null) {
       ret.setPath(path);
+    }
+    if (proxyUrl != null) {
+      JmeterUrl parsedUrl = JmeterUrl.valueOf(proxyUrl);
+      ret.setProxyScheme(parsedUrl.protocol());
+      ret.setProxyHost(parsedUrl.host());
+      ret.setProxyPortInt(parsedUrl.port());
+      if (proxyUser != null) {
+        ret.setProxyUser(proxyUser);
+      }
+      if (proxyPassword != null) {
+        ret.setProxyPass(proxyPassword);
+      }
     }
     return configureHttpTestElement(ret);
   }
@@ -211,33 +260,33 @@ public abstract class DslBaseHttpSampler<T extends DslBaseHttpSampler<?>> extend
       StringParam domain = paramBuilder.stringParam(HTTPSamplerBase.DOMAIN);
       IntParam port = paramBuilder.intParam(HTTPSamplerBase.PORT);
       StringParam path = paramBuilder.stringParam(HTTPSamplerBase.PATH, "/");
-      StringParam url = buildUrlParam(protocol, domain, port, path);
+      StringParam url = buildUrlParam(protocol, domain,
+          new StringParam(port.isDefault() ? "" : "" + port.getValue()), path);
       MethodCall ret = buildBaseHttpMethodCall(name, url, paramBuilder);
       context.findBuilder(DslCacheManager.CodeBuilder.class)
           .registerDependency(context, ret);
       context.findBuilder(DslCookieManager.CodeBuilder.class)
           .registerDependency(context, ret);
-      if (url == path) {
+      if (url.equals(path)) {
         ret.chain("protocol", protocol)
             .chain("host", domain)
             .chain("port", port);
       }
       buildRequestCall(ret, testElement, context);
       setAdditionalOptions(ret, paramBuilder);
+      setProxyOptions(ret, paramBuilder);
       return ret;
     }
 
     protected abstract MethodCall buildBaseHttpMethodCall(StringParam name, StringParam url,
         TestElementParamBuilder paramBuilder);
 
-    private StringParam buildUrlParam(StringParam protocol, StringParam domain, IntParam port,
-        StringParam path) {
+    public static StringParam buildUrlParam(StringParam protocol, StringParam domain,
+        StringParam port, StringParam path) {
       if (!domain.isDefault()) {
         return new StringParam(
-            (protocol.isDefault() ? "http" : protocol.getValue()) + "://"
-                + domain.getValue()
-                + (port.isDefault() ? "" : ":" + port.getValue())
-                + (path.isDefault() ? "" : path.getValue()));
+            new JmeterUrl(protocol.getValue(), domain.getValue(), port.getValue(),
+                path.isDefault() ? "" : path.getValue()).toString());
       } else {
         return path;
       }
@@ -269,6 +318,24 @@ public abstract class DslBaseHttpSampler<T extends DslBaseHttpSampler<?>> extend
 
     protected abstract void setAdditionalOptions(MethodCall ret,
         TestElementParamBuilder paramBuilder);
+
+    private void setProxyOptions(MethodCall ret, TestElementParamBuilder paramBuilder) {
+      StringParam protocol = paramBuilder.stringParam(HTTPSamplerBase.PROXYSCHEME);
+      StringParam host = paramBuilder.stringParam(HTTPSamplerBase.PROXYHOST);
+      IntParam port = paramBuilder.intParam(HTTPSamplerBase.PROXYPORT);
+      StringParam user = paramBuilder.stringParam(HTTPSamplerBase.PROXYUSER);
+      StringParam password = paramBuilder.stringParam(HTTPSamplerBase.PROXYPASS);
+      if (host.isDefault()) {
+        return;
+      }
+      StringParam proxyUrl = buildUrlParam(protocol, host,
+          new StringParam(port.isDefault() ? "" : "" + port.getValue()), new StringParam(""));
+      if (user.isDefault()) {
+        ret.chain("proxy", proxyUrl);
+      } else {
+        ret.chain("proxy", proxyUrl, user, password);
+      }
+    }
 
   }
 
