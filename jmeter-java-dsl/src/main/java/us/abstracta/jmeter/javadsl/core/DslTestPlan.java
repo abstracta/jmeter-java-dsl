@@ -160,9 +160,27 @@ public class DslTestPlan extends TestElementContainer<TestPlanChild> {
     @Override
     public HashTree buildTreeUnder(HashTree parent, BuildTreeContext context) {
       parent.putAll(tree);
-      return parent.values().iterator().next();
+      HashTree testPlanTree = parent.values().iterator().next();
+      children.forEach(c -> context.buildChild(c, testPlanTree));
+      return testPlanTree;
     }
 
+  }
+
+  /**
+   * Allows adding additional children elements to a test plan.
+   * <p>
+   * This might be helpful for adding elements to a test plan loaded from a JMX file (like adding
+   * htmlReport, resultsTreeVisualizer or dashboard) or if you want to create a test plan and then
+   * incrementally adding children to it.
+   *
+   * @param children elements to add to the test plan.
+   * @return the test plan for further usage (run, show, etc).
+   * @since 0.56
+   */
+  public DslTestPlan children(TestPlanChild... children) {
+    addChildren(children);
+    return this;
   }
 
   /**
