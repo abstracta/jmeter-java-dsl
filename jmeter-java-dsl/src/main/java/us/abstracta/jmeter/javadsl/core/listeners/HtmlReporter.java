@@ -7,9 +7,11 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Duration;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.apache.jmeter.JMeter;
 import org.apache.jmeter.report.config.ConfigurationException;
+import org.apache.jmeter.report.config.ReportGeneratorConfiguration;
 import org.apache.jmeter.report.dashboard.GenerationException;
 import org.apache.jmeter.report.dashboard.ReportGenerator;
 import org.apache.jmeter.reporters.ResultCollector;
@@ -115,4 +117,27 @@ public class HtmlReporter extends BaseListener {
 
   }
 
+  /**
+   * Allows to configure APDEX for all requests in test
+   *
+   * @param satisfied - "satisfied" threshold
+   * @param tolerated - "tolerated threshold
+   * @return HtmlReporter
+   *
+   * @since 0.57
+   */
+  public HtmlReporter adpex(Duration satisfied, Duration tolerated) {
+
+    JMeterUtils.setProperty(
+        ReportGeneratorConfiguration.REPORT_GENERATOR_KEY_PREFIX + ".apdex_satisfied_threshold",
+        "" + (satisfied.getSeconds() * 1000)
+    );
+
+    JMeterUtils.setProperty(
+        ReportGeneratorConfiguration.REPORT_GENERATOR_KEY_PREFIX + ".apdex_tolerated_threshold",
+        "" + (tolerated.getSeconds() * 1000)
+    );
+
+    return this;
+  }
 }

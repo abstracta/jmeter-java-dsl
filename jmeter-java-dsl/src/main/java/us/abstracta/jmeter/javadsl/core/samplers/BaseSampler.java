@@ -1,7 +1,10 @@
 package us.abstracta.jmeter.javadsl.core.samplers;
 
+import java.time.Duration;
 import java.util.Collections;
 import org.apache.jmeter.gui.JMeterGUIComponent;
+import org.apache.jmeter.report.config.ReportGeneratorConfiguration;
+import org.apache.jmeter.util.JMeterUtils;
 import us.abstracta.jmeter.javadsl.core.DslTestElement;
 import us.abstracta.jmeter.javadsl.core.testelements.TestElementContainer;
 import us.abstracta.jmeter.javadsl.core.threadgroups.BaseThreadGroup.ThreadGroupChild;
@@ -41,6 +44,30 @@ public abstract class BaseSampler<T extends BaseSampler<?>> extends
    */
   public interface SamplerChild extends DslTestElement {
 
+  }
+
+
+  /**
+   * Allows to apply APDEX configuration to report for exact sampler
+   *
+   * @param satisfied - "satisfied" threshold
+   * @param tolerated - "tolerated threshold
+   * @return the sampler itself as BaseSampler
+   *
+   * @since 0.57
+   */
+  public BaseSampler<T> apdex(Duration satisfied, Duration tolerated) {
+    String propName = ReportGeneratorConfiguration.REPORT_GENERATOR_KEY_PREFIX + ".apdex_per_transaction";
+
+    String prop = JMeterUtils.getProperty(propName);
+
+    if (!prop.isEmpty()) prop += ";\\";
+
+    prop += this.name + ":" + satisfied.getSeconds()*1000 + "|" + tolerated.getSeconds()*1000 + ";\\";
+
+    JMeterUtils.setProperty(propName, prop);
+
+    return this;
   }
 
 }
