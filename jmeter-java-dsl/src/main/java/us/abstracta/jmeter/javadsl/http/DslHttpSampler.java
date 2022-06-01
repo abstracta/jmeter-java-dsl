@@ -30,6 +30,7 @@ import us.abstracta.jmeter.javadsl.codegeneration.MethodParam.StringParam;
 import us.abstracta.jmeter.javadsl.codegeneration.TestElementParamBuilder;
 import us.abstracta.jmeter.javadsl.core.preprocessors.DslJsr223PreProcessor.PreProcessorScript;
 import us.abstracta.jmeter.javadsl.core.preprocessors.DslJsr223PreProcessor.PreProcessorVars;
+import us.abstracta.jmeter.javadsl.core.util.JmeterFunction;
 
 /**
  * Allows to configure a JMeter HTTP sampler to make HTTP requests in a test plan.
@@ -56,7 +57,7 @@ public class DslHttpSampler extends DslBaseHttpSampler<DslHttpSampler> {
   public DslHttpSampler(String name, Function<PreProcessorVars, String> urlSupplier) {
     this(name, (String) null);
     String variableName = "PRE_PROCESSOR_URL";
-    this.path = "${" + variableName + "}";
+    this.path = JmeterFunction.var(variableName);
     children(
         jsr223PreProcessor(s -> s.vars.put(variableName, urlSupplier.apply(s))
         ));
@@ -84,9 +85,9 @@ public class DslHttpSampler extends DslBaseHttpSampler<DslHttpSampler> {
    * <p>
    * <b>WARNING:</b> As this method internally uses
    * {@link JmeterDsl#jsr223PreProcessor(PreProcessorScript)}, same limitations and considerations
-   * apply. Check its documentation. To avoid such limitations you may use {@link #post(String,
-   * ContentType)} with a JMeter variable instead, and dynamically set the variable with {@link
-   * JmeterDsl#jsr223PreProcessor(String)}.
+   * apply. Check its documentation. To avoid such limitations you may use
+   * {@link #post(String, ContentType)} with a JMeter variable instead, and dynamically set the
+   * variable with {@link JmeterDsl#jsr223PreProcessor(String)}.
    *
    * @param bodySupplier function to calculate the body on each request.
    * @param contentType  to be sent as Content-Type header in HTTP POST request.
@@ -133,8 +134,8 @@ public class DslHttpSampler extends DslBaseHttpSampler<DslHttpSampler> {
    * <b>WARNING:</b> As this method internally uses
    * {@link JmeterDsl#jsr223PreProcessor(PreProcessorScript)}, same limitations and considerations
    * apply. Check its documentation.  To avoid such limitations you may use {@link #body(String)}
-   * with a JMeter variable instead, and dynamically set the variable with {@link
-   * JmeterDsl#jsr223PreProcessor(String)}.
+   * with a JMeter variable instead, and dynamically set the variable with
+   * {@link JmeterDsl#jsr223PreProcessor(String)}.
    *
    * @param bodySupplier function to calculate the body on each request.
    * @return the altered sampler to allow for fluent API usage.
@@ -142,7 +143,7 @@ public class DslHttpSampler extends DslBaseHttpSampler<DslHttpSampler> {
    */
   public DslHttpSampler body(Function<PreProcessorVars, String> bodySupplier) {
     String variableName = "PRE_PROCESSOR_REQUEST_BODY";
-    this.body = "${" + variableName + "}";
+    this.body = JmeterFunction.var(variableName);
     return children(
         jsr223PreProcessor(s -> s.vars.put(variableName, bodySupplier.apply(s))));
   }
@@ -164,16 +165,16 @@ public class DslHttpSampler extends DslBaseHttpSampler<DslHttpSampler> {
   /**
    * Allows specifying a query parameter or url encoded form body parameter.
    * <p>
-   * JMeter will automatically URL encode provided parameters names and values. Use {@link
-   * #rawParam(String, String)} to send parameters values which are already encoded and should be
-   * sent as is by JMeter.
+   * JMeter will automatically URL encode provided parameters names and values. Use
+   * {@link #rawParam(String, String)} to send parameters values which are already encoded and
+   * should be sent as is by JMeter.
    * <p>
    * JMeter will use provided parameter in query string if method is GET, DELETE or OPTIONS,
    * otherwise it will use them in url encoded form body.
    * <p>
-   * If you set a parameter with empty string name, it results in same behavior as using {@link
-   * #body(String)} method. In general, you either use body function or parameters functions, but
-   * don't use both of them in same sampler.
+   * If you set a parameter with empty string name, it results in same behavior as using
+   * {@link #body(String)} method. In general, you either use body function or parameters functions,
+   * but don't use both of them in same sampler.
    *
    * @param name  specifies the name of the parameter.
    * @param value specifies the value of the parameter to be URL encoded to include in URL
@@ -215,8 +216,8 @@ public class DslHttpSampler extends DslBaseHttpSampler<DslHttpSampler> {
   /**
    * Specifies a part of a multipart form body.
    * <p>
-   * In general, samplers should not use this method in combination with {@link #param(String,
-   * String)} or {@link #rawParam(String, String)}.
+   * In general, samplers should not use this method in combination with
+   * {@link #param(String, String)} or {@link #rawParam(String, String)}.
    *
    * @param name        specifies the name of the part.
    * @param value       specifies the string to be sent in the part.
@@ -286,8 +287,9 @@ public class DslHttpSampler extends DslBaseHttpSampler<DslHttpSampler> {
    * default (with up to 6 parallel downloads). The DSL enables this behavior by default since it is
    * the most common way to use it to properly emulate browsers behavior.
    * <p>
-   * Check <a href="https://jmeter.apache.org/usermanual/component_reference.html#HTTP_Request">JMeter
-   * HTTP Request documentation</a> for additional details on embedded resources download.
+   * Check <a
+   * href="https://jmeter.apache.org/usermanual/component_reference.html#HTTP_Request">JMeter HTTP
+   * Request documentation</a> for additional details on embedded resources download.
    *
    * @return the altered sampler to allow for fluent API usage.
    * @since 0.24
@@ -306,8 +308,8 @@ public class DslHttpSampler extends DslBaseHttpSampler<DslHttpSampler> {
    * <a href="https://jmeter.apache.org/usermanual/component_reference.html#HTTP_Request">JMeter
    * documentation</a> for more details.
    *
-   * @param clientImpl the HTTP client implementation to use. If none is specified, then {@link
-   *                   DslHttpSampler.HttpClientImpl#HTTP_CLIENT} is used.
+   * @param clientImpl the HTTP client implementation to use. If none is specified, then
+   *                   {@link DslHttpSampler.HttpClientImpl#HTTP_CLIENT} is used.
    * @return the altered sampler to allow for fluent API usage.
    * @since 0.39
    */
@@ -402,11 +404,11 @@ public class DslHttpSampler extends DslBaseHttpSampler<DslHttpSampler> {
 
     @Override
     protected void setAdditionalOptions(MethodCall ret, TestElementParamBuilder paramBuilder) {
-      ret.chain("encoding", new EncodingParam(paramBuilder))
+      ret.chain("encoding", EncodingParam.from(paramBuilder))
           .chain("followRedirects", buildFollowRedirectsParam(paramBuilder))
           .chain("downloadEmbeddedResources",
               paramBuilder.boolParam(HTTPSamplerBase.IMAGE_PARSER, false))
-          .chain("clientImpl", new ClientImplParam(paramBuilder));
+          .chain("clientImpl", ClientImplParam.from(paramBuilder));
     }
 
     @Override
@@ -467,14 +469,15 @@ public class DslHttpSampler extends DslBaseHttpSampler<DslHttpSampler> {
       return new StringParam(args.getArgument(0).getValue());
     }
 
-    private BoolParam buildFollowRedirectsParam(
-        TestElementParamBuilder paramBuilder) {
+    private BoolParam buildFollowRedirectsParam(TestElementParamBuilder paramBuilder) {
       BoolParam follow = paramBuilder.boolParam(HTTPSamplerBase.FOLLOW_REDIRECTS, true);
       if (!follow.isDefault()) {
         return follow;
       } else {
         BoolParam auto = paramBuilder.boolParam(HTTPSamplerBase.AUTO_REDIRECTS, false);
-        return Boolean.TRUE.equals(auto.getValue()) ? new BoolParam(auto.getValue(), true) : follow;
+        return Boolean.TRUE.equals(auto.getValue())
+            ? new BoolParam(true, true)
+            : follow;
       }
     }
 
@@ -506,7 +509,7 @@ public class DslHttpSampler extends DslBaseHttpSampler<DslHttpSampler> {
       }
 
       @Override
-      public String buildCode(String indent) {
+      public String buildSpecificCode(String indent) {
         String constant = CONSTANT_METHODS.get(value != null ? value.toUpperCase(Locale.US) : null);
         return constant != null ? HTTPConstants.class.getSimpleName() + "." + constant
             : super.buildCode(indent);

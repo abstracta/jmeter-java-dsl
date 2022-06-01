@@ -5,6 +5,7 @@ import kg.apc.jmeter.dummy.DummyElement;
 import kg.apc.jmeter.samplers.DummySampler;
 import kg.apc.jmeter.samplers.DummySamplerGui;
 import org.apache.jmeter.testelement.TestElement;
+import us.abstracta.jmeter.javadsl.core.util.JmeterFunction;
 
 /**
  * Allows using JMeter Dummy Sampler plugin to emulate other samples and ease testing post
@@ -22,7 +23,7 @@ public class DslDummySampler extends BaseSampler<DslDummySampler> {
   private boolean successful = true;
   private String responseCode = "200";
   private String responseMessage = "OK";
-  private String responseTime = "${__Random(50,500)}";
+  private String responseTime = JmeterFunction.from("__Random", 50, 500);
   private boolean simulateResponseTime;
   private String url = "";
   private String requestBody = "";

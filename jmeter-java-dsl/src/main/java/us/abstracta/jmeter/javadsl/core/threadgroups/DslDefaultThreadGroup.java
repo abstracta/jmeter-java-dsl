@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Stack;
+import java.util.regex.Pattern;
 import kg.apc.jmeter.JMeterPluginsUtils;
 import kg.apc.jmeter.threads.UltimateThreadGroup;
 import kg.apc.jmeter.threads.UltimateThreadGroupGui;
@@ -31,6 +32,7 @@ import us.abstracta.jmeter.javadsl.codegeneration.MethodParam.DurationParam;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodParam.IntParam;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodParam.StringParam;
 import us.abstracta.jmeter.javadsl.codegeneration.TestElementParamBuilder;
+import us.abstracta.jmeter.javadsl.core.util.JmeterFunction;
 import us.abstracta.jmeter.javadsl.core.util.SingleSeriesTimelinePanel;
 
 /**
@@ -44,25 +46,40 @@ import us.abstracta.jmeter.javadsl.core.util.SingleSeriesTimelinePanel;
  */
 public class DslDefaultThreadGroup extends BaseThreadGroup<DslDefaultThreadGroup> {
 
+  private static final Integer ZERO = 0;
   private final List<Stage> stages = new ArrayList<>();
 
   // represents a stage in thread profiling (ramp up or down, hold duration or iterations).
   private static class Stage {
 
-    private final int threadCount;
-    private final Duration duration;
-    private final int iterations;
+    private static final Pattern INT_PATTERN = Pattern.compile("^\\d+$");
 
-    private Stage(int threadCount, Duration duration) {
-      this.threadCount = threadCount;
-      this.duration = duration;
-      this.iterations = 0;
+    private final Object threadCount;
+    private final Object duration;
+    private final Object iterations;
+
+    private Stage(Object threadCount, Object duration, Object iterations) {
+      // parsing simplifies calculations and allow for further optimizations
+      this.threadCount = tryParseInt(threadCount);
+      this.duration = tryParseDuration(duration);
+      this.iterations = tryParseInt(iterations);
     }
 
-    private Stage(int threadCount, int iterations) {
-      this.threadCount = threadCount;
-      this.iterations = iterations;
-      this.duration = null;
+    private Object tryParseInt(Object val) {
+      return (val instanceof String && INT_PATTERN.matcher((String) val).matches())
+          ? Integer.valueOf((String) val)
+          : val;
+    }
+
+    private Object tryParseDuration(Object val) {
+      Object ret = tryParseInt(val);
+      return ret instanceof Integer ? Duration.ofSeconds((Integer) ret) : ret;
+    }
+
+    public boolean isFixedStage() {
+      return threadCount instanceof Integer
+          && (duration == null || duration instanceof Duration)
+          && (iterations == null || iterations instanceof Integer);
     }
 
   }
@@ -74,8 +91,8 @@ public class DslDefaultThreadGroup extends BaseThreadGroup<DslDefaultThreadGroup
     if (iterations <= 0) {
       throw new IllegalArgumentException("Iterations must be >=1");
     }
-    stages.add(new Stage(threads, Duration.ZERO));
-    stages.add(new Stage(threads, iterations));
+    stages.add(new Stage(threads, Duration.ZERO, null));
+    stages.add(new Stage(threads, null, iterations));
   }
 
   private DslDefaultThreadGroup(String name, List<ThreadGroupChild> children) {
@@ -86,8 +103,8 @@ public class DslDefaultThreadGroup extends BaseThreadGroup<DslDefaultThreadGroup
       List<ThreadGroupChild> children) {
     this(name, children);
     checkThreadCount(threads);
-    stages.add(new Stage(threads, Duration.ZERO));
-    stages.add(new Stage(threads, duration));
+    stages.add(new Stage(threads, Duration.ZERO, null));
+    stages.add(new Stage(threads, duration, null));
   }
 
   public DslDefaultThreadGroup(String name) {
@@ -115,9 +132,9 @@ public class DslDefaultThreadGroup extends BaseThreadGroup<DslDefaultThreadGroup
    * run) will run at least (duration may vary depending on test plan contents) after 20 seconds of
    * starting the test.
    * <p>
-   * You can use this method multiple times in a thread group and in conjunction with {@link
-   * #holdFor(Duration)} and {@link #rampToAndHold(int, Duration, Duration)} to elaborate complex
-   * test plan profiles.
+   * You can use this method multiple times in a thread group and in conjunction with
+   * {@link #holdFor(Duration)} and {@link #rampToAndHold(int, Duration, Duration)} to elaborate
+   * complex test plan profiles.
    * <p>
    * Eg:
    * <pre>{@code
@@ -143,14 +160,42 @@ public class DslDefaultThreadGroup extends BaseThreadGroup<DslDefaultThreadGroup
     if (threadCount < 0) {
       throw new IllegalArgumentException("Thread count must be >=0");
     }
+    checkRampNotAfterIterations();
+    addStage(new Stage(threadCount, duration, null));
+    return this;
+  }
+
+  /**
+   * Same as {@link #rampTo(int, Duration)} but allowing to use JMeter expressions (variables or
+   * functions) to solve the actual parameter values.
+   * <p>
+   * This is usually used in combination with properties to define values that change between
+   * environments or different test runs. Eg: <pre>{@code rampTo("${THREADS}", "${RAMP}"}</pre>.
+   * <p>
+   * This method can only be used for simple thread group configurations. Allowed combinations are:
+   * rampTo, rampTo + holdFor, holdFor + rampTo + holdFor, rampTo + holdIterating, holdFor + rampTo
+   * + holdIterating.
+   *
+   * @param threadCount a JMeter expression that returns the number of threads to ramp to.
+   * @param duration    a JMeter expression that returns the number of seconds to take for the
+   *                    ramp.
+   * @return the DslThreadGroup instance to use fluent API to set additional options.
+   * @see #rampTo(int, Duration)
+   * @since 0.57
+   */
+  public DslDefaultThreadGroup rampTo(String threadCount, String duration) {
+    checkRampNotAfterIterations();
+    addStage(new Stage(threadCount, duration, null));
+    return this;
+  }
+
+  private void checkRampNotAfterIterations() {
     if (isLastStageHoldingForIterations()) {
       throw new IllegalStateException(
           "Ramping up/down after holding for iterations is not supported. "
               + "If you used constructor with iterations, consider using "
               + "threadGroup().rampTo(X, Y).holdForIterations(Z) instead");
     }
-    stages.add(new Stage(threadCount, duration));
-    return this;
   }
 
   private boolean isLastStageHoldingForIterations() {
@@ -159,6 +204,17 @@ public class DslDefaultThreadGroup extends BaseThreadGroup<DslDefaultThreadGroup
 
   private Stage getLastStage() {
     return stages.get(stages.size() - 1);
+  }
+
+  public void addStage(Stage stage) {
+    stages.add(stage);
+    if (!isSimpleThreadGroup() && stages.stream().anyMatch(s -> !s.isFixedStage())) {
+      stages.remove(stages.size() - 1);
+      throw new UnsupportedOperationException(
+          "The DSL does not yet support configuring multiple thread ramps with ramp or hold "
+              + "parameters using jmeter expressions. If you need this please create an issue in "
+              + "Github repository.");
+    }
   }
 
   /**
@@ -176,13 +232,44 @@ public class DslDefaultThreadGroup extends BaseThreadGroup<DslDefaultThreadGroup
    * @since 0.18
    */
   public DslDefaultThreadGroup holdFor(Duration duration) {
+    checkHoldNotAfterIterations();
+    addStage(new Stage(getPrevThreadsCount(), duration, null));
+    return this;
+  }
+
+  /**
+   * Same as {@link #holdFor(Duration)} but allowing to use JMeter expressions (variables or
+   * functions) to solve the duration.
+   * <p>
+   * This is usually used in combination with properties to define values that change between
+   * environments or different test runs. Eg: <pre>{@code holdFor("${DURATION}"}</pre>.
+   * <p>
+   * This method can only be used for simple thread group configurations. Allowed combinations are:
+   * rampTo, rampTo + holdFor, holdFor + rampTo + holdFor, rampTo + holdIterating, holdFor + rampTo
+   * + holdIterating.
+   *
+   * @param duration a JMeter expression that returns the number of seconds to hold current thread
+   *                 groups.
+   * @return the DslThreadGroup instance to use fluent API to set additional options.
+   * @see #holdFor(Duration)
+   * @since 0.57
+   */
+  public DslDefaultThreadGroup holdFor(String duration) {
+    Object threadsCount = getPrevThreadsCount();
+    checkHoldNotAfterIterations();
+    addStage(new Stage(threadsCount, duration, null));
+    return this;
+  }
+
+  private void checkHoldNotAfterIterations() {
     if (isLastStageHoldingForIterations()) {
       throw new IllegalStateException(
           "Holding for duration after holding for iterations is not supported.");
     }
-    int threadsCount = stages.isEmpty() ? 0 : getLastStage().threadCount;
-    stages.add(new Stage(threadsCount, duration));
-    return this;
+  }
+
+  private Object getPrevThreadsCount() {
+    return stages.isEmpty() ? 0 : getLastStage().threadCount;
   }
 
   /**
@@ -203,14 +290,44 @@ public class DslDefaultThreadGroup extends BaseThreadGroup<DslDefaultThreadGroup
     if (iterations < 0) {
       throw new IllegalArgumentException("Iterations must be >=0");
     }
-    if (!(stages.size() == 1 && stages.get(0).threadCount != 0
-        || stages.size() == 2 && stages.get(0).threadCount == 0
-        && stages.get(1).threadCount != 0)) {
+    checkIterationsPreConditions();
+    addStage(new Stage(getLastStage().threadCount, null, iterations));
+    return this;
+  }
+
+  /**
+   * Same as {@link #holdIterating(int)} but allowing to use JMeter expressions (variables or
+   * functions) to solve the iterations.
+   * <p>
+   * This is usually used in combination with properties to define values that change between
+   * environments or different test runs. Eg: <pre>{@code holdIterating("${ITERATIONS}"}</pre>.
+   * <p>
+   * This method can only be used for simple thread group configurations. Allowed combinations are:
+   * rampTo, rampTo + holdFor, holdFor + rampTo + holdFor, rampTo + holdIterating, holdFor + rampTo
+   * + holdIterating.
+   *
+   * @param iterations a JMeter expression that returns the number of iterations for current threads
+   *                   to execute.
+   * @return the DslThreadGroup instance to use fluent API to set additional options.
+   * @see #holdIterating(int)
+   * @since 0.57
+   */
+  public DslDefaultThreadGroup holdIterating(String iterations) {
+    checkIterationsPreConditions();
+    addStage(new Stage(getLastStage().threadCount, null, iterations));
+    return this;
+  }
+
+  private void checkIterationsPreConditions() {
+    if (!(stages.size() == 1 && !ZERO.equals(stages.get(0).threadCount)
+        || stages.size() == 2 && ZERO.equals(stages.get(0).threadCount)
+        && !ZERO.equals(stages.get(1).threadCount))) {
       throw new IllegalStateException(
           "Holding for iterations is only supported after initial hold and ramp, or ramp.");
     }
-    stages.add(new Stage(getLastStage().threadCount, iterations));
-    return this;
+    if (ZERO.equals(getLastStage().threadCount)) {
+      throw new IllegalStateException("Can't hold for iterations with no threads.");
+    }
   }
 
   /**
@@ -229,6 +346,33 @@ public class DslDefaultThreadGroup extends BaseThreadGroup<DslDefaultThreadGroup
    */
   public DslDefaultThreadGroup rampToAndHold(int threads, Duration rampDuration,
       Duration holdDuration) {
+    return rampTo(threads, rampDuration)
+        .holdFor(holdDuration);
+  }
+
+  /**
+   * Same as {@link #rampToAndHold(int, Duration, Duration)} but allowing to use JMeter expressions
+   * (variables or functions) to solve the actual parameter values.
+   * <p>
+   * This is usually used in combination with properties to define values that change between
+   * environments or different test runs. Eg:
+   * <pre>{@code rampToAndHold("${THREADS}", "${RAMP}" ,"${DURATION}"}</pre>.
+   * <p>
+   * This method can only be used for simple thread group configurations. Allowed combinations are:
+   * rampTo, rampTo + holdFor, holdFor + rampTo + holdFor, rampTo + holdIterating, holdFor + rampTo
+   * + holdIterating.
+   *
+   * @param threads      a JMeter expression that returns the number of threads to ramp to.
+   * @param rampDuration a JMeter expression that returns the number of seconds to take for the
+   *                     ramp.
+   * @param holdDuration a JMeter expression that returns the number of seconds to hold current
+   *                     thread groups.
+   * @return the DslThreadGroup instance to use fluent API to set additional options.
+   * @see #rampToAndHold(int, Duration, Duration)
+   * @since 0.57
+   */
+  public DslDefaultThreadGroup rampToAndHold(String threads, String rampDuration,
+      String holdDuration) {
     return rampTo(threads, rampDuration)
         .holdFor(holdDuration);
   }
@@ -257,21 +401,23 @@ public class DslDefaultThreadGroup extends BaseThreadGroup<DslDefaultThreadGroup
 
   private boolean isSimpleThreadGroup() {
     return stages.size() <= 1
-        || stages.size() == 2 && (stages.get(0).threadCount == 0
-        || stages.get(0).threadCount == stages.get(1).threadCount)
-        || stages.size() == 3 && (stages.get(0).threadCount == 0
-        && stages.get(1).threadCount == stages.get(2).threadCount);
+        || stages.size() == 2 && (
+        ZERO.equals(stages.get(0).threadCount)
+            || stages.get(0).threadCount.equals(stages.get(1).threadCount))
+        || stages.size() == 3 && (
+        ZERO.equals(stages.get(0).threadCount)
+            && stages.get(1).threadCount.equals(stages.get(2).threadCount));
   }
 
   private AbstractThreadGroup buildSimpleThreadGroup() {
-    int threads = 1;
-    int iterations = 1;
-    Duration rampUpPeriod = null;
-    Duration duration = null;
-    Duration delay = null;
+    Object threads = 1;
+    Object iterations = 1;
+    Object rampUpPeriod = null;
+    Object duration = null;
+    Object delay = null;
     if (!stages.isEmpty()) {
       Stage firstStage = stages.get(0);
-      if (firstStage.threadCount == 0) {
+      if (ZERO.equals(firstStage.threadCount)) {
         delay = firstStage.duration;
       } else {
         rampUpPeriod = firstStage.duration;
@@ -282,7 +428,7 @@ public class DslDefaultThreadGroup extends BaseThreadGroup<DslDefaultThreadGroup
         Stage secondStage = stages.get(1);
         threads = secondStage.threadCount;
         iterations = secondStage.iterations;
-        if (firstStage.threadCount == 0) {
+        if (ZERO.equals(firstStage.threadCount)) {
           rampUpPeriod = secondStage.duration;
           if (stages.size() > 2) {
             Stage lastStage = stages.get(2);
@@ -295,33 +441,69 @@ public class DslDefaultThreadGroup extends BaseThreadGroup<DslDefaultThreadGroup
       }
     }
     if (rampUpPeriod != null && !Duration.ZERO.equals(rampUpPeriod) &&
-        (iterations == 0 || duration != null)) {
-      duration = duration != null ? duration.plus(rampUpPeriod) : rampUpPeriod;
+        (iterations == null || duration != null)) {
+      duration = duration != null ? sumDurations(duration, rampUpPeriod) : rampUpPeriod;
     }
-    return buildSimpleThreadGroup(threads, iterations, rampUpPeriod, duration, delay);
+    return buildSimpleThreadGroupFrom(threads, iterations, rampUpPeriod, duration, delay);
   }
 
-  private ThreadGroup buildSimpleThreadGroup(int threads, int iterations, Duration rampUpPeriod,
-      Duration duration, Duration delay) {
+  private Object sumDurations(Object duration, Object rampUpPeriod) {
+    if (duration instanceof Duration && rampUpPeriod instanceof Duration) {
+      return ((Duration) duration).plus((Duration) rampUpPeriod);
+    } else {
+      if (duration instanceof Duration) {
+        duration = String.valueOf(durationToSeconds((Duration) duration));
+      } else if (rampUpPeriod instanceof Duration) {
+        rampUpPeriod = String.valueOf(durationToSeconds((Duration) rampUpPeriod));
+      }
+      return JmeterFunction.groovy(buildGroovySolvingIntExpression((String) duration) + " + "
+          + buildGroovySolvingIntExpression((String) rampUpPeriod));
+    }
+  }
+
+  private static String buildGroovySolvingIntExpression(String expr) {
+    return "(new org.apache.jmeter.engine.util.CompoundVariable('" + expr.replace("$", "#")
+        + "'.replace('#','$')).execute() as int)";
+  }
+
+  private ThreadGroup buildSimpleThreadGroupFrom(Object threads, Object iterations,
+      Object rampUpPeriod, Object duration, Object delay) {
     ThreadGroup ret = new ThreadGroup();
-    ret.setNumThreads(Math.max(threads, 1));
-    ret.setRampUp(
-        (int) durationToSeconds(rampUpPeriod == null ? Duration.ZERO : rampUpPeriod));
+    setIntProperty(ret, ThreadGroup.NUM_THREADS, threads);
+    setIntProperty(ret, ThreadGroup.RAMP_TIME, rampUpPeriod == null ? Duration.ZERO : rampUpPeriod);
     LoopController loopController = new LoopController();
     ret.setSamplerController(loopController);
     if (duration != null) {
       loopController.setLoops(-1);
-      ret.setDuration(durationToSeconds(duration));
+      setLongProperty(ret, ThreadGroup.DURATION, duration);
     } else {
-      loopController.setLoops(iterations);
+      setIntProperty(loopController, LoopController.LOOPS, iterations);
     }
     if (delay != null) {
-      ret.setDelay(durationToSeconds(delay));
+      setLongProperty(ret, ThreadGroup.DELAY, delay);
     }
     if (duration != null || delay != null) {
       ret.setScheduler(true);
     }
     return ret;
+  }
+
+  private void setIntProperty(TestElement ret, String propName, Object value) {
+    if (value instanceof Duration) {
+      ret.setProperty(propName, (int) durationToSeconds((Duration) value));
+    } else if (value instanceof Integer) {
+      ret.setProperty(propName, (Integer) value);
+    } else {
+      ret.setProperty(propName, (String) value);
+    }
+  }
+
+  private void setLongProperty(TestElement ret, String propName, Object value) {
+    if (value instanceof Duration) {
+      ret.setProperty(propName, durationToSeconds((Duration) value));
+    } else {
+      ret.setProperty(propName, (String) value);
+    }
   }
 
   private AbstractThreadGroup buildUltimateThreadGroup() {
@@ -351,15 +533,17 @@ public class DslDefaultThreadGroup extends BaseThreadGroup<DslDefaultThreadGroup
     UltimateThreadSchedule curr = new UltimateThreadSchedule(0, Duration.ZERO, Duration.ZERO,
         Duration.ZERO, Duration.ZERO);
     for (Stage s : stages) {
-      if (s.threadCount == threads) {
-        curr.hold = curr.hold.plus(s.duration);
-      } else if (s.threadCount > threads) {
+      int stageThreads = (int) s.threadCount;
+      Duration stageDuration = (Duration) s.duration;
+      if (stageThreads == threads) {
+        curr.hold = curr.hold.plus(stageDuration);
+      } else if (stageThreads > threads) {
         stack.add(curr);
-        curr = new UltimateThreadSchedule(s.threadCount - threads, delay, s.duration, Duration.ZERO,
-            Duration.ZERO);
+        curr = new UltimateThreadSchedule(stageThreads - threads, delay, stageDuration,
+            Duration.ZERO, Duration.ZERO);
       } else {
-        int diff = threads - s.threadCount;
-        Duration shutdown = s.duration;
+        int diff = threads - stageThreads;
+        Duration shutdown = stageDuration;
         while (diff > curr.threadCount) {
           curr.shutdown = interpolateDurationForThreadCountWithRamp(curr.threadCount, diff,
               shutdown);
@@ -382,8 +566,8 @@ public class DslDefaultThreadGroup extends BaseThreadGroup<DslDefaultThreadGroup
         }
         curr = completeCurrentSchedule(curr, ret, stack);
       }
-      threads = s.threadCount;
-      delay = delay.plus(s.duration);
+      threads = stageThreads;
+      delay = delay.plus(stageDuration);
     }
     while (!stack.isEmpty()) {
       curr = completeCurrentSchedule(curr, ret, stack);
@@ -470,9 +654,13 @@ public class DslDefaultThreadGroup extends BaseThreadGroup<DslDefaultThreadGroup
    * @since 0.26
    */
   public void showTimeline() {
+    if (stages.stream().anyMatch(s -> !s.isFixedStage())) {
+      throw new IllegalStateException(
+          "Can't display timeline when some JMeter expression is used in any ramp or hold.");
+    }
     SingleSeriesTimelinePanel chart = new SingleSeriesTimelinePanel("Threads");
     chart.add(0, 0);
-    stages.forEach(s -> chart.add(s.duration.toMillis(), s.threadCount));
+    stages.forEach(s -> chart.add(((Duration) s.duration).toMillis(), (int) s.threadCount));
     showAndWaitFrameWith(chart, name + " threads timeline", 800, 300);
   }
 
@@ -499,7 +687,7 @@ public class DslDefaultThreadGroup extends BaseThreadGroup<DslDefaultThreadGroup
       } else {
         ret = buildUltimateThreadGroupMethodCall(paramBuilder);
       }
-      ret.chain("sampleErrorAction", new SampleErrorActionMethodParam(paramBuilder));
+      ret.chain("sampleErrorAction", SampleErrorActionMethodParam.from(paramBuilder));
       return ret;
     }
 
@@ -512,7 +700,8 @@ public class DslDefaultThreadGroup extends BaseThreadGroup<DslDefaultThreadGroup
       DurationParam delay = testElement.durationParam(ThreadGroup.DELAY);
       IntParam iterations = testElement.intParam(
           ThreadGroup.MAIN_CONTROLLER + "/" + LoopController.LOOPS);
-      if ((rampTime.isDefault() || rampTime.getValue().isZero()) && delay.isDefault()) {
+      if (threads.isFixed() && duration.isFixed() && iterations.isFixed()
+          && (rampTime.isDefault() || rampTime.getValue().isZero()) && delay.isDefault()) {
         return buildMethodCall(name, threads, duration.isDefault() ? iterations : duration,
             new ChildrenParam<>(ThreadGroupChild[].class));
       } else {
@@ -521,13 +710,27 @@ public class DslDefaultThreadGroup extends BaseThreadGroup<DslDefaultThreadGroup
           ret.chain("holdFor", delay);
         }
         if (!duration.isDefault()) {
-          ret.chain("rampToAndHold", threads, rampTime,
-              new DurationParam(duration.getValue().minus(rampTime.getValue())));
+          ret.chain("rampToAndHold", threads, rampTime, buildDurationParam(duration, rampTime));
         } else {
           ret.chain("rampTo", threads, rampTime)
               .chain("holdIterating", iterations);
         }
         return ret;
+      }
+    }
+
+    private DurationParam buildDurationParam(DurationParam duration, DurationParam rampTime) {
+      if (duration.isFixed() && rampTime.isFixed()) {
+        return new DurationParam(rampTime.isDefault() ? duration.getValue()
+            : duration.getValue().minus(rampTime.getValue()));
+      } else {
+        String expression =
+            rampTime.isDefault() || rampTime.isFixed() && rampTime.getValue().isZero()
+                ? duration.getExpression()
+                : JmeterFunction.groovy(
+                    buildGroovySolvingIntExpression(duration.getExpression()) + " - "
+                        + buildGroovySolvingIntExpression(rampTime.getExpression()));
+        return new DurationParam(expression, null);
       }
     }
 
@@ -694,14 +897,18 @@ public class DslDefaultThreadGroup extends BaseThreadGroup<DslDefaultThreadGroup
 
   private static class SampleErrorActionMethodParam extends MethodParam<SampleErrorAction> {
 
-    protected SampleErrorActionMethodParam(TestElementParamBuilder testElement) {
-      super(SampleErrorAction.class, SampleErrorAction.fromPropertyValue(
-              testElement.prop(AbstractThreadGroup.ON_SAMPLE_ERROR).getStringValue()),
-          SampleErrorAction.CONTINUE);
+    private SampleErrorActionMethodParam(String expression, SampleErrorAction defaultValue) {
+      super(SampleErrorAction.class, expression, SampleErrorAction::fromPropertyValue,
+          defaultValue);
+    }
+
+    public static SampleErrorActionMethodParam from(TestElementParamBuilder paramBuilder) {
+      return paramBuilder.buildParam(AbstractThreadGroup.ON_SAMPLE_ERROR,
+          SampleErrorActionMethodParam::new, SampleErrorAction.CONTINUE);
     }
 
     @Override
-    public String buildCode(String indent) {
+    public String buildSpecificCode(String indent) {
       return SampleErrorAction.class.getSimpleName() + "." + value.name();
     }
 

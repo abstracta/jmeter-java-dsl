@@ -13,11 +13,11 @@ public class ContentTypeParam extends MethodParam<ContentType> {
       f -> !"DEFAULT_TEXT".equals(f.getName()) && !"DEFAULT_BINARY".equals(f.getName()));
 
   protected ContentTypeParam(String value) {
-    super(ContentType.class, ContentType.parse(value), null);
+    super(ContentType.class, value, ContentType::parse, null);
   }
 
   @Override
-  public String buildCode(String indent) {
+  public String buildSpecificCode(String indent) {
     String contentTypeName = findConstantName(value);
     if (contentTypeName != null) {
       return ContentType.class.getSimpleName() + "." + contentTypeName;

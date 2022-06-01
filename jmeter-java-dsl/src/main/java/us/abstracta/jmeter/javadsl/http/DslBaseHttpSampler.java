@@ -25,6 +25,7 @@ import us.abstracta.jmeter.javadsl.core.BuildTreeContext;
 import us.abstracta.jmeter.javadsl.core.preprocessors.DslJsr223PreProcessor.PreProcessorScript;
 import us.abstracta.jmeter.javadsl.core.preprocessors.DslJsr223PreProcessor.PreProcessorVars;
 import us.abstracta.jmeter.javadsl.core.samplers.BaseSampler;
+import us.abstracta.jmeter.javadsl.core.util.JmeterFunction;
 
 /**
  * Abstracts common logic used by HTTP based samplers.
@@ -143,7 +144,7 @@ public abstract class DslBaseHttpSampler<T extends DslBaseHttpSampler<?>> extend
    */
   public T header(String name, Function<PreProcessorVars, String> valueSupplier) {
     String variableNamePrefix = "PRE_PROCESSOR_HEADER~";
-    headers.header(name, "${" + variableNamePrefix + name + "}");
+    headers.header(name, JmeterFunction.var(variableNamePrefix + name));
     return children(
         jsr223PreProcessor(s -> s.vars.put(variableNamePrefix + name, valueSupplier.apply(s)))
     );

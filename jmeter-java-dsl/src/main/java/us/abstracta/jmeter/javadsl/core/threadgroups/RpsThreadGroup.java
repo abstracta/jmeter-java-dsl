@@ -7,7 +7,6 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
 import kg.apc.jmeter.JMeterPluginsUtils;
 import kg.apc.jmeter.timers.VariableThroughputTimer;
 import kg.apc.jmeter.timers.VariableThroughputTimerGui;
@@ -19,6 +18,7 @@ import org.apache.jmeter.testelement.property.CollectionProperty;
 import org.apache.jmeter.threads.AbstractThreadGroup;
 import org.apache.jorphan.collections.HashTree;
 import us.abstracta.jmeter.javadsl.core.BuildTreeContext;
+import us.abstracta.jmeter.javadsl.core.util.JmeterFunction;
 import us.abstracta.jmeter.javadsl.core.util.SingleSeriesTimelinePanel;
 
 /**
@@ -27,14 +27,14 @@ import us.abstracta.jmeter.javadsl.core.util.SingleSeriesTimelinePanel;
  *
  * <b>Warning:</b> by default the thread group uses unbounded maximum number of threads, but this
  * is not a good practice since it might impose unexpected load on load generator (CPU or memory may
- * run out). It is advisable to always set a maximum number of threads. Check {@link
- * #maxThreads(int)}.
- *
+ * run out). It is advisable to always set a maximum number of threads. Check
+ * {@link #maxThreads(int)}.
+ * <p>
  * Internally this element uses
  * <a href="https://jmeter-plugins.org/wiki/ConcurrencyThreadGroup/">Concurrency Thread Group</a>
  * in combination with <a href="https://jmeter-plugins.org/wiki/ThroughputShapingTimer/">Throughput
  * Shaping Timer</a>.
- *
+ * <p>
  * By default, the thread group will control the number of requests per second, but this can be
  * changed to iterations per second with {@link #counting(EventType)}.
  *
@@ -87,14 +87,14 @@ public class RpsThreadGroup extends BaseThreadGroup<RpsThreadGroup> {
 
   /**
    * Allows ramping up or down RPS with a given duration.
-   *
+   * <p>
    * JMeter will automatically create or remove threads from thread group and add time pauses to
    * match provided RPS.
-   *
-   * You can use this method multiple times in a thread group and in conjunction with {@link
-   * #holdFor(Duration)} and {@link #rampToAndHold(double, Duration, Duration)} to elaborate complex
-   * test plan profiles.
-   *
+   * <p>
+   * You can use this method multiple times in a thread group and in conjunction with
+   * {@link #holdFor(Duration)} and {@link #rampToAndHold(double, Duration, Duration)} to elaborate
+   * complex test plan profiles.
+   * <p>
    * Eg:
    * <pre>{@code
    *  rpsThreadGroup()
@@ -106,14 +106,16 @@ public class RpsThreadGroup extends BaseThreadGroup<RpsThreadGroup> {
    *    .children(...)
    * }</pre>
    *
-   * @param rps specifies the final RPS (requests/iterations per second) after the given period.
-   * This value directly affects how often threads and pauses are adjusted. For example, if you
-   * configure a ramp from 0.01 to 10 RPS with 10 seconds duration, after 1 request it will wait 100
-   * seconds and then reevaluate, not honoring configured ramp. A value greater than 1 should at
-   * least re adjust every second.
+   * @param rps      specifies the final RPS (requests/iterations per second) after the given
+   *                 period. This value directly affects how often threads and pauses are adjusted.
+   *                 For example, if you configure a ramp from 0.01 to 10 RPS with 10 seconds
+   *                 duration, after 1 request it will wait 100 seconds and then reevaluate, not
+   *                 honoring configured ramp. A value greater than 1 should at least re adjust
+   *                 every second.
    * @param duration duration taken to reach the given RPS and move to the next stage or end the
-   * test plan. Since JMeter only supports specifying times in seconds, if you specify a smaller
-   * granularity (like milliseconds) it will be rounded up to seconds.
+   *                 test plan. Since JMeter only supports specifying times in seconds, if you
+   *                 specify a smaller granularity (like milliseconds) it will be rounded up to
+   *                 seconds.
    * @return the RpsThreadGroup instance to use fluent API to set additional options.
    */
   public RpsThreadGroup rampTo(double rps, Duration duration) {
@@ -129,13 +131,13 @@ public class RpsThreadGroup extends BaseThreadGroup<RpsThreadGroup> {
 
   /**
    * Specifies to keep current RPS for a given duration.
-   *
+   * <p>
    * This method is usually used in combination with {@link #rampTo(double, Duration)} to define the
    * profile of the test plan.
    *
    * @param duration duration to hold the current RPS until moving to next stage or ending the test
-   * plan. Since JMeter only supports specifying times in seconds, if you specify a smaller
-   * granularity (like milliseconds) it will be rounded up to seconds.
+   *                 plan. Since JMeter only supports specifying times in seconds, if you specify a
+   *                 smaller granularity (like milliseconds) it will be rounded up to seconds.
    * @return the RpsThreadGroup instance to use fluent API to set additional options.
    * @see #rampTo(double, Duration)
    */
@@ -150,13 +152,14 @@ public class RpsThreadGroup extends BaseThreadGroup<RpsThreadGroup> {
    * Simply combines {@link #rampTo(double, Duration)} and {@link #holdFor(Duration)} which are
    * usually used in combination.
    *
-   * @param rps target RPS to ramp up/down to. This value directly affects how often threads and
-   * pauses are adjusted. For example, if you configure a ramp from 0.01 to 10 RPS with 10 seconds
-   * duration, after 1 request it will wait 100 seconds and then reevaluate, not honoring configured
-   * ramp. A value greater than 1 should at least re adjust every second.
+   * @param rps          target RPS to ramp up/down to. This value directly affects how often
+   *                     threads and pauses are adjusted. For example, if you configure a ramp from
+   *                     0.01 to 10 RPS with 10 seconds duration, after 1 request it will wait 100
+   *                     seconds and then reevaluate, not honoring configured ramp. A value greater
+   *                     than 1 should at least re adjust every second.
    * @param rampDuration duration taken to reach the given RPS.
    * @param holdDuration duration to hold the given RPS after the ramp, until moving to next stage
-   * or ending the test plan.
+   *                     or ending the test plan.
    * @return the RpsThreadGroup instance to use fluent API to set additional options.
    * @see #rampTo(double, Duration)
    * @see #holdFor(Duration)
@@ -168,14 +171,14 @@ public class RpsThreadGroup extends BaseThreadGroup<RpsThreadGroup> {
 
   /**
    * Specifies to either control requests or iterations per second.
-   *
+   * <p>
    * If you are only concerned on controlling the number of requests per second, then there is no
    * need to use this method since this is the default behavior. On the other hand, if you actually
    * want to control how many times per second the flow inside the thread group executes, then you
    * can use this method counting iterations.
    *
    * @param counting specifies what event type to use to control the RPS. When not specified
-   * requests are counted.
+   *                 requests are counted.
    * @return the RpsThreadGroup instance to use fluent API to set additional options.
    */
   public RpsThreadGroup counting(EventType counting) {
@@ -197,7 +200,7 @@ public class RpsThreadGroup extends BaseThreadGroup<RpsThreadGroup> {
    * unexpected load on generator that may affect performance test in some undesired ways.
    *
    * @param maxThreads specifies the maximum threads to use by the thread group. By default is
-   * unbounded.
+   *                   unbounded.
    * @return the RpsThreadGroup instance to use fluent API to set additional options.
    */
   public RpsThreadGroup maxThreads(int maxThreads) {
@@ -207,12 +210,12 @@ public class RpsThreadGroup extends BaseThreadGroup<RpsThreadGroup> {
 
   /**
    * Specifies the initial number of threads to use.
-   *
+   * <p>
    * Use this method to start with a bigger pool if you know beforehand that for inital RPS 1 thread
    * would not be enough.
    *
    * @param initThreads specifies the initial number of threads to use by the thread group. By
-   * default is 1.
+   *                    default is 1.
    * @return the RpsThreadGroup instance to use fluent API to set additional options.
    */
   public RpsThreadGroup initThreads(int initThreads) {
@@ -222,13 +225,13 @@ public class RpsThreadGroup extends BaseThreadGroup<RpsThreadGroup> {
 
   /**
    * Specifies the number of spare (not used) threads to keep in the thread group.
-   *
+   * <p>
    * When thread group identifies that can use less threads, it can still keep them in pool to avoid
    * the cost to re-create them later on if needed. This method controls how many threads to keep.
    *
    * @param spareThreads specifies either the number of spare threads (if the value is greater than
-   * 1) or the percent (if &lt;= 1) from the current active threads count. By default is 0.1 (10% of
-   * active threads).
+   *                     1) or the percent (if &lt;= 1) from the current active threads count. By
+   *                     default is 0.1 (10% of active threads).
    * @return the RpsThreadGroup instance to use fluent API to set additional options.
    */
   public RpsThreadGroup spareThreads(double spareThreads) {
@@ -275,13 +278,9 @@ public class RpsThreadGroup extends BaseThreadGroup<RpsThreadGroup> {
   @Override
   protected AbstractThreadGroup buildThreadGroup() {
     ConcurrencyThreadGroup ret = new ConcurrencyThreadGroup();
-    /*
-     Using US locale to avoid particular locales generating commas which break parsing of function
-     and are not properly parsed by JMeter.
-     */
     ret.setTargetLevel(
-        String.format(Locale.US, "${__tstFeedback(%s,%d,%d,%.2f)}", buildTimerName(timerId),
-            initThreads, maxThreads, spareThreads));
+        JmeterFunction.from("__tstFeedback", buildTimerName(timerId), initThreads, maxThreads,
+            spareThreads));
     ret.setHold(String.valueOf(schedules.stream().mapToLong(s -> s.durationSecs).sum()));
     ret.setUnit(AbstractDynamicThreadGroup.UNIT_SECONDS);
     return ret;

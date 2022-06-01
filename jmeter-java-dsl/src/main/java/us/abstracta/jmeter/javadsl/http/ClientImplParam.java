@@ -7,15 +7,17 @@ import us.abstracta.jmeter.javadsl.http.DslHttpSampler.HttpClientImpl;
 
 public class ClientImplParam extends MethodParam<HttpClientImpl> {
 
-  protected ClientImplParam(TestElementParamBuilder paramBuilder) {
-    super(HttpClientImpl.class,
-        HttpClientImpl.fromPropertyValue(
-            paramBuilder.prop(HTTPSamplerBase.IMPLEMENTATION).getStringValue()),
+  private ClientImplParam(String expression, HttpClientImpl defaultValue) {
+    super(HttpClientImpl.class, expression, HttpClientImpl::fromPropertyValue, defaultValue);
+  }
+
+  public static ClientImplParam from(TestElementParamBuilder paramBuilder) {
+    return paramBuilder.buildParam(HTTPSamplerBase.IMPLEMENTATION, ClientImplParam::new,
         HttpClientImpl.HTTP_CLIENT);
   }
 
   @Override
-  public String buildCode(String indent) {
+  public String buildSpecificCode(String indent) {
     return HttpClientImpl.class.getSimpleName() + "." + value.name();
   }
 

@@ -20,6 +20,7 @@ import org.apache.jmeter.testelement.TestElement;
 import org.apache.jmeter.testelement.property.JMeterProperty;
 import org.apache.jmeter.threads.ThreadGroup;
 import org.assertj.core.api.AbstractAssert;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodCallBuilderTest;
@@ -42,26 +43,43 @@ public class DslDefaultThreadGroupTest {
         .isEqualTo(buildSimpleThreadGroup(THREAD_COUNT, ITERATIONS, 0, 0, 0));
   }
 
-  public TestElement buildSimpleThreadGroup(int threads, int iterations, int durationSecs,
-      int rampUpSecs, int delaySecs) {
+  private TestElement buildSimpleThreadGroup(int threads, int iterations, long durationSecs,
+      int rampUpSecs, long delaySecs) {
+    return buildSimpleThreadGroupFromObjects(threads, iterations, durationSecs, rampUpSecs,
+        delaySecs);
+  }
+
+  private TestElement buildSimpleThreadGroupFromObjects(Object threads, Object iterations,
+      Object durationSecs, Object rampUpSecs, Object delaySecs) {
     ThreadGroup ret = new ThreadGroup();
-    ret.setNumThreads(threads);
-    ret.setRampUp(rampUpSecs);
+    setProperty(ret, ThreadGroup.NUM_THREADS, threads);
+    setProperty(ret, ThreadGroup.RAMP_TIME, rampUpSecs);
     LoopController loopController = new LoopController();
     ret.setSamplerController(loopController);
-    if (durationSecs != 0) {
+    Long zero = Long.valueOf(0);
+    if (durationSecs != null && !zero.equals(durationSecs)) {
       loopController.setLoops(-1);
-      ret.setDuration(durationSecs);
+      setProperty(ret, ThreadGroup.DURATION, durationSecs);
     } else {
-      loopController.setLoops(iterations);
+      setProperty(loopController, LoopController.LOOPS, iterations);
     }
-    if (delaySecs != 0) {
-      ret.setDelay(delaySecs);
+    if (!zero.equals(delaySecs)) {
+      setProperty(ret, ThreadGroup.DELAY, delaySecs);
     }
-    if (durationSecs != 0 || delaySecs != 0) {
+    if (durationSecs != null && !zero.equals(durationSecs) || !zero.equals(delaySecs)) {
       ret.setScheduler(true);
     }
     return ret;
+  }
+
+  private void setProperty(TestElement ret, String propName, Object value) {
+    if (value instanceof Integer) {
+      ret.setProperty(propName, (Integer) value);
+    } else if (value instanceof Long) {
+      ret.setProperty(propName, (Long) value);
+    } else {
+      ret.setProperty(propName, (String) value);
+    }
   }
 
   public static TestElementAssert assertThatThreadGroup(TestElement actual) {
@@ -235,7 +253,7 @@ public class DslDefaultThreadGroupTest {
         .rampTo(0, Duration.ofSeconds(DURATION2_SECONDS))
         .buildThreadGroup())
         .isEqualTo(buildUltimateThreadGroup(
-            new int[][]{{THREAD_COUNT, 0, DURATION1_SECONDS, 0, DURATION2_SECONDS}}));
+            new int[][]{{THREAD_COUNT, 0, (int) DURATION1_SECONDS, 0, (int) DURATION2_SECONDS}}));
   }
 
   private TestElement buildUltimateThreadGroup(int[][] schedsProps) {
@@ -277,6 +295,60 @@ public class DslDefaultThreadGroupTest {
             {2, 70, 5, 35, 5},
             {2, 75, 5, 10, 10}
         }));
+  }
+
+  @Test
+  public void shouldBuildSimpleThreadGroupWhenHoldAndRampWithJmeterExpressions() {
+    String delay = "${__P(DELAY, 0)}";
+    String threads = "${__P(THREADS, 1)}";
+    String ramp = "${__P(RAMP, 0)}";
+    assertThatThreadGroup(threadGroup()
+        .holdFor(delay)
+        .rampTo(threads, ramp)
+        .buildThreadGroup())
+        .isEqualTo(buildSimpleThreadGroup(threads, null, ramp, ramp, delay));
+  }
+
+  private TestElement buildSimpleThreadGroup(String threads, String iterations, String durationSecs,
+      String rampUpSecs, String delaySecs) {
+    return buildSimpleThreadGroupFromObjects(threads, iterations, durationSecs, rampUpSecs,
+        delaySecs);
+  }
+
+  @Test
+  public void shouldBuildSimpleThreadGroupWhenHoldRampAndHoldWithJmeterExpressions() {
+    String delay = "${__P(DELAY, 0)}";
+    String threads = "${__P(THREADS, 1)}";
+    String ramp = "${__P(RAMP, 0)}";
+    String duration = "${__P(DURATION, 10)";
+    assertThatThreadGroup(threadGroup()
+        .holdFor(delay)
+        .rampToAndHold(threads, ramp, duration)
+        .buildThreadGroup())
+        .isEqualTo(buildSimpleThreadGroup(threads, null,
+            "${__groovy(" + intProp2Groovy(duration) + " + " + intProp2Groovy(ramp) + ")}", ramp,
+            delay));
+  }
+
+  @Test
+  public void shouldBuildSimpleThreadGroupWhenHoldAndRampHoldIteratingWithJmeterExpressions() {
+    String delay = "${__P(DELAY, 0)}";
+    String threads = "${__P(THREADS, 1)}";
+    String ramp = "${__P(RAMP, 0)}";
+    String iters = "${__P(ITERS, 10)}";
+    assertThatThreadGroup(threadGroup()
+        .holdFor(delay)
+        .rampTo(threads, ramp)
+        .holdIterating(iters)
+        .buildThreadGroup())
+        .isEqualTo(buildSimpleThreadGroup(threads, iters, null, ramp, delay));
+  }
+
+  @NotNull
+  private String intProp2Groovy(String property) {
+    return "(new org.apache.jmeter.engine.util.CompoundVariable('"
+        + property.replace("$", "#").replace(",", "\\,")
+        + "'.replace('#'\\,'$')).execute() as int)";
   }
 
   @Test
@@ -454,6 +526,17 @@ public class DslDefaultThreadGroupTest {
               .sampleErrorAction(SampleErrorAction.STOP_TEST)
               .children(
                   httpSampler("http://localhost"),
+                  httpSampler("http://myhost")
+              )
+      );
+    }
+
+    public DslTestPlan threadGroupWithParameterizedThreadsRampAndIterations() {
+      return testPlan(
+          threadGroup("myThreads")
+              .rampTo("${THREADS}", "${RAMP_UP}")
+              .holdIterating("${ITERATIONS}")
+              .children(
                   httpSampler("http://myhost")
               )
       );
