@@ -13,17 +13,16 @@ public class EncodingParam extends MethodParam<Charset> {
   private static final Map<Charset, String> STANDARD_CHARSETS_NAMES =
       findConstantNames(StandardCharsets.class, Charset.class, s -> true);
 
-  protected EncodingParam(TestElementParamBuilder paramBuilder) {
-    super(Charset.class, buildCharset(paramBuilder), null);
+  private EncodingParam(String expression, Charset defaultValue) {
+    super(Charset.class, expression, Charset::forName, defaultValue);
   }
 
-  private static Charset buildCharset(TestElementParamBuilder paramBuilder) {
-    StringParam charset = paramBuilder.stringParam(HTTPSamplerBase.CONTENT_ENCODING, "");
-    return charset.isDefault() ? null : Charset.forName(charset.getValue());
+  public static EncodingParam from(TestElementParamBuilder paramBuilder) {
+    return paramBuilder.buildParam(HTTPSamplerBase.CONTENT_ENCODING, EncodingParam::new, null);
   }
 
   @Override
-  public String buildCode(String indent) {
+  public String buildSpecificCode(String indent) {
     String standardCharsetName = STANDARD_CHARSETS_NAMES.get(value);
     return standardCharsetName != null
         ? StandardCharsets.class.getSimpleName() + "." + standardCharsetName

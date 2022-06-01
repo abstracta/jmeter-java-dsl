@@ -289,7 +289,7 @@ public class DslGraphqlSampler extends DslBaseHttpSampler<DslGraphqlSampler> {
       }
 
       @Override
-      protected String buildCode(String indent) {
+      protected String buildSpecificCode(String indent) {
         JsonNode node = (JsonNode) value;
         if (node.isValueNode()) {
           return node.isTextual() ? string2Code(node.textValue()) : node.asText();
@@ -304,7 +304,7 @@ public class DslGraphqlSampler extends DslBaseHttpSampler<DslGraphqlSampler> {
       }
 
       private String string2Code(String value) {
-        return new StringParam(value).buildCode("");
+        return buildStringLiteral(value);
       }
 
     }

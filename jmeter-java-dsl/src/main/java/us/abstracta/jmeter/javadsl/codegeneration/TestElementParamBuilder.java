@@ -1,7 +1,7 @@
 package us.abstracta.jmeter.javadsl.codegeneration;
 
 import java.time.Duration;
-import java.util.function.Function;
+import java.util.function.BiFunction;
 import org.apache.jmeter.testelement.TestElement;
 import org.apache.jmeter.testelement.property.JMeterProperty;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodParam.BoolParam;
@@ -25,8 +25,8 @@ public class TestElementParamBuilder {
    * <p>
    * When creating parameters from properties names, fully qualified property names are required.
    * <p>
-   * If the test element has a common prefix for properties, consider using {@link
-   * #TestElementParamBuilder(TestElement, String)} instead.
+   * If the test element has a common prefix for properties, consider using
+   * {@link #TestElementParamBuilder(TestElement, String)} instead.
    *
    * @param testElement is the JMeter test element backing this parameter builder.
    */
@@ -67,21 +67,19 @@ public class TestElementParamBuilder {
    * @throws UnsupportedOperationException when no integer can be parsed from the property value.
    */
   public IntParam intParam(String propName) {
-    return new IntParam(parseProp(propName, Integer::valueOf), null);
+    return buildParam(propName, IntParam::new, null);
   }
 
-  private <T> T parseProp(String propName, Function<String, T> parser) {
+  public <V, T extends MethodParam<V>> T buildParam(String propName,
+      BiFunction<String, V, T> builder, V defaultValue) {
     String propVal = prop(propName).getStringValue();
-    if (propVal.isEmpty()) {
-      return null;
-    }
     try {
-      return parser.apply(propVal);
-    } catch (NumberFormatException e) {
+      return builder.apply(propVal, defaultValue);
+    } catch (Exception e) {
       throw new UnsupportedOperationException(
-          String.format("DSL does currently only support numeric values for %s, but found: %s. "
-                  + "If you need this support please open an issue in GitHub repository.",
-              propsPrefix + propName, propVal), e);
+          String.format("DSL does not currently support '%s' as value for %s. If you need this "
+                  + "support please open an issue in GitHub repository.", propVal,
+              propsPrefix + propName), e);
     }
   }
 
@@ -142,21 +140,7 @@ public class TestElementParamBuilder {
    * @return the {@link BoolParam} instance.
    */
   public BoolParam boolParam(String propName, boolean defaultValue) {
-    return new BoolParam(parseBool(propName), defaultValue);
-  }
-
-  private Boolean parseBool(String propName) {
-    String s = prop(propName).getStringValue();
-    if (s.isEmpty()) {
-      return null;
-    }
-    if (!String.valueOf(true).equals(s) && !String.valueOf(false).equals(s)) {
-      throw new UnsupportedOperationException(
-          String.format("DSL does currently only support true or false values for %s, but found: "
-                  + "%s. If you need this support please open an issue in GitHub repository.",
-              propName, s));
-    }
-    return Boolean.valueOf(s);
+    return buildParam(propName, BoolParam::new, defaultValue);
   }
 
   /**
@@ -171,9 +155,7 @@ public class TestElementParamBuilder {
    * @return the {@link DurationParam} instance.
    */
   public DurationParam durationParam(String propName, Duration defaultValue) {
-    Long durationSecs = parseProp(propName, Long::parseLong);
-    return new DurationParam(durationSecs != null ? Duration.ofSeconds(durationSecs) : null,
-        defaultValue);
+    return buildParam(propName, DurationParam::new, defaultValue);
   }
 
   /**

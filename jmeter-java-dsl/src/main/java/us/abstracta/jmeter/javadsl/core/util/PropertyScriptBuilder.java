@@ -37,8 +37,7 @@ public class PropertyScriptBuilder extends DslScriptBuilder {
   }
 
   public String build() {
-    return scriptString != null ? scriptString
-        : "${__groovy(" + super.build().replace(",", "\\,") + ")}";
+    return scriptString != null ? scriptString : JmeterFunction.groovy(super.build());
   }
 
   /**

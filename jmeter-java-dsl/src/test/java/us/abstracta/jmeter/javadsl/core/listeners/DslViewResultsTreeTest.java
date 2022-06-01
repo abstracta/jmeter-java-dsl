@@ -15,8 +15,7 @@ import us.abstracta.jmeter.javadsl.core.DslTestPlan;
 public class DslViewResultsTreeTest extends DslVisualizerTest {
 
   @Test
-  public void shouldShowResultsInWindowWhenRunTestPlanWithViewResultsTree(TestInfo testInfo)
-      throws Exception {
+  public void shouldShowResultsInWindowWhenRunTestPlanWithViewResultsTree(TestInfo testInfo) {
     testVisualizerTestPlan(
         testPlan(
             threadGroup(1, 1,
