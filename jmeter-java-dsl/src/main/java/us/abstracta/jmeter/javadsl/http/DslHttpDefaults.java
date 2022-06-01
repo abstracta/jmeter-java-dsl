@@ -9,7 +9,7 @@ import org.apache.jmeter.protocol.http.sampler.HTTPSamplerBase;
 import org.apache.jmeter.testelement.TestElement;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodCall;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodCallContext;
-import us.abstracta.jmeter.javadsl.codegeneration.MethodParam.StringParam;
+import us.abstracta.jmeter.javadsl.codegeneration.MethodParam;
 import us.abstracta.jmeter.javadsl.codegeneration.SingleGuiClassCallBuilder;
 import us.abstracta.jmeter.javadsl.codegeneration.TestElementParamBuilder;
 import us.abstracta.jmeter.javadsl.core.configs.BaseConfigElement;
@@ -271,10 +271,10 @@ public class DslHttpDefaults extends BaseConfigElement {
     protected MethodCall buildMethodCall(MethodCallContext context) {
       MethodCall ret = buildMethodCall();
       TestElementParamBuilder paramBuilder = new TestElementParamBuilder(context.getTestElement());
-      StringParam protocol = paramBuilder.stringParam(HTTPSamplerBase.PROTOCOL);
-      StringParam host = paramBuilder.stringParam(HTTPSamplerBase.DOMAIN);
-      StringParam port = paramBuilder.stringParam(HTTPSamplerBase.PORT);
-      StringParam path = paramBuilder.stringParam(HTTPSamplerBase.PATH, "/");
+      MethodParam protocol = paramBuilder.stringParam(HTTPSamplerBase.PROTOCOL);
+      MethodParam host = paramBuilder.stringParam(HTTPSamplerBase.DOMAIN);
+      MethodParam port = paramBuilder.stringParam(HTTPSamplerBase.PORT);
+      MethodParam path = paramBuilder.stringParam(HTTPSamplerBase.PATH, "/");
 
       if (!protocol.isDefault() && !host.isDefault()) {
         ret.chain("url", BaseHttpSamplerCodeBuilder.buildUrlParam(protocol,

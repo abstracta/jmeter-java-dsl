@@ -32,10 +32,10 @@ public class MethodCall {
   private final Class<?> returnType;
   private MethodCall childrenMethod;
   private ChildrenParam<?> childrenParam;
-  private final List<MethodParam<?>> params;
+  private final List<MethodParam> params;
   private final List<MethodCall> chain = new ArrayList<>();
 
-  protected MethodCall(String methodName, Class<?> returnType, MethodParam<?>... params) {
+  protected MethodCall(String methodName, Class<?> returnType, MethodParam... params) {
     this.methodName = methodName;
     this.returnType = returnType;
     this.params = Arrays.asList(params);
@@ -45,7 +45,7 @@ public class MethodCall {
     }
   }
 
-  protected static MethodCall from(Method method, MethodParam<?>... params) {
+  protected static MethodCall from(Method method, MethodParam... params) {
     return new MethodCall(method.getName(), method.getReturnType(), params);
   }
 
@@ -62,7 +62,7 @@ public class MethodCall {
    * @return the newly created instance
    */
   public static MethodCall forStaticMethod(Class<?> methodClass, String methodName,
-      MethodParam<?>... params) {
+      MethodParam... params) {
     Class<?>[] paramsTypes = Arrays.stream(params)
         .map(MethodParam::getType)
         .toArray(Class[]::new);
@@ -202,10 +202,10 @@ public class MethodCall {
   /**
    * Allows chaining a method call to this call.
    * <p>
-   * This method is useful when adding property configuration methods (like {@link
-   * DslTestPlan#sequentialThreadGroups()}) or other chained methods that further configure the
-   * element (like {@link us.abstracta.jmeter.javadsl.http.DslHttpSampler#post(String,
-   * ContentType)}.
+   * This method is useful when adding property configuration methods (like
+   * {@link DslTestPlan#sequentialThreadGroups()}) or other chained methods that further configure
+   * the element (like
+   * {@link us.abstracta.jmeter.javadsl.http.DslHttpSampler#post(String, ContentType)}.
    * <p>
    * This method abstracts some common logic regarding chaining. For example: if chained method only
    * contains a parameter and its value is the default one, then method is not chained, since it is
@@ -222,7 +222,7 @@ public class MethodCall {
    * @throws UnsupportedOperationException when no method with given names and/or parameters can be
    *                                       found to be chained in current method call.
    */
-  public MethodCall chain(String methodName, MethodParam<?>... params) {
+  public MethodCall chain(String methodName, MethodParam... params) {
     // this eases chaining don't having to check in client code for this condition
     if (params.length == 1 && params[0].isDefault()) {
       return this;
@@ -247,7 +247,7 @@ public class MethodCall {
   }
 
   private Method findMethodInClassHierarchyMatchingParams(String methodName, Class<?> methodClass,
-      MethodParam<?>[] params) {
+      MethodParam[] params) {
     Method ret = null;
     while (ret == null && methodClass != Object.class) {
       ret = findMethodInClassMatchingParams(methodName, methodClass, params);
@@ -257,7 +257,7 @@ public class MethodCall {
   }
 
   private Method findMethodInClassMatchingParams(String methodName, Class<?> methodClass,
-      MethodParam<?>[] params) {
+      MethodParam[] params) {
     Stream<Method> chainableMethods = Arrays.stream(methodClass.getDeclaredMethods())
         .filter(m -> methodName.equals(m.getName()) && Modifier.isPublic(m.getModifiers())
             && m.getReturnType() == methodClass);
@@ -265,8 +265,8 @@ public class MethodCall {
   }
 
   protected static Method findParamsMatchingMethod(Stream<Method> methods,
-      MethodParam<?>[] params) {
-    List<MethodParam<?>> finalParams = Arrays.stream(params)
+      MethodParam[] params) {
+    List<MethodParam> finalParams = Arrays.stream(params)
         .filter(p -> !p.isIgnored())
         .collect(Collectors.toList());
     return methods
@@ -275,7 +275,7 @@ public class MethodCall {
         .orElse(null);
   }
 
-  private static boolean methodMatchesParameters(Method m, List<MethodParam<?>> params) {
+  private static boolean methodMatchesParameters(Method m, List<MethodParam> params) {
     if (m.getParameterCount() != params.size()) {
       return false;
     }
@@ -289,7 +289,7 @@ public class MethodCall {
   }
 
   protected static UnsupportedOperationException buildNoMatchingMethodFoundException(
-      String methodCondition, MethodParam<?>[] params) {
+      String methodCondition, MethodParam[] params) {
     return new UnsupportedOperationException(
         "No " + methodCondition + " method was found for parameters " + Arrays.toString(params)
             + ". This is probably due to some change in DSL not reflected in associated code "

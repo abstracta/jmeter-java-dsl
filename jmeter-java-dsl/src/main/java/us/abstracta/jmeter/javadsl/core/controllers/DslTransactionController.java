@@ -7,9 +7,8 @@ import org.apache.jmeter.control.gui.TransactionControllerGui;
 import org.apache.jmeter.testelement.TestElement;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodCall;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodCallContext;
-import us.abstracta.jmeter.javadsl.codegeneration.MethodParam.BoolParam;
+import us.abstracta.jmeter.javadsl.codegeneration.MethodParam;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodParam.ChildrenParam;
-import us.abstracta.jmeter.javadsl.codegeneration.MethodParam.StringParam;
 import us.abstracta.jmeter.javadsl.codegeneration.SingleTestElementCallBuilder;
 import us.abstracta.jmeter.javadsl.codegeneration.TestElementParamBuilder;
 import us.abstracta.jmeter.javadsl.core.threadgroups.BaseThreadGroup.ThreadGroupChild;
@@ -102,9 +101,9 @@ public class DslTransactionController extends BaseController {
         MethodCallContext context) {
       TestElementParamBuilder paramBuilder = new TestElementParamBuilder(testElement,
           "TransactionController");
-      StringParam name = paramBuilder.nameParam(null);
-      BoolParam parent = paramBuilder.boolParam("parent", false);
-      BoolParam timers = paramBuilder.boolParam("includeTimers", false);
+      MethodParam name = paramBuilder.nameParam(null);
+      MethodParam parent = paramBuilder.boolParam("parent", false);
+      MethodParam timers = paramBuilder.boolParam("includeTimers", false);
       if (parent.isDefault() && timers.isDefault()) {
         return buildMethodCall(name, new ChildrenParam<>(ThreadGroupChild[].class));
       } else {

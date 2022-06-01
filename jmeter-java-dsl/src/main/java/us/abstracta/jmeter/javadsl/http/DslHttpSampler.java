@@ -25,6 +25,7 @@ import org.apache.jmeter.testelement.property.JMeterProperty;
 import us.abstracta.jmeter.javadsl.JmeterDsl;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodCall;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodCallContext;
+import us.abstracta.jmeter.javadsl.codegeneration.MethodParam;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodParam.BoolParam;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodParam.StringParam;
 import us.abstracta.jmeter.javadsl.codegeneration.TestElementParamBuilder;
@@ -397,7 +398,7 @@ public class DslHttpSampler extends DslBaseHttpSampler<DslHttpSampler> {
     }
 
     @Override
-    protected MethodCall buildBaseHttpMethodCall(StringParam name, StringParam url,
+    protected MethodCall buildBaseHttpMethodCall(MethodParam name, MethodParam url,
         TestElementParamBuilder paramBuilder) {
       return buildMethodCall(name, url);
     }
@@ -415,12 +416,12 @@ public class DslHttpSampler extends DslBaseHttpSampler<DslHttpSampler> {
     protected void buildRequestCall(MethodCall ret, HTTPSamplerProxy testElem,
         MethodCallContext buildContext) {
       TestElementParamBuilder paramBuilder = new TestElementParamBuilder(testElem);
-      HttpMethodParam method = new HttpMethodParam(paramBuilder);
+      MethodParam method = HttpMethodParam.from(paramBuilder);
       MethodCallContext headers = buildContext.removeChild(HeaderManager.class);
       String contentType = removeContentTypeHeader(headers);
       Arguments args = testElem.getArguments();
-      if (method.isFixed() && !method.isDefault() && HTTPConstants.POST.equals(
-          method.getValue().toUpperCase(Locale.US)) && !testElem.getUseMultipart()
+      if (method instanceof StringParam && !method.isDefault() && HTTPConstants.POST.equals(
+          ((StringParam) method).getValue().toUpperCase(Locale.US)) && !testElem.getUseMultipart()
           && contentType != null && isRawBody(args)) {
         ret.chain("post", buildRawBody(args), new ContentTypeParam(contentType));
         chainHeaders(ret, headers);
@@ -470,13 +471,13 @@ public class DslHttpSampler extends DslBaseHttpSampler<DslHttpSampler> {
       return new StringParam(args.getArgument(0).getValue());
     }
 
-    private BoolParam buildFollowRedirectsParam(TestElementParamBuilder paramBuilder) {
-      BoolParam follow = paramBuilder.boolParam(HTTPSamplerBase.FOLLOW_REDIRECTS, true);
+    private MethodParam buildFollowRedirectsParam(TestElementParamBuilder paramBuilder) {
+      MethodParam follow = paramBuilder.boolParam(HTTPSamplerBase.FOLLOW_REDIRECTS, true);
       if (!follow.isDefault()) {
         return follow;
       } else {
-        BoolParam auto = paramBuilder.boolParam(HTTPSamplerBase.AUTO_REDIRECTS, false);
-        return Boolean.TRUE.equals(auto.getValue())
+        MethodParam auto = paramBuilder.boolParam(HTTPSamplerBase.AUTO_REDIRECTS, false);
+        return auto instanceof BoolParam && Boolean.TRUE.equals(((BoolParam) auto).getValue())
             ? new BoolParam(true, true)
             : follow;
       }
@@ -499,8 +500,13 @@ public class DslHttpSampler extends DslBaseHttpSampler<DslHttpSampler> {
             }
           });
 
-      private HttpMethodParam(TestElementParamBuilder paramBuilder) {
-        super(paramBuilder.prop(HTTPSamplerBase.METHOD).getStringValue(), HTTPConstants.GET);
+      private HttpMethodParam(String expression, String defaultValue) {
+        super(expression, defaultValue);
+      }
+
+      public static MethodParam from(TestElementParamBuilder paramBuilder) {
+        return paramBuilder.buildParam(HTTPSamplerBase.METHOD, HttpMethodParam::new,
+            HTTPConstants.GET);
       }
 
       @Override
@@ -510,7 +516,7 @@ public class DslHttpSampler extends DslBaseHttpSampler<DslHttpSampler> {
       }
 
       @Override
-      public String buildSpecificCode(String indent) {
+      public String buildCode(String indent) {
         String constant = CONSTANT_METHODS.get(value != null ? value.toUpperCase(Locale.US) : null);
         return constant != null ? HTTPConstants.class.getSimpleName() + "." + constant
             : super.buildCode(indent);

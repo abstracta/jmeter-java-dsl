@@ -6,6 +6,7 @@ import org.apache.jmeter.testelement.TestElement;
 import org.apache.jmeter.testelement.property.JMeterProperty;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodParam.BoolParam;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodParam.DurationParam;
+import us.abstracta.jmeter.javadsl.codegeneration.MethodParam.DynamicParam;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodParam.IntParam;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodParam.NameParam;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodParam.StringParam;
@@ -53,7 +54,7 @@ public class TestElementParamBuilder {
    * @param defaultName is the default name used by the JMeter test element.
    * @return a {@link NameParam} instance.
    */
-  public StringParam nameParam(String defaultName) {
+  public MethodParam nameParam(String defaultName) {
     return new NameParam(testElement.getName(), defaultName);
   }
 
@@ -66,13 +67,16 @@ public class TestElementParamBuilder {
    * @return the {@link IntParam} instance.
    * @throws UnsupportedOperationException when no integer can be parsed from the property value.
    */
-  public IntParam intParam(String propName) {
-    return buildParam(propName, IntParam::new, null);
+  public MethodParam intParam(String propName) {
+    return buildParam(propName, IntParam::new, (Integer) null);
   }
 
-  public <V, T extends MethodParam<V>> T buildParam(String propName,
+  public <V, T extends MethodParam> MethodParam buildParam(String propName,
       BiFunction<String, V, T> builder, V defaultValue) {
     String propVal = prop(propName).getStringValue();
+    if (propVal != null && DynamicParam.matches(propVal)) {
+      return new DynamicParam(propVal);
+    }
     try {
       return builder.apply(propVal, defaultValue);
     } catch (Exception e) {
@@ -113,7 +117,7 @@ public class TestElementParamBuilder {
    * @param defaultValue the default value assigned to the JMeter test element property.
    * @return the {@link StringParam} instance.
    */
-  public StringParam stringParam(String propName, String defaultValue) {
+  public MethodParam stringParam(String propName, String defaultValue) {
     return new StringParam(prop(propName).getStringValue(), defaultValue);
   }
 
@@ -126,7 +130,7 @@ public class TestElementParamBuilder {
    * @return the {@link StringParam} instance.
    * @see #stringParam(String, String)
    */
-  public StringParam stringParam(String propName) {
+  public MethodParam stringParam(String propName) {
     return stringParam(propName, null);
   }
 
@@ -139,7 +143,7 @@ public class TestElementParamBuilder {
    * @param defaultValue the default value assigned to the JMeter test element property.
    * @return the {@link BoolParam} instance.
    */
-  public BoolParam boolParam(String propName, boolean defaultValue) {
+  public MethodParam boolParam(String propName, boolean defaultValue) {
     return buildParam(propName, BoolParam::new, defaultValue);
   }
 
@@ -154,7 +158,7 @@ public class TestElementParamBuilder {
    * @param defaultValue the default value assigned to the JMeter test element property.
    * @return the {@link DurationParam} instance.
    */
-  public DurationParam durationParam(String propName, Duration defaultValue) {
+  public MethodParam durationParam(String propName, Duration defaultValue) {
     return buildParam(propName, DurationParam::new, defaultValue);
   }
 
@@ -167,7 +171,7 @@ public class TestElementParamBuilder {
    * @return the {@link DurationParam} instance.
    * @see #durationParam(String, Duration)
    */
-  public DurationParam durationParam(String propName) {
+  public MethodParam durationParam(String propName) {
     return durationParam(propName, null);
   }
 

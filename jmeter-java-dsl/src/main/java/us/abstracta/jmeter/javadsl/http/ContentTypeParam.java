@@ -5,8 +5,9 @@ import java.util.Map;
 import org.apache.http.entity.ContentType;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodCall;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodParam;
+import us.abstracta.jmeter.javadsl.codegeneration.MethodParam.FixedParam;
 
-public class ContentTypeParam extends MethodParam<ContentType> {
+public class ContentTypeParam extends FixedParam<ContentType> {
 
   private static final Map<ContentType, String> CONSTANT_CONTENT_TYPES = findConstantNames(
       ContentType.class, ContentType.class,
@@ -17,14 +18,14 @@ public class ContentTypeParam extends MethodParam<ContentType> {
   }
 
   @Override
-  public String buildSpecificCode(String indent) {
+  public String buildCode(String indent) {
     String contentTypeName = findConstantName(value);
     if (contentTypeName != null) {
       return ContentType.class.getSimpleName() + "." + contentTypeName;
     }
     Charset charset = value.getCharset();
     StringParam mimeTypeParam = new StringParam(value.getMimeType());
-    MethodParam<?>[] params = charset != null
+    MethodParam[] params = charset != null
         ? new MethodParam[]{mimeTypeParam, new StringParam(value.getCharset().name())}
         : new MethodParam[]{mimeTypeParam};
     return MethodCall.forStaticMethod(ContentType.class, "create", params)

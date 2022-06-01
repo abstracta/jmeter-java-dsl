@@ -6,9 +6,10 @@ import java.util.Map;
 import org.apache.jmeter.protocol.http.sampler.HTTPSamplerBase;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodCall;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodParam;
+import us.abstracta.jmeter.javadsl.codegeneration.MethodParam.FixedParam;
 import us.abstracta.jmeter.javadsl.codegeneration.TestElementParamBuilder;
 
-public class EncodingParam extends MethodParam<Charset> {
+public class EncodingParam extends FixedParam<Charset> {
 
   private static final Map<Charset, String> STANDARD_CHARSETS_NAMES =
       findConstantNames(StandardCharsets.class, Charset.class, s -> true);
@@ -17,12 +18,12 @@ public class EncodingParam extends MethodParam<Charset> {
     super(Charset.class, expression, Charset::forName, defaultValue);
   }
 
-  public static EncodingParam from(TestElementParamBuilder paramBuilder) {
+  public static MethodParam from(TestElementParamBuilder paramBuilder) {
     return paramBuilder.buildParam(HTTPSamplerBase.CONTENT_ENCODING, EncodingParam::new, null);
   }
 
   @Override
-  public String buildSpecificCode(String indent) {
+  public String buildCode(String indent) {
     String standardCharsetName = STANDARD_CHARSETS_NAMES.get(value);
     return standardCharsetName != null
         ? StandardCharsets.class.getSimpleName() + "." + standardCharsetName

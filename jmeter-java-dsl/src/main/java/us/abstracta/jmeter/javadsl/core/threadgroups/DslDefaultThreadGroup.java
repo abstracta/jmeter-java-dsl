@@ -29,8 +29,8 @@ import us.abstracta.jmeter.javadsl.codegeneration.MethodCallContext;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodParam;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodParam.ChildrenParam;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodParam.DurationParam;
+import us.abstracta.jmeter.javadsl.codegeneration.MethodParam.FixedParam;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodParam.IntParam;
-import us.abstracta.jmeter.javadsl.codegeneration.MethodParam.StringParam;
 import us.abstracta.jmeter.javadsl.codegeneration.TestElementParamBuilder;
 import us.abstracta.jmeter.javadsl.core.util.JmeterFunction;
 import us.abstracta.jmeter.javadsl.core.util.SingleSeriesTimelinePanel;
@@ -692,16 +692,19 @@ public class DslDefaultThreadGroup extends BaseThreadGroup<DslDefaultThreadGroup
     }
 
     private MethodCall buildSimpleThreadGroupMethodCall(TestElementParamBuilder testElement) {
-      StringParam name = testElement.nameParam("Thread Group");
-      IntParam threads = testElement.intParam(ThreadGroup.NUM_THREADS);
-      DurationParam rampTime = testElement.durationParam(ThreadGroup.RAMP_TIME,
+      MethodParam name = testElement.nameParam("Thread Group");
+      MethodParam threads = testElement.intParam(ThreadGroup.NUM_THREADS);
+      MethodParam rampTime = testElement.durationParam(ThreadGroup.RAMP_TIME,
           Duration.ofSeconds(1));
-      DurationParam duration = testElement.durationParam(ThreadGroup.DURATION);
-      DurationParam delay = testElement.durationParam(ThreadGroup.DELAY);
-      IntParam iterations = testElement.intParam(
+      MethodParam duration = testElement.durationParam(ThreadGroup.DURATION);
+      MethodParam delay = testElement.durationParam(ThreadGroup.DELAY);
+      MethodParam iterations = testElement.intParam(
           ThreadGroup.MAIN_CONTROLLER + "/" + LoopController.LOOPS);
-      if (threads.isFixed() && duration.isFixed() && iterations.isFixed()
-          && (rampTime.isDefault() || rampTime.getValue().isZero()) && delay.isDefault()) {
+      if (threads instanceof IntParam && duration instanceof DurationParam
+          && iterations instanceof IntParam
+          && (rampTime.isDefault()
+          || rampTime instanceof DurationParam && ((DurationParam) rampTime).getValue().isZero())
+          && delay.isDefault()) {
         return buildMethodCall(name, threads, duration.isDefault() ? iterations : duration,
             new ChildrenParam<>(ThreadGroupChild[].class));
       } else {
@@ -719,23 +722,23 @@ public class DslDefaultThreadGroup extends BaseThreadGroup<DslDefaultThreadGroup
       }
     }
 
-    private DurationParam buildDurationParam(DurationParam duration, DurationParam rampTime) {
-      if (duration.isFixed() && rampTime.isFixed()) {
-        return new DurationParam(rampTime.isDefault() ? duration.getValue()
-            : duration.getValue().minus(rampTime.getValue()));
+    private DurationParam buildDurationParam(MethodParam duration, MethodParam rampTime) {
+      if (duration instanceof DurationParam && rampTime instanceof DurationParam) {
+        return new DurationParam(rampTime.isDefault() ? ((DurationParam) duration).getValue()
+            : ((DurationParam) duration).getValue().minus(((DurationParam) rampTime).getValue()));
       } else {
-        String expression =
-            rampTime.isDefault() || rampTime.isFixed() && rampTime.getValue().isZero()
-                ? duration.getExpression()
-                : JmeterFunction.groovy(
-                    buildGroovySolvingIntExpression(duration.getExpression()) + " - "
-                        + buildGroovySolvingIntExpression(rampTime.getExpression()));
+        String expression = rampTime.isDefault()
+            || rampTime instanceof DurationParam && ((DurationParam) rampTime).getValue().isZero()
+            ? duration.getExpression()
+            : JmeterFunction.groovy(
+                buildGroovySolvingIntExpression(duration.getExpression()) + " - "
+                    + buildGroovySolvingIntExpression(rampTime.getExpression()));
         return new DurationParam(expression, null);
       }
     }
 
     private MethodCall buildUltimateThreadGroupMethodCall(TestElementParamBuilder testElement) {
-      StringParam name = testElement.nameParam("jp@gc - Ultimate Thread Group");
+      MethodParam name = testElement.nameParam("jp@gc - Ultimate Thread Group");
       MethodCall ret = buildMethodCall(name);
       return ThreadsTimeline.fromSchedules(schedulesProp(testElement))
           .addMethodCallsTo(ret);
@@ -895,20 +898,20 @@ public class DslDefaultThreadGroup extends BaseThreadGroup<DslDefaultThreadGroup
 
   }
 
-  private static class SampleErrorActionMethodParam extends MethodParam<SampleErrorAction> {
+  private static class SampleErrorActionMethodParam extends FixedParam<SampleErrorAction> {
 
     private SampleErrorActionMethodParam(String expression, SampleErrorAction defaultValue) {
       super(SampleErrorAction.class, expression, SampleErrorAction::fromPropertyValue,
           defaultValue);
     }
 
-    public static SampleErrorActionMethodParam from(TestElementParamBuilder paramBuilder) {
+    public static MethodParam from(TestElementParamBuilder paramBuilder) {
       return paramBuilder.buildParam(AbstractThreadGroup.ON_SAMPLE_ERROR,
           SampleErrorActionMethodParam::new, SampleErrorAction.CONTINUE);
     }
 
     @Override
-    public String buildSpecificCode(String indent) {
+    public String buildCode(String indent) {
       return SampleErrorAction.class.getSimpleName() + "." + value.name();
     }
 

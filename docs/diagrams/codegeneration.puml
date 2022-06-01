@@ -28,25 +28,25 @@ package codegeneration {
 
   abstract class MethodParam {
     String name
-    Object value
-    Object defaultValue
 
     String buildCode(String indent)
   }
 
-  class StringParam extends MethodParam
+  abstract class FixedParam extends MethodParam
+
+  class DynamicParam extends MethodParam
+
+  class StringParam extends FixedParam
 
   class NameParam extends StringParam
 
-  abstract class LiteralParam extends MethodParam
+  class IntParam extends FixedParam
 
-  class IntParam extends LiteralParam
+  class LongParam extends FixedParam
 
-  class LongParam extends LiteralParam
+  class BoolParam extends FixedParam
 
-  class BoolParam extends LiteralParam
-
-  class DurationParam extends MethodParam
+  class DurationParam extends FixedParam
 
   abstract class SingleTestElementCallBuilder extends MethodCallBuilder {
     abstract MethodCall buildMethodCall(TestElement testElement, MethodCallContext context)

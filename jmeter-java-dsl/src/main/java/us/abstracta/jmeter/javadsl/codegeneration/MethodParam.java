@@ -29,33 +29,16 @@ import us.abstracta.jmeter.javadsl.core.timers.DslTimer;
  * This class should be extended to implement custom types of parameters (eg: check
  * {@link us.abstracta.jmeter.javadsl.http.ContentTypeParam}
  *
- * @param <T> Is the type of the parameter value.
  * @since 0.45
  */
-public abstract class MethodParam<T> {
-
-  private static final Pattern DYNAMIC_VALUE_PATTERN = Pattern.compile("\\$\\{.+}");
+public abstract class MethodParam {
 
   protected final Class<?> paramType;
   protected final String expression;
-  protected final T value;
-  protected final T defaultValue;
 
-  protected MethodParam(Class<T> paramType, String expression, Function<String, T> parser,
-      T defaultValue) {
+  protected MethodParam(Class<?> paramType, String expression) {
     this.paramType = paramType;
     this.expression = expression != null && expression.isEmpty() ? null : expression;
-    this.value = this.expression != null && !DYNAMIC_VALUE_PATTERN.matcher(expression).matches()
-        ? parser.apply(expression)
-        : null;
-    this.defaultValue = defaultValue;
-  }
-
-  protected MethodParam(Class<T> paramType, T value, T defaultValue) {
-    this.paramType = paramType;
-    this.expression = null;
-    this.value = value;
-    this.defaultValue = defaultValue;
   }
 
   public String getExpression() {
@@ -63,16 +46,7 @@ public abstract class MethodParam<T> {
   }
 
   protected Class<?> getType() {
-    return value == null && expression != null ? String.class : paramType;
-  }
-
-  /**
-   * Gets the value associated to the parameter.
-   *
-   * @return the value.
-   */
-  public T getValue() {
-    return value;
+    return paramType;
   }
 
   /**
@@ -87,28 +61,20 @@ public abstract class MethodParam<T> {
    * @return true when the value is the default one or not specified (null), false otherwise.
    */
   public boolean isDefault() {
-    return !(value == null && expression != null)
-        && (defaultValue != null && defaultValue.equals(value) || value == null);
+    return expression == null;
   }
 
   protected boolean isIgnored() {
     return false;
   }
 
-  public boolean isFixed() {
-    return value != null || expression == null;
-  }
-
-  protected final String buildCode(String indent) {
-    return value == null && expression != null ? buildStringLiteral(getExpression())
-        : buildSpecificCode(indent);
+  protected String buildCode(String indent) {
+    return buildStringLiteral(getExpression());
   }
 
   protected static String buildStringLiteral(String value) {
     return "\"" + value.replaceAll("[\\\\\"\n\t\r]", "\\\\$0") + "\"";
   }
-
-  protected abstract String buildSpecificCode(String indent);
 
   protected static <T> Map<T, String> findConstantNames(Class<?> constantsHolderClass,
       Class<T> constantClass, Predicate<Field> filter) {
@@ -151,7 +117,7 @@ public abstract class MethodParam<T> {
    * This implementation in particular takes care of proper escaping of characters for code
    * generation.
    */
-  public static class StringParam extends MethodParam<String> {
+  public static class StringParam extends FixedParam<String> {
 
     public StringParam(String expression, String defaultValue) {
       super(String.class, expression, v -> v, defaultValue);
@@ -162,31 +128,65 @@ public abstract class MethodParam<T> {
     }
 
     @Override
-    public String buildSpecificCode(String indent) {
+    public String buildCode(String indent) {
       return buildStringLiteral(value);
     }
 
   }
 
+  public static class DynamicParam extends MethodParam {
+
+    private static final Pattern DYNAMIC_VALUE_PATTERN = Pattern.compile(".*\\$\\{.+}.*");
+
+    protected DynamicParam(String expression) {
+      super(String.class, expression);
+    }
+
+    public static boolean matches(String propVal) {
+      return DYNAMIC_VALUE_PATTERN.matcher(propVal).matches();
+    }
+
+  }
+
   /**
-   * This represents parameters for which generated code does not need any sort of transformation on
-   * the assigned value.
+   * This represents parameters which are associated to a fixed value.
    *
    * @param <T> The type of the parameter value.
    */
-  public abstract static class LiteralParam<T> extends MethodParam<T> {
+  public abstract static class FixedParam<T> extends MethodParam {
 
-    protected LiteralParam(Class<T> paramType, String expression, Function<String, T> parser,
+    protected final T value;
+    protected final T defaultValue;
+
+    protected FixedParam(Class<T> paramType, String expression, Function<String, T> parser,
         T defaultValue) {
-      super(paramType, expression, parser, defaultValue);
+      super(paramType, expression);
+      this.value = this.expression != null ? parser.apply(expression) : null;
+      this.defaultValue = defaultValue;
     }
 
-    protected LiteralParam(Class<T> paramType, T value, T defaultValue) {
-      super(paramType, value, defaultValue);
+    protected FixedParam(Class<T> paramType, T value, T defaultValue) {
+      super(paramType, value == null ? null : value.toString());
+      this.value = value;
+      this.defaultValue = defaultValue;
     }
 
     @Override
-    public String buildSpecificCode(String indent) {
+    public boolean isDefault() {
+      return super.isDefault() || defaultValue != null && defaultValue.equals(value);
+    }
+
+    /**
+     * Gets the value associated to the parameter.
+     *
+     * @return the value.
+     */
+    public T getValue() {
+      return value;
+    }
+
+    @Override
+    public String buildCode(String indent) {
       return String.valueOf(value);
     }
 
@@ -195,7 +195,7 @@ public abstract class MethodParam<T> {
   /**
    * Is a parameter with an integer value.
    */
-  public static class IntParam extends LiteralParam<Integer> {
+  public static class IntParam extends FixedParam<Integer> {
 
     public IntParam(String expression, Integer defaultValue) {
       super(int.class, expression, Integer::valueOf, defaultValue);
@@ -210,7 +210,7 @@ public abstract class MethodParam<T> {
   /**
    * Is a parameter with a long value.
    */
-  public static class LongParam extends LiteralParam<Long> {
+  public static class LongParam extends FixedParam<Long> {
 
     public LongParam(long seconds) {
       super(long.class, seconds, null);
@@ -221,7 +221,7 @@ public abstract class MethodParam<T> {
   /**
    * Is a parameter with a boolean (true/false) value.
    */
-  public static class BoolParam extends LiteralParam<Boolean> {
+  public static class BoolParam extends FixedParam<Boolean> {
 
     public BoolParam(String expression, Boolean defaultValue) {
       super(boolean.class,
@@ -245,7 +245,7 @@ public abstract class MethodParam<T> {
   /**
    * Is a parameter with a Duration value.
    */
-  public static class DurationParam extends MethodParam<Duration> {
+  public static class DurationParam extends FixedParam<Duration> {
 
     public DurationParam(String expression, Duration defaultValue) {
       super(Duration.class, expression, v -> Duration.ofSeconds(Long.parseLong(v)), defaultValue);
@@ -256,7 +256,7 @@ public abstract class MethodParam<T> {
     }
 
     @Override
-    public String buildSpecificCode(String indent) {
+    public String buildCode(String indent) {
       return value.isZero() ? Duration.class.getSimpleName() + ".ZERO"
           : MethodCall.forStaticMethod(Duration.class, "ofSeconds",
               new LongParam(value.getSeconds())).buildCode();
@@ -272,7 +272,7 @@ public abstract class MethodParam<T> {
    *
    * @param <T> The type of the children DSl test elements.
    */
-  public static class ChildrenParam<T> extends MethodParam<T> {
+  public static class ChildrenParam<T> extends MethodParam {
 
     private static final Class<?>[][] EXECUTION_ORDERS = new Class[][]{
         {DslVariables.class},
@@ -288,7 +288,7 @@ public abstract class MethodParam<T> {
     private final List<MethodCall> children = new ArrayList<>();
 
     public ChildrenParam(Class<T> childrenClass) {
-      super(checkChildrenType(childrenClass), null, null, null);
+      super(checkChildrenType(childrenClass), null);
     }
 
     private static <T> Class<T> checkChildrenType(Class<T> childrenClass) {
@@ -301,7 +301,7 @@ public abstract class MethodParam<T> {
     }
 
     @Override
-    public String buildSpecificCode(String indent) {
+    public String buildCode(String indent) {
       List<MethodCall> childrenCalls = children.stream()
           // order elements to provide the most intuitive representation and ease tests
           .sorted(Comparator.comparing(c -> findExecutionOrder(c.getReturnType())))

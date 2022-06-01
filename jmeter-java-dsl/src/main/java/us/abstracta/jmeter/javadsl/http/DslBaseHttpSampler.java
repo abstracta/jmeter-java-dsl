@@ -17,7 +17,7 @@ import org.apache.jorphan.collections.HashTree;
 import us.abstracta.jmeter.javadsl.JmeterDsl;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodCall;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodCallContext;
-import us.abstracta.jmeter.javadsl.codegeneration.MethodParam.IntParam;
+import us.abstracta.jmeter.javadsl.codegeneration.MethodParam;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodParam.StringParam;
 import us.abstracta.jmeter.javadsl.codegeneration.SingleGuiClassCallBuilder;
 import us.abstracta.jmeter.javadsl.codegeneration.TestElementParamBuilder;
@@ -256,13 +256,13 @@ public abstract class DslBaseHttpSampler<T extends DslBaseHttpSampler<?>> extend
     protected MethodCall buildMethodCall(MethodCallContext context) {
       HTTPSamplerProxy testElement = (HTTPSamplerProxy) context.getTestElement();
       TestElementParamBuilder paramBuilder = new TestElementParamBuilder(testElement);
-      StringParam name = paramBuilder.nameParam(defaultName);
-      StringParam protocol = paramBuilder.stringParam(HTTPSamplerBase.PROTOCOL);
-      StringParam domain = paramBuilder.stringParam(HTTPSamplerBase.DOMAIN);
-      IntParam port = paramBuilder.intParam(HTTPSamplerBase.PORT);
-      StringParam path = paramBuilder.stringParam(HTTPSamplerBase.PATH, "/");
-      StringParam url = buildUrlParam(protocol, domain,
-          new StringParam(port.isDefault() ? "" : "" + port.getValue()), path);
+      MethodParam name = paramBuilder.nameParam(defaultName);
+      MethodParam protocol = paramBuilder.stringParam(HTTPSamplerBase.PROTOCOL);
+      MethodParam domain = paramBuilder.stringParam(HTTPSamplerBase.DOMAIN);
+      MethodParam port = paramBuilder.intParam(HTTPSamplerBase.PORT);
+      MethodParam path = paramBuilder.stringParam(HTTPSamplerBase.PATH, "/");
+      MethodParam url = buildUrlParam(protocol, domain,
+          new StringParam(port.isDefault() ? "" : "" + port.getExpression()), path);
       MethodCall ret = buildBaseHttpMethodCall(name, url, paramBuilder);
       context.findBuilder(DslCacheManager.CodeBuilder.class)
           .registerDependency(context, ret);
@@ -279,15 +279,15 @@ public abstract class DslBaseHttpSampler<T extends DslBaseHttpSampler<?>> extend
       return ret;
     }
 
-    protected abstract MethodCall buildBaseHttpMethodCall(StringParam name, StringParam url,
+    protected abstract MethodCall buildBaseHttpMethodCall(MethodParam name, MethodParam url,
         TestElementParamBuilder paramBuilder);
 
-    public static StringParam buildUrlParam(StringParam protocol, StringParam domain,
-        StringParam port, StringParam path) {
+    public static MethodParam buildUrlParam(MethodParam protocol, MethodParam domain,
+        MethodParam port, MethodParam path) {
       if (!domain.isDefault()) {
         return new StringParam(
-            new JmeterUrl(protocol.getValue(), domain.getValue(), port.getValue(),
-                path.isDefault() ? "" : path.getValue()).toString());
+            new JmeterUrl(protocol.getExpression(), domain.getExpression(), port.getExpression(),
+                path.isDefault() ? "" : path.getExpression()).toString());
       } else {
         return path;
       }
@@ -321,16 +321,16 @@ public abstract class DslBaseHttpSampler<T extends DslBaseHttpSampler<?>> extend
         TestElementParamBuilder paramBuilder);
 
     private void setProxyOptions(MethodCall ret, TestElementParamBuilder paramBuilder) {
-      StringParam protocol = paramBuilder.stringParam(HTTPSamplerBase.PROXYSCHEME);
-      StringParam host = paramBuilder.stringParam(HTTPSamplerBase.PROXYHOST);
-      IntParam port = paramBuilder.intParam(HTTPSamplerBase.PROXYPORT);
-      StringParam user = paramBuilder.stringParam(HTTPSamplerBase.PROXYUSER);
-      StringParam password = paramBuilder.stringParam(HTTPSamplerBase.PROXYPASS);
+      MethodParam protocol = paramBuilder.stringParam(HTTPSamplerBase.PROXYSCHEME);
+      MethodParam host = paramBuilder.stringParam(HTTPSamplerBase.PROXYHOST);
+      MethodParam port = paramBuilder.intParam(HTTPSamplerBase.PROXYPORT);
+      MethodParam user = paramBuilder.stringParam(HTTPSamplerBase.PROXYUSER);
+      MethodParam password = paramBuilder.stringParam(HTTPSamplerBase.PROXYPASS);
       if (host.isDefault()) {
         return;
       }
-      StringParam proxyUrl = buildUrlParam(protocol, host,
-          new StringParam(port.isDefault() ? "" : "" + port.getValue()), new StringParam(""));
+      MethodParam proxyUrl = buildUrlParam(protocol, host,
+          port.isDefault() ? new StringParam("") : port, new StringParam(""));
       if (user.isDefault()) {
         ret.chain("proxy", proxyUrl);
       } else {

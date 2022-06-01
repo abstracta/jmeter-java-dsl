@@ -25,6 +25,7 @@ import org.apache.jmeter.protocol.http.util.HTTPConstants;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodCall;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodCallContext;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodParam;
+import us.abstracta.jmeter.javadsl.codegeneration.MethodParam.FixedParam;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodParam.StringParam;
 import us.abstracta.jmeter.javadsl.codegeneration.TestElementParamBuilder;
 import us.abstracta.jmeter.javadsl.http.DslBaseHttpSampler;
@@ -102,8 +103,9 @@ public class DslGraphqlSampler extends DslBaseHttpSampler<DslGraphqlSampler> {
    * @param name  specifies the name of the variable.
    * @param value specifies the value associated to the variable. This value is serialized into
    *              json, so for non-primitive values (int, long, boolean, float, double, string,
-   *              etc.) make sure they can be properly serialized by jackson library or use {@link
-   *              #rawVariable(String, String)} or {@link #variables(String)} method instead.
+   *              etc.) make sure they can be properly serialized by jackson library or use
+   *              {@link #rawVariable(String, String)} or {@link #variables(String)} method
+   *              instead.
    * @return the sampler instance for further configuration or usage.
    * @throws IllegalArgumentException when provided value object can't be serialized by jackson.
    */
@@ -231,7 +233,7 @@ public class DslGraphqlSampler extends DslBaseHttpSampler<DslGraphqlSampler> {
     }
 
     @Override
-    protected MethodCall buildBaseHttpMethodCall(StringParam name, StringParam url,
+    protected MethodCall buildBaseHttpMethodCall(MethodParam name, MethodParam url,
         TestElementParamBuilder paramBuilder) {
       return buildMethodCall(name, url, paramBuilder.stringParam(GraphQLUrlConfigGui.QUERY));
     }
@@ -242,17 +244,20 @@ public class DslGraphqlSampler extends DslBaseHttpSampler<DslGraphqlSampler> {
       TestElementParamBuilder paramBuilder = new TestElementParamBuilder(testElem);
       ret.chain("operationName",
           paramBuilder.stringParam(GraphQLUrlConfigGui.OPERATION_NAME));
-      StringParam vars = paramBuilder.stringParam(GraphQLUrlConfigGui.VARIABLES);
-      if (!vars.isDefault()) {
+      MethodParam vars = paramBuilder.stringParam(GraphQLUrlConfigGui.VARIABLES);
+      if (!(vars instanceof StringParam)) {
+        chainRawVariables(ret, vars);
+      } else if (!vars.isDefault()) {
         try {
-          JsonNode varsNode = OBJECT_MAPPER.readValue(vars.getValue(), JsonNode.class);
+          JsonNode varsNode = OBJECT_MAPPER.readValue(((StringParam) vars).getValue(),
+              JsonNode.class);
           if (!varsNode.isObject()) {
             chainRawVariables(ret, vars);
-            return;
+          } else {
+            iterator2Stream(varsNode.fields())
+                .forEach(var -> ret.chain(var.getValue().isValueNode() ? "variable" : "rawVariable",
+                    new StringParam(var.getKey()), new JsonValueParam(var.getValue())));
           }
-          iterator2Stream(varsNode.fields())
-              .forEach(var -> ret.chain(var.getValue().isValueNode() ? "variable" : "rawVariable",
-                  new StringParam(var.getKey()), new JsonValueParam(var.getValue())));
         } catch (JsonProcessingException e) {
           chainRawVariables(ret, vars);
         }
@@ -269,7 +274,7 @@ public class DslGraphqlSampler extends DslBaseHttpSampler<DslGraphqlSampler> {
       chainHeaders(ret, headers);
     }
 
-    private void chainRawVariables(MethodCall ret, StringParam vars) {
+    private void chainRawVariables(MethodCall ret, MethodParam vars) {
       ret.chain("variablesJson", vars);
     }
 
@@ -282,14 +287,14 @@ public class DslGraphqlSampler extends DslBaseHttpSampler<DslGraphqlSampler> {
     protected void setAdditionalOptions(MethodCall ret, TestElementParamBuilder paramBuilder) {
     }
 
-    private static class JsonValueParam extends MethodParam<Object> {
+    private static class JsonValueParam extends FixedParam<Object> {
 
       private JsonValueParam(JsonNode value) {
         super(Object.class, value, null);
       }
 
       @Override
-      protected String buildSpecificCode(String indent) {
+      public String buildCode(String indent) {
         JsonNode node = (JsonNode) value;
         if (node.isValueNode()) {
           return node.isTextual() ? string2Code(node.textValue()) : node.asText();

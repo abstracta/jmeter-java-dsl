@@ -76,11 +76,11 @@ public abstract class MethodCallBuilder {
    * @return generated method call.
    * @throws UnsupportedOperationException if no builder method is found for the given parameters.
    */
-  protected MethodCall buildMethodCall(MethodParam<?>... params) {
+  protected MethodCall buildMethodCall(MethodParam... params) {
     return MethodCall.from(findBuilderMethod(params), params);
   }
 
-  private Method findBuilderMethod(MethodParam<?>... params) {
+  private Method findBuilderMethod(MethodParam... params) {
     Method ret = MethodCall.findParamsMatchingMethod(builderMethods.stream(), params);
     if (ret == null) {
       throw MethodCall.buildNoMatchingMethodFoundException(
