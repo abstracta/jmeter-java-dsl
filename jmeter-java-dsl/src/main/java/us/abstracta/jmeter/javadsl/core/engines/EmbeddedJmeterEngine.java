@@ -2,6 +2,7 @@ package us.abstracta.jmeter.javadsl.core.engines;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.time.Instant;
@@ -10,6 +11,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -44,6 +46,7 @@ public class EmbeddedJmeterEngine implements DslJmeterEngine {
 
   private static final Logger LOG = LoggerFactory.getLogger(EmbeddedJmeterEngine.class);
   private final Map<String, Object> props = new HashMap<>();
+  private String propsFile;
 
   /**
    * Allows setting properties to be used during test plan execution.
@@ -67,13 +70,37 @@ public class EmbeddedJmeterEngine implements DslJmeterEngine {
     return this;
   }
 
+  /**
+   * Allows specifying a properties file path to get properties from.
+   * <p>
+   * This is handy when different properties are required for different runs (eg: different
+   * environments).
+   * <p>
+   * This is an alternative to {@link #prop(String, Object)} which is handy for setting a small set
+   * of properties, or set them programmatically.
+   *
+   * @param propsFile is the path to the properties file to load.
+   * @return the engine instance for further configuration or usage.
+   * @since 0.57
+   */
+  public EmbeddedJmeterEngine propertiesFile(String propsFile) {
+    this.propsFile = propsFile;
+    return this;
+  }
+
   @Override
   public TestPlanStats run(DslTestPlan testPlan) throws IOException {
     return runInEnv(testPlan, new JmeterEnvironment());
   }
 
-  protected TestPlanStats runInEnv(DslTestPlan testPlan, JmeterEnvironment env) {
-    JMeterUtils.getJMeterProperties().putAll(props);
+  protected TestPlanStats runInEnv(DslTestPlan testPlan, JmeterEnvironment env) throws IOException {
+    Properties jmeterProps = JMeterUtils.getJMeterProperties();
+    if (propsFile != null) {
+      try (FileInputStream is = new FileInputStream(propsFile)) {
+        jmeterProps.load(is);
+      }
+    }
+    jmeterProps.putAll(props);
     HashTree rootTree = new ListedHashTree();
     BuildTreeContext buildContext = new BuildTreeContext();
     HashTree testPlanTree = buildContext.buildTreeFor(testPlan, rootTree);

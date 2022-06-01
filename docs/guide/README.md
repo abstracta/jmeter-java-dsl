@@ -1949,6 +1949,29 @@ public class PerformanceTest {
 }
 ```
 
+Or you can even load them from a file, which might be handy to have different files with different values for different execution profiles (eg: different environments). Eg:
+
+```java
+import static us.abstracta.jmeter.javadsl.JmeterDsl.*;
+
+import org.junit.jupiter.api.Test;
+import us.abstracta.jmeter.javadsl.core.engines.EmbeddedJmeterEngine;
+
+public class PerformanceTest {
+
+  @Test
+  public void testProperties() {
+    testPlan(
+        threadGroup(1, 1,
+            httpSampler("http://myservice.test/${__P(MY_PROP)}")
+        )
+    ).runIn(new EmbeddedJmeterEngine()
+        .propertiesFile("my.properties"));
+  }
+
+}
+```
+
 ::: tip
 You can put any object (not just strings) in properties, but only strings can be accessed via `${__P(PROPERTY_NAME)}` and `${__property(PROPERTY_NAME)}`.
 

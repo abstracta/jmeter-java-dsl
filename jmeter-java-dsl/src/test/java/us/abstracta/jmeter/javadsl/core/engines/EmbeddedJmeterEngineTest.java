@@ -8,6 +8,7 @@ import static us.abstracta.jmeter.javadsl.JmeterDsl.threadGroup;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import org.junit.jupiter.api.Test;
 import us.abstracta.jmeter.javadsl.JmeterDslTest;
+import us.abstracta.jmeter.javadsl.util.TestResource;
 
 public class EmbeddedJmeterEngineTest extends JmeterDslTest {
 
@@ -23,6 +24,18 @@ public class EmbeddedJmeterEngineTest extends JmeterDslTest {
     ).runIn(new EmbeddedJmeterEngine()
         .prop(propName, propVal));
     verify(WireMock.getRequestedFor(WireMock.urlEqualTo("/" + propVal)));
+  }
+
+  @Test
+  public void shouldProperlySolvePropGroovyReferenceWhenEngineWithPropertiesFile()
+      throws Exception {
+    testPlan(
+        threadGroup(1, 1,
+            httpSampler(wiremockUri + "/${__groovy(props['MY_PROP'])}")
+        )
+    ).runIn(new EmbeddedJmeterEngine()
+        .propertiesFile(new TestResource("sample.properties").filePath()));
+    verify(WireMock.getRequestedFor(WireMock.urlEqualTo("/MY_VAL")));
   }
 
 }
