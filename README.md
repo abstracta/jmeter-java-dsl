@@ -14,7 +14,7 @@ If you use [maven](https://maven.apache.org/what-is-maven.html), just include fo
 <dependency>
   <groupId>us.abstracta.jmeter</groupId>
   <artifactId>jmeter-java-dsl</artifactId>
-  <version>0.56</version>
+  <version>0.57</version>
   <scope>test</scope>
 </dependency>
 ``` 
