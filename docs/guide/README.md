@@ -244,6 +244,90 @@ In case you want to get debug logs for HTTP calls to BlazeMeter API, you can inc
 If you use JSR223 Pre- or Post- processors with Java code (lambdas) instead of strings ([here](#change-sample-result-statuses-with-custom-logic) are some examples), or use one of the HTTP Sampler methods which receive a function as parameter (as in [here](#provide-request-parameters-programmatically-per-request)), then BlazeMeter execution won't work. You can migrate them to use `jsrPreProcessor` with string scripts instead. Check associated methods documentation for more details.
 :::
 
+### OctoPerf
+
+In same fashion as with BlazeMeter, jut by including following module as dependency:
+
+:::: tabs type:card
+::: tab Maven
+```xml
+<dependency>
+  <groupId>us.abstracta.jmeter</groupId>
+  <artifactId>jmeter-java-dsl-octoperf</artifactId>
+  <version>0.58</version>
+  <scope>test</scope>
+</dependency>
+```
+:::
+::: tab Gradle
+```groovy
+testImplementation 'us.abstracta.jmeter:jmeter-java-dsl-octoperf:0.58'
+```
+:::
+::::
+
+You can easily run a JMeter test plan at scale in [OctoPerf](https://octoperf.com/) like this:
+
+```java
+import static org.assertj.core.api.Assertions.assertThat;
+import static us.abstracta.jmeter.javadsl.JmeterDsl.*;
+
+import java.time.Duration;
+import org.junit.jupiter.api.Test;
+import us.abstracta.jmeter.javadsl.octoperf.OctoPerfEngine;
+import us.abstracta.jmeter.javadsl.core.TestPlanStats;
+
+public class PerformanceTest {
+
+  @Test
+  public void testPerformance() throws Exception {
+    TestPlanStats stats = testPlan(
+        // number of threads and iterations are in the end overwritten by OctoPerf engine settings 
+        threadGroup(2, 10,
+            httpSampler("http://my.service")
+        )
+    ).runIn(new OctoPerfEngine(System.getenv("OCTOPERF_API_KEY"))
+        .projectName("DSL test")
+        .totalUsers(500)
+        .rampUp(Duration.ofMinutes(1))
+        .holdFor(Duration.ofMinutes(10))
+        .testTimeout(Duration.ofMinutes(20)));
+    assertThat(stats.overall().sampleTimePercentile99()).isLessThan(Duration.ofSeconds(5));
+  }
+
+}
+```
+> This test is using `OCTOPERF_API_KEY`, a custom environment variable containing an OctoPerf API key.
+
+Note that, as with BlazeMeter case, is as simple as [getting the OctoPerf API key](https://doc.octoperf.com/account/profile/#apikey) and adding `.runIn(new OctoPerfEngine(...))` to any existing jmeter-java-dsl test to get it running at scale in OctoPerf.
+
+As with BlazeMeter case, with OctoPerf you can not only run the test at scale but also get additional features like the nice real time reporting, historic data tracking, etc. Here is an example of how a test looks like in OctoPerf:
+
+![OctoPerf Example Execution Dashboard](./images/octoperf.png)
+
+Check [OctoPerfEngine](../../jmeter-java-dsl-octoperf/src/main/java/us/abstracta/jmeter/javadsl/octoperf/OctoPerfEngine.java) for details on usage and available settings when running tests in OctoPerf.
+
+::: tip
+In case you want to get debug logs for HTTP calls to OctoPerf API, you can include following setting to an existing `log4j2.xml` configuration file:
+```xml
+<Logger name="us.abstracta.jmeter.javadsl.octoperf.OctoPerfClient" level="DEBUG"/>
+<Logger name="okhttp3" level="DEBUG"/>
+```
+:::
+
+::: warning
+If you use JSR223 Pre- or Post- processors with Java code (lambdas) instead of strings ([here](#change-sample-result-statuses-with-custom-logic) are some examples), or use one of the HTTP Sampler methods which receive a function as parameter (as in [here](#provide-request-parameters-programmatically-per-request)), then OctoPerf execution won't work. You can migrate them to use `jsrPreProcessor` with string scripts instead. Check associated methods documentation for more details.
+:::
+
+::: warning
+To avoid piling up virtual users and scenarios in OctoPerf project, OctoPerfEngine deletes any OctoPerfEngine previously created entities (virtual users and scenarios with `jmeter-java-dsl` tag) in the project. 
+
+**Is very important that you use different project names for different projects** to avoid interference (parallel execution of two jmeter-java-dsl projects).
+
+If you want to disable this automatic cleanup, you can use existing OctoPerfEngine method `.projectCleanUp(false)`.
+:::
+
+
 ### JMeter Remote Testing
 
 JMeter already provides means to run a test on several machines controlled by one master/client machine. This is refered as [Remote Testing](http://jmeter.apache.org/usermanual/remote-test.html).
@@ -283,7 +367,7 @@ To be able to run the test you require the `rmi_keystore.jks` file in working di
 :::
 
 ::: warning
-In general, prefer using BlazeMeter option which avoids all the setup and maintenance costs of the infrastructure required by JMeter remote testing, in addition to additional useful features (like reporting capabilities).
+In general, prefer using BlazeMeter or OctoPerf options which avoid all the setup and maintenance costs of the infrastructure required by JMeter remote testing, in addition to additional useful features (like reporting capabilities).
 :::
 
 Check [DistributedJmeterEngine](../../jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/engines/DistributedJmeterEngine.java) and [JMeter documentation](http://jmeter.apache.org/usermanual/remote-test.html) for proper setup and additional options.
@@ -549,7 +633,7 @@ DSL provides following methods to ease results and variables visualization and d
 :::
 
 ::: tip
-Remove such post processors when no longer needed (when debugging is finished). Leaving them would generate errors when loading generated JMX test plan or running test plan in BlazeMeter, in addition to unnecessary processing time and resource usage.  
+Remove such post processors when no longer needed (when debugging is finished). Leaving them would generate errors when loading generated JMX test plan or running test plan in BlazeMeter or OctoPerf, in addition to unnecessary processing time and resource usage.  
 :::
 
 ### Debug info during test plan execution
@@ -1116,7 +1200,7 @@ jsr223PostProcessor(s -> {
 ```
 
 ::: warning
-Using this last approach is currently only supported when using embedded JMeter engine (no support for saving to JMX and running it in JMeter GUI, or running it with BlazeMeter).
+Using this last approach is currently only supported when using embedded JMeter engine (no support for saving to JMX and running it in JMeter GUI, or running it with BlazeMeter or OctoPerf).
 :::
 
 Check [DslJsr223PostProcessor](../../jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/postprocessors/DslJsr223PostProcessor.java) for more details and additional options.
@@ -1286,7 +1370,7 @@ ifController(s -> s.vars.get("ACCOUNT_ID") != null,
 ```
 
 ::: warning
-Using java code (lambdas) will only work with embedded JMeter engine (no support for saving to JMX and running it in JMeter GUI, or running it with BlazeMeter). Use the first option to avoid such limitations.
+Using java code (lambdas) will only work with embedded JMeter engine (no support for saving to JMX and running it in JMeter GUI, or running it with BlazeMeter or OctoPerf). Use the first option to avoid such limitations.
 :::
 
 Check [DslIfController](../../jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/controllers/DslIfController.java) and [JMeter Component documentation](https://jmeter.apache.org/usermanual/component_reference.html#If_Controller) for more details.
@@ -1388,7 +1472,7 @@ whileController(s -> s.vars.get("ACCOUNT_ID") == null,
 ```
 
 ::: warning
-Using java code (lambdas) will only work with embedded JMeter engine (no support for saving to JMX and running it in JMeter GUI, or running it with BlazeMeter). Use the first option to avoid such limitations.
+Using java code (lambdas) will only work with embedded JMeter engine (no support for saving to JMX and running it in JMeter GUI, or running it with BlazeMeter or OctoPerf). Use the first option to avoid such limitations.
 :::
 
 ::: warning
@@ -1545,7 +1629,7 @@ post(s -> buildRequestBody(s.vars), Type.TEXT_PLAIN)
 ```
 
 ::: warning
-Using java code (lambdas) will only work with embedded JMeter engine (no support for saving to JMX and running it in JMeter GUI, or running it with BlazeMeter). Use the first option to avoid such limitations.
+Using java code (lambdas) will only work with embedded JMeter engine (no support for saving to JMX and running it in JMeter GUI, or running it with BlazeMeter or OctoPerf). Use the first option to avoid such limitations.
 :::
 
 Check [DslJsr223PreProcessor](../../jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/preprocessors/DslJsr223PreProcessor.java) & [DslHttpSampler](../../jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/http/DslHttpSampler.java) for more details and additional options.
@@ -2131,7 +2215,7 @@ testPlan(
 ```
 
 ::: tip
-You can also use lambda expressions for dynamically building HTTP Headers, but same limitations apply as in other cases (running in BlazeMeter or using generated JMX file).
+You can also use lambda expressions for dynamically building HTTP Headers, but same limitations apply as in other cases (running in BlazeMeter, OctoPerf or using generated JMX file).
 :::
 
 #### Multipart requests
@@ -2642,7 +2726,7 @@ jsr223Sampler(v -> {
 ```
 
 ::: warning
-Using java code (lambdas) will only work with embedded JMeter engine (no support for saving to JMX and running it in JMeter GUI, or running it with BlazeMeter). Use the first option to avoid such limitations.
+Using java code (lambdas) will only work with embedded JMeter engine (no support for saving to JMX and running it in JMeter GUI, or running it with BlazeMeter or OctoPerf). Use the first option to avoid such limitations.
 :::
 
 `jsr223Sampler` is very powerful, but also makes code and test plan harder to maintain (as with any custom code) compared to using JMeter built-in samplers. So, in general, prefer using JMeter provided samplers if they are enough for the task at hand, and use `jsr223Sampler` sparingly.
@@ -2798,7 +2882,7 @@ If you use JSR223 Pre- or Post- processors with Java code (lambdas) instead of s
 
 ### Run JMX file
 
-jmeter-java-dsl also provides means to easily run a test plan from a JMX file either locally or in BlazeMeter (through [previously mentioned jmeter-java-dsl-blazemeter module](#run-test-at-scale-in-blazemeter)). Here is an example:
+jmeter-java-dsl also provides means to easily run a test plan from a JMX file either locally, in BlazeMeter (through [previously mentioned jmeter-java-dsl-blazemeter module](#blazemeter)) or OctoPerf (through [jmeter-java-dsl-octoperf module](#octoperf)). Here is an example:
 
 ```java
 import static org.assertj.core.api.Assertions.assertThat;

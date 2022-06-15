@@ -8,7 +8,6 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 import java.util.concurrent.TimeoutException;
-import org.apache.jmeter.samplers.SampleResult;
 import org.apache.jorphan.collections.HashTree;
 import org.apache.jorphan.collections.ListedHashTree;
 import org.slf4j.Logger;
@@ -24,11 +23,7 @@ import us.abstracta.jmeter.javadsl.blazemeter.api.TestRunSummaryStats.TestRunLab
 import us.abstracta.jmeter.javadsl.core.BuildTreeContext;
 import us.abstracta.jmeter.javadsl.core.DslJmeterEngine;
 import us.abstracta.jmeter.javadsl.core.DslTestPlan;
-import us.abstracta.jmeter.javadsl.core.TestPlanStats;
 import us.abstracta.jmeter.javadsl.core.engines.JmeterEnvironment;
-import us.abstracta.jmeter.javadsl.core.stats.CountMetricSummary;
-import us.abstracta.jmeter.javadsl.core.stats.StatsSummary;
-import us.abstracta.jmeter.javadsl.core.stats.TimeMetricSummary;
 
 /**
  * A {@link DslJmeterEngine} which allows running DslTestPlan in BlazeMeter.
@@ -58,7 +53,8 @@ public class BlazeMeterEngine implements DslJmeterEngine {
    *                  <p>
    *                  It follows the following format: &lt;Key ID&gt;:&lt;Key Secret&gt;.
    *                  <p>
-   *                  Check <a href="https://guide.blazemeter.com/hc/en-us/articles/115002213289-BlazeMeter-API-keys-">BlazeMeter
+   *                  Check <a
+   *                  href="https://guide.blazemeter.com/hc/en-us/articles/115002213289-BlazeMeter-API-keys-">BlazeMeter
    *                  API keys</a> for instructions on how to generate them.
    */
   public BlazeMeterEngine(String authToken) {
@@ -68,10 +64,10 @@ public class BlazeMeterEngine implements DslJmeterEngine {
   /**
    * Sets the name of the BlazeMeter test to use.
    * <p>
-   * BlazeMeterEngine will search for a test with the given name in the given project (Check {@link
-   * #projectId(long)}) and if one exists, it will update it and use it to run the provided test
-   * plan. If a test with the given name does not exist, then it will create a new one to run the
-   * given test plan.
+   * BlazeMeterEngine will search for a test with the given name in the given project (Check
+   * {@link #projectId(long)}) and if one exists, it will update it and use it to run the provided
+   * test plan. If a test with the given name does not exist, then it will create a new one to run
+   * the given test plan.
    * <p>
    * When not specified, the test name defaults to "jmeter-java-dsl".
    *
@@ -249,7 +245,8 @@ public class BlazeMeterEngine implements DslJmeterEngine {
    * different load in BlazeMeter engines. This in turns ends up defining different limit of number
    * of virtual users per engine that a test run requires to properly measure the performance of the
    * system under test. This process is usually referred as "calibration" and you can read more
-   * about it <a href="https://guide.blazemeter.com/hc/en-us/articles/360001456978-Calibrating-a-JMeter-Test">here</a>.
+   * about it <a
+   * href="https://guide.blazemeter.com/hc/en-us/articles/360001456978-Calibrating-a-JMeter-Test">here</a>.
    * <p>
    * When not specified, the value of the last test run will be used, or the default one for your
    * BlazeMeter billing plan if no previous test run exists.
@@ -397,179 +394,10 @@ public class BlazeMeterEngine implements DslJmeterEngine {
     }
   }
 
-  private BlazeMeterTestPlanStats findTestPlanStats(TestRun testRun)
-      throws IOException {
-    TestRunLabeledSummary summary = client
-        .findTestRunSummaryStats(testRun).getSummary().get(0);
-    List<TestRunRequestStats> labeledStats = client
-        .findTestRunRequestStats(testRun);
-    return buildTestStats(summary, labeledStats);
-  }
-
-  private BlazeMeterTestPlanStats buildTestStats(TestRunLabeledSummary summary,
-      List<TestRunRequestStats> labeledStats) {
-    BlazeMeterTestPlanStats stats = new BlazeMeterTestPlanStats();
-    for (TestRunRequestStats labeledStat : labeledStats) {
-      BlazemeterStatsSummary labelStatsSummary = new BlazemeterStatsSummary(labeledStat, summary);
-      if ("ALL".equals(labeledStat.getLabelName())) {
-        stats.setOverallStats(labelStatsSummary);
-        stats.setStart(labelStatsSummary.firstTime);
-        stats.setEnd(labelStatsSummary.endTime);
-      } else {
-        stats.setLabeledStats(labeledStat.getLabelName(), labelStatsSummary);
-      }
-    }
-
-    return stats;
-  }
-
-  public static class BlazeMeterTestPlanStats extends TestPlanStats {
-
-    public BlazeMeterTestPlanStats() {
-      super(() -> null);
-    }
-
-    public void setLabeledStats(String label, StatsSummary stats) {
-      labeledStats.put(label, stats);
-    }
-
-    public void setOverallStats(StatsSummary stats) {
-      overallStats = stats;
-    }
-
-  }
-
-  public static class BlazemeterStatsSummary implements StatsSummary {
-
-    private final Instant firstTime;
-    private final Instant endTime;
-    private final CountMetricSummary samples = new CountMetricSummary();
-    private final CountMetricSummary errors = new CountMetricSummary();
-    private final CountMetricSummary receivedBytes = new CountMetricSummary();
-    private final BlazeMeterTimeMetricSummary sampleTime;
-
-    private BlazemeterStatsSummary(TestRunRequestStats labeledStat,
-        TestRunLabeledSummary summary) {
-      /*
-       These two values are approximations, since BZ api does not provide such information per label
-       and calculating it from result logs would incur in significant additional time and resources
-       usage.
-       */
-      firstTime = summary.getFirst();
-      endTime = summary.getLast();
-      long elapsedTimeMillis = labeledStat.getDuration();
-      samples.increment(labeledStat.getSamples(), elapsedTimeMillis);
-      errors.increment(labeledStat.getErrorsCount(), elapsedTimeMillis);
-      sampleTime = new BlazeMeterTimeMetricSummary(labeledStat.getMinResponseTime(),
-          labeledStat.getMaxResponseTime(), labeledStat.getAvgResponseTime(),
-          labeledStat.getMedianResponseTime(), labeledStat.getPerc90(), labeledStat.getPerc95(),
-          labeledStat.getPerc99());
-      // Similar comment as with firstTime and endTime: this is just an approximation.
-      receivedBytes.increment(Math.round(labeledStat.getAvgBytes() / 1000 * elapsedTimeMillis),
-          elapsedTimeMillis);
-    }
-
-    @Override
-    public void add(SampleResult result) {
-    }
-
-    @Override
-    public Instant firstTime() {
-      return firstTime;
-    }
-
-    @Override
-    public Instant endTime() {
-      return endTime;
-    }
-
-    @Override
-    public CountMetricSummary samples() {
-      return samples;
-    }
-
-    @Override
-    public CountMetricSummary errors() {
-      return errors;
-    }
-
-    public BlazeMeterTimeMetricSummary sampleTime() {
-      return sampleTime;
-    }
-
-    @Override
-    public CountMetricSummary receivedBytes() {
-      return receivedBytes;
-    }
-
-    @Override
-    public CountMetricSummary sentBytes() {
-      throw new UnsupportedOperationException(
-          "BlazeMeter API does not provide an efficient way to get this value.");
-    }
-
-  }
-
-  public static class BlazeMeterTimeMetricSummary implements TimeMetricSummary {
-
-    private final Duration min;
-    private final Duration max;
-    private final Duration mean;
-    private final Duration median;
-    private final Duration percentile90;
-    private final Duration percentile95;
-    private final Duration percentile99;
-
-    private BlazeMeterTimeMetricSummary(long min, long max, double mean, double median,
-        double percentile90, double percentile95, double percentile99) {
-      this.min = Duration.ofMillis(min);
-      this.max = Duration.ofMillis(max);
-      this.mean = double2Duration(mean);
-      this.median = double2Duration(median);
-      this.percentile90 = double2Duration(percentile90);
-      this.percentile95 = double2Duration(percentile95);
-      this.percentile99 = double2Duration(percentile99);
-    }
-
-    private Duration double2Duration(double millis) {
-      return Duration.ofMillis(Math.round(millis));
-    }
-
-    @Override
-    public Duration min() {
-      return min;
-    }
-
-    @Override
-    public Duration max() {
-      return max;
-    }
-
-    @Override
-    public Duration mean() {
-      return mean;
-    }
-
-    @Override
-    public Duration median() {
-      return median;
-    }
-
-    @Override
-    public Duration perc90() {
-      return percentile90;
-    }
-
-    @Override
-    public Duration perc95() {
-      return percentile95;
-    }
-
-    @Override
-    public Duration perc99() {
-      return percentile99;
-    }
-
+  private BlazeMeterTestPlanStats findTestPlanStats(TestRun testRun) throws IOException {
+    TestRunLabeledSummary summary = client.findTestRunSummaryStats(testRun).getSummary().get(0);
+    List<TestRunRequestStats> labeledStats = client.findTestRunRequestStats(testRun);
+    return new BlazeMeterTestPlanStats(summary, labeledStats);
   }
 
 }

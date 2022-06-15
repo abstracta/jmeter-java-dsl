@@ -26,6 +26,7 @@ jobs:
         run: mvn --batch-mode --no-transfer-progress clean install --settings .github/settings.xml
         env:
           BZ_TOKEN: ${{ secrets.BZ_TOKEN }}
+          OCTOPERF_API_KEY: ${{ secrets.OCTOPERF_API_KEY }}
       - name: Upload jmeter-java-dsl.jar to release
         uses: svenstaro/upload-release-action@v2
         with:

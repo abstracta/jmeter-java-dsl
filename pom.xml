@@ -64,6 +64,7 @@
     <module>jmeter-java-dsl-wrapper</module>
     <module>jmeter-java-dsl-jmx2dsl</module>
     <module>jmeter-java-dsl-graphql</module>
+    <module>jmeter-java-dsl-octoperf</module>
   </modules>
 
   <dependencyManagement>

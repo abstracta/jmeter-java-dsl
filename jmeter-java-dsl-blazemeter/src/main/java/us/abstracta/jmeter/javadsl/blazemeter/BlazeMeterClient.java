@@ -16,6 +16,7 @@ import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
+import okhttp3.ResponseBody;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import retrofit2.Call;
@@ -146,9 +147,12 @@ public class BlazeMeterClient {
   private <T> T execApiCall(Call<ApiResponse<T>> call) throws IOException {
     Response<ApiResponse<T>> response = call.execute();
     if (!response.isSuccessful()) {
-      throw new BlazeMeterException(response.code(), response.errorBody().string());
+      try (ResponseBody errorBody = response.errorBody()) {
+        throw new BlazeMeterException(response.code(), errorBody.string());
+      }
     }
     return response.body().getResult();
+
   }
 
   public Optional<Test> findTestByName(String testName, Project project) throws IOException {
