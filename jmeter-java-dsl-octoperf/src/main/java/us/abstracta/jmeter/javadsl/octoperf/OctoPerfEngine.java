@@ -3,10 +3,10 @@ package us.abstracta.jmeter.javadsl.octoperf;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.file.Files;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -23,11 +23,17 @@ import us.abstracta.jmeter.javadsl.core.DslTestPlan;
 import us.abstracta.jmeter.javadsl.core.TestPlanStats;
 import us.abstracta.jmeter.javadsl.core.engines.JmeterEnvironment;
 import us.abstracta.jmeter.javadsl.octoperf.api.BenchReport;
+import us.abstracta.jmeter.javadsl.octoperf.api.BenchReport.BenchReportItem;
+import us.abstracta.jmeter.javadsl.octoperf.api.BenchReport.ReportItemMetric;
+import us.abstracta.jmeter.javadsl.octoperf.api.BenchReport.ReportMetricId;
+import us.abstracta.jmeter.javadsl.octoperf.api.BenchReport.StatisticTableReportItem;
+import us.abstracta.jmeter.javadsl.octoperf.api.BenchReport.SummaryReportItem;
 import us.abstracta.jmeter.javadsl.octoperf.api.BenchResult;
 import us.abstracta.jmeter.javadsl.octoperf.api.BenchResult.State;
 import us.abstracta.jmeter.javadsl.octoperf.api.Project;
 import us.abstracta.jmeter.javadsl.octoperf.api.Provider;
 import us.abstracta.jmeter.javadsl.octoperf.api.Scenario;
+import us.abstracta.jmeter.javadsl.octoperf.api.TableEntry;
 import us.abstracta.jmeter.javadsl.octoperf.api.User;
 import us.abstracta.jmeter.javadsl.octoperf.api.UserLoad;
 import us.abstracta.jmeter.javadsl.octoperf.api.UserLoad.UserLoadRampUp;
@@ -45,6 +51,7 @@ public class OctoPerfEngine implements DslJmeterEngine {
   private static final String TAG = "jmeter-java-dsl";
   private static final Set<String> TAGS = Collections.singleton(TAG);
   private static final Duration STATUS_POLL_PERIOD = Duration.ofSeconds(5);
+  private static final Duration STATISTICS_POLL_PERIOD = Duration.ofSeconds(30);
 
   private final String apiKey;
   private String projectName = "jmeter-java-dsl";
@@ -195,8 +202,9 @@ public class OctoPerfEngine implements DslJmeterEngine {
       Scenario scenario = buildScenario(user, project, vus, client);
       BenchReport report = client.runScenario(scenario);
       LOG.info("Running scenario in {}", report.getUrl());
-      BenchResult result = awaitTestEnd(report, client);
-      return findTestPlanStats(result, client);
+      Instant testStart = Instant.now();
+      BenchResult result = awaitTestEnd(report, testStart, client);
+      return findTestPlanStats(report, testStart, vus, result, client);
     } finally {
       jmxFile.delete();
     }
@@ -278,12 +286,11 @@ public class OctoPerfEngine implements DslJmeterEngine {
     return ret;
   }
 
-  private BenchResult awaitTestEnd(BenchReport report, OctoPerfClient client)
+  private BenchResult awaitTestEnd(BenchReport report, Instant testStart, OctoPerfClient client)
       throws InterruptedException, IOException, TimeoutException {
     String resultId = report.getBenchResultIds().get(0);
     BenchResult result;
     State status = State.CREATED;
-    Instant testStart = Instant.now();
     do {
       Thread.sleep(STATUS_POLL_PERIOD.toMillis());
       result = client.findBenchResult(resultId);
@@ -316,23 +323,61 @@ public class OctoPerfEngine implements DslJmeterEngine {
         report.getUrl(), testTimeout));
   }
 
-  private TestPlanStats findTestPlanStats(BenchResult result, OctoPerfClient client)
-      throws IOException {
+  private TestPlanStats findTestPlanStats(BenchReport report, Instant testStart,
+      List<VirtualUser> vus, BenchResult result, OctoPerfClient client)
+      throws IOException, TimeoutException, InterruptedException {
+    List<ReportMetricId> metrics = Arrays.asList(ReportMetricId.HITS_TOTAL,
+        ReportMetricId.HITS_RATE, ReportMetricId.ERRORS_TOTAL, ReportMetricId.ERRORS_RATE,
+        ReportMetricId.RESPONSE_TIME_AVG, ReportMetricId.RESPONSE_TIME_MIN,
+        ReportMetricId.RESPONSE_TIME_MAX, ReportMetricId.RESPONSE_TIME_MEDIAN,
+        ReportMetricId.RESPONSE_TIME_PERCENTILE_90, ReportMetricId.RESPONSE_TIME_PERCENTILE_95,
+        ReportMetricId.RESPONSE_TIME_PERCENTILE_99, ReportMetricId.THROUGHPUT_TOTAL,
+        ReportMetricId.THROUGHPUT_RATE, ReportMetricId.SENT_BYTES_TOTAL,
+        ReportMetricId.SENT_BYTES_RATE);
+    SummaryReportItem summaryReport = findReportItemWithType(SummaryReportItem.class,
+        report.getItems());
+    setReportMetrics(summaryReport, metrics);
+    double[] summaryStats = client.findSummaryStats(summaryReport);
+    double[] prevStats;
     /*
-     since OctoPerf statistics may not be complete when test execution ends, and there is no way to
-     detect when they are complete, we download JTL files and calculate stats from them.
+     since OctoPerf statistics are processed asynchronously, they may not be yet fully updated
+     when tests result is marked as finished and since there is no indicator either when statistics
+     are completely updated, we poll until we don't see further changes in statistics which is an
+     indicator that statistics are highly probably complete. Explored alternatives included using
+     jtl files and jmeter logs, but there is a limit of 1GB disk space in OctoPerf load generators
+     and jtl and jmeter logs may as well be incomplete, with the additional performance penalty of
+     handling such files.
      */
-    Set<String> files = client.findBenchResultFiles(result);
-    OctoPerfTestPlanStats ret = new OctoPerfTestPlanStats(result);
-    for (String file : files) {
-      if (file.endsWith(".jtl.gz")) {
-        LOG.debug("Downloading {}", file);
-        try (InputStream jtFileContents = client.downloadFile(result, file)) {
-          ret.loadJtlFile(jtFileContents);
-        }
-      }
+    do {
+      Thread.sleep(STATISTICS_POLL_PERIOD.toMillis());
+      prevStats = summaryStats;
+      summaryStats = client.findSummaryStats(summaryReport);
+    } while (!Arrays.equals(summaryStats, prevStats) && !hasTimedOut(testStart, testTimeout));
+    if (hasTimedOut(testStart, testTimeout)) {
+      throw buildTestTimeoutException(report);
     }
-    return ret;
+    StatisticTableReportItem tableReport = findReportItemWithType(StatisticTableReportItem.class,
+        report.getItems());
+    setReportMetrics(tableReport, metrics);
+    List<TableEntry> tableStats = client.findTableStats(tableReport);
+    return new OctoPerfTestPlanStats(summaryStats, tableStats, vus, result);
+  }
+
+  private static <T extends BenchReportItem> T findReportItemWithType(Class<T> reportItemClass,
+      List<BenchReportItem> items) {
+    return items.stream()
+        .filter(reportItemClass::isInstance)
+        .map(reportItemClass::cast)
+        .findAny()
+        .get();
+  }
+
+  private static void setReportMetrics(BenchReportItem summaryReport,
+      List<ReportMetricId> metricIds) {
+    List<ReportItemMetric> metrics = summaryReport.getMetrics();
+    String benchResultId = metrics.get(0).getBenchResultId();
+    metrics.clear();
+    metricIds.forEach(m -> metrics.add(new ReportItemMetric(m, benchResultId)));
   }
 
 }

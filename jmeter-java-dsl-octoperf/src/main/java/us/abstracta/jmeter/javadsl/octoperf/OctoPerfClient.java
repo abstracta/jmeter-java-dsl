@@ -7,15 +7,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import devcsrj.okhttp3.logging.HttpLoggingInterceptor;
-import java.io.BufferedInputStream;
 import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
-import java.util.zip.GZIPInputStream;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
@@ -38,10 +34,13 @@ import retrofit2.http.Part;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
 import us.abstracta.jmeter.javadsl.octoperf.api.BenchReport;
+import us.abstracta.jmeter.javadsl.octoperf.api.BenchReport.StatisticTableReportItem;
+import us.abstracta.jmeter.javadsl.octoperf.api.BenchReport.SummaryReportItem;
 import us.abstracta.jmeter.javadsl.octoperf.api.BenchResult;
 import us.abstracta.jmeter.javadsl.octoperf.api.Project;
 import us.abstracta.jmeter.javadsl.octoperf.api.Provider;
 import us.abstracta.jmeter.javadsl.octoperf.api.Scenario;
+import us.abstracta.jmeter.javadsl.octoperf.api.TableEntry;
 import us.abstracta.jmeter.javadsl.octoperf.api.User;
 import us.abstracta.jmeter.javadsl.octoperf.api.VirtualUser;
 import us.abstracta.jmeter.javadsl.octoperf.api.Workspace;
@@ -140,12 +139,11 @@ public class OctoPerfClient implements Closeable {
     @GET("runtime/bench-results/{benchResultId}")
     Call<BenchResult> findBenchResult(@Path("benchResultId") String benchResultId);
 
-    @GET("analysis/logs/list/{benchResultId}")
-    Call<Set<String>> findBenchResultFiles(@Path("benchResultId") String benchResultId);
+    @POST("analysis/metrics/summary")
+    Call<double[]> findSummaryStats(@Body SummaryReportItem report);
 
-    @GET("/analysis/logs/{benchResultId}")
-    Call<ResponseBody> findFile(@Path("benchResultId") String benchResultId,
-        @Query("filename") String file);
+    @POST("analysis/metrics/table")
+    Call<List<TableEntry>> findTableStats(@Body StatisticTableReportItem report);
 
   }
 
@@ -239,13 +237,12 @@ public class OctoPerfClient implements Closeable {
     return execApiCall(api.findBenchResult(resultId));
   }
 
-  public Set<String> findBenchResultFiles(BenchResult result) throws IOException {
-    return execApiCall(api.findBenchResultFiles(result.getId()));
+  public double[] findSummaryStats(SummaryReportItem summaryReport) throws IOException {
+    return execApiCall(api.findSummaryStats(summaryReport));
   }
 
-  public InputStream downloadFile(BenchResult result, String file) throws IOException {
-    ResponseBody body = execApiCall(api.findFile(result.getId(), file));
-    return new GZIPInputStream(new BufferedInputStream(body.byteStream()));
+  public List<TableEntry> findTableStats(StatisticTableReportItem tableReport) throws IOException {
+    return execApiCall(api.findTableStats(tableReport));
   }
 
 }

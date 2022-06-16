@@ -6,7 +6,6 @@ import static com.fasterxml.jackson.annotation.JsonTypeInfo.Id.NAME;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -143,8 +142,7 @@ public class UserLoad {
   public static class JtlSettings {
 
     private final String type = "ALL";
-    private final List<String> settings = Arrays.asList("ELAPSED_TIME", "IS_SUCCESS",
-        "SENT_BYTES_COUNT", "LABEL", "TIMESTAMP", "RECEIVED_BYTES_COUNT");
+    private final List<String> settings = Collections.emptyList();
 
   }
 

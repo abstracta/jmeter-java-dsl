@@ -11,6 +11,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import java.time.Instant;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @JsonTypeInfo(use = NAME, include = PROPERTY)
 public class VirtualUser {
@@ -51,6 +52,13 @@ public class VirtualUser {
     return id;
   }
 
+  @JsonIgnore
+  public List<Action> getChildren() {
+    return children.stream()
+        .map(n -> new Action(n.get("id").textValue(), n.get("name").textValue()))
+        .collect(Collectors.toList());
+  }
+
   public Set<String> getTags() {
     return tags;
   }
@@ -62,6 +70,26 @@ public class VirtualUser {
   @JsonIgnore
   public String getUrl() {
     return url;
+  }
+
+  public static class Action {
+
+    private final String id;
+    private final String name;
+
+    public Action(String id, String name) {
+      this.id = id;
+      this.name = name;
+    }
+
+    public String getId() {
+      return id;
+    }
+
+    public String getName() {
+      return name;
+    }
+
   }
 
 }

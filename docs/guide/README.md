@@ -307,6 +307,14 @@ As with BlazeMeter case, with OctoPerf you can not only run the test at scale bu
 
 Check [OctoPerfEngine](../../jmeter-java-dsl-octoperf/src/main/java/us/abstracta/jmeter/javadsl/octoperf/OctoPerfEngine.java) for details on usage and available settings when running tests in OctoPerf.
 
+::: warning
+To avoid piling up virtual users and scenarios in OctoPerf project, OctoPerfEngine deletes any OctoPerfEngine previously created entities (virtual users and scenarios with `jmeter-java-dsl` tag) in the project.
+
+**Is very important that you use different project names for different projects** to avoid interference (parallel execution of two jmeter-java-dsl projects).
+
+If you want to disable this automatic cleanup, you can use existing OctoPerfEngine method `.projectCleanUp(false)`.
+:::
+
 ::: tip
 In case you want to get debug logs for HTTP calls to OctoPerf API, you can include following setting to an existing `log4j2.xml` configuration file:
 ```xml
@@ -318,15 +326,6 @@ In case you want to get debug logs for HTTP calls to OctoPerf API, you can inclu
 ::: warning
 If you use JSR223 Pre- or Post- processors with Java code (lambdas) instead of strings ([here](#change-sample-result-statuses-with-custom-logic) are some examples), or use one of the HTTP Sampler methods which receive a function as parameter (as in [here](#provide-request-parameters-programmatically-per-request)), then OctoPerf execution won't work. You can migrate them to use `jsrPreProcessor` with string scripts instead. Check associated methods documentation for more details.
 :::
-
-::: warning
-To avoid piling up virtual users and scenarios in OctoPerf project, OctoPerfEngine deletes any OctoPerfEngine previously created entities (virtual users and scenarios with `jmeter-java-dsl` tag) in the project. 
-
-**Is very important that you use different project names for different projects** to avoid interference (parallel execution of two jmeter-java-dsl projects).
-
-If you want to disable this automatic cleanup, you can use existing OctoPerfEngine method `.projectCleanUp(false)`.
-:::
-
 
 ### JMeter Remote Testing
 
