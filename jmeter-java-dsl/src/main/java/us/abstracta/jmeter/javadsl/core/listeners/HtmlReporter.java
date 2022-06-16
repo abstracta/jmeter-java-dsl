@@ -7,9 +7,11 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Duration;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.apache.jmeter.JMeter;
 import org.apache.jmeter.report.config.ConfigurationException;
+import org.apache.jmeter.report.config.ReportGeneratorConfiguration;
 import org.apache.jmeter.report.dashboard.GenerationException;
 import org.apache.jmeter.report.dashboard.ReportGenerator;
 import org.apache.jmeter.reporters.ResultCollector;
@@ -27,6 +29,8 @@ import org.apache.jmeter.visualizers.SimpleDataWriter;
 public class HtmlReporter extends BaseListener {
 
   private final File reportDirectory;
+  private long apdexSatisfied = 0;
+  private long apdexTolerated = 0;
 
   public HtmlReporter(String reportPath) throws IOException {
     super("Simple Data Writer", SimpleDataWriter.class);
@@ -55,6 +59,17 @@ public class HtmlReporter extends BaseListener {
     HtmlReportSummariser reporter = new HtmlReportSummariser(resultsFile);
     ResultCollector logger = new AutoFlushingResultCollector(reporter);
     logger.setFilename(resultsFile.getPath());
+
+    if (apdexSatisfied != 0 && apdexTolerated != 0) {
+      JMeterUtils.setProperty(
+          ReportGeneratorConfiguration.REPORT_GENERATOR_KEY_PREFIX + ".apdex_satisfied_threshold",
+          "" + (this.apdexSatisfied)
+      );
+      JMeterUtils.setProperty(
+          ReportGeneratorConfiguration.REPORT_GENERATOR_KEY_PREFIX + ".apdex_tolerated_threshold",
+          "" + (this.apdexTolerated)
+      );
+    }
     return logger;
   }
 
@@ -115,4 +130,20 @@ public class HtmlReporter extends BaseListener {
 
   }
 
+  /**
+   * Allows to configure APDEX for all requests in test.
+   *
+   * @param satisfied - "satisfied" threshold
+   * @param tolerated - "tolerated" threshold
+   * @return HtmlReporter
+   *
+   * @since 0.57
+   */
+  public HtmlReporter apdex(Duration satisfied, Duration tolerated) {
+
+    this.apdexSatisfied = satisfied.getSeconds() * 1000;
+    this.apdexTolerated = tolerated.getSeconds() * 1000;
+
+    return this;
+  }
 }
