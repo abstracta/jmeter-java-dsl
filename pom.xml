@@ -51,7 +51,7 @@
     <testcontainers.version>1.17.1</testcontainers.version>
     <wiremock.version>2.33.1</wiremock.version>
     <junit.version>5.8.2</junit.version>
-    <jackson.version>2.12.6</jackson.version>
+    <jackson.version>2.13.3</jackson.version>
   </properties>
 
   <modules>
