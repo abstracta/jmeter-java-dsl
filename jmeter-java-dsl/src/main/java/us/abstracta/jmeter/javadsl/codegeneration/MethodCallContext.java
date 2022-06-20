@@ -155,14 +155,16 @@ public class MethodCallContext {
           .map(b -> b.buildMethodCall(this))
           .findAny()
           .orElseGet(() -> {
-            LOG.warn("No builder found for {}. " + UNSUPPORTED_USAGE_WARNING, testElement);
+            LOG.warn("No builder found for {}({}). " + UNSUPPORTED_USAGE_WARNING,
+                testElement.getClass(), testElement.getName());
             return MethodCall.buildUnsupported();
           });
       addChildrenTo(ret);
       endListeners.forEach(l -> l.execute(this, ret));
       return ret;
     } catch (UnsupportedOperationException e) {
-      LOG.warn("Could not build code for {}. " + UNSUPPORTED_USAGE_WARNING, testElement, e);
+      LOG.warn("Could not build code for {}({}). " + UNSUPPORTED_USAGE_WARNING,
+          testElement.getClass(), testElement.getName(), e);
       return MethodCall.buildUnsupported();
     }
   }
