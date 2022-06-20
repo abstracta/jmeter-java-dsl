@@ -96,7 +96,6 @@
                   <exclude>org.checkerframework:checker-qual</exclude>
                   <exclude>org.jsoup:jsoup</exclude>
                   <exclude>com.helger:*</exclude>
-                  <exclude>dnsjava:dnsjava</exclude>
                   <exclude>org.brotli:dec</exclude>
                   <exclude>com.miglayout:*</exclude>
                   <exclude>org.apache.tika:*</exclude>
