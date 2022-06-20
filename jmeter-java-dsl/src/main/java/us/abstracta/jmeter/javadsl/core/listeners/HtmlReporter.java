@@ -8,7 +8,10 @@ import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 import org.apache.jmeter.JMeter;
 import org.apache.jmeter.report.config.ConfigurationException;
 import org.apache.jmeter.report.config.ReportGeneratorConfiguration;
@@ -29,8 +32,8 @@ import org.apache.jmeter.visualizers.SimpleDataWriter;
 public class HtmlReporter extends BaseListener {
 
   private final File reportDirectory;
-  private long apdexSatisfied = 0;
-  private long apdexTolerated = 0;
+  private final ApdexThresholds apdexThresholds = new ApdexThresholds();
+  private final Map<String, ApdexThresholds> labelApdexThresholds = new HashMap<>();
 
   public HtmlReporter(String reportPath) throws IOException {
     super("Simple Data Writer", SimpleDataWriter.class);
@@ -50,36 +53,47 @@ public class HtmlReporter extends BaseListener {
     }
   }
 
+  private static class ApdexThresholds {
+
+    private Duration satisfied;
+    private Duration tolerated;
+
+    private ApdexThresholds() {
+    }
+
+    private ApdexThresholds(Duration satisfied, Duration tolerated) {
+      this.satisfied = satisfied;
+      this.tolerated = tolerated;
+    }
+
+  }
+
   @Override
   public TestElement buildTestElement() {
     if (!reportDirectory.exists()) {
       reportDirectory.mkdirs();
     }
     File resultsFile = new File(reportDirectory, "report.jtl");
-    HtmlReportSummariser reporter = new HtmlReportSummariser(resultsFile);
+    HtmlReportSummariser reporter = new HtmlReportSummariser(resultsFile, apdexThresholds,
+        labelApdexThresholds);
     ResultCollector logger = new AutoFlushingResultCollector(reporter);
     logger.setFilename(resultsFile.getPath());
 
-    if (apdexSatisfied != 0 && apdexTolerated != 0) {
-      JMeterUtils.setProperty(
-          ReportGeneratorConfiguration.REPORT_GENERATOR_KEY_PREFIX + ".apdex_satisfied_threshold",
-          "" + (this.apdexSatisfied)
-      );
-      JMeterUtils.setProperty(
-          ReportGeneratorConfiguration.REPORT_GENERATOR_KEY_PREFIX + ".apdex_tolerated_threshold",
-          "" + (this.apdexTolerated)
-      );
-    }
     return logger;
   }
 
   private static class HtmlReportSummariser extends Summariser {
 
     private final File resultsFile;
+    private final ApdexThresholds apdexThresholds;
+    private final Map<String, ApdexThresholds> labelApdexThresholds;
     private final AtomicInteger hostsCount = new AtomicInteger(0);
 
-    private HtmlReportSummariser(File resultsFile) {
+    private HtmlReportSummariser(File resultsFile, ApdexThresholds apdexThresholds,
+        Map<String, ApdexThresholds> labelApdexThresholds) {
       this.resultsFile = resultsFile;
+      this.apdexThresholds = apdexThresholds;
+      this.labelApdexThresholds = labelApdexThresholds;
     }
 
     @Override
@@ -98,12 +112,32 @@ public class HtmlReporter extends BaseListener {
       // verify that all remote hosts have ended before generating report
       if (hostsCount.decrementAndGet() <= 0) {
         try {
+          configureApdexThresholds();
           JMeterUtils.setProperty(JMeter.JMETER_REPORT_OUTPUT_DIR_PROPERTY,
               new File(resultsFile.getParent()).getAbsolutePath());
           new ReportGenerator(resultsFile.getPath(), null).generate();
         } catch (GenerationException | ConfigurationException e) {
           throw new RuntimeException(e);
         }
+      }
+    }
+
+    private void configureApdexThresholds() {
+      if (apdexThresholds.satisfied != null) {
+        JMeterUtils.setProperty(ReportGeneratorConfiguration.REPORT_GENERATOR_KEY_PREFIX
+            + ".apdex_satisfied_threshold", "" + apdexThresholds.satisfied.toMillis());
+      }
+      if (apdexThresholds.tolerated != null) {
+        JMeterUtils.setProperty(ReportGeneratorConfiguration.REPORT_GENERATOR_KEY_PREFIX
+            + ".apdex_tolerated_threshold", "" + apdexThresholds.tolerated.toMillis());
+      }
+      String transactionsApdex = labelApdexThresholds.entrySet().stream()
+          .map(e -> e.getKey() + ":" + e.getValue().satisfied.toMillis() + "|"
+              + e.getValue().tolerated.toMillis())
+          .collect(Collectors.joining(";"));
+      if (!transactionsApdex.isEmpty()) {
+        JMeterUtils.setProperty(ReportGeneratorConfiguration.REPORT_GENERATOR_KEY_PREFIX
+            + ".apdex_per_transaction", "" + transactionsApdex);
       }
     }
 
@@ -131,19 +165,46 @@ public class HtmlReporter extends BaseListener {
   }
 
   /**
-   * Allows to configure APDEX for all requests in test.
+   * Allows to configure general Apdex thresholds for all requests.
+   * <p>
+   * Apdex allows to evaluate user satisfaction according to response times. You may find more about
+   * this <a href="https://en.wikipedia.org/wiki/Apdex">here</a>.
    *
-   * @param satisfied - "satisfied" threshold
-   * @param tolerated - "tolerated" threshold
-   * @return HtmlReporter
-   *
-   * @since 0.57
+   * @param satisfiedThreshold specifies the satisfaction threshold. When not specified this value
+   *                           defaults to 1500.
+   * @param toleratedThreshold specifies the tolerance threshold. When not specified this value
+   *                           defaults to 3000.
+   * @return the HtmlReporter for further configuration and usage.
+   * @since 0.59
    */
-  public HtmlReporter apdex(Duration satisfied, Duration tolerated) {
-
-    this.apdexSatisfied = satisfied.getSeconds() * 1000;
-    this.apdexTolerated = tolerated.getSeconds() * 1000;
-
+  public HtmlReporter apdexThresholds(Duration satisfiedThreshold, Duration toleratedThreshold) {
+    this.apdexThresholds.satisfied = satisfiedThreshold;
+    this.apdexThresholds.tolerated = toleratedThreshold;
     return this;
   }
+
+  /**
+   * Allows to configure a particular sample label Apdex thresholds.
+   * <p>
+   * You can use it to control the apdex thresholds for a set of samplers or transactions that share
+   * same label.
+   *
+   * @param sampleLabelRegex   regular expression used to match sample labels to apply the
+   *                           thresholds to.
+   * @param satisfiedThreshold specifies the satisfaction threshold. When not specified, the general
+   *                           apdex thresholds for all requests are applied.
+   * @param toleratedThreshold specifies the tolerance threshold. When not specified, the general
+   *                           apdex thresholds for all requests are applied.
+   * @return the HtmlReporter for further configuration and usage.
+   * @see #apdexThresholds(Duration, Duration)
+   * @since 0.59
+   */
+  public HtmlReporter transactionApdexThresholds(String sampleLabelRegex,
+      Duration satisfiedThreshold,
+      Duration toleratedThreshold) {
+    this.labelApdexThresholds.put(sampleLabelRegex,
+        new ApdexThresholds(satisfiedThreshold, toleratedThreshold));
+    return this;
+  }
+
 }
