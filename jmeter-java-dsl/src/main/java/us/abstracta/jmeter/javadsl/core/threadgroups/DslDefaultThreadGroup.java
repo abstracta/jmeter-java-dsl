@@ -4,35 +4,19 @@ import java.lang.reflect.Method;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Stack;
-import java.util.regex.Pattern;
-import kg.apc.jmeter.JMeterPluginsUtils;
 import kg.apc.jmeter.threads.UltimateThreadGroup;
 import kg.apc.jmeter.threads.UltimateThreadGroupGui;
-import org.apache.jmeter.control.LoopController;
-import org.apache.jmeter.gui.util.PowerTableModel;
 import org.apache.jmeter.testelement.TestElement;
-import org.apache.jmeter.testelement.property.CollectionProperty;
-import org.apache.jmeter.testelement.property.JMeterProperty;
 import org.apache.jmeter.threads.AbstractThreadGroup;
 import org.apache.jmeter.threads.ThreadGroup;
 import org.apache.jmeter.threads.gui.ThreadGroupGui;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodCall;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodCallBuilder;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodCallContext;
-import us.abstracta.jmeter.javadsl.codegeneration.MethodParam;
-import us.abstracta.jmeter.javadsl.codegeneration.MethodParam.ChildrenParam;
-import us.abstracta.jmeter.javadsl.codegeneration.MethodParam.DurationParam;
-import us.abstracta.jmeter.javadsl.codegeneration.MethodParam.FixedParam;
-import us.abstracta.jmeter.javadsl.codegeneration.MethodParam.IntParam;
-import us.abstracta.jmeter.javadsl.codegeneration.TestElementParamBuilder;
-import us.abstracta.jmeter.javadsl.core.util.JmeterFunction;
+import us.abstracta.jmeter.javadsl.core.threadgroups.defaultthreadgroup.SimpleThreadGroupHelper;
+import us.abstracta.jmeter.javadsl.core.threadgroups.defaultthreadgroup.Stage;
+import us.abstracta.jmeter.javadsl.core.threadgroups.defaultthreadgroup.UltimateThreadGroupHelper;
 import us.abstracta.jmeter.javadsl.core.util.SingleSeriesTimelinePanel;
 
 /**
@@ -48,41 +32,6 @@ public class DslDefaultThreadGroup extends BaseThreadGroup<DslDefaultThreadGroup
 
   private static final Integer ZERO = 0;
   private final List<Stage> stages = new ArrayList<>();
-
-  // represents a stage in thread profiling (ramp up or down, hold duration or iterations).
-  private static class Stage {
-
-    private static final Pattern INT_PATTERN = Pattern.compile("^\\d+$");
-
-    private final Object threadCount;
-    private final Object duration;
-    private final Object iterations;
-
-    private Stage(Object threadCount, Object duration, Object iterations) {
-      // parsing simplifies calculations and allow for further optimizations
-      this.threadCount = tryParseInt(threadCount);
-      this.duration = tryParseDuration(duration);
-      this.iterations = tryParseInt(iterations);
-    }
-
-    private Object tryParseInt(Object val) {
-      return (val instanceof String && INT_PATTERN.matcher((String) val).matches())
-          ? Integer.valueOf((String) val)
-          : val;
-    }
-
-    private Object tryParseDuration(Object val) {
-      Object ret = tryParseInt(val);
-      return ret instanceof Integer ? Duration.ofSeconds((Integer) ret) : ret;
-    }
-
-    public boolean isFixedStage() {
-      return threadCount instanceof Integer
-          && (duration == null || duration instanceof Duration)
-          && (iterations == null || iterations instanceof Integer);
-    }
-
-  }
 
   public DslDefaultThreadGroup(String name, int threads, int iterations,
       List<ThreadGroupChild> children) {
@@ -199,14 +148,14 @@ public class DslDefaultThreadGroup extends BaseThreadGroup<DslDefaultThreadGroup
   }
 
   private boolean isLastStageHoldingForIterations() {
-    return !stages.isEmpty() && getLastStage().duration == null;
+    return !stages.isEmpty() && getLastStage().duration() == null;
   }
 
   private Stage getLastStage() {
     return stages.get(stages.size() - 1);
   }
 
-  public void addStage(Stage stage) {
+  private void addStage(Stage stage) {
     stages.add(stage);
     if (!isSimpleThreadGroup() && stages.stream().anyMatch(s -> !s.isFixedStage())) {
       stages.remove(stages.size() - 1);
@@ -215,6 +164,16 @@ public class DslDefaultThreadGroup extends BaseThreadGroup<DslDefaultThreadGroup
               + "parameters using jmeter expressions. If you need this please create an issue in "
               + "Github repository.");
     }
+  }
+
+  private boolean isSimpleThreadGroup() {
+    return stages.size() <= 1
+        || stages.size() == 2 && (
+        ZERO.equals(stages.get(0).threadCount())
+            || stages.get(0).threadCount().equals(stages.get(1).threadCount()))
+        || stages.size() == 3 && (
+        ZERO.equals(stages.get(0).threadCount())
+            && stages.get(1).threadCount().equals(stages.get(2).threadCount()));
   }
 
   /**
@@ -269,7 +228,7 @@ public class DslDefaultThreadGroup extends BaseThreadGroup<DslDefaultThreadGroup
   }
 
   private Object getPrevThreadsCount() {
-    return stages.isEmpty() ? 0 : getLastStage().threadCount;
+    return stages.isEmpty() ? 0 : getLastStage().threadCount();
   }
 
   /**
@@ -291,7 +250,7 @@ public class DslDefaultThreadGroup extends BaseThreadGroup<DslDefaultThreadGroup
       throw new IllegalArgumentException("Iterations must be >=0");
     }
     checkIterationsPreConditions();
-    addStage(new Stage(getLastStage().threadCount, null, iterations));
+    addStage(new Stage(getLastStage().threadCount(), null, iterations));
     return this;
   }
 
@@ -314,18 +273,18 @@ public class DslDefaultThreadGroup extends BaseThreadGroup<DslDefaultThreadGroup
    */
   public DslDefaultThreadGroup holdIterating(String iterations) {
     checkIterationsPreConditions();
-    addStage(new Stage(getLastStage().threadCount, null, iterations));
+    addStage(new Stage(getLastStage().threadCount(), null, iterations));
     return this;
   }
 
   private void checkIterationsPreConditions() {
-    if (!(stages.size() == 1 && !ZERO.equals(stages.get(0).threadCount)
-        || stages.size() == 2 && ZERO.equals(stages.get(0).threadCount)
-        && !ZERO.equals(stages.get(1).threadCount))) {
+    if (!(stages.size() == 1 && !ZERO.equals(stages.get(0).threadCount())
+        || stages.size() == 2 && ZERO.equals(stages.get(0).threadCount())
+        && !ZERO.equals(stages.get(1).threadCount()))) {
       throw new IllegalStateException(
           "Holding for iterations is only supported after initial hold and ramp, or ramp.");
     }
-    if (ZERO.equals(getLastStage().threadCount)) {
+    if (ZERO.equals(getLastStage().threadCount())) {
       throw new IllegalStateException("Can't hold for iterations with no threads.");
     }
   }
@@ -396,240 +355,12 @@ public class DslDefaultThreadGroup extends BaseThreadGroup<DslDefaultThreadGroup
 
   @Override
   public AbstractThreadGroup buildThreadGroup() {
-    return isSimpleThreadGroup() ? buildSimpleThreadGroup() : buildUltimateThreadGroup();
-  }
-
-  private boolean isSimpleThreadGroup() {
-    return stages.size() <= 1
-        || stages.size() == 2 && (
-        ZERO.equals(stages.get(0).threadCount)
-            || stages.get(0).threadCount.equals(stages.get(1).threadCount))
-        || stages.size() == 3 && (
-        ZERO.equals(stages.get(0).threadCount)
-            && stages.get(1).threadCount.equals(stages.get(2).threadCount));
-  }
-
-  private AbstractThreadGroup buildSimpleThreadGroup() {
-    Object threads = 1;
-    Object iterations = 1;
-    Object rampUpPeriod = null;
-    Object duration = null;
-    Object delay = null;
-    if (!stages.isEmpty()) {
-      Stage firstStage = stages.get(0);
-      if (ZERO.equals(firstStage.threadCount)) {
-        delay = firstStage.duration;
-      } else {
-        rampUpPeriod = firstStage.duration;
-        threads = firstStage.threadCount;
-      }
-      iterations = firstStage.iterations;
-      if (stages.size() > 1) {
-        Stage secondStage = stages.get(1);
-        threads = secondStage.threadCount;
-        iterations = secondStage.iterations;
-        if (ZERO.equals(firstStage.threadCount)) {
-          rampUpPeriod = secondStage.duration;
-          if (stages.size() > 2) {
-            Stage lastStage = stages.get(2);
-            duration = lastStage.duration;
-            iterations = lastStage.iterations;
-          }
-        } else {
-          duration = secondStage.duration;
-        }
-      }
-    }
-    if (rampUpPeriod != null && !Duration.ZERO.equals(rampUpPeriod) &&
-        (iterations == null || duration != null)) {
-      duration = duration != null ? sumDurations(duration, rampUpPeriod) : rampUpPeriod;
-    }
-    return buildSimpleThreadGroupFrom(threads, iterations, rampUpPeriod, duration, delay);
-  }
-
-  private Object sumDurations(Object duration, Object rampUpPeriod) {
-    if (duration instanceof Duration && rampUpPeriod instanceof Duration) {
-      return ((Duration) duration).plus((Duration) rampUpPeriod);
+    if (isSimpleThreadGroup()) {
+      return new SimpleThreadGroupHelper(stages).buildThreadGroup();
     } else {
-      if (duration instanceof Duration) {
-        duration = String.valueOf(durationToSeconds((Duration) duration));
-      } else if (rampUpPeriod instanceof Duration) {
-        rampUpPeriod = String.valueOf(durationToSeconds((Duration) rampUpPeriod));
-      }
-      return JmeterFunction.groovy(buildGroovySolvingIntExpression((String) duration) + " + "
-          + buildGroovySolvingIntExpression((String) rampUpPeriod));
+      guiClass = UltimateThreadGroupGui.class;
+      return new UltimateThreadGroupHelper(stages).buildThreadGroup();
     }
-  }
-
-  private static String buildGroovySolvingIntExpression(String expr) {
-    return "(new org.apache.jmeter.engine.util.CompoundVariable('" + expr.replace("$", "#")
-        + "'.replace('#','$')).execute() as int)";
-  }
-
-  private ThreadGroup buildSimpleThreadGroupFrom(Object threads, Object iterations,
-      Object rampUpPeriod, Object duration, Object delay) {
-    ThreadGroup ret = new ThreadGroup();
-    setIntProperty(ret, ThreadGroup.NUM_THREADS, threads);
-    setIntProperty(ret, ThreadGroup.RAMP_TIME, rampUpPeriod == null ? Duration.ZERO : rampUpPeriod);
-    LoopController loopController = new LoopController();
-    ret.setSamplerController(loopController);
-    if (duration != null) {
-      loopController.setLoops(-1);
-      setLongProperty(ret, ThreadGroup.DURATION, duration);
-    } else {
-      setIntProperty(loopController, LoopController.LOOPS, iterations);
-    }
-    if (delay != null) {
-      setLongProperty(ret, ThreadGroup.DELAY, delay);
-    }
-    if (duration != null || delay != null) {
-      ret.setScheduler(true);
-    }
-    return ret;
-  }
-
-  private void setIntProperty(TestElement ret, String propName, Object value) {
-    if (value instanceof Duration) {
-      ret.setProperty(propName, (int) durationToSeconds((Duration) value));
-    } else if (value instanceof Integer) {
-      ret.setProperty(propName, (Integer) value);
-    } else {
-      ret.setProperty(propName, (String) value);
-    }
-  }
-
-  private void setLongProperty(TestElement ret, String propName, Object value) {
-    if (value instanceof Duration) {
-      ret.setProperty(propName, durationToSeconds((Duration) value));
-    } else {
-      ret.setProperty(propName, (String) value);
-    }
-  }
-
-  private AbstractThreadGroup buildUltimateThreadGroup() {
-    guiClass = UltimateThreadGroupGui.class;
-    UltimateThreadGroup ret = new UltimateThreadGroup();
-    PowerTableModel table = buildUltimateThreadGroupTableModel();
-    buildUltimateThreadGroupSchedules().forEach(s -> table.addRow(s.buildTableRow()));
-    ret.setData(JMeterPluginsUtils.tableModelRowsToCollectionProperty(table,
-        UltimateThreadGroup.DATA_PROPERTY));
-    LoopController loopController = new LoopController();
-    loopController.setLoops(-1);
-    loopController.setContinueForever(true);
-    ret.setSamplerController(loopController);
-    return ret;
-  }
-
-  private static PowerTableModel buildUltimateThreadGroupTableModel() {
-    return new PowerTableModel(UltimateThreadGroupGui.columnIdentifiers,
-        UltimateThreadGroupGui.columnClasses);
-  }
-
-  private List<UltimateThreadSchedule> buildUltimateThreadGroupSchedules() {
-    List<UltimateThreadSchedule> ret = new ArrayList<>();
-    Duration delay = Duration.ZERO;
-    int threads = 0;
-    Stack<UltimateThreadSchedule> stack = new Stack<>();
-    UltimateThreadSchedule curr = new UltimateThreadSchedule(0, Duration.ZERO, Duration.ZERO,
-        Duration.ZERO, Duration.ZERO);
-    for (Stage s : stages) {
-      int stageThreads = (int) s.threadCount;
-      Duration stageDuration = (Duration) s.duration;
-      if (stageThreads == threads) {
-        curr.hold = curr.hold.plus(stageDuration);
-      } else if (stageThreads > threads) {
-        stack.add(curr);
-        curr = new UltimateThreadSchedule(stageThreads - threads, delay, stageDuration,
-            Duration.ZERO, Duration.ZERO);
-      } else {
-        int diff = threads - stageThreads;
-        Duration shutdown = stageDuration;
-        while (diff > curr.threadCount) {
-          curr.shutdown = interpolateDurationForThreadCountWithRamp(curr.threadCount, diff,
-              shutdown);
-          diff -= curr.threadCount;
-          shutdown = shutdown.minus(curr.shutdown);
-          curr = completeCurrentSchedule(curr, ret, stack);
-        }
-        if (diff == curr.threadCount) {
-          curr.shutdown = shutdown;
-        } else {
-          Duration start = interpolateDurationForThreadCountWithRamp(diff, curr.threadCount,
-              curr.startup);
-          UltimateThreadSchedule last = curr;
-          curr = new UltimateThreadSchedule(diff, curr.delay.plus(curr.startup).minus(start), start,
-              curr.hold, shutdown);
-          last.threadCount -= diff;
-          last.startup = last.startup.minus(start);
-          last.hold = Duration.ZERO;
-          stack.push(last);
-        }
-        curr = completeCurrentSchedule(curr, ret, stack);
-      }
-      threads = stageThreads;
-      delay = delay.plus(stageDuration);
-    }
-    while (!stack.isEmpty()) {
-      curr = completeCurrentSchedule(curr, ret, stack);
-    }
-    ret.sort(Comparator.comparing(r -> r.delay.toMillis()));
-    return ret;
-  }
-
-  protected static class UltimateThreadSchedule {
-
-    private int threadCount;
-    private final Duration delay;
-    private Duration startup;
-    private Duration hold;
-    private Duration shutdown;
-
-    public UltimateThreadSchedule(int threadCount, Duration delay, Duration startup,
-        Duration hold, Duration shutdown) {
-      this.threadCount = threadCount;
-      this.delay = delay;
-      this.startup = startup;
-      this.hold = hold;
-      this.shutdown = shutdown;
-    }
-
-    public static UltimateThreadSchedule fromTableRow(Object[] row) {
-      int i = 0;
-      return new UltimateThreadSchedule(Integer.parseInt(stringProp(row[i++])), duration(row[i++]),
-          duration(row[i++]), duration(row[i++]), duration(row[i]));
-    }
-
-    private static Duration duration(Object val) {
-      return Duration.ofSeconds(Long.parseLong(stringProp(val)));
-    }
-
-    private static String stringProp(Object val) {
-      return ((JMeterProperty) val).getStringValue();
-    }
-
-    public Object[] buildTableRow() {
-      return new Object[]{String.valueOf(threadCount),
-          String.valueOf(durationToSeconds(delay)),
-          String.valueOf(durationToSeconds(startup)),
-          String.valueOf(durationToSeconds(hold)),
-          String.valueOf(durationToSeconds(shutdown))};
-    }
-
-  }
-
-  private static Duration interpolateDurationForThreadCountWithRamp(int threadCount,
-      int rampThreads, Duration rampDuration) {
-    return Duration.ofMillis(
-        (long) (rampDuration.toMillis() * ((double) threadCount / rampThreads)));
-  }
-
-  private UltimateThreadSchedule completeCurrentSchedule(UltimateThreadSchedule curr,
-      List<UltimateThreadSchedule> ret, Stack<UltimateThreadSchedule> stack) {
-    ret.add(curr);
-    UltimateThreadSchedule last = curr;
-    curr = stack.pop();
-    curr.hold = curr.hold.plus(last.startup).plus(last.hold).plus(last.shutdown);
-    return curr;
   }
 
   /**
@@ -660,7 +391,7 @@ public class DslDefaultThreadGroup extends BaseThreadGroup<DslDefaultThreadGroup
     }
     SingleSeriesTimelinePanel chart = new SingleSeriesTimelinePanel("Threads");
     chart.add(0, 0);
-    stages.forEach(s -> chart.add(((Duration) s.duration).toMillis(), (int) s.threadCount));
+    stages.forEach(s -> chart.add(((Duration) s.duration()).toMillis(), (int) s.threadCount()));
     showAndWaitFrameWith(chart, name + " threads timeline", 800, 300);
   }
 
@@ -681,238 +412,13 @@ public class DslDefaultThreadGroup extends BaseThreadGroup<DslDefaultThreadGroup
     protected MethodCall buildMethodCall(MethodCallContext context) {
       MethodCall ret;
       TestElement testElement = context.getTestElement();
-      TestElementParamBuilder paramBuilder = new TestElementParamBuilder(testElement);
       if (testElement.getClass() == ThreadGroup.class) {
-        ret = buildSimpleThreadGroupMethodCall(paramBuilder);
+        ret = new SimpleThreadGroupHelper.CodeBuilder(builderMethods).buildMethodCall(context);
       } else {
-        ret = buildUltimateThreadGroupMethodCall(paramBuilder);
+        ret = new UltimateThreadGroupHelper.CodeBuilder(builderMethods).buildMethodCall(context);
       }
-      ret.chain("sampleErrorAction", SampleErrorActionMethodParam.from(paramBuilder));
+      ret.chain("sampleErrorAction", SampleErrorActionMethodParam.from(testElement));
       return ret;
-    }
-
-    private MethodCall buildSimpleThreadGroupMethodCall(TestElementParamBuilder testElement) {
-      MethodParam name = testElement.nameParam("Thread Group");
-      MethodParam threads = testElement.intParam(ThreadGroup.NUM_THREADS);
-      MethodParam rampTime = testElement.durationParam(ThreadGroup.RAMP_TIME,
-          Duration.ofSeconds(1));
-      MethodParam duration = testElement.durationParam(ThreadGroup.DURATION);
-      MethodParam delay = testElement.durationParam(ThreadGroup.DELAY);
-      MethodParam iterations = testElement.intParam(
-          ThreadGroup.MAIN_CONTROLLER + "/" + LoopController.LOOPS);
-      if (threads instanceof IntParam && duration instanceof DurationParam
-          && iterations instanceof IntParam
-          && (rampTime.isDefault()
-          || rampTime instanceof DurationParam && ((DurationParam) rampTime).getValue().isZero())
-          && delay.isDefault()) {
-        return buildMethodCall(name, threads, duration.isDefault() ? iterations : duration,
-            new ChildrenParam<>(ThreadGroupChild[].class));
-      } else {
-        MethodCall ret = buildMethodCall(name);
-        if (!delay.isDefault()) {
-          ret.chain("holdFor", delay);
-        }
-        if (!duration.isDefault()) {
-          ret.chain("rampToAndHold", threads, rampTime, buildDurationParam(duration, rampTime));
-        } else {
-          ret.chain("rampTo", threads, rampTime)
-              .chain("holdIterating", iterations);
-        }
-        return ret;
-      }
-    }
-
-    private DurationParam buildDurationParam(MethodParam duration, MethodParam rampTime) {
-      if (duration instanceof DurationParam && rampTime instanceof DurationParam) {
-        return new DurationParam(rampTime.isDefault() ? ((DurationParam) duration).getValue()
-            : ((DurationParam) duration).getValue().minus(((DurationParam) rampTime).getValue()));
-      } else {
-        String expression = rampTime.isDefault()
-            || rampTime instanceof DurationParam && ((DurationParam) rampTime).getValue().isZero()
-            ? duration.getExpression()
-            : JmeterFunction.groovy(
-                buildGroovySolvingIntExpression(duration.getExpression()) + " - "
-                    + buildGroovySolvingIntExpression(rampTime.getExpression()));
-        return new DurationParam(expression, null);
-      }
-    }
-
-    private MethodCall buildUltimateThreadGroupMethodCall(TestElementParamBuilder testElement) {
-      MethodParam name = testElement.nameParam("jp@gc - Ultimate Thread Group");
-      MethodCall ret = buildMethodCall(name);
-      return ThreadsTimeline.fromSchedules(schedulesProp(testElement))
-          .addMethodCallsTo(ret);
-    }
-
-    private List<UltimateThreadSchedule> schedulesProp(TestElementParamBuilder testElement) {
-      JMeterProperty schedulesProp = testElement.prop(UltimateThreadGroup.DATA_PROPERTY);
-      PowerTableModel tableModel = buildUltimateThreadGroupTableModel();
-      JMeterPluginsUtils.collectionPropertyToTableModelRows((CollectionProperty) schedulesProp,
-          tableModel);
-      List<UltimateThreadSchedule> ret = new ArrayList<>();
-      for (int i = 0; i < tableModel.getRowCount(); i++) {
-        ret.add(UltimateThreadSchedule.fromTableRow(tableModel.getRowData(i)));
-      }
-      return ret;
-    }
-
-  }
-
-  private static class ThreadsTimeline {
-
-    private final Map<Duration, Integer> points = new LinkedHashMap<>();
-    private Duration lastDuration = Duration.ZERO;
-    private int lastThreads;
-    private double lastSlope;
-
-    private ThreadsTimeline() {
-    }
-
-    private ThreadsTimeline(UltimateThreadSchedule s) {
-      Duration duration = Duration.ZERO;
-      if (!s.delay.isZero()) {
-        duration = duration.plus(s.delay);
-        points.put(duration, 0);
-      }
-      duration = duration.plus(s.startup);
-      points.put(duration, s.threadCount);
-      if (!s.hold.isZero()) {
-        duration = duration.plus(s.hold);
-        points.put(duration, s.threadCount);
-      }
-      duration = duration.plus(s.shutdown);
-      points.put(duration, 0);
-    }
-
-    public static ThreadsTimeline fromSchedules(List<UltimateThreadSchedule> scheds) {
-      ThreadsTimeline ret = new ThreadsTimeline();
-      for (UltimateThreadSchedule s : scheds) {
-        ret = ret.plus(new ThreadsTimeline(s));
-      }
-      return ret;
-    }
-
-    public ThreadsTimeline plus(ThreadsTimeline other) {
-      if (points.isEmpty()) {
-        return other;
-      }
-      ThreadsTimeline ret = new ThreadsTimeline();
-      Iterator<Map.Entry<Duration, Integer>> thisIter = this.points.entrySet()
-          .iterator();
-      Iterator<Map.Entry<Duration, Integer>> otherIter = other.points.entrySet()
-          .iterator();
-      Entry<Duration, Integer> thisPoint = thisIter.next();
-      Entry<Duration, Integer> otherPoint = otherIter.next();
-      int prevThisThread = 0;
-      int prevOtherThread = 0;
-      while (thisPoint != null && otherPoint != null) {
-        int durationOrder = thisPoint.getKey().compareTo(otherPoint.getKey());
-        if (durationOrder == 0) {
-          prevThisThread = thisPoint.getValue();
-          prevOtherThread = otherPoint.getValue();
-          ret.add(thisPoint.getKey(), prevThisThread + prevOtherThread);
-          thisPoint = nextPoint(thisIter);
-          otherPoint = nextPoint(otherIter);
-        } else if (durationOrder < 0) {
-          prevThisThread = thisPoint.getValue();
-          ret.add(thisPoint.getKey(), prevThisThread + prevOtherThread);
-          thisPoint = nextPoint(thisIter);
-        } else {
-          prevOtherThread = otherPoint.getValue();
-          ret.add(otherPoint.getKey(), prevThisThread + prevOtherThread);
-          otherPoint = nextPoint(otherIter);
-        }
-      }
-      Entry<Duration, Integer> pendingPoint = thisPoint != null ? thisPoint : otherPoint;
-      Iterator<Map.Entry<Duration, Integer>> pendingIter = thisPoint != null ? thisIter : otherIter;
-      while (pendingPoint != null) {
-        ret.add(pendingPoint.getKey(), pendingPoint.getValue());
-        pendingPoint = nextPoint(pendingIter);
-      }
-      return ret;
-    }
-
-    private void add(Duration duration, int threads) {
-      if (duration.equals(lastDuration) && threads == lastThreads) {
-        return;
-      }
-      // we calculate slope to identify if we can compact the new point with previous one
-      double slope;
-      if (duration.equals(lastDuration)) {
-        slope = threads > lastThreads ? Double.POSITIVE_INFINITY : Double.NEGATIVE_INFINITY;
-      } else {
-        slope = (double) (threads - lastThreads) / duration.minus(lastDuration).getSeconds();
-      }
-      // using double comparison with threshold to avoid precision issues while comparing slopes
-      if (Math.abs(slope - lastSlope) < 0.01) {
-        points.remove(lastDuration);
-      }
-      points.put(duration, threads);
-      lastDuration = duration;
-      lastThreads = threads;
-      lastSlope = slope;
-    }
-
-    private Entry<Duration, Integer> nextPoint(Iterator<Entry<Duration, Integer>> iter) {
-      return iter.hasNext() ? iter.next() : null;
-    }
-
-    private MethodCall addMethodCallsTo(MethodCall methodCall) {
-      int prevThreads = 0;
-      Duration prevDuration = Duration.ZERO;
-      Duration rampDuration = Duration.ZERO;
-      Duration holdDuration = Duration.ZERO;
-      for (Map.Entry<Duration, Integer> point : points.entrySet()) {
-        if (point.getValue() == prevThreads) {
-          holdDuration = holdDuration.plus(point.getKey().minus(prevDuration));
-        } else {
-          if (!rampDuration.isZero()) {
-            if (!holdDuration.isZero()) {
-              methodCall.chain("rampToAndHold", new IntParam(prevThreads),
-                  new DurationParam(rampDuration), new DurationParam(holdDuration));
-              holdDuration = Duration.ZERO;
-            } else {
-              chainRampTo(methodCall, prevThreads, rampDuration);
-            }
-          } else {
-            if (!holdDuration.isZero()) {
-              methodCall.chain("holdFor", new DurationParam(holdDuration));
-              holdDuration = Duration.ZERO;
-            }
-          }
-          rampDuration = point.getKey().minus(prevDuration);
-        }
-        prevThreads = point.getValue();
-        prevDuration = point.getKey();
-      }
-      if (!rampDuration.isZero()) {
-        chainRampTo(methodCall, prevThreads, rampDuration);
-
-      }
-      return methodCall;
-    }
-
-    private void chainRampTo(MethodCall methodCall, int threads, Duration rampDuration) {
-      methodCall.chain("rampTo", new IntParam(threads), new DurationParam(rampDuration));
-    }
-
-  }
-
-  private static class SampleErrorActionMethodParam extends FixedParam<SampleErrorAction> {
-
-    private SampleErrorActionMethodParam(String expression, SampleErrorAction defaultValue) {
-      super(SampleErrorAction.class, expression, SampleErrorAction::fromPropertyValue,
-          defaultValue);
-    }
-
-    public static MethodParam from(TestElementParamBuilder paramBuilder) {
-      return paramBuilder.buildParam(AbstractThreadGroup.ON_SAMPLE_ERROR,
-          SampleErrorActionMethodParam::new, SampleErrorAction.CONTINUE);
-    }
-
-    @Override
-    public String buildCode(String indent) {
-      return SampleErrorAction.class.getSimpleName() + "." + value.name();
     }
 
   }

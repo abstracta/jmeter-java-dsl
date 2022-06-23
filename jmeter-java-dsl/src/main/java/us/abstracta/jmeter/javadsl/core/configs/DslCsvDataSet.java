@@ -161,7 +161,7 @@ public class DslCsvDataSet extends BaseConfigElement {
     ret.setIgnoreFirstLine(ignoreFirstLine);
     if (shareMode == Sharing.THREAD_GROUP) {
       throw new IllegalStateException(
-          "CSV data sets with random order, don't support THREAD_GROUP sharing mode");
+          "CSV data sets with random order don't support THREAD_GROUP sharing mode");
     }
     ret.setIndependentListPerThread(shareMode == Sharing.THREAD);
     ret.setRewindOnTheEndOfList(!stopThread);
