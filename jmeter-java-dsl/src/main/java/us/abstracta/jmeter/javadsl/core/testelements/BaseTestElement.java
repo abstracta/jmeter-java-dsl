@@ -80,7 +80,7 @@ public abstract class BaseTestElement implements DslTestElement {
 
   protected abstract TestElement buildTestElement();
 
-  private static void loadBeanProperties(TestElement bean) {
+  public static void loadBeanProperties(TestElement bean) {
     try {
       BeanInfo beanInfo = Introspector.getBeanInfo(bean.getClass());
       for (PropertyDescriptor prop : beanInfo.getPropertyDescriptors()) {

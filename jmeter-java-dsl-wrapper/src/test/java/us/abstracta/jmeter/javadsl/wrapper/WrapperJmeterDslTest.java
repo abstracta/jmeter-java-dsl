@@ -187,19 +187,20 @@ public class WrapperJmeterDslTest {
       );
     }
 
+    public DslTestPlan threadGroupTestBean() {
+      return testPlan(
+          testElement(new MyThreadGroupTestBean())
+              .prop("MY_PROP", "MY_VAL")
+              .children(
+                  httpSampler("http://myservice")
+              )
+      );
+    }
+
     public DslTestPlan sampler() {
       return testPlan(
           threadGroup(1, 1,
               testElement(new MySamplerGui())
-                  .prop("MY_PROP", "MY_VAL")
-          )
-      );
-    }
-
-    public DslTestPlan samplerTestBean() {
-      return testPlan(
-          threadGroup(1, 1,
-              testElement(new MySamplerTestBean())
                   .prop("MY_PROP", "MY_VAL")
           )
       );

@@ -27,6 +27,7 @@ import us.abstracta.jmeter.javadsl.codegeneration.MethodCallContext;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodParam;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodParam.NameParam;
 import us.abstracta.jmeter.javadsl.codegeneration.SingleTestElementCallBuilder;
+import us.abstracta.jmeter.javadsl.core.testelements.BaseTestElement;
 
 public class TestElementWrapperCallBuilder<T extends TestElement> extends
     SingleTestElementCallBuilder<T> {
@@ -51,6 +52,7 @@ public class TestElementWrapperCallBuilder<T extends TestElement> extends
         Class<? extends TestElement> constructorClass = testElement.getClass();
         builderParam = new ClassInstanceParam(testElementClass, constructorClass);
         defaultInstance = (T) constructorClass.newInstance();
+        BaseTestElement.loadBeanProperties(defaultInstance);
       } else {
         String guiClassName = testElement.getPropertyAsString(TestElement.GUI_CLASS);
         Class<?> constructorClass = Class.forName(guiClassName);
