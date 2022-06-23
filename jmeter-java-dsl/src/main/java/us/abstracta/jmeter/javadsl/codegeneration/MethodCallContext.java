@@ -162,7 +162,7 @@ public class MethodCallContext {
       addChildrenTo(ret);
       endListeners.forEach(l -> l.execute(this, ret));
       return ret;
-    } catch (UnsupportedOperationException e) {
+    } catch (RuntimeException e) {
       LOG.warn("Could not build code for {}({}). " + UNSUPPORTED_USAGE_WARNING,
           testElement.getClass(), testElement.getName(), e);
       return MethodCall.buildUnsupported();

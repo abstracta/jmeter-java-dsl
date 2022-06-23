@@ -25,7 +25,7 @@ import us.abstracta.jmeter.javadsl.core.testelements.MultiLevelTestElement;
  */
 public class MethodCall {
 
-  private static final String INDENT = "  ";
+  public static final String INDENT = "  ";
   private static final MethodCall EMPTY_METHOD_CALL = new EmptyMethodCall();
 
   protected final String methodName;
@@ -325,7 +325,7 @@ public class MethodCall {
         .append("(");
     String childIndent = indent + INDENT;
     String paramsCode = buildParamsCode(childIndent);
-    ret.append(paramsCode);
+    ret.append(reIndentParenthesis(paramsCode));
     boolean hasChildren = paramsCode.endsWith("\n");
     if (hasChildren) {
       ret.append(indent);
@@ -341,6 +341,13 @@ public class MethodCall {
       ret.append(chainedCode);
     }
     return ret.toString();
+  }
+
+  private String reIndentParenthesis(String paramsCode) {
+    String indentedParenthesis = INDENT + ")";
+    return paramsCode.endsWith(indentedParenthesis)
+        ? paramsCode.substring(0, paramsCode.length() - indentedParenthesis.length()) + ")"
+        : paramsCode;
   }
 
   protected String buildParamsCode(String indent) {

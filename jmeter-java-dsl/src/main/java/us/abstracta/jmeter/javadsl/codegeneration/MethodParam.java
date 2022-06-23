@@ -293,9 +293,8 @@ public abstract class MethodParam {
 
     private static <T> Class<T> checkChildrenType(Class<T> childrenClass) {
       if (!childrenClass.isArray()) {
-        throw new IllegalArgumentException(
-            "You need always to provide an array class and not the raw class for the children. "
-                + "Eg use TestPlanChild[].class");
+        throw new RuntimeException("You need always to provide an array class and not the raw "
+            + "class for the children. Eg use TestPlanChild[].class");
       }
       return childrenClass;
     }

@@ -44,8 +44,8 @@ public class WrapperJmeterDsl {
    *                       element.
    *                       <p>
    *                       You can provide a gui component with pre initialized properties, or you
-   *                       can set properties in returned instance through {@link
-   *                       DslThreadGroupWrapper#prop(String, Object)} method.
+   *                       can set properties in returned instance through
+   *                       {@link DslThreadGroupWrapper#prop(String, Object)} method.
    *                       <p>
    *                       Consider invoking {@link JMeterGUIComponent#clearGui()} before passing it
    *                       to the method in case the method sets some default values not set by
@@ -100,8 +100,7 @@ public class WrapperJmeterDsl {
    *
    * @see #testElement(AbstractThreadGroup)
    */
-  public static DslThreadGroupWrapper testElement(String name,
-      AbstractThreadGroup threadGroup) {
+  public static DslThreadGroupWrapper testElement(String name, AbstractThreadGroup threadGroup) {
     return new DslThreadGroupWrapper(name, threadGroup, null);
   }
 
@@ -117,8 +116,8 @@ public class WrapperJmeterDsl {
    *                   {@link DslSamplerWrapper#prop(String, Object)} method.
    *                   <p>
    *                   Consider invoking {@link JMeterGUIComponent#clearGui()} before passing it to
-   *                   the method in case the method sets some default values not set by {@link
-   *                   JMeterGUIComponent#createTestElement()}.
+   *                   the method in case the method sets some default values not set by
+   *                   {@link JMeterGUIComponent#createTestElement()}.
    * @return the wrapped test element for further configuration and usage.
    * @see DslSamplerWrapper
    */
@@ -179,8 +178,8 @@ public class WrapperJmeterDsl {
    * @param controllerGui is a controller gui component used to create the associated test element.
    *                      <p>
    *                      You can provide a gui component with pre initialized properties, or you
-   *                      can set properties in returned instance through {@link
-   *                      DslControllerWrapper#prop(String, Object)} method.
+   *                      can set properties in returned instance through
+   *                      {@link DslControllerWrapper#prop(String, Object)} method.
    *                      <p>
    *                      Consider invoking {@link JMeterGUIComponent#clearGui()} before passing it
    *                      to the method in case the method sets some default values not set by
@@ -252,8 +251,8 @@ public class WrapperJmeterDsl {
    *                     {@link MultiLevelTestElementWrapper#prop(String, Object)} method.
    *                     <p>
    *                     Consider invoking {@link JMeterGUIComponent#clearGui()} before passing it
-   *                     to the method in case the method sets some default values not set by {@link
-   *                     JMeterGUIComponent#createTestElement()}.
+   *                     to the method in case the method sets some default values not set by
+   *                     {@link JMeterGUIComponent#createTestElement()}.
    * @return the wrapped test element for further configuration and usage.
    * @see MultiLevelTestElementWrapper
    */
@@ -291,8 +290,8 @@ public class WrapperJmeterDsl {
    *                    plan.
    *                    <p>
    *                    You can provide a pre initialized test element, or you can set properties in
-   *                    returned instance through {@link MultiLevelTestElementWrapper#prop(String,
-   *                    Object)} method.
+   *                    returned instance through
+   *                    {@link MultiLevelTestElementWrapper#prop(String, Object)} method.
    * @return the wrapped test element for further configuration and usage.
    * @see MultiLevelTestElementWrapper
    */

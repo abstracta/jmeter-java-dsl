@@ -26,6 +26,11 @@
     </dependency>
     <dependency>
       <groupId>us.abstracta.jmeter</groupId>
+      <artifactId>jmeter-java-dsl-wrapper</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>us.abstracta.jmeter</groupId>
       <artifactId>jmeter-java-dsl-graphql</artifactId>
       <version>${project.version}</version>
     </dependency>
@@ -79,11 +84,9 @@
               <artifactSet>
                 <excludes>
                   <exclude>bsf:bsf</exclude>
-                  <exclude>com.fifesoft:rsyntaxtextarea</exclude>
                   <exclude>xalan:*</exclude>
                   <exclude>net.sf.saxon:Saxon-HE</exclude>
                   <exclude>com.formdev:svgSalamander</exclude>
-                  <exclude>com.github.weisj:darklaf-*</exclude>
                   <exclude>net.java.dev.jna:jna</exclude>
                   <exclude>org.swinglabs:jxlayer</exclude>
                   <exclude>org.apache.xmlgraphics:xmlgraphics-commons</exclude>
@@ -97,7 +100,6 @@
                   <exclude>org.jsoup:jsoup</exclude>
                   <exclude>com.helger:*</exclude>
                   <exclude>org.brotli:dec</exclude>
-                  <exclude>com.miglayout:*</exclude>
                   <exclude>org.apache.tika:*</exclude>
                   <exclude>org.mozilla:rhino</exclude>
                   <exclude>commons-logging:commons-logging</exclude>

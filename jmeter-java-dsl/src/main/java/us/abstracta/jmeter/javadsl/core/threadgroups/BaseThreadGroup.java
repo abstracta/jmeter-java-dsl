@@ -8,6 +8,9 @@ import org.apache.jmeter.gui.JMeterGUIComponent;
 import org.apache.jmeter.testelement.TestElement;
 import org.apache.jmeter.testelement.property.StringProperty;
 import org.apache.jmeter.threads.AbstractThreadGroup;
+import us.abstracta.jmeter.javadsl.codegeneration.MethodParam;
+import us.abstracta.jmeter.javadsl.codegeneration.MethodParam.FixedParam;
+import us.abstracta.jmeter.javadsl.codegeneration.TestElementParamBuilder;
 import us.abstracta.jmeter.javadsl.core.DslTestElement;
 import us.abstracta.jmeter.javadsl.core.testelements.TestElementContainer;
 import us.abstracta.jmeter.javadsl.core.threadgroups.BaseThreadGroup.ThreadGroupChild;
@@ -118,6 +121,26 @@ public abstract class BaseThreadGroup<T extends BaseThreadGroup<?>> extends
                 + propertyValue);
       }
       return ret;
+    }
+
+  }
+
+  protected static class SampleErrorActionMethodParam extends FixedParam<SampleErrorAction> {
+
+    private SampleErrorActionMethodParam(String expression, SampleErrorAction defaultValue) {
+      super(SampleErrorAction.class, expression, SampleErrorAction::fromPropertyValue,
+          defaultValue);
+    }
+
+    public static MethodParam from(TestElement testElement) {
+      return new TestElementParamBuilder(testElement)
+          .buildParam(AbstractThreadGroup.ON_SAMPLE_ERROR, SampleErrorActionMethodParam::new,
+              SampleErrorAction.CONTINUE);
+    }
+
+    @Override
+    public String buildCode(String indent) {
+      return SampleErrorAction.class.getSimpleName() + "." + value.name();
     }
 
   }

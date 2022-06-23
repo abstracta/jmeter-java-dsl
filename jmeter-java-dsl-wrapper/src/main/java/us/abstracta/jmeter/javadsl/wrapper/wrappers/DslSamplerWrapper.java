@@ -3,6 +3,8 @@ package us.abstracta.jmeter.javadsl.wrapper.wrappers;
 import static us.abstracta.jmeter.javadsl.wrapper.wrappers.TestElementWrapperHelper.solveGuiClass;
 import static us.abstracta.jmeter.javadsl.wrapper.wrappers.TestElementWrapperHelper.solveName;
 
+import java.lang.reflect.Method;
+import java.util.List;
 import org.apache.jmeter.samplers.Sampler;
 import org.apache.jmeter.samplers.gui.AbstractSamplerGui;
 import org.apache.jmeter.testelement.TestElement;
@@ -31,6 +33,14 @@ public class DslSamplerWrapper extends BaseSampler<DslSamplerWrapper> implements
   @Override
   protected TestElement buildTestElement() {
     return helper.buildTestElement();
+  }
+
+  public static class CodeBuilder extends TestElementWrapperCallBuilder<Sampler> {
+
+    public CodeBuilder(List<Method> builderMethods) {
+      super(Sampler.class, AbstractSamplerGui.class, builderMethods);
+    }
+
   }
 
 }

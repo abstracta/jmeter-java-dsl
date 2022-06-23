@@ -12,8 +12,8 @@ import java.util.List;
  * found in a JMeter test plan.
  * <p>
  * Whenever you implement a new DSL test element remember creating a nested class named CodeBuilder
- * extending MethodCallBuilder with the proper logic for generating its DSL code. Check {@link
- * us.abstracta.jmeter.javadsl.core.DslTestPlan.CodeBuilder} for an example.
+ * extending MethodCallBuilder with the proper logic for generating its DSL code. Check
+ * {@link us.abstracta.jmeter.javadsl.core.DslTestPlan.CodeBuilder} for an example.
  *
  * @since 0.45
  */
@@ -65,14 +65,14 @@ public abstract class MethodCallBuilder {
   /**
    * Builds a method call for the given set of parameters using one of registered builder methods.
    * <p>
-   * This method is the starting point for creating the MethodCall returned by {@link
-   * #buildMethodCall(MethodCallContext)}.
+   * This method is the starting point for creating the MethodCall returned by
+   * {@link #buildMethodCall(MethodCallContext)}.
    *
    * @param params contains the list of parameters to find the proper builder method and associate
    *               to the method call. If the MethodCall accepts as parameter children DSL test
-   *               elements, then remember adding an array class for {@link
-   *               us.abstracta.jmeter.javadsl.codegeneration.MethodParam.ChildrenParam} (eg: {@code
-   *               new ChildrenParam<>(TestPlanChild[].class)}).
+   *               elements, then remember adding an array class for
+   *               {@link us.abstracta.jmeter.javadsl.codegeneration.MethodParam.ChildrenParam} (eg:
+   *               {@code new ChildrenParam<>(TestPlanChild[].class)}).
    * @return generated method call.
    * @throws UnsupportedOperationException if no builder method is found for the given parameters.
    */
@@ -87,6 +87,25 @@ public abstract class MethodCallBuilder {
           builderMethods.get(0).getName() + " builder", params);
     }
     return ret;
+  }
+
+  /**
+   * This method allows specifying an order over builders.
+   * <p>
+   * Low values for order will make builders execute first than higher values.
+   * <p>
+   * This is handy when the order is relevant, for instance if a builder is more generic than others
+   * and should be used as fallback when others don't match.
+   * <p>
+   * No need for specifying an order for each builder. In most of the cases using the default value
+   * is ok. Only overwrite when you need a specific order between builders (implementing fallback of
+   * builders).
+   *
+   * @return a number used to order this builder among other existing values.
+   * @since 0.60
+   */
+  public int order() {
+    return 1;
   }
 
 }

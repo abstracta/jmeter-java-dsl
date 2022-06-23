@@ -33,7 +33,7 @@ public abstract class SingleTestElementCallBuilder<T extends TestElement> extend
   }
 
   public boolean matches(MethodCallContext context) {
-    return context.getTestElement().getClass() == testElementClass;
+    return testElementClass.isInstance(context.getTestElement());
   }
 
   @Override

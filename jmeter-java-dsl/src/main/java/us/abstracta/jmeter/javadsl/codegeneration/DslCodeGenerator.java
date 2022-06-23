@@ -7,6 +7,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -42,6 +43,11 @@ public class DslCodeGenerator {
   public DslCodeGenerator() {
     builders.addAll(findCallBuilders(JmeterDsl.class));
     builders.add(new DslRecordingController.CodeBuilder());
+    sortBuilders();
+  }
+
+  private void sortBuilders() {
+    builders.sort(Comparator.comparing(MethodCallBuilder::order));
   }
 
   /**
@@ -73,6 +79,7 @@ public class DslCodeGenerator {
    */
   public DslCodeGenerator addBuildersFrom(Class<?>... dslClasses) {
     builders.addAll(findCallBuilders(dslClasses));
+    sortBuilders();
     return this;
   }
 
@@ -88,6 +95,7 @@ public class DslCodeGenerator {
    */
   public DslCodeGenerator addBuilders(MethodCallBuilder... builders) {
     this.builders.addAll(Arrays.asList(builders));
+    sortBuilders();
     return this;
   }
 
@@ -120,7 +128,7 @@ public class DslCodeGenerator {
       LOG.debug("No code builder associated to {}", testElementClass);
       return null;
     } catch (NoSuchMethodException | InvocationTargetException | InstantiationException
-        | IllegalAccessException e) {
+             | IllegalAccessException e) {
       throw new RuntimeException("Problem instantiating builder for " + builderClass
           + ". Check builder constructor with a list of methods and registry as parameters.", e);
     }

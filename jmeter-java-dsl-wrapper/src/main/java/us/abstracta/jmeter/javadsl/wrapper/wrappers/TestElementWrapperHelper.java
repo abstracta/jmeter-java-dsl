@@ -1,9 +1,12 @@
 package us.abstracta.jmeter.javadsl.wrapper.wrappers;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import org.apache.jmeter.gui.JMeterGUIComponent;
 import org.apache.jmeter.testbeans.TestBean;
+import org.apache.jmeter.testbeans.TestBeanHelper;
 import org.apache.jmeter.testbeans.gui.TestBeanGUI;
 import org.apache.jmeter.testelement.TestElement;
 import org.apache.jmeter.testelement.property.AbstractProperty;
@@ -95,10 +98,22 @@ public class TestElementWrapperHelper<T extends TestElement> {
   public T buildTestElement() {
     T ret = testElement != null ? testElement : (T) guiComponent.createTestElement();
     props.forEach((k, v) -> {
-      JMeterProperty prop = AbstractProperty.createProperty(v);
+      /*
+       since lists created by Arrays.asList & Collections.singletonList have no default constructor
+       which is required by createProperty conversion, we use a new collection.
+       */
+      Object val = v instanceof List ? new ArrayList<>((List<?>) v) : v;
+      JMeterProperty prop = AbstractProperty.createProperty(val);
       prop.setName(k);
       ret.setProperty(prop);
     });
+    if (testElement instanceof TestBean) {
+      /*
+       This is required to avoid when building test element for test bean fields to overwrite
+       already set properties
+       */
+      TestBeanHelper.prepare(testElement);
+    }
     return ret;
   }
 

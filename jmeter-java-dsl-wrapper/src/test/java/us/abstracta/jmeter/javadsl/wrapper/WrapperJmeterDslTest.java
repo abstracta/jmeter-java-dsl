@@ -1,32 +1,30 @@
 package us.abstracta.jmeter.javadsl.wrapper;
 
+import static us.abstracta.jmeter.javadsl.JmeterDsl.httpSampler;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.jsr223PostProcessor;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.jsr223Sampler;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.testPlan;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.threadGroup;
 import static us.abstracta.jmeter.javadsl.wrapper.WrapperJmeterDsl.testElement;
 
-import org.apache.jmeter.assertions.Assertion;
-import org.apache.jmeter.assertions.AssertionResult;
-import org.apache.jmeter.assertions.gui.AbstractAssertionGui;
-import org.apache.jmeter.control.GenericController;
-import org.apache.jmeter.control.gui.AbstractControllerGui;
-import org.apache.jmeter.engine.StandardJMeterEngine;
-import org.apache.jmeter.samplers.AbstractSampler;
-import org.apache.jmeter.samplers.Entry;
-import org.apache.jmeter.samplers.SampleResult;
-import org.apache.jmeter.samplers.gui.AbstractSamplerGui;
-import org.apache.jmeter.testbeans.TestBean;
-import org.apache.jmeter.testelement.AbstractTestElement;
-import org.apache.jmeter.testelement.TestElement;
-import org.apache.jmeter.threads.AbstractThreadGroup;
-import org.apache.jmeter.threads.JMeterThread;
-import org.apache.jmeter.threads.ListenerNotifier;
-import org.apache.jmeter.threads.gui.AbstractThreadGroupGui;
-import org.apache.jorphan.collections.ListedHashTree;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import us.abstracta.jmeter.javadsl.codegeneration.MethodCallBuilderTest;
+import us.abstracta.jmeter.javadsl.core.DslTestPlan;
 import us.abstracta.jmeter.javadsl.core.postprocessors.DslJsr223PostProcessor;
 import us.abstracta.jmeter.javadsl.java.DslJsr223Sampler;
+import us.abstracta.jmeter.javadsl.wrapper.customelements.MyAssertion;
+import us.abstracta.jmeter.javadsl.wrapper.customelements.MyAssertionGui;
+import us.abstracta.jmeter.javadsl.wrapper.customelements.MyAssertionTestBean;
+import us.abstracta.jmeter.javadsl.wrapper.customelements.MyController;
+import us.abstracta.jmeter.javadsl.wrapper.customelements.MyControllerGui;
+import us.abstracta.jmeter.javadsl.wrapper.customelements.MyControllerTestBean;
+import us.abstracta.jmeter.javadsl.wrapper.customelements.MySampler;
+import us.abstracta.jmeter.javadsl.wrapper.customelements.MySamplerGui;
+import us.abstracta.jmeter.javadsl.wrapper.customelements.MySamplerTestBean;
+import us.abstracta.jmeter.javadsl.wrapper.customelements.MyThreadGroup;
+import us.abstracta.jmeter.javadsl.wrapper.customelements.MyThreadGroupGui;
+import us.abstracta.jmeter.javadsl.wrapper.customelements.MyThreadGroupTestBean;
 import us.abstracta.jmeter.javadsl.wrapper.wrappers.MultiLevelTestElementWrapper;
 
 public class WrapperJmeterDslTest {
@@ -46,70 +44,6 @@ public class WrapperJmeterDslTest {
     ).run();
   }
 
-  private static class MyThreadGroupGui extends AbstractThreadGroupGui {
-
-    @Override
-    public String getLabelResource() {
-      return "MyThreadGroup";
-    }
-
-    @Override
-    public TestElement createTestElement() {
-      return new MyThreadGroup();
-    }
-
-    @Override
-    public void modifyTestElement(TestElement element) {
-
-    }
-
-  }
-
-  private static class MyThreadGroup extends AbstractThreadGroup {
-
-    @Override
-    public boolean stopThread(String threadName, boolean now) {
-      return true;
-    }
-
-    @Override
-    public int numberOfActiveThreads() {
-      return 0;
-    }
-
-    @Override
-    public void start(int groupCount, ListenerNotifier notifier,
-        ListedHashTree threadGroupTree, StandardJMeterEngine engine) {
-    }
-
-    @Override
-    public JMeterThread addNewThread(int delay, StandardJMeterEngine engine) {
-      return null;
-    }
-
-    @Override
-    public boolean verifyThreadsStopped() {
-      return true;
-    }
-
-    @Override
-    public void waitThreadsStopped() {
-    }
-
-    @Override
-    public void tellThreadsToStop() {
-    }
-
-    @Override
-    public void stop() {
-    }
-
-    @Override
-    public void threadFinished(JMeterThread thread) {
-    }
-
-  }
-
   @Test
   public void shouldGetDslThreadGroupWhenTestElementFromTestBeanThreadGroup() throws Exception {
     testPlan(
@@ -117,10 +51,6 @@ public class WrapperJmeterDslTest {
             .prop(PROP_NAME, PROP_VAL)
             .children(DUMMY_SAMPLER)
     ).run();
-  }
-
-  private static class MyThreadGroupTestBean extends MyThreadGroup implements TestBean {
-
   }
 
   @Test
@@ -143,35 +73,6 @@ public class WrapperJmeterDslTest {
     ).run();
   }
 
-  private static class MySamplerGui extends AbstractSamplerGui {
-
-    @Override
-    public String getLabelResource() {
-      return "MySampler";
-    }
-
-    @Override
-    public TestElement createTestElement() {
-      return new MySampler();
-    }
-
-    @Override
-    public void modifyTestElement(TestElement element) {
-
-    }
-
-  }
-
-  // requires public visibility due to test element clone method
-  public static class MySampler extends AbstractSampler {
-
-    @Override
-    public SampleResult sample(Entry e) {
-      return null;
-    }
-
-  }
-
   @Test
   public void shouldGetDslSamplerWhenTestElementFromTestBeanSampler() throws Exception {
     testPlan(
@@ -181,11 +82,6 @@ public class WrapperJmeterDslTest {
                 .children(DUMMY_CHILD)
         )
     ).run();
-  }
-
-  // requires public visibility due to test element clone method
-  public static class MySamplerTestBean extends MySampler implements TestBean {
-
   }
 
   @Test
@@ -210,30 +106,6 @@ public class WrapperJmeterDslTest {
     ).run();
   }
 
-  private static class MyControllerGui extends AbstractControllerGui {
-
-    @Override
-    public String getLabelResource() {
-      return "MyController";
-    }
-
-    @Override
-    public TestElement createTestElement() {
-      return new MyController();
-    }
-
-    @Override
-    public void modifyTestElement(TestElement element) {
-
-    }
-
-  }
-
-  // requires public visibility due to test element clone method
-  public static class MyController extends GenericController {
-
-  }
-
   @Test
   public void shouldGetDslControllerWhenTestElementFromTestBeanController() throws Exception {
     testPlan(
@@ -243,11 +115,6 @@ public class WrapperJmeterDslTest {
                 .children(DUMMY_SAMPLER)
         )
     ).run();
-  }
-
-  // requires public visibility due to test element clone method
-  public static class MyControllerTestBean extends MyController implements TestBean {
-
   }
 
   @Test
@@ -275,35 +142,6 @@ public class WrapperJmeterDslTest {
     ).run();
   }
 
-  private static class MyAssertionGui extends AbstractAssertionGui {
-
-    @Override
-    public String getLabelResource() {
-      return "MyController";
-    }
-
-    @Override
-    public TestElement createTestElement() {
-      return new MyAssertion();
-    }
-
-    @Override
-    public void modifyTestElement(TestElement element) {
-
-    }
-
-  }
-
-  // requires public visibility due to test element clone method
-  public static class MyAssertion extends AbstractTestElement implements Assertion {
-
-    @Override
-    public AssertionResult getResult(SampleResult response) {
-      return new AssertionResult("MyAssertion");
-    }
-
-  }
-
   @Test
   public void shouldGetDslMultiLevelElementWhenTestElementFromTestBeanMultiLevelElement()
       throws Exception {
@@ -318,11 +156,6 @@ public class WrapperJmeterDslTest {
     ).run();
   }
 
-  // requires public visibility due to test element clone method
-  public static class MyAssertionTestBean extends MyAssertion implements TestBean {
-
-  }
-
   @Test
   public void shouldGetDslMultiLevelElementWhenTestElementFromNonTestBeanMultiLevelElement()
       throws Exception {
@@ -335,6 +168,67 @@ public class WrapperJmeterDslTest {
             DUMMY_SAMPLER.children(assertion)
         )
     ).run();
+  }
+
+  @Nested
+  public class CodeBuilderTest extends MethodCallBuilderTest {
+
+    protected CodeBuilderTest() {
+      codeGenerator.addBuildersFrom(WrapperJmeterDsl.class);
+    }
+
+    public DslTestPlan threadGroupGui() {
+      return testPlan(
+          testElement(new MyThreadGroupGui())
+              .prop("MY_PROP", "MY_VAL")
+              .children(
+                  httpSampler("http://myservice")
+              )
+      );
+    }
+
+    public DslTestPlan sampler() {
+      return testPlan(
+          threadGroup(1, 1,
+              testElement(new MySamplerGui())
+                  .prop("MY_PROP", "MY_VAL")
+          )
+      );
+    }
+
+    public DslTestPlan samplerTestBean() {
+      return testPlan(
+          threadGroup(1, 1,
+              testElement(new MySamplerTestBean())
+                  .prop("MY_PROP", "MY_VAL")
+          )
+      );
+    }
+
+    public DslTestPlan controller() {
+      return testPlan(
+          threadGroup(1, 1,
+              testElement(new MyControllerGui())
+                  .prop("MY_PROP", "MY_VAL")
+                  .children(
+                      httpSampler("http://myservice")
+                  )
+          )
+      );
+    }
+
+    public DslTestPlan assertion() {
+      return testPlan(
+          threadGroup(1, 1,
+              httpSampler("http://myservice")
+                  .children(
+                      testElement(new MyAssertionGui())
+                          .prop("MY_PROP", "MY_VAL")
+                  )
+          )
+      );
+    }
+
   }
 
 }
