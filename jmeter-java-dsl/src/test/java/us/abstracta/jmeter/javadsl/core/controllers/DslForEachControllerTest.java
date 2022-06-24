@@ -6,13 +6,17 @@ import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.verify;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.forEachController;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.httpSampler;
+import static us.abstracta.jmeter.javadsl.JmeterDsl.ifController;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.regexExtractor;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.testPlan;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.threadGroup;
 
 import com.github.tomakehurst.wiremock.client.WireMock;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import us.abstracta.jmeter.javadsl.JmeterDslTest;
+import us.abstracta.jmeter.javadsl.codegeneration.MethodCallBuilderTest;
+import us.abstracta.jmeter.javadsl.core.DslTestPlan;
 
 public class DslForEachControllerTest extends JmeterDslTest {
 
@@ -68,6 +72,31 @@ public class DslForEachControllerTest extends JmeterDslTest {
     verifyRequestMadeForPath("/0");
     verifyRequestMadeForPath("/1");
     verifyRequestMadeForPath("/2");
+  }
+
+  @Nested
+  public class CodeBuilderTest extends MethodCallBuilderTest {
+
+    public DslTestPlan forEachControllerWithoutName() {
+      return testPlan(
+          threadGroup(1, 1,
+              forEachController("items", "item",
+                  httpSampler("http://localhost")
+              )
+          )
+      );
+    }
+
+    public DslTestPlan forEachControllerWithName() {
+      return testPlan(
+          threadGroup(1, 1,
+              forEachController("loop", "items", "item",
+                  httpSampler("http://localhost")
+              )
+          )
+      );
+    }
+
   }
 
 }
