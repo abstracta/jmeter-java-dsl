@@ -3,12 +3,16 @@ package us.abstracta.jmeter.javadsl.core.testelements;
 import java.util.function.Consumer;
 import org.apache.jmeter.gui.JMeterGUIComponent;
 import org.apache.jmeter.testelement.AbstractScopedTestElement;
+import org.apache.jmeter.testelement.TestElement;
+import us.abstracta.jmeter.javadsl.codegeneration.MethodParam;
+import us.abstracta.jmeter.javadsl.codegeneration.MethodParam.FixedParam;
+import us.abstracta.jmeter.javadsl.codegeneration.TestElementParamBuilder;
 
 /**
  * Contains common logic for test elements that only process certain samples.
  *
  * @param <T> is the type of the test element that extends this class (to properly inherit fluent
- * API methods).
+ *            API methods).
  * @since 0.11
  */
 public abstract class DslScopedTestElement<T> extends BaseTestElement {
@@ -81,6 +85,33 @@ public abstract class DslScopedTestElement<T> extends BaseTestElement {
 
     private void applyTo(AbstractScopedTestElement re) {
       applier.accept(re);
+    }
+
+    public static Scope fromPropertyValue(String propertyValue) {
+      if ("all".equals(propertyValue)) {
+        return Scope.ALL_SAMPLES;
+      } else if ("children".equals(propertyValue)) {
+        return Scope.SUB_SAMPLES;
+      }
+      return null;
+    }
+
+  }
+
+  protected static class ScopeMethodParam extends FixedParam<Scope> {
+
+    private ScopeMethodParam(String expression, Scope defaultValue) {
+      super(Scope.class, expression, Scope::fromPropertyValue, defaultValue);
+    }
+
+    public static MethodParam from(TestElement testElement) {
+      return new TestElementParamBuilder(testElement)
+          .buildParam("Sample.scope", ScopeMethodParam::new, Scope.MAIN_SAMPLE);
+    }
+
+    @Override
+    public String buildCode(String indent) {
+      return Scope.class.getSimpleName() + "." + value.name();
     }
 
   }

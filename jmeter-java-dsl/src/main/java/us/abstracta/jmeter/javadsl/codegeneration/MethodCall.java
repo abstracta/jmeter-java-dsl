@@ -260,7 +260,7 @@ public class MethodCall {
       MethodParam[] params) {
     Stream<Method> chainableMethods = Arrays.stream(methodClass.getDeclaredMethods())
         .filter(m -> methodName.equals(m.getName()) && Modifier.isPublic(m.getModifiers())
-            && m.getReturnType() == methodClass);
+            && m.getReturnType().isAssignableFrom(methodClass));
     return findParamsMatchingMethod(chainableMethods, params);
   }
 

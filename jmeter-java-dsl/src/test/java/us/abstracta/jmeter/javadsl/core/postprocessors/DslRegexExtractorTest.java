@@ -12,9 +12,13 @@ import static us.abstracta.jmeter.javadsl.JmeterDsl.regexExtractor;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.testPlan;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.threadGroup;
 
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import us.abstracta.jmeter.javadsl.JmeterDslTest;
+import us.abstracta.jmeter.javadsl.codegeneration.MethodCallBuilderTest;
+import us.abstracta.jmeter.javadsl.core.DslTestPlan;
 import us.abstracta.jmeter.javadsl.core.postprocessors.DslRegexExtractor.TargetField;
+import us.abstracta.jmeter.javadsl.core.testelements.DslScopedTestElement.Scope;
 
 public class DslRegexExtractorTest extends JmeterDslTest {
 
@@ -58,6 +62,50 @@ public class DslRegexExtractorTest extends JmeterDslTest {
     ).run();
 
     verify(getRequestedFor(urlEqualTo(REGEX_PATH + USER_QUERY_PARAMETER + USER)));
+  }
+
+  @Nested
+  public class CodeBuilderTest extends MethodCallBuilderTest {
+
+    public DslTestPlan simpleRegexExtractor() {
+      return testPlan(
+          threadGroup(1, 1,
+              httpSampler("http://localhost")
+                  .children(
+                      regexExtractor("myVar", "(.*)")
+                  )
+          )
+      );
+    }
+
+    public DslTestPlan completeRegexExtractor() {
+      return testPlan(
+          threadGroup(1, 1,
+              httpSampler("http://localhost")
+                  .children(
+                      regexExtractor("myVar", "(.*)")
+                          .scope(Scope.ALL_SAMPLES)
+                          .fieldToCheck(TargetField.REQUEST_HEADERS)
+                          .matchNumber(0)
+                          .template("$0$")
+                          .defaultValue("NO_MATCH")
+                  )
+          )
+      );
+    }
+
+    public DslTestPlan variableScopedRegexExtractor() {
+      return testPlan(
+          threadGroup(1, 1,
+              httpSampler("http://localhost")
+                  .children(
+                      regexExtractor("myVar", "(.*)")
+                          .scopeVariable("otherVar")
+                  )
+          )
+      );
+    }
+
   }
 
 }

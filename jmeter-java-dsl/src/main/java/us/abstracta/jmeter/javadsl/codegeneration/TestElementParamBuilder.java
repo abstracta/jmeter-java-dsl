@@ -49,26 +49,41 @@ public class TestElementParamBuilder {
   }
 
   /**
-   * Generates a new {@link NameParam} instance for the test element.
+   * Generates a MethodParam representing a test element name.
    *
    * @param defaultName is the default name used by the JMeter test element.
-   * @return a {@link NameParam} instance.
+   * @return the MethodParam instance.
    */
-  public MethodParam nameParam(String defaultName) {
+  public NameParam nameParam(String defaultName) {
     return new NameParam(testElement.getName(), defaultName);
   }
 
   /**
-   * Generates a new {@link IntParam} instance for a test element property.
+   * Generates a MethodParam representing an integer test element property.
    *
-   * @param propName is the name of the property holding an integer value. For nested properties (a
-   *                 property that is inside another object property) you can use the slash
-   *                 character to separate the levels (eg: http_config/use_proxy).
-   * @return the {@link IntParam} instance.
+   * @param propName     is the name of the property holding an integer value. For nested properties
+   *                     (a property that is inside another object property) you can use the slash
+   *                     character to separate the levels (eg: http_config/use_proxy).
+   * @param defaultValue is the default value used by the test element for this property.
+   * @return the MethodParam instance.
    * @throws UnsupportedOperationException when no integer can be parsed from the property value.
+   * @since 0.61
+   */
+  public MethodParam intParam(String propName, Integer defaultValue) {
+    return buildParam(propName, IntParam::new, defaultValue);
+  }
+
+  /**
+   * Same as {@link #intParam(String, Integer)} but with no default value.
+   *
+   * @param propName is the name of the property. For nested properties (a property that is inside
+   *                 another object property) you can use the slash character to separate the levels
+   *                 (eg: http_config/use_proxy).
+   * @return the {@link MethodParam} instance.
+   * @see #intParam(String, Integer)
    */
   public MethodParam intParam(String propName) {
-    return buildParam(propName, IntParam::new, (Integer) null);
+    return intParam(propName, null);
   }
 
   public <V, T extends MethodParam> MethodParam buildParam(String propName,
@@ -109,13 +124,13 @@ public class TestElementParamBuilder {
   }
 
   /**
-   * Gets a {@link StringParam} instance for the given property name and default value.
+   * Gets a MethodParam for a string test element property.
    *
    * @param propName     is the name of the property. For nested properties (a property that is
    *                     inside another object property) you can use the slash character to separate
    *                     the levels (eg: http_config/use_proxy).
    * @param defaultValue the default value assigned to the JMeter test element property.
-   * @return the {@link StringParam} instance.
+   * @return the {@link MethodParam} instance.
    */
   public MethodParam stringParam(String propName, String defaultValue) {
     return new StringParam(prop(propName).getStringValue(), defaultValue);
@@ -127,7 +142,7 @@ public class TestElementParamBuilder {
    * @param propName is the name of the property. For nested properties (a property that is inside
    *                 another object property) you can use the slash character to separate the levels
    *                 (eg: http_config/use_proxy).
-   * @return the {@link StringParam} instance.
+   * @return the {@link MethodParam} instance.
    * @see #stringParam(String, String)
    */
   public MethodParam stringParam(String propName) {
@@ -135,28 +150,26 @@ public class TestElementParamBuilder {
   }
 
   /**
-   * Gets a {@link BoolParam} instance for the given property name and default value.
+   * Gets a MethodParam representing a boolean test element property.
    *
    * @param propName     is the name of the property. For nested properties (a property that is
    *                     inside another object property) you can use the slash character to separate
    *                     the levels (eg: http_config/use_proxy).
    * @param defaultValue the default value assigned to the JMeter test element property.
-   * @return the {@link BoolParam} instance.
+   * @return the {@link MethodParam} instance.
    */
   public MethodParam boolParam(String propName, boolean defaultValue) {
     return buildParam(propName, BoolParam::new, defaultValue);
   }
 
   /**
-   * Gets a {@link DurationParam} instance for the given property name and default value.
-   * <p>
-   * The property is considered to be a given number of seconds.
+   * Gets a MethodParam representing a test element property containing a duration (in seconds).
    *
    * @param propName     is the name of the property. For nested properties (a property that is
    *                     inside another object property) you can use the slash character to separate
    *                     the levels (eg: http_config/use_proxy).
    * @param defaultValue the default value assigned to the JMeter test element property.
-   * @return the {@link DurationParam} instance.
+   * @return the {@link MethodParam} instance.
    */
   public MethodParam durationParam(String propName, Duration defaultValue) {
     return buildParam(propName, DurationParam::new, defaultValue);
@@ -168,7 +181,7 @@ public class TestElementParamBuilder {
    * @param propName is the name of the property. For nested properties (a property that is inside
    *                 another object property) you can use the slash character to separate the levels
    *                 (eg: http_config/use_proxy).
-   * @return the {@link DurationParam} instance.
+   * @return the {@link MethodParam} instance.
    * @see #durationParam(String, Duration)
    */
   public MethodParam durationParam(String propName) {
