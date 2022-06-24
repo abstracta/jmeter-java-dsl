@@ -212,8 +212,23 @@ public abstract class MethodParam {
    */
   public static class LongParam extends FixedParam<Long> {
 
-    public LongParam(long seconds) {
-      super(long.class, seconds, null);
+    public LongParam(String expression, Long defaultValue) {
+      super(long.class, expression, Long::valueOf, defaultValue);
+    }
+
+    public LongParam(long value) {
+      super(long.class, value, null);
+    }
+
+  }
+
+  /**
+   * Is a parameter with a double value.
+   */
+  public static class DoubleParam extends FixedParam<Double> {
+
+    public DoubleParam(String expression, Double defaultValue) {
+      super(double.class, expression, Double::valueOf, defaultValue);
     }
 
   }

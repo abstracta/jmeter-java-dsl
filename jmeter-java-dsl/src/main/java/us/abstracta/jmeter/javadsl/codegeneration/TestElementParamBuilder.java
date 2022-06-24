@@ -5,9 +5,11 @@ import java.util.function.BiFunction;
 import org.apache.jmeter.testelement.TestElement;
 import org.apache.jmeter.testelement.property.JMeterProperty;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodParam.BoolParam;
+import us.abstracta.jmeter.javadsl.codegeneration.MethodParam.DoubleParam;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodParam.DurationParam;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodParam.DynamicParam;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodParam.IntParam;
+import us.abstracta.jmeter.javadsl.codegeneration.MethodParam.LongParam;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodParam.NameParam;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodParam.StringParam;
 
@@ -121,6 +123,34 @@ public class TestElementParamBuilder {
       propHolder = (TestElement) testElement.getProperty(propLevels[i]).getObjectValue();
     }
     return propHolder.getProperty(propLevels[propLevels.length - 1]);
+  }
+
+  /**
+   * Generates a MethodParam representing a long test element property.
+   *
+   * @param propName     is the name of the property holding a long value. For nested properties
+   *                     (a property that is inside another object property) you can use the slash
+   *                     character to separate the levels (eg: http_config/use_proxy).
+   * @return the MethodParam instance.
+   * @throws UnsupportedOperationException when no long can be parsed from the property value.
+   * @since 0.61
+   */
+  public MethodParam longParam(String propName) {
+    return buildParam(propName, LongParam::new, (Long) null);
+  }
+
+  /**
+   * Generates a MethodParam representing a double test element property.
+   *
+   * @param propName     is the name of the property holding a double value. For nested properties
+   *                     (a property that is inside another object property) you can use the slash
+   *                     character to separate the levels (eg: http_config/use_proxy).
+   * @return the MethodParam instance.
+   * @throws UnsupportedOperationException when no double can be parsed from the property value.
+   * @since 0.61
+   */
+  public MethodParam doubleParam(String propName) {
+    return buildParam(propName, DoubleParam::new, null);
   }
 
   /**
