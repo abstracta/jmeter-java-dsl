@@ -1,9 +1,15 @@
 package us.abstracta.jmeter.javadsl.core.controllers;
 
+import java.lang.reflect.Method;
 import java.util.List;
 import org.apache.jmeter.control.IfController;
 import org.apache.jmeter.control.gui.IfControllerPanel;
 import org.apache.jmeter.testelement.TestElement;
+import us.abstracta.jmeter.javadsl.codegeneration.MethodCall;
+import us.abstracta.jmeter.javadsl.codegeneration.MethodCallContext;
+import us.abstracta.jmeter.javadsl.codegeneration.MethodParam.ChildrenParam;
+import us.abstracta.jmeter.javadsl.codegeneration.SingleTestElementCallBuilder;
+import us.abstracta.jmeter.javadsl.codegeneration.TestElementParamBuilder;
 import us.abstracta.jmeter.javadsl.core.threadgroups.BaseThreadGroup.ThreadGroupChild;
 import us.abstracta.jmeter.javadsl.core.util.DslScriptBuilder;
 import us.abstracta.jmeter.javadsl.core.util.PropertyScriptBuilder;
@@ -38,6 +44,22 @@ public class DslIfController extends BaseController {
     String condition = conditionBuilder.build();
     ret.setCondition(condition);
     return ret;
+  }
+
+  public static class CodeBuilder extends SingleTestElementCallBuilder<IfController> {
+
+    public CodeBuilder(List<Method> builderMethods) {
+      super(IfController.class, builderMethods);
+    }
+
+    @Override
+    protected MethodCall buildMethodCall(IfController testElement, MethodCallContext context) {
+      TestElementParamBuilder paramBuilder = new TestElementParamBuilder(testElement,
+          "IfController");
+      return buildMethodCall(paramBuilder.stringParam("condition"),
+          new ChildrenParam<>(ThreadGroupChild[].class));
+    }
+
   }
 
 }

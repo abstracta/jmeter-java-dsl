@@ -8,8 +8,11 @@ import static us.abstracta.jmeter.javadsl.JmeterDsl.threadGroup;
 
 import java.util.HashMap;
 import java.util.Map;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import us.abstracta.jmeter.javadsl.JmeterDslTest;
+import us.abstracta.jmeter.javadsl.codegeneration.MethodCallBuilderTest;
+import us.abstracta.jmeter.javadsl.core.DslTestPlan;
 import us.abstracta.jmeter.javadsl.core.TestPlanStats;
 
 public class DslIfControllerTest extends JmeterDslTest {
@@ -42,6 +45,21 @@ public class DslIfControllerTest extends JmeterDslTest {
         )
     ).run();
     assertThat(extractCounts(stats)).isEqualTo(buildExpectedCounts());
+  }
+
+  @Nested
+  public class CodeBuilderTest extends MethodCallBuilderTest {
+
+    public DslTestPlan testPlanWithIfController() {
+      return testPlan(
+          threadGroup(1, 1,
+              ifController("${X} == 1",
+                  httpSampler("http://localhost")
+              )
+          )
+      );
+    }
+
   }
 
 }
