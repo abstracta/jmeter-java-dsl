@@ -3,10 +3,7 @@ package us.abstracta.jmeter.javadsl.core.testelements;
 import java.util.function.Consumer;
 import org.apache.jmeter.gui.JMeterGUIComponent;
 import org.apache.jmeter.testelement.AbstractScopedTestElement;
-import org.apache.jmeter.testelement.TestElement;
-import us.abstracta.jmeter.javadsl.codegeneration.MethodParam;
-import us.abstracta.jmeter.javadsl.codegeneration.TestElementParamBuilder;
-import us.abstracta.jmeter.javadsl.codegeneration.params.FixedParam;
+import us.abstracta.jmeter.javadsl.codegeneration.params.EnumParam.EnumPropertyValue;
 
 /**
  * Contains common logic for test elements that only process certain samples.
@@ -62,56 +59,36 @@ public abstract class DslScopedTestElement<T> extends BaseTestElement {
   /**
    * Specifies to which samples apply the regular extractor to.
    */
-  public enum Scope {
+  public enum Scope implements EnumPropertyValue {
     /**
      * Applies the regular extractor to all samples (main and sub samples).
      */
-    ALL_SAMPLES(AbstractScopedTestElement::setScopeAll),
+    ALL_SAMPLES(AbstractScopedTestElement::setScopeAll, "all"),
     /**
      * Applies the regular extractor only to main sample (sub samples, like redirects, are not
      * included).
      */
-    MAIN_SAMPLE(AbstractScopedTestElement::setScopeParent),
+    MAIN_SAMPLE(AbstractScopedTestElement::setScopeParent, "parent"),
     /**
      * Applies the regular extractor only to sub samples (redirects, embedded resources, etc.).
      */
-    SUB_SAMPLES(AbstractScopedTestElement::setScopeChildren);
+    SUB_SAMPLES(AbstractScopedTestElement::setScopeChildren, "children");
 
     private final Consumer<AbstractScopedTestElement> applier;
+    private final String propertyValue;
 
-    Scope(Consumer<AbstractScopedTestElement> applier) {
+    Scope(Consumer<AbstractScopedTestElement> applier, String propertyValue) {
       this.applier = applier;
+      this.propertyValue = propertyValue;
     }
 
     private void applyTo(AbstractScopedTestElement re) {
       applier.accept(re);
     }
 
-    public static Scope fromPropertyValue(String propertyValue) {
-      if ("all".equals(propertyValue)) {
-        return Scope.ALL_SAMPLES;
-      } else if ("children".equals(propertyValue)) {
-        return Scope.SUB_SAMPLES;
-      }
-      return null;
-    }
-
-  }
-
-  protected static class ScopeMethodParam extends FixedParam<Scope> {
-
-    private ScopeMethodParam(String expression, Scope defaultValue) {
-      super(Scope.class, expression, Scope::fromPropertyValue, defaultValue);
-    }
-
-    public static MethodParam from(TestElement testElement) {
-      return new TestElementParamBuilder(testElement)
-          .buildParam("Sample.scope", ScopeMethodParam::new, Scope.MAIN_SAMPLE);
-    }
-
     @Override
-    public String buildCode(String indent) {
-      return Scope.class.getSimpleName() + "." + value.name();
+    public String propertyValue() {
+      return propertyValue;
     }
 
   }

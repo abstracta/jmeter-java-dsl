@@ -28,6 +28,7 @@ import us.abstracta.jmeter.javadsl.codegeneration.MethodCallContext;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodParam;
 import us.abstracta.jmeter.javadsl.codegeneration.TestElementParamBuilder;
 import us.abstracta.jmeter.javadsl.codegeneration.params.BoolParam;
+import us.abstracta.jmeter.javadsl.codegeneration.params.EnumParam.EnumPropertyValue;
 import us.abstracta.jmeter.javadsl.codegeneration.params.StringParam;
 import us.abstracta.jmeter.javadsl.core.preprocessors.DslJsr223PreProcessor.PreProcessorScript;
 import us.abstracta.jmeter.javadsl.core.preprocessors.DslJsr223PreProcessor.PreProcessorVars;
@@ -356,7 +357,7 @@ public class DslHttpSampler extends DslBaseHttpSampler<DslHttpSampler> {
   /**
    * Specifies an HTTP client implementation to be used by HTTP samplers.
    */
-  public enum HttpClientImpl {
+  public enum HttpClientImpl implements EnumPropertyValue {
     /**
      * Specifies to use the Java implementation.
      */
@@ -367,26 +368,15 @@ public class DslHttpSampler extends DslBaseHttpSampler<DslHttpSampler> {
      */
     HTTP_CLIENT("HttpClient4");
 
-    private static final Map<String, HttpClientImpl> IMPLS_BY_PROPERTY_VALUE = Arrays.stream(
-        values()).collect(Collectors.toMap(v -> v.propertyValue, v -> v));
-
     public final String propertyValue;
 
     HttpClientImpl(String propertyValue) {
       this.propertyValue = propertyValue;
     }
 
-    public static HttpClientImpl fromPropertyValue(String propertyValue) {
-      if (propertyValue.isEmpty()) {
-        return null;
-      }
-      HttpClientImpl ret = IMPLS_BY_PROPERTY_VALUE.get(propertyValue);
-      if (ret == null) {
-        throw new IllegalArgumentException(
-            "Unknown " + HttpClientImpl.class.getSimpleName() + " property value: "
-                + propertyValue);
-      }
-      return ret;
+    @Override
+    public String propertyValue() {
+      return propertyValue;
     }
 
   }
@@ -409,7 +399,8 @@ public class DslHttpSampler extends DslBaseHttpSampler<DslHttpSampler> {
           .chain("followRedirects", buildFollowRedirectsParam(paramBuilder))
           .chain("downloadEmbeddedResources",
               paramBuilder.boolParam(HTTPSamplerBase.IMAGE_PARSER, false))
-          .chain("clientImpl", ClientImplParam.from(paramBuilder));
+          .chain("clientImpl",
+              paramBuilder.enumParam(HTTPSamplerBase.IMPLEMENTATION, HttpClientImpl.HTTP_CLIENT));
     }
 
     @Override

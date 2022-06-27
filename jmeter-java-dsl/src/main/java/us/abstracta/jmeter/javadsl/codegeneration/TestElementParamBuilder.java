@@ -13,7 +13,6 @@ import us.abstracta.jmeter.javadsl.codegeneration.params.IntParam;
 import us.abstracta.jmeter.javadsl.codegeneration.params.LongParam;
 import us.abstracta.jmeter.javadsl.codegeneration.params.NameParam;
 import us.abstracta.jmeter.javadsl.codegeneration.params.StringParam;
-import us.abstracta.jmeter.javadsl.core.configs.DslCsvDataSet.JmeterEnumPropertyValue;
 
 /**
  * Is a wrapper class for {@link TestElement} for easy creation of {@link MethodParam} instances.
@@ -227,12 +226,12 @@ public class TestElementParamBuilder {
    * @param propName     is the name of the property. For nested properties (a property that is
    *                     inside another object property) you can use the slash character to separate
    *                     the levels (eg: http_config/use_proxy).
-   * @param enumType     the enum class that represents the set of values of the property.
    * @param defaultValue the default value assigned to the JMeter test element property.
    * @return the {@link MethodParam} instance.
    */
-  public <T extends Enum<?> & JmeterEnumPropertyValue> MethodParam enumParam(String propName,
-      Class<T> enumType, T defaultValue) {
+  public <T extends Enum<?> & EnumParam.EnumPropertyValue> MethodParam enumParam(String propName,
+      T defaultValue) {
+    Class<T> enumType = (Class<T>) defaultValue.getClass();
     return buildParam(propName, (s, d) -> new EnumParam<>(enumType, s, d), defaultValue);
   }
 

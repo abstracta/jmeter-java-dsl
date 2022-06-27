@@ -8,9 +8,7 @@ import org.apache.jmeter.gui.JMeterGUIComponent;
 import org.apache.jmeter.testelement.TestElement;
 import org.apache.jmeter.testelement.property.StringProperty;
 import org.apache.jmeter.threads.AbstractThreadGroup;
-import us.abstracta.jmeter.javadsl.codegeneration.MethodParam;
-import us.abstracta.jmeter.javadsl.codegeneration.TestElementParamBuilder;
-import us.abstracta.jmeter.javadsl.codegeneration.params.FixedParam;
+import us.abstracta.jmeter.javadsl.codegeneration.params.EnumParam.EnumPropertyValue;
 import us.abstracta.jmeter.javadsl.core.DslTestElement;
 import us.abstracta.jmeter.javadsl.core.testelements.TestElementContainer;
 import us.abstracta.jmeter.javadsl.core.threadgroups.BaseThreadGroup.ThreadGroupChild;
@@ -77,7 +75,7 @@ public abstract class BaseThreadGroup<T extends BaseThreadGroup<?>> extends
   /**
    * Specifies an action to be taken by thread group when a sample error is detected.
    */
-  public enum SampleErrorAction {
+  public enum SampleErrorAction implements EnumPropertyValue {
     /**
      * Ignores the error and continues execution with the next element in children elements, or
      * starts a new iteration.
@@ -110,37 +108,9 @@ public abstract class BaseThreadGroup<T extends BaseThreadGroup<?>> extends
       this.propertyValue = propertyValue;
     }
 
-    public static SampleErrorAction fromPropertyValue(String propertyValue) {
-      if (propertyValue.isEmpty()) {
-        return null;
-      }
-      SampleErrorAction ret = ACTIONS_BY_PROPERTY_VALUE.get(propertyValue);
-      if (ret == null) {
-        throw new IllegalArgumentException(
-            "Unknown " + SampleErrorAction.class.getSimpleName() + " property value: "
-                + propertyValue);
-      }
-      return ret;
-    }
-
-  }
-
-  protected static class SampleErrorActionMethodParam extends FixedParam<SampleErrorAction> {
-
-    private SampleErrorActionMethodParam(String expression, SampleErrorAction defaultValue) {
-      super(SampleErrorAction.class, expression, SampleErrorAction::fromPropertyValue,
-          defaultValue);
-    }
-
-    public static MethodParam from(TestElement testElement) {
-      return new TestElementParamBuilder(testElement)
-          .buildParam(AbstractThreadGroup.ON_SAMPLE_ERROR, SampleErrorActionMethodParam::new,
-              SampleErrorAction.CONTINUE);
-    }
-
     @Override
-    public String buildCode(String indent) {
-      return SampleErrorAction.class.getSimpleName() + "." + value.name();
+    public String propertyValue() {
+      return propertyValue;
     }
 
   }

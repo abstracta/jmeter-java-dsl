@@ -1,10 +1,7 @@
 package us.abstracta.jmeter.javadsl.core.postprocessors;
 
 import java.lang.reflect.Method;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 import org.apache.jmeter.extractor.RegexExtractor;
 import org.apache.jmeter.extractor.gui.RegexExtractorGui;
 import org.apache.jmeter.testelement.TestElement;
@@ -13,7 +10,7 @@ import us.abstracta.jmeter.javadsl.codegeneration.MethodCallContext;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodParam;
 import us.abstracta.jmeter.javadsl.codegeneration.SingleTestElementCallBuilder;
 import us.abstracta.jmeter.javadsl.codegeneration.TestElementParamBuilder;
-import us.abstracta.jmeter.javadsl.codegeneration.params.FixedParam;
+import us.abstracta.jmeter.javadsl.codegeneration.params.EnumParam.EnumPropertyValue;
 import us.abstracta.jmeter.javadsl.codegeneration.params.StringParam;
 
 /**
@@ -137,7 +134,7 @@ public class DslRegexExtractor extends DslVariableExtractor<DslRegexExtractor> {
   /**
    * Used to specify the field the regular extractor will apply to.
    */
-  public enum TargetField {
+  public enum TargetField implements EnumPropertyValue {
     /**
      * Applies the regular extractor to the plain string of the response body.
      *
@@ -182,26 +179,15 @@ public class DslRegexExtractor extends DslVariableExtractor<DslRegexExtractor> {
      */
     RESPONSE_MESSAGE(RegexExtractor.USE_MESSAGE);
 
-    private static final Map<String, TargetField> FIELDS_BY_PROPERTY_VALUE = Arrays.stream(
-            values())
-        .collect(Collectors.toMap(v -> v.propertyValue, v -> v));
-
     private final String propertyValue;
 
     TargetField(String propertyValue) {
       this.propertyValue = propertyValue;
     }
 
-    public static TargetField fromPropertyValue(String propertyValue) {
-      if (propertyValue.isEmpty()) {
-        return null;
-      }
-      TargetField ret = FIELDS_BY_PROPERTY_VALUE.get(propertyValue);
-      if (ret == null) {
-        throw new IllegalArgumentException(
-            "Unknown " + TargetField.class.getSimpleName() + " property value: " + propertyValue);
-      }
-      return ret;
+    @Override
+    public String propertyValue() {
+      return propertyValue;
     }
 
   }
@@ -218,13 +204,15 @@ public class DslRegexExtractor extends DslVariableExtractor<DslRegexExtractor> {
           "RegexExtractor");
       MethodCall ret = buildMethodCall(regexParamBuilder.stringParam("refname"),
           regexParamBuilder.stringParam("regex"));
-      MethodParam scopeVar = new TestElementParamBuilder(testElement).stringParam("Scope.variable");
+      TestElementParamBuilder scopeParamBuilder = new TestElementParamBuilder(testElement, "Scope");
+      MethodParam scopeVar = scopeParamBuilder.stringParam("variable");
       if (scopeVar.isDefault()) {
-        ret.chain("scope", ScopeMethodParam.from(testElement));
+        ret.chain("scope", scopeParamBuilder.enumParam("scope", Scope.MAIN_SAMPLE));
       } else {
         ret.chain("scopeVariable", scopeVar);
       }
-      ret.chain("fieldToCheck", TargetFieldMethodParam.from(testElement));
+      ret.chain("fieldToCheck",
+          regexParamBuilder.enumParam("useHeaders", TargetField.RESPONSE_BODY));
       ret.chain("matchNumber", regexParamBuilder.intParam("match_number", 1));
       ret.chain("template", regexParamBuilder.stringParam("template", "$1$"));
       ret.chain("defaultValue", buildDefaultParam(regexParamBuilder));
@@ -241,25 +229,6 @@ public class DslRegexExtractor extends DslVariableExtractor<DslRegexExtractor> {
         defaultParam = sourceDefaultParam.isDefault() ? new StringParam(null) : sourceDefaultParam;
       }
       return defaultParam;
-    }
-
-  }
-
-  protected static class TargetFieldMethodParam extends FixedParam<TargetField> {
-
-    private TargetFieldMethodParam(String expression, TargetField defaultValue) {
-      super(TargetField.class, expression, TargetField::fromPropertyValue, defaultValue);
-    }
-
-    public static MethodParam from(TestElement testElement) {
-      return new TestElementParamBuilder(testElement)
-          .buildParam("RegexExtractor.useHeaders", TargetFieldMethodParam::new,
-              TargetField.RESPONSE_BODY);
-    }
-
-    @Override
-    public String buildCode(String indent) {
-      return TargetField.class.getSimpleName() + "." + value.name();
     }
 
   }

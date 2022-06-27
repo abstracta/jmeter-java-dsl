@@ -289,7 +289,8 @@ public class DslHttpDefaults extends BaseConfigElement {
       ret.chain("encoding", EncodingParam.from(paramBuilder))
           .chain("downloadEmbeddedResources",
               paramBuilder.boolParam(HTTPSamplerBase.IMAGE_PARSER, false))
-          .chain("clientImpl", ClientImplParam.from(paramBuilder));
+          .chain("clientImpl",
+              paramBuilder.enumParam(HTTPSamplerBase.IMPLEMENTATION, HttpClientImpl.HTTP_CLIENT));
       return ret;
     }
 

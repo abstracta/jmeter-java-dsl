@@ -14,6 +14,7 @@ import org.apache.jmeter.threads.gui.ThreadGroupGui;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodCall;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodCallBuilder;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodCallContext;
+import us.abstracta.jmeter.javadsl.codegeneration.TestElementParamBuilder;
 import us.abstracta.jmeter.javadsl.core.threadgroups.defaultthreadgroup.SimpleThreadGroupHelper;
 import us.abstracta.jmeter.javadsl.core.threadgroups.defaultthreadgroup.Stage;
 import us.abstracta.jmeter.javadsl.core.threadgroups.defaultthreadgroup.UltimateThreadGroupHelper;
@@ -417,7 +418,9 @@ public class DslDefaultThreadGroup extends BaseThreadGroup<DslDefaultThreadGroup
       } else {
         ret = new UltimateThreadGroupHelper.CodeBuilder(builderMethods).buildMethodCall(context);
       }
-      ret.chain("sampleErrorAction", SampleErrorActionMethodParam.from(testElement));
+      TestElementParamBuilder paramBuilder = new TestElementParamBuilder(testElement);
+      ret.chain("sampleErrorAction",
+          paramBuilder.enumParam(AbstractThreadGroup.ON_SAMPLE_ERROR, SampleErrorAction.CONTINUE));
       return ret;
     }
 
