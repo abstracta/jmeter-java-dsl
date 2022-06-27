@@ -1,5 +1,6 @@
 package us.abstracta.jmeter.javadsl.codegeneration;
 
+import java.nio.charset.Charset;
 import java.time.Duration;
 import java.util.function.BiFunction;
 import org.apache.jmeter.testelement.TestElement;
@@ -8,6 +9,7 @@ import us.abstracta.jmeter.javadsl.codegeneration.params.BoolParam;
 import us.abstracta.jmeter.javadsl.codegeneration.params.DoubleParam;
 import us.abstracta.jmeter.javadsl.codegeneration.params.DurationParam;
 import us.abstracta.jmeter.javadsl.codegeneration.params.DynamicParam;
+import us.abstracta.jmeter.javadsl.codegeneration.params.EncodingParam;
 import us.abstracta.jmeter.javadsl.codegeneration.params.EnumParam;
 import us.abstracta.jmeter.javadsl.codegeneration.params.IntParam;
 import us.abstracta.jmeter.javadsl.codegeneration.params.LongParam;
@@ -228,11 +230,26 @@ public class TestElementParamBuilder {
    *                     the levels (eg: http_config/use_proxy).
    * @param defaultValue the default value assigned to the JMeter test element property.
    * @return the {@link MethodParam} instance.
+   * @since 0.62
    */
   public <T extends Enum<?> & EnumParam.EnumPropertyValue> MethodParam enumParam(String propName,
       T defaultValue) {
     Class<T> enumType = (Class<T>) defaultValue.getClass();
     return buildParam(propName, (s, d) -> new EnumParam<>(enumType, s, d), defaultValue);
+  }
+
+  /**
+   * Gets a MethodParam representing a test element property containing an encoding (Charset).
+   *
+   * @param propName     is the name of the property. For nested properties (a property that is
+   *                     inside another object property) you can use the slash character to separate
+   *                     the levels (eg: http_config/use_proxy).
+   * @param defaultValue the default value assigned to the JMeter test element property.
+   * @return the {@link MethodParam} instance.
+   * @since 0.62
+   */
+  public MethodParam encodingParam(String propName, Charset defaultValue) {
+    return buildParam(propName, EncodingParam::new, defaultValue);
   }
 
 }

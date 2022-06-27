@@ -15,8 +15,11 @@ import com.github.tomakehurst.wiremock.matching.RequestPatternBuilder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import us.abstracta.jmeter.javadsl.JmeterDslTest;
+import us.abstracta.jmeter.javadsl.codegeneration.MethodCallBuilderTest;
+import us.abstracta.jmeter.javadsl.core.DslTestPlan;
 import us.abstracta.jmeter.javadsl.core.configs.DslCsvDataSet.Sharing;
 import us.abstracta.jmeter.javadsl.util.TestResource;
 
@@ -171,6 +174,50 @@ public class CsvDataSetTest extends JmeterDslTest {
       ret.add("val" + i);
     }
     return ret;
+  }
+
+  @Nested
+  public class CodeBuilderTest extends MethodCallBuilderTest {
+
+    public DslTestPlan testPlanWithDefaultCsvDataSet() {
+      return testPlan(
+          csvDataSet("myFile.csv")
+      );
+    }
+
+    public DslTestPlan testPlanWithCustomCsvDataSet() {
+      return testPlan(
+          csvDataSet("myFile.csv")
+              .ignoreFirstLine()
+              .variableNames("user", "password")
+              .delimiter(";")
+              .encoding(StandardCharsets.ISO_8859_1)
+              .sharedIn(Sharing.THREAD)
+              .stopThreadOnEOF()
+
+      );
+    }
+
+    public DslTestPlan testPlanWithDefaultRandomOrderCsvDataSet() {
+      return testPlan(
+          csvDataSet("myFile.csv")
+              .randomOrder()
+      );
+    }
+
+    public DslTestPlan testPlanWithCustomRandomOrderCsvDataSet() {
+      return testPlan(
+          csvDataSet("myFile.csv")
+              .ignoreFirstLine()
+              .variableNames("user", "password")
+              .delimiter(";")
+              .randomOrder()
+              .encoding(StandardCharsets.ISO_8859_1)
+              .sharedIn(Sharing.THREAD)
+              .stopThreadOnEOF()
+      );
+    }
+
   }
 
 }

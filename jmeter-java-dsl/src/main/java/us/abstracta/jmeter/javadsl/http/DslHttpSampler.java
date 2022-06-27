@@ -5,12 +5,10 @@ import static us.abstracta.jmeter.javadsl.JmeterDsl.jsr223PreProcessor;
 import java.lang.reflect.Method;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 import org.apache.http.entity.ContentType;
 import org.apache.jmeter.config.Arguments;
 import org.apache.jmeter.protocol.http.control.HeaderManager;
@@ -395,7 +393,7 @@ public class DslHttpSampler extends DslBaseHttpSampler<DslHttpSampler> {
 
     @Override
     protected void setAdditionalOptions(MethodCall ret, TestElementParamBuilder paramBuilder) {
-      ret.chain("encoding", EncodingParam.from(paramBuilder))
+      ret.chain("encoding", paramBuilder.encodingParam(HTTPSamplerBase.CONTENT_ENCODING, null))
           .chain("followRedirects", buildFollowRedirectsParam(paramBuilder))
           .chain("downloadEmbeddedResources",
               paramBuilder.boolParam(HTTPSamplerBase.IMAGE_PARSER, false))

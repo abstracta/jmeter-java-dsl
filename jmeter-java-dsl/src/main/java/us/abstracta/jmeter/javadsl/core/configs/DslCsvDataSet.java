@@ -2,10 +2,24 @@ package us.abstracta.jmeter.javadsl.core.configs;
 
 import com.blazemeter.jmeter.RandomCSVDataSetConfig;
 import com.blazemeter.jmeter.RandomCSVDataSetConfigGui;
+import java.lang.reflect.Method;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 import org.apache.jmeter.config.CSVDataSet;
 import org.apache.jmeter.testbeans.gui.TestBeanGUI;
 import org.apache.jmeter.testelement.TestElement;
+import us.abstracta.jmeter.javadsl.codegeneration.MethodCall;
+import us.abstracta.jmeter.javadsl.codegeneration.MethodCallBuilder;
+import us.abstracta.jmeter.javadsl.codegeneration.MethodCallContext;
+import us.abstracta.jmeter.javadsl.codegeneration.MethodParam;
+import us.abstracta.jmeter.javadsl.codegeneration.TestElementParamBuilder;
+import us.abstracta.jmeter.javadsl.codegeneration.params.BoolParam;
+import us.abstracta.jmeter.javadsl.codegeneration.params.EnumParam;
+import us.abstracta.jmeter.javadsl.codegeneration.params.EnumParam.EnumPropertyValue;
+import us.abstracta.jmeter.javadsl.codegeneration.params.FixedParam;
 
 /**
  * Allows using a CSV file as input data for JMeter variables to use in test plan.
@@ -56,6 +70,9 @@ public class DslCsvDataSet extends BaseConfigElement {
 
   /**
    * Specifies the file encoding used by the file.
+   * <p>
+   * This method is useful when specifying a dynamic encoding (through JMeter variable or function
+   * reference). Otherwise prefer using {@link #encoding(Charset)}.
    *
    * @param encoding the file encoding of the file. By default, it will use UTF-8 (which differs
    *                 from JMeter default, to have more consistent test plan execution). This might
@@ -65,6 +82,23 @@ public class DslCsvDataSet extends BaseConfigElement {
    */
   public DslCsvDataSet encoding(String encoding) {
     this.encoding = encoding;
+    return this;
+  }
+
+  /**
+   * Specifies the file encoding used by the file.
+   * <p>
+   * If you need to specify a dynamic encoding (through JMeter variable or function reference), then
+   * use {@link #encoding(String)} instead.
+   *
+   * @param encoding the file encoding of the file. By default, it will use UTF-8 (which differs
+   *                 from JMeter default, to have more consistent test plan execution). This might
+   *                 require to be changed but in general is good to have all files in same encoding
+   *                 (eg: UTF-8).
+   * @return the DslCsvDataSet for further configuration.
+   */
+  public DslCsvDataSet encoding(Charset encoding) {
+    this.encoding = encoding.name();
     return this;
   }
 
@@ -116,8 +150,8 @@ public class DslCsvDataSet extends BaseConfigElement {
    *
    * @param shareMode specifies the way threads consume information from the CSV file. By default,
    *                  all threads share the CSV information, meaning that any thread iteration will
-   *                  advance the consumption of the file (the file is a singleton). When {@link
-   *                  #randomOrder()} is used, THREAD_GROUP shared mode is not supported.
+   *                  advance the consumption of the file (the file is a singleton). When
+   *                  {@link #randomOrder()} is used, THREAD_GROUP shared mode is not supported.
    * @return the DslCsvDataSet for further configuration.
    * @see Sharing
    */
@@ -129,7 +163,8 @@ public class DslCsvDataSet extends BaseConfigElement {
   /**
    * Specifies to get file lines in random order instead of sequentially iterating over them.
    * <p>
-   * When this method is invoked <a href="https://github.com/Blazemeter/jmeter-bzm-plugins/blob/master/random-csv-data-set/RandomCSVDataSetConfig.md">Random
+   * When this method is invoked <a
+   * href="https://github.com/Blazemeter/jmeter-bzm-plugins/blob/master/random-csv-data-set/RandomCSVDataSetConfig.md">Random
    * CSV Data Set plugin</a> is used.
    *
    * <b>Warning:</b> Getting lines in random order has a performance penalty.
@@ -185,14 +220,14 @@ public class DslCsvDataSet extends BaseConfigElement {
     ret.setQuotedData(true);
     ret.setRecycle(!stopThread);
     ret.setStopThread(stopThread);
-    ret.setShareMode(shareMode.jmeterPropertyValue);
+    ret.setShareMode(shareMode.propertyValue);
     return ret;
   }
 
   /**
    * Specifies the way the threads in a test plan consume the CSV.
    */
-  public enum Sharing {
+  public enum Sharing implements EnumPropertyValue {
     /**
      * All threads in the test plan will share the CSV file, meaning that any thread iteration will
      * consume an entry from it. You can think as having only one pointer to the current line of the
@@ -212,10 +247,88 @@ public class DslCsvDataSet extends BaseConfigElement {
      */
     THREAD("thread");
 
-    private final String jmeterPropertyValue;
+    private final String propertyValue;
 
     Sharing(String jmeterPropertySuffix) {
-      this.jmeterPropertyValue = "shareMode." + jmeterPropertySuffix;
+      this.propertyValue = "shareMode." + jmeterPropertySuffix;
+    }
+
+    @Override
+    public String propertyValue() {
+      return propertyValue;
+    }
+
+  }
+
+  public static class CodeBuilder extends MethodCallBuilder {
+
+    public CodeBuilder(List<Method> builderMethods) {
+      super(builderMethods);
+    }
+
+    @Override
+    public boolean matches(MethodCallContext context) {
+      TestElement testElement = context.getTestElement();
+      return testElement.getClass() == CSVDataSet.class
+          || testElement.getClass() == RandomCSVDataSetConfig.class;
+    }
+
+    @Override
+    protected MethodCall buildMethodCall(MethodCallContext context) {
+      TestElement testElement = context.getTestElement();
+      TestElementParamBuilder paramBuilder = new TestElementParamBuilder(testElement);
+      MethodCall ret = buildMethodCall(paramBuilder.stringParam("filename"));
+      ret.chain("ignoreFirstLine", paramBuilder.boolParam("ignoreFirstLine", false));
+      ret.chain("variableNames",
+          new StringArrayParam(testElement.getPropertyAsString("variableNames")));
+      ret.chain("delimiter", paramBuilder.stringParam("delimiter", ","));
+      ret.chain("randomOrder", buildRandomOrderParameter(testElement, paramBuilder));
+      ret.chain("encoding", paramBuilder.encodingParam("fileEncoding", StandardCharsets.UTF_8));
+      ret.chain("sharedIn", buildSharingParameter(testElement, paramBuilder));
+      ret.chain("stopThreadOnEOF", buildStopThreadParameter(testElement, paramBuilder));
+      return ret;
+    }
+
+    private MethodParam buildSharingParameter(TestElement testElement,
+        TestElementParamBuilder paramBuilder) {
+      if (testElement instanceof RandomCSVDataSetConfig) {
+        return paramBuilder.boolParam("independentListPerThread", false).isDefault()
+            ? new EnumParam<>(Sharing.class, Sharing.ALL_THREADS.propertyValue, Sharing.ALL_THREADS)
+            : new EnumParam<>(Sharing.class, Sharing.THREAD.propertyValue, Sharing.ALL_THREADS);
+      } else {
+        return paramBuilder.enumParam("shareMode", Sharing.ALL_THREADS);
+      }
+    }
+
+    private MethodParam buildStopThreadParameter(TestElement testElement,
+        TestElementParamBuilder paramBuilder) {
+      if (testElement instanceof CSVDataSet) {
+        return paramBuilder.boolParam("stopThread", false);
+      } else {
+        MethodParam rewind = paramBuilder.boolParam("rewindOnTheEndOfList", true);
+        return new BoolParam(!rewind.isDefault(), false);
+      }
+    }
+
+    private MethodParam buildRandomOrderParameter(TestElement testElement,
+        TestElementParamBuilder paramBuilder) {
+      return new BoolParam(testElement.getClass() == RandomCSVDataSetConfig.class
+          && !paramBuilder.boolParam("randomOrder", false).isDefault(), false);
+    }
+
+  }
+
+  private static class StringArrayParam extends FixedParam<String[]> {
+
+    protected StringArrayParam(String expression) {
+      super(String[].class, expression, e -> e.split(","), null);
+    }
+
+    @Override
+    public String buildCode(String indent) {
+      return Arrays.stream(value)
+          .map(MethodParam::buildStringLiteral)
+          .collect(Collectors.joining(", "));
     }
 
   }
