@@ -10,6 +10,7 @@ import org.apache.jmeter.threads.AbstractThreadGroup;
 import org.apache.jmeter.threads.gui.AbstractThreadGroupGui;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodCall;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodCallContext;
+import us.abstracta.jmeter.javadsl.codegeneration.TestElementParamBuilder;
 import us.abstracta.jmeter.javadsl.core.threadgroups.BaseThreadGroup;
 
 /**
@@ -56,7 +57,9 @@ public class DslThreadGroupWrapper extends BaseThreadGroup<DslThreadGroupWrapper
     protected MethodCall buildMethodCall(AbstractThreadGroup testElement,
         MethodCallContext context) {
       MethodCall ret = super.buildMethodCall(testElement, context);
-      ret.chain("sampleErrorAction", SampleErrorActionMethodParam.from(testElement));
+      ret.chain("sampleErrorAction",
+          new TestElementParamBuilder(testElement).enumParam(AbstractThreadGroup.ON_SAMPLE_ERROR,
+              SampleErrorAction.CONTINUE));
       return ret;
     }
 

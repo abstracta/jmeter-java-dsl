@@ -2,6 +2,11 @@ package us.abstracta.jmeter.javadsl.codegeneration;
 
 import java.lang.reflect.Method;
 import java.util.List;
+import java.util.Spliterators;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
+import org.apache.jmeter.testelement.property.JMeterProperty;
+import org.apache.jmeter.testelement.property.PropertyIterator;
 import us.abstracta.jmeter.javadsl.codegeneration.params.ChildrenParam;
 
 /**
@@ -106,6 +111,10 @@ public abstract class MethodCallBuilder {
    */
   public int order() {
     return 1;
+  }
+
+  public static Stream<JMeterProperty> propertyIterator2Stream(PropertyIterator iter) {
+    return StreamSupport.stream(Spliterators.spliteratorUnknownSize(iter, 0), false);
   }
 
 }

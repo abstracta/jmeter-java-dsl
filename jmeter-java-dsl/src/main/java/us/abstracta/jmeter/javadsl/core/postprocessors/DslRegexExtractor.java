@@ -8,7 +8,7 @@ import org.apache.jmeter.testelement.TestElement;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodCall;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodCallContext;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodParam;
-import us.abstracta.jmeter.javadsl.codegeneration.SingleTestElementCallBuilder;
+import us.abstracta.jmeter.javadsl.codegeneration.ScopedTestElementCallBuilder;
 import us.abstracta.jmeter.javadsl.codegeneration.TestElementParamBuilder;
 import us.abstracta.jmeter.javadsl.codegeneration.params.EnumParam.EnumPropertyValue;
 import us.abstracta.jmeter.javadsl.codegeneration.params.StringParam;
@@ -192,7 +192,7 @@ public class DslRegexExtractor extends DslVariableExtractor<DslRegexExtractor> {
 
   }
 
-  public static class CodeBuilder extends SingleTestElementCallBuilder<RegexExtractor> {
+  public static class CodeBuilder extends ScopedTestElementCallBuilder<RegexExtractor> {
 
     public CodeBuilder(List<Method> builderMethods) {
       super(RegexExtractor.class, builderMethods);
@@ -204,13 +204,7 @@ public class DslRegexExtractor extends DslVariableExtractor<DslRegexExtractor> {
           "RegexExtractor");
       MethodCall ret = buildMethodCall(regexParamBuilder.stringParam("refname"),
           regexParamBuilder.stringParam("regex"));
-      TestElementParamBuilder scopeParamBuilder = new TestElementParamBuilder(testElement, "Scope");
-      MethodParam scopeVar = scopeParamBuilder.stringParam("variable");
-      if (scopeVar.isDefault()) {
-        ret.chain("scope", scopeParamBuilder.enumParam("scope", Scope.MAIN_SAMPLE));
-      } else {
-        ret.chain("scopeVariable", scopeVar);
-      }
+      ret = chainScope(testElement, ret);
       ret.chain("fieldToCheck",
           regexParamBuilder.enumParam("useHeaders", TargetField.RESPONSE_BODY));
       ret.chain("matchNumber", regexParamBuilder.intParam("match_number", 1));

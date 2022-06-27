@@ -84,7 +84,7 @@ public abstract class MethodCallBuilderTest {
   }
 
   private String buildMethodBodyWith(String code) {
-    String ret = code.replaceAll("\n\\s+", " ").replaceAll("([()])\\s+", "$1");
+    String ret = code.replaceAll("\n\\s+", " ").replaceAll("\\s*([()])\\s*", "$1");
     return "{\n    return " + ret + ";\n}";
   }
 

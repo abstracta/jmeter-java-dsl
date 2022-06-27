@@ -1,9 +1,6 @@
 package us.abstracta.jmeter.javadsl.core.threadgroups;
 
-import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 import org.apache.jmeter.gui.JMeterGUIComponent;
 import org.apache.jmeter.testelement.TestElement;
 import org.apache.jmeter.testelement.property.StringProperty;
@@ -97,10 +94,6 @@ public abstract class BaseThreadGroup<T extends BaseThreadGroup<?>> extends
      * Stops the test plan abruptly, with all associated threads, interrupting current samples.
      */
     STOP_TEST_NOW("stoptestnow");
-
-    private static final Map<String, SampleErrorAction> ACTIONS_BY_PROPERTY_VALUE = Arrays.stream(
-            values())
-        .collect(Collectors.toMap(v -> v.propertyValue, v -> v));
 
     private final String propertyValue;
 

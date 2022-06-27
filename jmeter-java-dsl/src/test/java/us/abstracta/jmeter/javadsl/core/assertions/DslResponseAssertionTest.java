@@ -6,9 +6,14 @@ import static us.abstracta.jmeter.javadsl.JmeterDsl.responseAssertion;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.testPlan;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.threadGroup;
 
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import us.abstracta.jmeter.javadsl.JmeterDslTest;
+import us.abstracta.jmeter.javadsl.codegeneration.MethodCallBuilderTest;
+import us.abstracta.jmeter.javadsl.core.DslTestPlan;
 import us.abstracta.jmeter.javadsl.core.TestPlanStats;
+import us.abstracta.jmeter.javadsl.core.assertions.DslResponseAssertion.TargetField;
+import us.abstracta.jmeter.javadsl.core.testelements.DslScopedTestElement.Scope;
 
 public class DslResponseAssertionTest extends JmeterDslTest {
 
@@ -39,6 +44,54 @@ public class DslResponseAssertionTest extends JmeterDslTest {
         )
     ).run();
     assertThat(stats.overall().errorsCount()).isEqualTo(0);
+  }
+
+  @Nested
+  public class CodeBuilderTest extends MethodCallBuilderTest {
+
+    public DslTestPlan testPlanWithDefaultResponseAssertion() {
+      return testPlan(
+          responseAssertion()
+              .containsSubstrings("Test")
+      );
+    }
+
+    public DslTestPlan testPlanWithCustomResponseAssertion() {
+      return testPlan(
+          responseAssertion()
+              .scope(Scope.ALL_SAMPLES)
+              .fieldToTest(TargetField.RESPONSE_HEADERS)
+              .ignoreStatus()
+              .anyMatch()
+              .invertCheck()
+              .containsSubstrings(
+                  "Test",
+                  "Test2"
+              )
+      );
+    }
+
+    public DslTestPlan testPlanWithEqualsResponseAssertion() {
+      return testPlan(
+          responseAssertion()
+              .equalsToStrings("Test")
+      );
+    }
+
+    public DslTestPlan testPlanWithMatchesResponseAssertion() {
+      return testPlan(
+          responseAssertion()
+              .matchesRegexes("Test")
+      );
+    }
+
+    public DslTestPlan testPlanWithContainsRegexesResponseAssertion() {
+      return testPlan(
+          responseAssertion()
+              .containsRegexes("Test")
+      );
+    }
+
   }
 
 }

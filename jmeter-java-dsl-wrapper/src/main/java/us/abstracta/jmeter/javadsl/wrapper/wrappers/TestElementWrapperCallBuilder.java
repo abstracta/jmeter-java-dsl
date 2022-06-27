@@ -6,10 +6,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import java.util.Spliterators;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 import org.apache.jmeter.gui.JMeterGUIComponent;
 import org.apache.jmeter.testbeans.TestBean;
 import org.apache.jmeter.testelement.TestElement;
@@ -21,7 +18,6 @@ import org.apache.jmeter.testelement.property.IntegerProperty;
 import org.apache.jmeter.testelement.property.JMeterProperty;
 import org.apache.jmeter.testelement.property.LongProperty;
 import org.apache.jmeter.testelement.property.NullProperty;
-import org.apache.jmeter.testelement.property.PropertyIterator;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodCall;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodCallContext;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodParam;
@@ -67,7 +63,7 @@ public class TestElementWrapperCallBuilder<T extends TestElement> extends
     }
     MethodCall ret = buildMethodCall(
         new NameParam(testElement.getName(), defaultInstance.getName()), builderParam);
-    propIter2Stream(testElement.propertyIterator())
+    propertyIterator2Stream(testElement.propertyIterator())
         .filter(p -> !isPropertyWithDefaultValue(p, defaultInstance)
             && !ignoredProperties.contains(p.getName()))
         .map(PropertyParam::new)
@@ -80,10 +76,6 @@ public class TestElementWrapperCallBuilder<T extends TestElement> extends
   private boolean isPropertyWithDefaultValue(JMeterProperty p, T defaultInstance) {
     return Objects.equals(p.getObjectValue(),
         defaultInstance.getProperty(p.getName()).getObjectValue());
-  }
-
-  private static Stream<JMeterProperty> propIter2Stream(PropertyIterator iter) {
-    return StreamSupport.stream(Spliterators.spliteratorUnknownSize(iter, 0), false);
   }
 
   private static class PropertyParam extends MethodParam {
@@ -121,14 +113,14 @@ public class TestElementWrapperCallBuilder<T extends TestElement> extends
 
     private String buildCollectionCode(CollectionProperty prop, String indent) {
       if (prop.size() == 1) {
-        return "Collections.singletonList(" + new PropertyParam(
-            prop.iterator().next()).buildCode(indent) + ")";
+        return "Collections.singletonList(" + new PropertyParam(prop.get(0)).buildCode(indent)
+            + ")";
       }
       String childIndent = indent + MethodCall.INDENT;
-      return "Arrays.asList(\n" + childIndent
-          + propIter2Stream(prop.iterator())
-          .map(p -> new PropertyParam(p).buildCode(childIndent))
-          .collect(Collectors.joining(",\n" + childIndent))
+      return "Arrays.asList(\n"
+          + propertyIterator2Stream(prop.iterator())
+          .map(p -> childIndent + new PropertyParam(p).buildCode(childIndent))
+          .collect(Collectors.joining(",\n"))
           + "\n" + indent + ")";
     }
 

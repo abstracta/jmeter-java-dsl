@@ -1,12 +1,22 @@
 package us.abstracta.jmeter.javadsl.core.assertions;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 import org.apache.jmeter.assertions.ResponseAssertion;
 import org.apache.jmeter.assertions.gui.AssertionGui;
 import org.apache.jmeter.testelement.TestElement;
+import org.apache.jmeter.testelement.property.CollectionProperty;
+import us.abstracta.jmeter.javadsl.codegeneration.MethodCall;
+import us.abstracta.jmeter.javadsl.codegeneration.MethodCallContext;
+import us.abstracta.jmeter.javadsl.codegeneration.MethodParam;
+import us.abstracta.jmeter.javadsl.codegeneration.ScopedTestElementCallBuilder;
+import us.abstracta.jmeter.javadsl.codegeneration.TestElementParamBuilder;
+import us.abstracta.jmeter.javadsl.codegeneration.params.BoolParam;
+import us.abstracta.jmeter.javadsl.codegeneration.params.EnumParam.EnumPropertyValue;
 import us.abstracta.jmeter.javadsl.core.testelements.DslScopedTestElement;
 
 /**
@@ -17,6 +27,8 @@ import us.abstracta.jmeter.javadsl.core.testelements.DslScopedTestElement;
 public class DslResponseAssertion extends DslScopedTestElement<DslResponseAssertion> implements
     DslAssertion {
 
+  private static final String DEFAULT_NAME = "Response Assertion";
+
   private TargetField fieldToTest = TargetField.RESPONSE_BODY;
   private boolean ignoreStatus;
   private List<String> testStrings = new ArrayList<>();
@@ -25,7 +37,7 @@ public class DslResponseAssertion extends DslScopedTestElement<DslResponseAssert
   private boolean anyMatch;
 
   public DslResponseAssertion(String name) {
-    super(name != null ? name : "Response Assertion", AssertionGui.class);
+    super(name != null ? name : DEFAULT_NAME, AssertionGui.class);
   }
 
   /**
@@ -74,7 +86,7 @@ public class DslResponseAssertion extends DslScopedTestElement<DslResponseAssert
    * specified substrings should be contained).
    *
    * @param substrings list of strings to be searched in the given field to test (by default
-   * response body).
+   *                   response body).
    * @return the Response Assertion to allow configuring other potential settings in a fluent API
    * way.
    */
@@ -98,7 +110,7 @@ public class DslResponseAssertion extends DslScopedTestElement<DslResponseAssert
    * be equal to the field value).
    *
    * @param strings list of strings to be compared against the given field to test (by default
-   * response body).
+   *                response body).
    * @return the Response Assertion to allow configuring other potential settings in a fluent API
    */
   public DslResponseAssertion equalsToStrings(String... strings) {
@@ -121,7 +133,7 @@ public class DslResponseAssertion extends DslScopedTestElement<DslResponseAssert
    * case-sensitive, which can be changed to insensitive by adding '(?i)' to the regex.
    *
    * @param regexes list of regular expressions to search for matches in the field to test (by
-   * default response body).
+   *                default response body).
    * @return the Response Assertion to allow configuring other potential settings in a fluent API
    */
   public DslResponseAssertion containsRegexes(String... regexes) {
@@ -143,7 +155,7 @@ public class DslResponseAssertion extends DslScopedTestElement<DslResponseAssert
    * case-sensitive, which can be changed to insensitive by adding '(?i)' to the regex.
    *
    * @param regexes list of regular expressions the field to test (by default response body) must
-   * match.
+   *                match.
    * @return the Response Assertion to allow configuring other potential settings in a fluent API
    */
   public DslResponseAssertion matchesRegexes(String... regexes) {
@@ -161,7 +173,7 @@ public class DslResponseAssertion extends DslScopedTestElement<DslResponseAssert
    * <pre>{@code
    *   responseAssertion().containsSubstrings("error", "failure").invertCheck()
    * }</pre>
-   *
+   * <p>
    * Will check that the response does not contain "error" and does not contain "failure". You can
    * think it as {@code !(containsSubstring("error")) && !(containsSubstring("failure"))}.
    * <p>
@@ -170,7 +182,7 @@ public class DslResponseAssertion extends DslScopedTestElement<DslResponseAssert
    * <pre>{@code
    *    responseAssertion().containsSubstrings("error", "failure").invertCheck().matchAny()
    * }</pre>
-   *
+   * <p>
    * Will check that response does not contain both "error" and "failure" at the same time. This is
    * analogous to {@code !(containsSubstring("error")) || !(containsSubstring("failure)}, which is
    * equivalent to {@code !(containsSubstring("error") && containsSubstring("failure))}.
@@ -195,17 +207,17 @@ public class DslResponseAssertion extends DslScopedTestElement<DslResponseAssert
    * <pre>{@code
    *    responseAssertion().containsSubstrings("success", "OK")
    * }</pre>
-   *
+   * <p>
    * The response assertion will be success when both "success" and "OK" sub strings appear in
-   * response body (if one or both don't appear, then it fails). You can think of it like {@code
-   * containsSubstring("success") && containsSubstring("OK")}.
+   * response body (if one or both don't appear, then it fails). You can think of it like
+   * {@code containsSubstring("success") && containsSubstring("OK")}.
    * <p>
    * If you want to check that any of them matches then use anyMatch, like this:
    *
    * <pre>{@code
    *     responseAssertion().containsSubstrings("success", "OK").anyMatch()
    * }</pre>
-   *
+   * <p>
    * Which you can interpret as {@code containsSubstring("success") || containsSubstring("OK")}.
    *
    * @return the Response Assertion to allow configuring other potential settings in a fluent API
@@ -219,7 +231,7 @@ public class DslResponseAssertion extends DslScopedTestElement<DslResponseAssert
   protected TestElement buildTestElement() {
     ResponseAssertion ret = new ResponseAssertion();
     setScopeTo(ret);
-    fieldToTest.applyTo(ret);
+    ret.setProperty("Assertion.test_field", fieldToTest.propertyValue);
     ret.setAssumeSuccess(ignoreStatus);
     if (invertCheck) {
       ret.setToNotType();
@@ -235,51 +247,53 @@ public class DslResponseAssertion extends DslScopedTestElement<DslResponseAssert
   /**
    * Identifies a particular field to apply the assertion to.
    */
-  public enum TargetField {
+  public enum TargetField implements EnumPropertyValue {
     /**
      * Applies the assertion to the response body.
      */
-    RESPONSE_BODY(ResponseAssertion::setTestFieldResponseData),
+    RESPONSE_BODY("response_data"),
     /**
-     * Applies the assertion to the text obtained through <a href="http://tika.apache.org/1.2/formats.html">Apache
-     * Tika</a> from the response body (which might be a pdf, excel, etc.).
+     * Applies the assertion to the text obtained through <a
+     * href="http://tika.apache.org/1.2/formats.html">Apache Tika</a> from the response body (which
+     * might be a pdf, excel, etc.).
      */
-    RESPONSE_BODY_AS_DOCUMENT(ResponseAssertion::setTestFieldResponseDataAsDocument),
+    RESPONSE_BODY_AS_DOCUMENT("response_data_as_document"),
     /**
      * Applies the assertion to the response code (eg: the HTTP response code, like 200).
      */
-    RESPONSE_CODE(ResponseAssertion::setTestFieldResponseCode),
+    RESPONSE_CODE("response_code"),
     /**
      * Applies the assertion to the response message (eg: the HTTP response message, like OK).
      */
-    RESPONSE_MESSAGE(ResponseAssertion::setTestFieldResponseMessage),
+    RESPONSE_MESSAGE("response_message"),
     /**
      * Applies the assertion to the set of response headers. Response headers is a string with
      * headers separated by new lines and names and values separated by colons.
      */
-    RESPONSE_HEADERS(ResponseAssertion::setTestFieldResponseHeaders),
+    RESPONSE_HEADERS("response_headers"),
     /**
      * Applies the assertion to the set of request headers. Request headers is a string with headers
      * separated by new lines and names and values separated by colons.
      */
-    REQUEST_HEADERS(ResponseAssertion::setTestFieldRequestHeaders),
+    REQUEST_HEADERS("request_headers"),
     /**
      * Applies the assertion to the requested URL.
      */
-    REQUEST_URL(ResponseAssertion::setTestFieldURL),
+    REQUEST_URL("sample_label"),
     /**
      * Applies the assertion to the request body.
      */
-    REQUEST_BODY(ResponseAssertion::setTestFieldRequestData);
+    REQUEST_BODY("request_data");
 
-    private final Consumer<ResponseAssertion> applier;
+    private final String propertyValue;
 
-    TargetField(Consumer<ResponseAssertion> applier) {
-      this.applier = applier;
+    TargetField(String propertyValue) {
+      this.propertyValue = "Assertion." + propertyValue;
     }
 
-    private void applyTo(ResponseAssertion assertion) {
-      applier.accept(assertion);
+    @Override
+    public String propertyValue() {
+      return propertyValue;
     }
 
   }
@@ -298,6 +312,66 @@ public class DslResponseAssertion extends DslScopedTestElement<DslResponseAssert
 
     private void applyTo(ResponseAssertion assertion) {
       applier.accept(assertion);
+    }
+
+  }
+
+  public static class CodeBuilder extends ScopedTestElementCallBuilder<ResponseAssertion> {
+
+    public CodeBuilder(List<Method> builderMethods) {
+      super("Assertion", ResponseAssertion.class, builderMethods);
+    }
+
+    @Override
+    protected MethodCall buildMethodCall(ResponseAssertion testElement, MethodCallContext context) {
+      TestElementParamBuilder paramBuilder = new TestElementParamBuilder(testElement, "Assertion");
+      MethodCall ret = buildMethodCall(paramBuilder.nameParam(DEFAULT_NAME));
+      ret = chainScope(testElement, ret);
+      ret.chain("fieldToTest", paramBuilder.enumParam("test_field", TargetField.RESPONSE_BODY));
+      ret.chain("ignoreStatus", paramBuilder.boolParam("assume_success", false));
+      ret.chain("anyMatch", new BoolParam(testElement.isOrType(), false));
+      ret.chain("invertCheck", new BoolParam(testElement.isNotType(), false));
+      ret.chain(findTestingStrategyMethod(testElement),
+          new StringsCollectionParam(testElement.getTestStrings()));
+      return ret;
+    }
+
+    public static class StringsCollectionParam extends MethodParam {
+
+      private final CollectionProperty collection;
+
+      protected StringsCollectionParam(CollectionProperty prop) {
+        super(String[].class, prop.getStringValue());
+        collection = prop;
+      }
+
+      @Override
+      protected String buildCode(String indent) {
+        if (collection.size() == 1) {
+          return buildStringLiteral(collection.get(0).getStringValue());
+        }
+        return "\n"
+            + propertyIterator2Stream(collection.iterator())
+            .map(p -> indent + buildStringLiteral(p.getStringValue()))
+            .collect(Collectors.joining(",\n"))
+            + "\n";
+      }
+
+    }
+
+    private String findTestingStrategyMethod(ResponseAssertion testElement) {
+      if (testElement.isSubstringType()) {
+        return "containsSubstrings";
+      } else if (testElement.isEqualsType()) {
+        return "equalsToStrings";
+      } else if (testElement.isContainsType()) {
+        return "containsRegexes";
+      } else if (testElement.isMatchType()) {
+        return "matchesRegexes";
+      }
+      throw new UnsupportedOperationException(
+          String.format("The response assertion has a type (%d) which is not supported by de DSL.",
+              testElement.getTestType()));
     }
 
   }
