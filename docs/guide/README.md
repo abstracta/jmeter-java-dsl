@@ -1742,7 +1742,7 @@ This will provide additional sample results for each transaction, which contain 
 
 ### Emulate user delays between requests
 
-Sometimes, is necessary to replicate users' behavior on the test plan, adding a timer between requests is one of the most used practices. For example, simulate the time it will take to complete a purchase form. JMeter (and the DSL) provide Uniform Random Timer for this purpose. Here is an example that adds a delay between four and ten seconds:
+Sometimes, is necessary to replicate users' behavior on the test plan, adding a timer between requests is one of the most used practices. For example, simulate the time it will take to complete a purchase form. JMeter (and the DSL) provide Constant & Uniform Random timers for this purpose. Here is an example that adds a delay of 3 seconds and another between 4 and 10 seconds:
 
 ```java
 import static us.abstracta.jmeter.javadsl.JmeterDsl.*;
@@ -1758,8 +1758,11 @@ public class PerformanceTest {
     testPlan(
         threadGroup(2, 10,
             transaction('addItemToCart',
-                httpSampler("http://my.service/items"),
-                httpSampler("http://my.service/cart/items")
+                httpSampler("http://my.service/items")
+                    .children(
+                        constantTimer(3000)
+                    ),
+                httpSampler("http://my.service/cart/selected-items")
                     .post("{\"id\": 1}", ContentType.APPLICATION_JSON)
             ),
             transaction('chekcout',
@@ -1778,14 +1781,7 @@ public class PerformanceTest {
 ```
 
 ::: warning
-Timers apply to all samplers in their scope, adding a pause after pre-processors executions and before the actual sampling. For example, in previous example pauses would be added before checkout and also before user info (two pauses).
-
-If you want to apply a timer only to one sampler, add it as child of the given sampler. Like in this example:
-
-```java
-httpSampler("http://my.service/cart/chekout")
-    .children(uniformRandomTimer(4000, 10000))
-```
+Timers apply to all samplers in their scope, adding a pause after pre-processors executions and before the actual sampling. For example, in previous example pauses would be added before items, checkout and also before user info (three pauses).
 :::
 
 ::: warning

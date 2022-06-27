@@ -338,7 +338,13 @@ package core {
 
     interface DslTimer extends MultiLevelTestElement
 
-    class DslUniformRandomTimer extends BaseTestElement implements DslTimer {
+    abstract class BaseTimer extends BaseTestElement implements DslTimer
+
+    class DslConstantTimer extends BaseTimer {
+      long delayMillis
+    }
+
+    class DslUniformRandomTimer extends BaseTimer {
       long minimumMillis
       long maximumMillis
     }

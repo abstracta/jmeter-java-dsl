@@ -39,6 +39,7 @@ import us.abstracta.jmeter.javadsl.core.threadgroups.DslDefaultThreadGroup;
 import us.abstracta.jmeter.javadsl.core.threadgroups.DslSetupThreadGroup;
 import us.abstracta.jmeter.javadsl.core.threadgroups.DslTeardownThreadGroup;
 import us.abstracta.jmeter.javadsl.core.threadgroups.RpsThreadGroup;
+import us.abstracta.jmeter.javadsl.core.timers.DslConstantTimer;
 import us.abstracta.jmeter.javadsl.core.timers.DslUniformRandomTimer;
 import us.abstracta.jmeter.javadsl.core.util.PropertyScriptBuilder.PropertyScript;
 import us.abstracta.jmeter.javadsl.http.DslCacheManager;
@@ -1235,6 +1236,17 @@ public class JmeterDsl {
    */
   public static DslViewResultsTree resultsTreeVisualizer() {
     return new DslViewResultsTree();
+  }
+
+  /**
+   * Builds a Constant Timer which pauses the thread with for a given number of milliseconds.
+   *
+   * @param durationMillis specifies the number of milliseconds for the timer to wait.
+   * @return the timer for usage in test plan.
+   * @since 0.62
+   */
+  public static DslConstantTimer constantTimer(long durationMillis) {
+    return new DslConstantTimer(durationMillis);
   }
 
   /**
