@@ -119,7 +119,11 @@ public class DslRegexExtractor extends DslVariableExtractor<DslRegexExtractor> {
     ret.setUseField(fieldToCheck.propertyValue);
     ret.setRefName(varName);
     ret.setRegex(regex);
-    ret.setMatchNumber(matchNumber);
+    /*
+     we use string instead of int method to generate same JMX as JMeter GUI generates and avoid
+     incompatibility with potential JMX parsers (like the OctoPerf one).
+     */
+    ret.setMatchNumber(String.valueOf(matchNumber));
     ret.setTemplate(template);
     if (defaultValue != null) {
       if (defaultValue.isEmpty()) {
