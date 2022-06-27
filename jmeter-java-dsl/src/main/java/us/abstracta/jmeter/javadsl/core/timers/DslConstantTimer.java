@@ -57,7 +57,7 @@ public class DslConstantTimer extends BaseTimer {
             + "still not supported. Request it in the GitHub repository as an issue and we will "
             + "add support for it.");
       }
-      return buildMethodCall(delay);
+      return ((LongParam) delay).getValue() == 0 ? MethodCall.emptyCall() : buildMethodCall(delay);
     }
 
   }
