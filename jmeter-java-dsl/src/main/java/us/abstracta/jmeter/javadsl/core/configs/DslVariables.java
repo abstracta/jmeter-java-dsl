@@ -13,8 +13,8 @@ import org.apache.jorphan.collections.HashTree;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodCall;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodCallContext;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodCallContext.MethodCallContextEndListener;
-import us.abstracta.jmeter.javadsl.codegeneration.MethodParam.StringParam;
 import us.abstracta.jmeter.javadsl.codegeneration.SingleTestElementCallBuilder;
+import us.abstracta.jmeter.javadsl.codegeneration.params.StringParam;
 import us.abstracta.jmeter.javadsl.core.BuildTreeContext;
 
 /**

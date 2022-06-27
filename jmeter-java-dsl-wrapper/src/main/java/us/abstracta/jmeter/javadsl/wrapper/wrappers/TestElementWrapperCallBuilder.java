@@ -25,8 +25,9 @@ import org.apache.jmeter.testelement.property.PropertyIterator;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodCall;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodCallContext;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodParam;
-import us.abstracta.jmeter.javadsl.codegeneration.MethodParam.NameParam;
 import us.abstracta.jmeter.javadsl.codegeneration.SingleTestElementCallBuilder;
+import us.abstracta.jmeter.javadsl.codegeneration.params.NameParam;
+import us.abstracta.jmeter.javadsl.codegeneration.params.StringParam;
 import us.abstracta.jmeter.javadsl.core.testelements.BaseTestElement;
 
 public class TestElementWrapperCallBuilder<T extends TestElement> extends
@@ -72,7 +73,7 @@ public class TestElementWrapperCallBuilder<T extends TestElement> extends
         .map(PropertyParam::new)
         .filter(p -> !p.isDefault())
         .forEach(
-            p -> ret.chain("prop", new MethodParam.StringParam(p.getName()), p));
+            p -> ret.chain("prop", new StringParam(p.getName()), p));
     return ret;
   }
 

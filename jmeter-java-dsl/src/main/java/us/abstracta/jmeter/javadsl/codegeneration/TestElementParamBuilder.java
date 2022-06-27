@@ -4,14 +4,16 @@ import java.time.Duration;
 import java.util.function.BiFunction;
 import org.apache.jmeter.testelement.TestElement;
 import org.apache.jmeter.testelement.property.JMeterProperty;
-import us.abstracta.jmeter.javadsl.codegeneration.MethodParam.BoolParam;
-import us.abstracta.jmeter.javadsl.codegeneration.MethodParam.DoubleParam;
-import us.abstracta.jmeter.javadsl.codegeneration.MethodParam.DurationParam;
-import us.abstracta.jmeter.javadsl.codegeneration.MethodParam.DynamicParam;
-import us.abstracta.jmeter.javadsl.codegeneration.MethodParam.IntParam;
-import us.abstracta.jmeter.javadsl.codegeneration.MethodParam.LongParam;
-import us.abstracta.jmeter.javadsl.codegeneration.MethodParam.NameParam;
-import us.abstracta.jmeter.javadsl.codegeneration.MethodParam.StringParam;
+import us.abstracta.jmeter.javadsl.codegeneration.params.BoolParam;
+import us.abstracta.jmeter.javadsl.codegeneration.params.DoubleParam;
+import us.abstracta.jmeter.javadsl.codegeneration.params.DurationParam;
+import us.abstracta.jmeter.javadsl.codegeneration.params.DynamicParam;
+import us.abstracta.jmeter.javadsl.codegeneration.params.EnumParam;
+import us.abstracta.jmeter.javadsl.codegeneration.params.IntParam;
+import us.abstracta.jmeter.javadsl.codegeneration.params.LongParam;
+import us.abstracta.jmeter.javadsl.codegeneration.params.NameParam;
+import us.abstracta.jmeter.javadsl.codegeneration.params.StringParam;
+import us.abstracta.jmeter.javadsl.core.configs.DslCsvDataSet.JmeterEnumPropertyValue;
 
 /**
  * Is a wrapper class for {@link TestElement} for easy creation of {@link MethodParam} instances.
@@ -128,9 +130,9 @@ public class TestElementParamBuilder {
   /**
    * Generates a MethodParam representing a long test element property.
    *
-   * @param propName     is the name of the property holding a long value. For nested properties
-   *                     (a property that is inside another object property) you can use the slash
-   *                     character to separate the levels (eg: http_config/use_proxy).
+   * @param propName is the name of the property holding a long value. For nested properties (a
+   *                 property that is inside another object property) you can use the slash
+   *                 character to separate the levels (eg: http_config/use_proxy).
    * @return the MethodParam instance.
    * @throws UnsupportedOperationException when no long can be parsed from the property value.
    * @since 0.61
@@ -142,9 +144,9 @@ public class TestElementParamBuilder {
   /**
    * Generates a MethodParam representing a double test element property.
    *
-   * @param propName     is the name of the property holding a double value. For nested properties
-   *                     (a property that is inside another object property) you can use the slash
-   *                     character to separate the levels (eg: http_config/use_proxy).
+   * @param propName is the name of the property holding a double value. For nested properties (a
+   *                 property that is inside another object property) you can use the slash
+   *                 character to separate the levels (eg: http_config/use_proxy).
    * @return the MethodParam instance.
    * @throws UnsupportedOperationException when no double can be parsed from the property value.
    * @since 0.61
@@ -216,6 +218,22 @@ public class TestElementParamBuilder {
    */
   public MethodParam durationParam(String propName) {
     return durationParam(propName, null);
+  }
+
+  /**
+   * Gets a MethodParam representing a test element property with a restricted set (enumerated) of
+   * string values.
+   *
+   * @param propName     is the name of the property. For nested properties (a property that is
+   *                     inside another object property) you can use the slash character to separate
+   *                     the levels (eg: http_config/use_proxy).
+   * @param enumType     the enum class that represents the set of values of the property.
+   * @param defaultValue the default value assigned to the JMeter test element property.
+   * @return the {@link MethodParam} instance.
+   */
+  public <T extends Enum<?> & JmeterEnumPropertyValue> MethodParam enumParam(String propName,
+      Class<T> enumType, T defaultValue) {
+    return buildParam(propName, (s, d) -> new EnumParam<>(enumType, s, d), defaultValue);
   }
 
 }

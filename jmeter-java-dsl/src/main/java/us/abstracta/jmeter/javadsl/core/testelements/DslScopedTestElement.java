@@ -5,8 +5,8 @@ import org.apache.jmeter.gui.JMeterGUIComponent;
 import org.apache.jmeter.testelement.AbstractScopedTestElement;
 import org.apache.jmeter.testelement.TestElement;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodParam;
-import us.abstracta.jmeter.javadsl.codegeneration.MethodParam.FixedParam;
 import us.abstracta.jmeter.javadsl.codegeneration.TestElementParamBuilder;
+import us.abstracta.jmeter.javadsl.codegeneration.params.FixedParam;
 
 /**
  * Contains common logic for test elements that only process certain samples.

@@ -9,7 +9,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.apache.http.entity.ContentType;
 import org.apache.jorphan.collections.HashTree;
-import us.abstracta.jmeter.javadsl.codegeneration.MethodParam.ChildrenParam;
+import us.abstracta.jmeter.javadsl.codegeneration.params.BoolParam;
+import us.abstracta.jmeter.javadsl.codegeneration.params.ChildrenParam;
 import us.abstracta.jmeter.javadsl.core.BuildTreeContext;
 import us.abstracta.jmeter.javadsl.core.DslTestElement;
 import us.abstracta.jmeter.javadsl.core.DslTestPlan;
@@ -192,7 +193,7 @@ public class MethodCall {
     }
 
     @Override
-    protected String buildCode(String indent) {
+    public String buildCode(String indent) {
       String paramsCode = buildParamsCode(indent + INDENT);
       return paramsCode.isEmpty() ? "" : methodName + "(" + paramsCode + indent + ")";
     }
@@ -232,7 +233,7 @@ public class MethodCall {
     when chaining methods with booleans in some cases the parameter is required, and in some others
     is not.
      */
-    if (method == null && params.length == 1 && params[0] instanceof MethodParam.BoolParam) {
+    if (method == null && params.length == 1 && params[0] instanceof BoolParam) {
       method = findMethodInClassHierarchyMatchingParams(methodName, returnType, new MethodParam[0]);
       if (method != null) {
         params = new MethodParam[0];
@@ -319,7 +320,7 @@ public class MethodCall {
     return buildCode("");
   }
 
-  protected String buildCode(String indent) {
+  public String buildCode(String indent) {
     StringBuilder ret = new StringBuilder();
     ret.append(methodName)
         .append("(");

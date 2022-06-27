@@ -2,8 +2,8 @@ package us.abstracta.jmeter.javadsl.http;
 
 import org.apache.jmeter.protocol.http.sampler.HTTPSamplerBase;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodParam;
-import us.abstracta.jmeter.javadsl.codegeneration.MethodParam.FixedParam;
 import us.abstracta.jmeter.javadsl.codegeneration.TestElementParamBuilder;
+import us.abstracta.jmeter.javadsl.codegeneration.params.FixedParam;
 import us.abstracta.jmeter.javadsl.http.DslHttpSampler.HttpClientImpl;
 
 public class ClientImplParam extends FixedParam<HttpClientImpl> {

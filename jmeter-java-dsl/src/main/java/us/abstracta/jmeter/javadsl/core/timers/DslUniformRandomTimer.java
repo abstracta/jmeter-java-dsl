@@ -9,10 +9,10 @@ import org.apache.jmeter.timers.gui.UniformRandomTimerGui;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodCall;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodCallContext;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodParam;
-import us.abstracta.jmeter.javadsl.codegeneration.MethodParam.DoubleParam;
-import us.abstracta.jmeter.javadsl.codegeneration.MethodParam.LongParam;
 import us.abstracta.jmeter.javadsl.codegeneration.SingleTestElementCallBuilder;
 import us.abstracta.jmeter.javadsl.codegeneration.TestElementParamBuilder;
+import us.abstracta.jmeter.javadsl.codegeneration.params.DoubleParam;
+import us.abstracta.jmeter.javadsl.codegeneration.params.LongParam;
 
 /**
  * Allows specifying JMeter Uniform Random Timers which pause the thread with a random time with

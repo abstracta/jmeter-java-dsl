@@ -2,6 +2,7 @@ package us.abstracta.jmeter.javadsl.codegeneration;
 
 import java.lang.reflect.Method;
 import java.util.List;
+import us.abstracta.jmeter.javadsl.codegeneration.params.ChildrenParam;
 
 /**
  * Builds a method call for a particular DSL test element.
@@ -70,8 +71,7 @@ public abstract class MethodCallBuilder {
    *
    * @param params contains the list of parameters to find the proper builder method and associate
    *               to the method call. If the MethodCall accepts as parameter children DSL test
-   *               elements, then remember adding an array class for
-   *               {@link us.abstracta.jmeter.javadsl.codegeneration.MethodParam.ChildrenParam} (eg:
+   *               elements, then remember adding an array class for {@link ChildrenParam} (eg:
    *               {@code new ChildrenParam<>(TestPlanChild[].class)}).
    * @return generated method call.
    * @throws UnsupportedOperationException if no builder method is found for the given parameters.

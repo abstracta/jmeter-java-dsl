@@ -6,8 +6,9 @@ import java.util.Map;
 import org.apache.jmeter.protocol.http.sampler.HTTPSamplerBase;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodCall;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodParam;
-import us.abstracta.jmeter.javadsl.codegeneration.MethodParam.FixedParam;
 import us.abstracta.jmeter.javadsl.codegeneration.TestElementParamBuilder;
+import us.abstracta.jmeter.javadsl.codegeneration.params.FixedParam;
+import us.abstracta.jmeter.javadsl.codegeneration.params.StringParam;
 
 public class EncodingParam extends FixedParam<Charset> {
 
