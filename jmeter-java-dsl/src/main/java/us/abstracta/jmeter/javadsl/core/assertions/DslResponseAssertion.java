@@ -11,9 +11,7 @@ import org.apache.jmeter.assertions.gui.AssertionGui;
 import org.apache.jmeter.testelement.TestElement;
 import org.apache.jmeter.testelement.property.CollectionProperty;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodCall;
-import us.abstracta.jmeter.javadsl.codegeneration.MethodCallContext;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodParam;
-import us.abstracta.jmeter.javadsl.codegeneration.ScopedTestElementCallBuilder;
 import us.abstracta.jmeter.javadsl.codegeneration.TestElementParamBuilder;
 import us.abstracta.jmeter.javadsl.codegeneration.params.BoolParam;
 import us.abstracta.jmeter.javadsl.codegeneration.params.EnumParam.EnumPropertyValue;
@@ -323,17 +321,19 @@ public class DslResponseAssertion extends DslScopedTestElement<DslResponseAssert
     }
 
     @Override
-    protected MethodCall buildMethodCall(ResponseAssertion testElement, MethodCallContext context) {
+    protected MethodCall buildScopedMethodCall(ResponseAssertion testElement) {
+      return buildMethodCall(new TestElementParamBuilder(testElement).nameParam(DEFAULT_NAME));
+    }
+
+    @Override
+    protected void chainAdditionalOptions(MethodCall ret, ResponseAssertion testElement) {
       TestElementParamBuilder paramBuilder = new TestElementParamBuilder(testElement, "Assertion");
-      MethodCall ret = buildMethodCall(paramBuilder.nameParam(DEFAULT_NAME));
-      ret = chainScope(testElement, ret);
       ret.chain("fieldToTest", paramBuilder.enumParam("test_field", TargetField.RESPONSE_BODY));
       ret.chain("ignoreStatus", paramBuilder.boolParam("assume_success", false));
       ret.chain("anyMatch", new BoolParam(testElement.isOrType(), false));
       ret.chain("invertCheck", new BoolParam(testElement.isNotType(), false));
       ret.chain(findTestingStrategyMethod(testElement),
           new StringsCollectionParam(testElement.getTestStrings()));
-      return ret;
     }
 
     public static class StringsCollectionParam extends MethodParam {

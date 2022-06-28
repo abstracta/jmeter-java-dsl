@@ -1,8 +1,16 @@
 package us.abstracta.jmeter.javadsl.core.testelements;
 
+import java.lang.reflect.Method;
+import java.util.List;
 import java.util.function.Consumer;
 import org.apache.jmeter.gui.JMeterGUIComponent;
 import org.apache.jmeter.testelement.AbstractScopedTestElement;
+import org.apache.jmeter.testelement.TestElement;
+import us.abstracta.jmeter.javadsl.codegeneration.MethodCall;
+import us.abstracta.jmeter.javadsl.codegeneration.MethodCallContext;
+import us.abstracta.jmeter.javadsl.codegeneration.MethodParam;
+import us.abstracta.jmeter.javadsl.codegeneration.SingleTestElementCallBuilder;
+import us.abstracta.jmeter.javadsl.codegeneration.TestElementParamBuilder;
 import us.abstracta.jmeter.javadsl.codegeneration.params.EnumParam.EnumPropertyValue;
 
 /**
@@ -90,6 +98,50 @@ public abstract class DslScopedTestElement<T> extends BaseTestElement {
     public String propertyValue() {
       return propertyValue;
     }
+
+  }
+
+  /**
+   * Abstracts common logic for
+   * {@link us.abstracta.jmeter.javadsl.core.testelements.DslScopedTestElement} method call
+   * builders.
+   *
+   * @param <T> is the type of test element class that is used to identify when this call builder
+   *            should apply.
+   * @since 0.62
+   */
+  protected abstract static class ScopedTestElementCallBuilder<T extends TestElement> extends
+      SingleTestElementCallBuilder<T> {
+
+    private final String scopePrefix;
+
+    protected ScopedTestElementCallBuilder(Class<T> testElementClass, List<Method> builderMethods) {
+      this("Sample", testElementClass, builderMethods);
+    }
+
+    protected ScopedTestElementCallBuilder(String scopePrefix, Class<T> testElementClass,
+        List<Method> builderMethods) {
+      super(testElementClass, builderMethods);
+      this.scopePrefix = scopePrefix;
+    }
+
+    @Override
+    protected MethodCall buildMethodCall(T testElement, MethodCallContext context) {
+      MethodCall ret = buildScopedMethodCall(testElement);
+      TestElementParamBuilder paramBuilder = new TestElementParamBuilder(testElement);
+      MethodParam scopeVar = paramBuilder.stringParam("Scope.variable");
+      if (scopeVar.isDefault()) {
+        ret.chain("scope", paramBuilder.enumParam(scopePrefix + ".scope", Scope.MAIN_SAMPLE));
+      } else {
+        ret.chain("scopeVariable", scopeVar);
+      }
+      chainAdditionalOptions(ret, testElement);
+      return ret;
+    }
+
+    protected abstract MethodCall buildScopedMethodCall(T testElement);
+
+    protected abstract void chainAdditionalOptions(MethodCall ret, T testElement);
 
   }
 

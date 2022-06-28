@@ -6,9 +6,7 @@ import org.apache.jmeter.extractor.RegexExtractor;
 import org.apache.jmeter.extractor.gui.RegexExtractorGui;
 import org.apache.jmeter.testelement.TestElement;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodCall;
-import us.abstracta.jmeter.javadsl.codegeneration.MethodCallContext;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodParam;
-import us.abstracta.jmeter.javadsl.codegeneration.ScopedTestElementCallBuilder;
 import us.abstracta.jmeter.javadsl.codegeneration.TestElementParamBuilder;
 import us.abstracta.jmeter.javadsl.codegeneration.params.EnumParam.EnumPropertyValue;
 import us.abstracta.jmeter.javadsl.codegeneration.params.StringParam;
@@ -203,18 +201,23 @@ public class DslRegexExtractor extends DslVariableExtractor<DslRegexExtractor> {
     }
 
     @Override
-    protected MethodCall buildMethodCall(RegexExtractor testElement, MethodCallContext context) {
-      TestElementParamBuilder regexParamBuilder = new TestElementParamBuilder(testElement,
-          "RegexExtractor");
-      MethodCall ret = buildMethodCall(regexParamBuilder.stringParam("refname"),
-          regexParamBuilder.stringParam("regex"));
-      ret = chainScope(testElement, ret);
-      ret.chain("fieldToCheck",
-          regexParamBuilder.enumParam("useHeaders", TargetField.RESPONSE_BODY));
-      ret.chain("matchNumber", regexParamBuilder.intParam("match_number", 1));
-      ret.chain("template", regexParamBuilder.stringParam("template", "$1$"));
-      ret.chain("defaultValue", buildDefaultParam(regexParamBuilder));
-      return ret;
+    protected MethodCall buildScopedMethodCall(RegexExtractor testElement) {
+      TestElementParamBuilder paramBuilder = buildParamBuilder(testElement);
+      return buildMethodCall(paramBuilder.stringParam("refname"),
+          paramBuilder.stringParam("regex"));
+    }
+
+    private TestElementParamBuilder buildParamBuilder(RegexExtractor testElement) {
+      return new TestElementParamBuilder(testElement, "RegexExtractor");
+    }
+
+    @Override
+    protected void chainAdditionalOptions(MethodCall ret, RegexExtractor testElement) {
+      TestElementParamBuilder paramBuilder = buildParamBuilder(testElement);
+      ret.chain("fieldToCheck", paramBuilder.enumParam("useHeaders", TargetField.RESPONSE_BODY));
+      ret.chain("matchNumber", paramBuilder.intParam("match_number", 1));
+      ret.chain("template", paramBuilder.stringParam("template", "$1$"));
+      ret.chain("defaultValue", buildDefaultParam(paramBuilder));
     }
 
     private MethodParam buildDefaultParam(TestElementParamBuilder regexParamBuilder) {
