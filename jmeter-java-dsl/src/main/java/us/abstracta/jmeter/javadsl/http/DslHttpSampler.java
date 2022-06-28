@@ -402,7 +402,7 @@ public class DslHttpSampler extends DslBaseHttpSampler<DslHttpSampler> {
     }
 
     @Override
-    protected void setAdditionalOptions(MethodCall ret, TestElementParamBuilder paramBuilder) {
+    protected void chainAdditionalOptions(MethodCall ret, TestElementParamBuilder paramBuilder) {
       ret.chain("encoding", paramBuilder.encodingParam(HTTPSamplerBase.CONTENT_ENCODING, null))
           .chain("followRedirects", buildFollowRedirectsParam(paramBuilder))
           .chain("downloadEmbeddedResources",
@@ -412,7 +412,7 @@ public class DslHttpSampler extends DslBaseHttpSampler<DslHttpSampler> {
     }
 
     @Override
-    protected void buildRequestCall(MethodCall ret, HTTPSamplerProxy testElem,
+    protected void chainRequestCalls(MethodCall ret, HTTPSamplerProxy testElem,
         MethodCallContext buildContext) {
       TestElementParamBuilder paramBuilder = new TestElementParamBuilder(testElem);
       MethodParam method = HttpMethodParam.from(paramBuilder);

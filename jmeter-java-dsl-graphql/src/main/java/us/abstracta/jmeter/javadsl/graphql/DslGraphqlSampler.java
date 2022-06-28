@@ -239,7 +239,7 @@ public class DslGraphqlSampler extends DslBaseHttpSampler<DslGraphqlSampler> {
     }
 
     @Override
-    protected void buildRequestCall(MethodCall ret, HTTPSamplerProxy testElem,
+    protected void chainRequestCalls(MethodCall ret, HTTPSamplerProxy testElem,
         MethodCallContext buildContext) {
       TestElementParamBuilder paramBuilder = new TestElementParamBuilder(testElem);
       ret.chain("operationName",
@@ -284,7 +284,7 @@ public class DslGraphqlSampler extends DslBaseHttpSampler<DslGraphqlSampler> {
     }
 
     @Override
-    protected void setAdditionalOptions(MethodCall ret, TestElementParamBuilder paramBuilder) {
+    protected void chainAdditionalOptions(MethodCall ret, TestElementParamBuilder paramBuilder) {
     }
 
     private static class JsonValueParam extends FixedParam<Object> {

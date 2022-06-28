@@ -273,9 +273,9 @@ public abstract class DslBaseHttpSampler<T extends DslBaseHttpSampler<?>> extend
             .chain("host", domain)
             .chain("port", port);
       }
-      buildRequestCall(ret, testElement, context);
-      setAdditionalOptions(ret, paramBuilder);
-      setProxyOptions(ret, paramBuilder);
+      chainRequestCalls(ret, testElement, context);
+      chainAdditionalOptions(ret, paramBuilder);
+      chainProxyOptions(ret, paramBuilder);
       return ret;
     }
 
@@ -293,7 +293,7 @@ public abstract class DslBaseHttpSampler<T extends DslBaseHttpSampler<?>> extend
       }
     }
 
-    protected abstract void buildRequestCall(MethodCall ret, HTTPSamplerProxy testElement,
+    protected abstract void chainRequestCalls(MethodCall ret, HTTPSamplerProxy testElement,
         MethodCallContext context);
 
     protected String removeContentTypeHeader(MethodCallContext context) {
@@ -317,10 +317,10 @@ public abstract class DslBaseHttpSampler<T extends DslBaseHttpSampler<?>> extend
       }
     }
 
-    protected abstract void setAdditionalOptions(MethodCall ret,
+    protected abstract void chainAdditionalOptions(MethodCall ret,
         TestElementParamBuilder paramBuilder);
 
-    private void setProxyOptions(MethodCall ret, TestElementParamBuilder paramBuilder) {
+    private void chainProxyOptions(MethodCall ret, TestElementParamBuilder paramBuilder) {
       MethodParam protocol = paramBuilder.stringParam(HTTPSamplerBase.PROXYSCHEME);
       MethodParam host = paramBuilder.stringParam(HTTPSamplerBase.PROXYHOST);
       MethodParam port = paramBuilder.intParam(HTTPSamplerBase.PROXYPORT);
