@@ -20,7 +20,7 @@ public abstract class ScopedTestElementCallBuilder<T extends TestElement> extend
 
   protected ScopedTestElementCallBuilder(Class<T> testElementClass,
       List<Method> builderMethods) {
-    this("Scope", testElementClass, builderMethods);
+    this("Sample", testElementClass, builderMethods);
   }
 
   protected ScopedTestElementCallBuilder(String scopePrefix, Class<T> testElementClass,

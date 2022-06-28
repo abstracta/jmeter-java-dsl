@@ -41,6 +41,11 @@ public class TestElementWrapperCallBuilder<T extends TestElement> extends
   }
 
   @Override
+  public boolean matches(MethodCallContext context) {
+    return testElementClass.isInstance(context.getTestElement());
+  }
+
+  @Override
   protected MethodCall buildMethodCall(T testElement, MethodCallContext context) {
     ClassInstanceParam builderParam;
     T defaultInstance;
