@@ -325,7 +325,13 @@ public class DslHttpSampler extends DslBaseHttpSampler<DslHttpSampler> {
     if (multiPart) {
       elem.setDoMultipart(true);
     }
-    elem.setHTTPFiles(files.toArray(new HTTPFileArg[0]));
+    /*
+     we clone file args to avoid test plan executions changing variable and function references
+     with solved entries (like FunctionProperty)
+     */
+    elem.setHTTPFiles(files.stream()
+        .map(f -> (HTTPFileArg) f.clone())
+        .toArray(HTTPFileArg[]::new));
     if (encoding != null) {
       elem.setContentEncoding(encoding.toString());
     }
@@ -348,7 +354,11 @@ public class DslHttpSampler extends DslBaseHttpSampler<DslHttpSampler> {
       arg.setAlwaysEncoded(false);
       args.addArgument(arg);
     }
-    arguments.forEach(args::addArgument);
+    /*
+     we clone arguments to avoid test plan executions changing variable and function references
+     with solved entries (like FunctionProperty)
+     */
+    arguments.forEach(arg -> args.addArgument((HTTPArgument) arg.clone()));
     return args;
   }
 
