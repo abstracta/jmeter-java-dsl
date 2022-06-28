@@ -66,6 +66,7 @@ public abstract class DslVisualizerTest extends JmeterDslTest {
       ResultsReceivedCondition resultsCondition, VisualizerAssertion assertion, TestInfo testInfo) {
     executor.submit(testPlan::run);
     FrameFixture frame = WindowFinder.findFrame(JFrame.class)
+        .withTimeout(10, TimeUnit.SECONDS)
         .using(robot);
     try {
       int timeoutSeconds = 30;
