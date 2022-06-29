@@ -1,7 +1,6 @@
 package us.abstracta.jmeter.javadsl.dashboard;
 
 import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.GraphicsEnvironment;
 import java.awt.GridLayout;
 import java.time.Duration;
@@ -149,22 +148,21 @@ public class DashboardVisualizer extends DslVisualizer {
   }
 
   protected Component buildGui(List<AbstractOverTimeVisualizer> graphs, SummaryReport summary) {
-    return new JSplitPane(JSplitPane.VERTICAL_SPLIT, buildGraphsPanel(graphs),
+    JSplitPane ret = new JSplitPane(JSplitPane.VERTICAL_SPLIT, buildGraphsPanel(graphs),
         buildSummaryPanel(summary));
+    ret.setResizeWeight(1.0);
+    return ret;
   }
 
   private JPanel buildGraphsPanel(List<AbstractOverTimeVisualizer> graphs) {
     JPanel graphsPanel = new JPanel();
-    graphsPanel.setPreferredSize(new Dimension(0, 470));
     graphsPanel.setLayout(new GridLayout(0, 2));
     graphs.forEach(g -> graphsPanel.add(g.getGraphPanelChart()));
     return graphsPanel;
   }
 
   private Component buildSummaryPanel(SummaryReport summary) {
-    Component summaryReportPanel = summary.getComponent(1);
-    summaryReportPanel.setPreferredSize(new Dimension(0, 80));
-    return summaryReportPanel;
+    return summary.getComponent(1);
   }
 
   @Override
