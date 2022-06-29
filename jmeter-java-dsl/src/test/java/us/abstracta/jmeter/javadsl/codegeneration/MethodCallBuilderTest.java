@@ -79,7 +79,8 @@ public abstract class MethodCallBuilderTest {
       String methodCode) throws Exception {
     Path jmxPath = tempDir.resolve("test.jmx");
     ((DslTestPlan) builderMethod.invoke(this)).saveAsJmx(jmxPath.toString());
-    assertThat(buildMethodBodyWith(codeGenerator.generateCodeFromJmx(jmxPath.toFile())))
+    assertThat(
+        buildMethodBodyWith(codeGenerator.buildMethodCallFromJmxFile(jmxPath.toFile()).buildCode()))
         .isEqualTo(methodCode);
   }
 

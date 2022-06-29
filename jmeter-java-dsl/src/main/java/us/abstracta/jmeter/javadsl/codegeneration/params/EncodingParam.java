@@ -2,7 +2,9 @@ package us.abstracta.jmeter.javadsl.codegeneration.params;
 
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.util.Collections;
 import java.util.Map;
+import java.util.Set;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodCall;
 
 /**
@@ -17,6 +19,12 @@ public class EncodingParam extends FixedParam<Charset> {
 
   public EncodingParam(String expression, Charset defaultValue) {
     super(Charset.class, expression, Charset::forName, defaultValue);
+  }
+
+  @Override
+  public Set<Class<?>> getImports() {
+    return Collections.singleton(
+        STANDARD_CHARSETS_NAMES.get(value) != null ? StandardCharsets.class : Charset.class);
   }
 
   public String buildCode(String indent) {

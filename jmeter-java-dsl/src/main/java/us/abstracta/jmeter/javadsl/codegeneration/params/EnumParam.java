@@ -1,7 +1,9 @@
 package us.abstracta.jmeter.javadsl.codegeneration.params;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Optional;
+import java.util.Set;
 import us.abstracta.jmeter.javadsl.codegeneration.params.EnumParam.EnumPropertyValue;
 
 /**
@@ -26,6 +28,11 @@ public class EnumParam<T extends Enum<?> & EnumPropertyValue> extends FixedParam
         .findAny();
     return ret.orElseThrow(() -> new IllegalArgumentException(
         "Unknown " + enumType.getSimpleName() + " property value: " + propertyValue));
+  }
+
+  @Override
+  public Set<Class<?>> getImports() {
+    return Collections.singleton(paramType);
   }
 
   @Override

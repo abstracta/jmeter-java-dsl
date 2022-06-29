@@ -4,7 +4,9 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.apache.http.entity.ContentType;
@@ -35,6 +37,7 @@ public class MethodCall {
   private ChildrenParam<?> childrenParam;
   private final List<MethodParam> params;
   private final List<MethodCall> chain = new ArrayList<>();
+  private final Set<Class<?>> requiredStaticImports = new HashSet<>();
 
   protected MethodCall(String methodName, Class<?> returnType, MethodParam... params) {
     this.methodName = methodName;
@@ -46,7 +49,13 @@ public class MethodCall {
     }
   }
 
-  protected static MethodCall from(Method method, MethodParam... params) {
+  public static MethodCall fromBuilderMethod(Method method, MethodParam... params) {
+    MethodCall ret = from(method, params);
+    ret.requiredStaticImports.add(method.getDeclaringClass());
+    return ret;
+  }
+
+  private static MethodCall from(Method method, MethodParam... params) {
     return new MethodCall(method.getName(), method.getReturnType(), params);
   }
 
@@ -135,6 +144,24 @@ public class MethodCall {
 
   }
 
+  public Set<Class<?>> getStaticImports() {
+    Set<Class<?>> ret = new HashSet<>(requiredStaticImports);
+    params.stream()
+        .filter(p -> !p.isIgnored())
+        .forEach(p -> ret.addAll(p.getStaticImports()));
+    chain.forEach(c -> ret.addAll(c.getStaticImports()));
+    return ret;
+  }
+
+  public Set<Class<?>> getImports() {
+    Set<Class<?>> ret = new HashSet<>();
+    params.stream()
+        .filter(p -> !p.isIgnored())
+        .forEach(p -> ret.addAll(p.getImports()));
+    chain.forEach(c -> ret.addAll(c.getImports()));
+    return ret;
+  }
+
   public Class<?> getReturnType() {
     return returnType;
   }
@@ -154,7 +181,7 @@ public class MethodCall {
    * <b>Warning:</b> You should only use this method after applying any required chaining.
    *
    * @param child specifies the method call to be added as child call of this call.
-   * @return the current call instance, or chained children method for further addition of children.
+   * @return the current call instance for further configuration.
    */
   public MethodCall child(MethodCall child) {
     if (childrenMethod == null) {
@@ -163,7 +190,7 @@ public class MethodCall {
       childrenParam = (ChildrenParam<?>) childrenMethod.params.get(0);
     }
     childrenParam.addChild(child);
-    return childrenMethod;
+    return this;
   }
 
   private MethodCall findChildrenMethod() {

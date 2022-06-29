@@ -2,6 +2,7 @@ package us.abstracta.jmeter.javadsl.wrapper.wrappers;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -106,6 +107,16 @@ public class TestElementWrapperCallBuilder<T extends TestElement> extends
     }
 
     @Override
+    public Set<Class<?>> getImports() {
+      if (prop instanceof CollectionProperty) {
+        return Collections.singleton(
+            ((CollectionProperty) prop).size() == 1 ? Collections.class : Arrays.class);
+      } else {
+        return Collections.emptySet();
+      }
+    }
+
+    @Override
     protected String buildCode(String indent) {
       if (LITERAL_PROPERTY_TYPES.stream().anyMatch(pt -> pt.isInstance(prop))) {
         return prop.getStringValue();
@@ -138,6 +149,11 @@ public class TestElementWrapperCallBuilder<T extends TestElement> extends
     private ClassInstanceParam(Class<?> paramType, Class<?> constructorType) {
       super(paramType, null);
       this.constructorType = constructorType;
+    }
+
+    @Override
+    public Set<Class<?>> getImports() {
+      return Collections.singleton(constructorType);
     }
 
     @Override

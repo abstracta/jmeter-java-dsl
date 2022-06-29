@@ -1,16 +1,22 @@
 package us.abstracta.jmeter.javadsl.codegeneration;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 import org.apache.jmeter.testelement.TestElement;
 import org.apache.jorphan.collections.HashTree;
@@ -18,6 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import us.abstracta.jmeter.javadsl.JmeterDsl;
 import us.abstracta.jmeter.javadsl.core.DslTestElement;
+import us.abstracta.jmeter.javadsl.core.TestPlanStats;
 import us.abstracta.jmeter.javadsl.core.controllers.DslRecordingController;
 import us.abstracta.jmeter.javadsl.core.engines.JmeterEnvironment;
 import us.abstracta.jmeter.javadsl.core.testelements.BaseTestElement;
@@ -58,12 +65,56 @@ public class DslCodeGenerator {
    * @throws IOException when there is some problem reading the file.
    */
   public String generateCodeFromJmx(File file) throws IOException {
+    String indent = "      ";
+    MethodCall call = buildMethodCallFromJmxFile(file);
+    String testPlanCode = call.buildCode(indent);
+    return String.format(findTestClassTemplate(),
+        buildStaticImports(call.getStaticImports()),
+        buildImports(call.getImports()),
+        testPlanCode.matches("\\s+\\)$") ? testPlanCode : testPlanCode + "\n" + indent);
+  }
+
+  public MethodCall buildMethodCallFromJmxFile(File file) throws IOException {
     JmeterEnvironment env = new JmeterEnvironment();
     HashTree tree = env.loadTree(new File(file.getPath()));
     TestElement testPlanElem = (TestElement) tree.getArray()[0];
     return new MethodCallContext(testPlanElem, tree.getTree(testPlanElem), this)
-        .buildMethodCall()
-        .buildCode();
+        .buildMethodCall();
+  }
+
+  private String findTestClassTemplate() throws IOException {
+    try (BufferedReader reader = new BufferedReader(
+        new InputStreamReader(getClass().getResourceAsStream("/TestClass.template.java"),
+            StandardCharsets.UTF_8))) {
+      return reader.lines()
+          .collect(Collectors.joining("\n"));
+    }
+  }
+
+  private String buildStaticImports(Set<Class<?>> staticImportClasses) {
+    TreeSet<String> imports = new TreeSet<>();
+    imports.add("org.assertj.core.api.Assertions.assertThat");
+    imports.addAll(staticImportClasses.stream()
+        .map(c -> c.getName() + ".*")
+        .collect(Collectors.toList()));
+    return buildImportsCode(imports, "static ");
+  }
+
+  private String buildImportsCode(TreeSet<String> imports, String importModifier) {
+    return imports.stream()
+        .map(s -> "import " + importModifier + s.replace("$", ".") + ";")
+        .collect(Collectors.joining("\n"));
+  }
+
+  private String buildImports(Set<Class<?>> importClasses) {
+    TreeSet<String> imports = new TreeSet<>();
+    imports.add("org.junit.jupiter.api.Test");
+    Set<Class<?>> classes = new HashSet<>(importClasses);
+    classes.addAll(Arrays.asList(IOException.class, TestPlanStats.class));
+    imports.addAll(classes.stream()
+        .map(Class::getName)
+        .collect(Collectors.toList()));
+    return buildImportsCode(imports, "");
   }
 
   /**

@@ -19,7 +19,7 @@ public class Jmx2DslIT {
         .start();
     String output = processOutput2String(p);
     p.waitFor();
-    assertThat(output).isEqualTo(new TestResource("testPlan.jsh").contents());
+    assertThat(output).isEqualTo(new TestResource("TestPlan.java").contents() + "\n");
   }
 
   private String processOutput2String(Process p) throws IOException {

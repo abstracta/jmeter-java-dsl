@@ -15,12 +15,12 @@ import us.abstracta.jmeter.javadsl.util.TestResource;
 public class DslCodeGeneratorTest {
 
   @Test
-  public void shouldWriteExpectedTestPlanDslWhenSimpleJmxIsProvided(@TempDir Path tempDir)
+  public void shouldGenerateExpectedCodeWhenSimpleJmxIsProvided(@TempDir Path tempDir)
       throws Exception {
     File solvedTemplate = solveTemplateResource("test-plan.template.jmx", tempDir);
     assertThat(new DslCodeGenerator()
         .generateCodeFromJmx(solvedTemplate))
-        .isEqualTo(new TestResource("simple-sample.jsh").contents());
+        .isEqualTo(new TestResource("SimpleTest.java").contents());
   }
 
   private File solveTemplateResource(String resourcePath, Path tempDir) throws IOException {
@@ -32,10 +32,10 @@ public class DslCodeGeneratorTest {
   }
 
   @Test
-  public void shouldWriteExpectedTestPlanDslWhenRecordedJmxIsProvided() throws Exception {
+  public void shouldGenerateExpectedCodeWhenRecordedJmxIsProvided() throws Exception {
     assertThat(new DslCodeGenerator()
         .generateCodeFromJmx(new TestResource("recorded.jmx").file()))
-        .isEqualTo(new TestResource("recorded.jsh").contents());
+        .isEqualTo(new TestResource("RecordedTest.java").contents());
   }
 
 }

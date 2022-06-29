@@ -82,7 +82,7 @@ public abstract class MethodCallBuilder {
    * @throws UnsupportedOperationException if no builder method is found for the given parameters.
    */
   protected MethodCall buildMethodCall(MethodParam... params) {
-    return MethodCall.from(findBuilderMethod(params), params);
+    return MethodCall.fromBuilderMethod(findBuilderMethod(params), params);
   }
 
   private Method findBuilderMethod(MethodParam... params) {

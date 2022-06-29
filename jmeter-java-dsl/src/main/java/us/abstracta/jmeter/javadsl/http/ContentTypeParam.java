@@ -1,7 +1,9 @@
 package us.abstracta.jmeter.javadsl.http;
 
 import java.nio.charset.Charset;
+import java.util.Collections;
 import java.util.Map;
+import java.util.Set;
 import org.apache.http.entity.ContentType;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodCall;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodParam;
@@ -16,6 +18,11 @@ public class ContentTypeParam extends FixedParam<ContentType> {
 
   protected ContentTypeParam(String value) {
     super(ContentType.class, value, ContentType::parse, null);
+  }
+
+  @Override
+  public Set<Class<?>> getImports() {
+    return Collections.singleton(ContentType.class);
   }
 
   @Override
