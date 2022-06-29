@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodCall;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodParam;
@@ -52,6 +53,20 @@ public class ChildrenParam<T> extends MethodParam {
           + "class for the children. Eg use TestPlanChild[].class");
     }
     return childrenClass;
+  }
+
+  @Override
+  public Set<Class<?>> getStaticImports() {
+    return children.stream()
+        .flatMap(c -> c.getStaticImports().stream())
+        .collect(Collectors.toSet());
+  }
+
+  @Override
+  public Set<Class<?>> getImports() {
+    return children.stream()
+        .flatMap(c -> c.getImports().stream())
+        .collect(Collectors.toSet());
   }
 
   @Override

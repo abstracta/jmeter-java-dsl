@@ -1,6 +1,8 @@
 package us.abstracta.jmeter.javadsl.codegeneration.params;
 
 import java.time.Duration;
+import java.util.Collections;
+import java.util.Set;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodCall;
 
 /**
@@ -16,6 +18,11 @@ public class DurationParam extends FixedParam<Duration> {
 
   public DurationParam(Duration value) {
     super(Duration.class, value, null);
+  }
+
+  @Override
+  public Set<Class<?>> getImports() {
+    return Collections.singleton(Duration.class);
   }
 
   @Override

@@ -3,7 +3,9 @@ package us.abstracta.jmeter.javadsl.codegeneration;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -50,6 +52,30 @@ public abstract class MethodParam {
 
   protected boolean isIgnored() {
     return false;
+  }
+
+  /**
+   * Gets all classes that are required to be imported by generated code.
+   * <p>
+   * Override this method if you implement a custom MethodParam that requires some particular
+   * import.
+   *
+   * @return the set of required classes that need to be imported by generated code.
+   */
+  public Set<Class<?>> getStaticImports() {
+    return Collections.emptySet();
+  }
+
+  /**
+   * Gets all classes that are required to be statically imported by generated code.
+   * <p>
+   * Override this method if you implement a custom MethodParam that requires some particular static
+   * import.
+   *
+   * @return the set of required classes that need to be statically imported by generated code.
+   */
+  public Set<Class<?>> getImports() {
+    return Collections.emptySet();
   }
 
   protected String buildCode(String indent) {

@@ -15,11 +15,11 @@ import us.abstracta.jmeter.javadsl.util.TestResource;
 public class DslCodeGeneratorTest {
 
   @Test
-  public void shouldWriteExpectedTestPlanDslWhenSimpleJmxIsProvided(@TempDir Path tempDir)
+  public void shouldGenerateExpectedTestPlanDslWhenSimpleJmxIsProvided(@TempDir Path tempDir)
       throws Exception {
     File solvedTemplate = solveTemplateResource("test-plan.template.jmx", tempDir);
     assertThat(new DslCodeGenerator()
-        .generateCodeFromJmx(solvedTemplate))
+        .generateTestPlanCodeFromJmx(solvedTemplate))
         .isEqualTo(new TestResource("simple-sample.jsh").contents());
   }
 
@@ -32,10 +32,19 @@ public class DslCodeGeneratorTest {
   }
 
   @Test
-  public void shouldWriteExpectedTestPlanDslWhenRecordedJmxIsProvided() throws Exception {
+  public void shouldGenerateExpectedTestPlanDslWhenRecordedJmxIsProvided() throws Exception {
     assertThat(new DslCodeGenerator()
-        .generateCodeFromJmx(new TestResource("recorded.jmx").file()))
+        .generateTestClassCodeFromJmx(new TestResource("recorded.jmx").file()))
         .isEqualTo(new TestResource("recorded.jsh").contents());
+  }
+
+  @Test
+  public void shouldGenerateExpectedTestClassWhenSimpleJmxIsProvided(@TempDir Path tempDir)
+      throws Exception {
+    File solvedTemplate = solveTemplateResource("test-plan.template.jmx", tempDir);
+    assertThat(new DslCodeGenerator()
+        .generateTestClassCodeFromJmx(solvedTemplate))
+        .isEqualTo(new TestResource("SimpleTestClass.java").contents());
   }
 
 }

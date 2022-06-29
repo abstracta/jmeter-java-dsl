@@ -5,9 +5,11 @@ import static us.abstracta.jmeter.javadsl.JmeterDsl.jsr223PreProcessor;
 import java.lang.reflect.Method;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 import org.apache.http.entity.ContentType;
 import org.apache.jmeter.config.Arguments;
@@ -515,8 +517,19 @@ public class DslHttpSampler extends DslBaseHttpSampler<DslHttpSampler> {
       }
 
       @Override
+      public Set<Class<?>> getImports() {
+        return findConstant() != null
+            ? Collections.singleton(HTTPConstants.class)
+            : Collections.emptySet();
+      }
+
+      private String findConstant() {
+        return CONSTANT_METHODS.get(value != null ? value.toUpperCase(Locale.US) : null);
+      }
+
+      @Override
       public String buildCode(String indent) {
-        String constant = CONSTANT_METHODS.get(value != null ? value.toUpperCase(Locale.US) : null);
+        String constant = findConstant();
         return constant != null ? HTTPConstants.class.getSimpleName() + "." + constant
             : super.buildCode(indent);
       }
