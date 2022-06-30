@@ -3,9 +3,12 @@ package us.abstracta.jmeter.javadsl.codegeneration;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
@@ -14,18 +17,32 @@ import us.abstracta.jmeter.javadsl.core.TestPlanStats;
 public class DslPerformanceTest {
 
   private final MethodCall testPlanMethodCall;
+  private final Map<Class<?>, String> dependencies;
 
-  public DslPerformanceTest(MethodCall testPlanMethodCall) {
+  public DslPerformanceTest(MethodCall testPlanMethodCall, Map<Class<?>, String> dependencies) {
     this.testPlanMethodCall = testPlanMethodCall;
+    this.dependencies = dependencies;
   }
 
   public String buildCode() {
-    String indent = "      ";
-    String testPlanCode = testPlanMethodCall.buildCode(indent);
-    return String.format(findTestClassTemplate(),
-        buildStaticImports(testPlanMethodCall.getStaticImports()),
-        buildImports(testPlanMethodCall.getImports()),
-        testPlanCode.matches("\\s+\\)$") ? testPlanCode : testPlanCode + "\n" + indent);
+    return String.format(findTestClassTemplate(), buildDependencies(), buildStaticImports(),
+        buildImports(), buildTestMethodCall());
+  }
+
+  private String buildDependencies() {
+    TreeSet<String> dependencyPaths = new TreeSet<>(Arrays.asList(
+        "org.junit.jupiter:junit-jupiter-engine:5.8.2",
+        "org.junit.platform:junit-platform-launcher:1.8.2",
+        "org.assertj:assertj-core:3.22.0"
+    ));
+    dependencyPaths.addAll(dependencies.entrySet().stream()
+        .filter(e -> testPlanMethodCall.getStaticImports().contains(e.getKey())
+            || testPlanMethodCall.getImports().contains(e.getKey()))
+        .map(Entry::getValue)
+        .collect(Collectors.toList()));
+    return dependencyPaths
+        .stream().map(d -> "//DEPS " + d)
+        .collect(Collectors.joining("\n"));
   }
 
   private String findTestClassTemplate() {
@@ -39,10 +56,10 @@ public class DslPerformanceTest {
     }
   }
 
-  private String buildStaticImports(Set<Class<?>> staticImportClasses) {
+  private String buildStaticImports() {
     TreeSet<String> imports = new TreeSet<>();
     imports.add("org.assertj.core.api.Assertions.assertThat");
-    imports.addAll(staticImportClasses.stream()
+    imports.addAll(testPlanMethodCall.getStaticImports().stream()
         .map(c -> c.getName() + ".*")
         .collect(Collectors.toList()));
     return buildImportsCode(imports, "static ");
@@ -54,15 +71,27 @@ public class DslPerformanceTest {
         .collect(Collectors.joining("\n"));
   }
 
-  private String buildImports(Set<Class<?>> importClasses) {
-    TreeSet<String> imports = new TreeSet<>();
-    imports.add("org.junit.jupiter.api.Test");
-    Set<Class<?>> classes = new HashSet<>(importClasses);
-    classes.addAll(Arrays.asList(IOException.class, TestPlanStats.class));
+  private String buildImports() {
+    TreeSet<String> imports = new TreeSet<>(Arrays.asList(
+        "org.junit.jupiter.api.Test",
+        "org.junit.platform.engine.discovery.DiscoverySelectors",
+        "org.junit.platform.launcher.core.LauncherDiscoveryRequestBuilder",
+        "org.junit.platform.launcher.core.LauncherFactory",
+        "org.junit.platform.launcher.listeners.SummaryGeneratingListener",
+        "org.junit.platform.launcher.listeners.TestExecutionSummary"
+    ));
+    Set<Class<?>> classes = new HashSet<>(testPlanMethodCall.getImports());
+    classes.addAll(Arrays.asList(IOException.class, PrintWriter.class, TestPlanStats.class));
     imports.addAll(classes.stream()
         .map(Class::getName)
         .collect(Collectors.toList()));
     return buildImportsCode(imports, "");
+  }
+
+  private String buildTestMethodCall() {
+    String indent = "      ";
+    String testPlanCode = testPlanMethodCall.buildCode(indent);
+    return testPlanCode.matches("\\s+\\)$") ? testPlanCode : testPlanCode + "\n" + indent;
   }
 
 }

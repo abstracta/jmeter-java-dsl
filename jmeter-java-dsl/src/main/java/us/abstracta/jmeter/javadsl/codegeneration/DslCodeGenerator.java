@@ -8,6 +8,7 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -40,9 +41,11 @@ public class DslCodeGenerator implements MethodCallBuilderRegistry {
   private static final Logger LOG = LoggerFactory.getLogger(DslCodeGenerator.class);
 
   private final List<MethodCallBuilder> builders = new ArrayList<>();
+  private final Map<Class<?>, String> dependencies = new HashMap<>();
 
   public DslCodeGenerator() {
     builders.addAll(findCallBuilders(JmeterDsl.class));
+    dependencies.put(JmeterDsl.class, "us.abstracta.jmeter:jmeter-java-dsl");
     builders.add(new DslRecordingController.CodeBuilder());
     sortBuilders();
   }
@@ -120,6 +123,21 @@ public class DslCodeGenerator implements MethodCallBuilderRegistry {
   }
 
   /**
+   * Allows registering libraries required to use a specific class.
+   *
+   * @param dependencyClass   is the class to register a library for.
+   * @param dependencyLocator the <a
+   *                          href="https://www.jbang.dev/documentation/guide/latest/dependencies.html">jbang
+   *                          library locator</a> for the library containing the class.
+   * @return the DslCodeGenerator instance for further configuration or usage.
+   * @since 0.62
+   */
+  public DslCodeGenerator addDependency(Class<?> dependencyClass, String dependencyLocator) {
+    dependencies.put(dependencyClass, dependencyLocator);
+    return this;
+  }
+
+  /**
    * Generates DSL code from JMX file.
    *
    * @param file is the JMX file from which DSL code will be generated.
@@ -127,7 +145,7 @@ public class DslCodeGenerator implements MethodCallBuilderRegistry {
    * @throws IOException when there is some problem reading the file.
    */
   public String generateCodeFromJmx(File file) throws IOException {
-    return new DslPerformanceTest(buildMethodCallFromJmxFile(file))
+    return new DslPerformanceTest(buildMethodCallFromJmxFile(file), dependencies)
         .buildCode();
   }
 

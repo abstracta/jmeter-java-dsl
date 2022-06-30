@@ -9,6 +9,7 @@ import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.IVersionProvider;
 import picocli.CommandLine.Parameters;
+import us.abstracta.jmeter.javadsl.JmeterDsl;
 import us.abstracta.jmeter.javadsl.codegeneration.DslCodeGenerator;
 import us.abstracta.jmeter.javadsl.graphql.DslGraphqlSampler;
 import us.abstracta.jmeter.javadsl.wrapper.WrapperJmeterDsl;
@@ -21,15 +22,34 @@ import us.abstracta.jmeter.javadsl.wrapper.WrapperJmeterDsl;
         + "https://github.com/abstracta/jmeter-java-dsl/issues to help us improving it.")
 public class Jmx2Dsl implements Callable<Integer> {
 
+  private static final String VERSION = getVersion();
+
   @Parameters(paramLabel = "JMX_FILE", description = "path to .jmx file to generate DSL from")
   private File jmxFile;
 
+  private static String getVersion() {
+    try {
+      return new ManifestVersionProvider().getVersion()[0];
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
+  }
+
   @Override
   public Integer call() throws Exception {
-    DslCodeGenerator codeGenerator = new DslCodeGenerator()
-        .addBuildersFrom(DslGraphqlSampler.class, WrapperJmeterDsl.class);
+    DslCodeGenerator codeGenerator = new DslCodeGenerator();
+    addBuildersFrom(JmeterDsl.class, "jmeter-java-dsl", codeGenerator);
+    addBuildersFrom(DslGraphqlSampler.class, "jmeter-java-dsl-graphql", codeGenerator);
+    addBuildersFrom(WrapperJmeterDsl.class, "jmeter-java-dsl-wrapper", codeGenerator);
     System.out.println(codeGenerator.generateCodeFromJmx(jmxFile));
     return 0;
+  }
+
+  private void addBuildersFrom(Class<?> jmeterDslClass, String moduleName,
+      DslCodeGenerator codeGenerator) {
+    codeGenerator.addBuildersFrom(jmeterDslClass);
+    codeGenerator.addDependency(jmeterDslClass,
+        "us.abstracta.jmeter:" + moduleName + (VERSION != null ? ":" + VERSION : ""));
   }
 
   public static void main(String[] args) {
