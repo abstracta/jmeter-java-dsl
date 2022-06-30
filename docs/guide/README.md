@@ -149,7 +149,7 @@ executable (eg: chmod +x ./PerformanceTest.java) and just executing it with ./Pe
 //DEPS org.assertj:assertj-core:3.22.0
 //DEPS org.junit.jupiter:junit-jupiter-engine:5.8.2
 //DEPS org.junit.platform:junit-platform-launcher:1.8.2
-//DEPS us.abstracta.jmeter:jmeter-java-dsl:${project.version}
+//DEPS us.abstracta.jmeter:jmeter-java-dsl:0.62
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.*;
