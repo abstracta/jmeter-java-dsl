@@ -141,12 +141,60 @@ jbang us.abstracta.jmeter:jmeter-java-dsl-jmx2dsl:0.61 test-plan.jmx
 Could generate something like following output:
 
 ```java
-testPlan(
-    threadGroup(2, 10,
-        httpSampler("http://my.service")
-    ),
-    jtlWriter("test.jtl")
-)
+///usr/bin/env jbang "$0" "$@" ; exit $?
+/*
+These commented lines make the class executable if you have jbang installed by making file
+executable (eg: chmod +x ./PerformanceTest.java) and just executing it with ./PerformanceTest.java
+*/
+//DEPS org.assertj:assertj-core:3.22.0
+//DEPS org.junit.jupiter:junit-jupiter-engine:5.8.2
+//DEPS org.junit.platform:junit-platform-launcher:1.8.2
+//DEPS us.abstracta.jmeter:jmeter-java-dsl:${project.version}
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static us.abstracta.jmeter.javadsl.JmeterDsl.*;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import org.apache.http.entity.ContentType;
+import org.junit.jupiter.api.Test;
+import org.junit.platform.engine.discovery.DiscoverySelectors;
+import org.junit.platform.launcher.core.LauncherDiscoveryRequestBuilder;
+import org.junit.platform.launcher.core.LauncherFactory;
+import org.junit.platform.launcher.listeners.SummaryGeneratingListener;
+import org.junit.platform.launcher.listeners.TestExecutionSummary;
+import us.abstracta.jmeter.javadsl.core.TestPlanStats;
+
+public class PerformanceTest {
+
+  @Test
+  public void test() throws IOException {
+    TestPlanStats stats = testPlan(
+        threadGroup(2, 10,
+            httpSampler("http://my.service")
+        ),
+        jtlWriter("test.jtl")
+    ).run();
+    assertThat(stats.overall().errorsCount()).isEqualTo(0);
+  }
+
+  /*
+   This method is only included to make test class self executable. You can remove it when
+   executing tests with maven, gradle or some other tool.
+   */
+  public static void main(String[] args) {
+    SummaryGeneratingListener summaryListener = new SummaryGeneratingListener();
+    LauncherFactory.create()
+        .execute(LauncherDiscoveryRequestBuilder.request()
+                .selectors(DiscoverySelectors.selectClass(PerformanceTest.class))
+                .build(),
+            summaryListener);
+    TestExecutionSummary summary = summaryListener.getSummary();
+    summary.printFailuresTo(new PrintWriter(System.out));
+    System.exit(summary.getTotalFailureCount() > 0 ? 1 : 0);
+  }
+
+}
 ```
 
 ::: tip

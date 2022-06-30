@@ -1,6 +1,6 @@
 ///usr/bin/env jbang "$0" "$@" ; exit $?
 /*
-These commented lines makes the class executable if you have jbang installed by making file
+These commented lines make the class executable if you have jbang installed by making file
 executable (eg: chmod +x ./PerformanceTest.java) and just executing it with ./PerformanceTest.java
 */
 //DEPS org.assertj:assertj-core:3.22.0
