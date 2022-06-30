@@ -31,21 +31,16 @@ public class MethodCallContext {
   private final TestElement testElement;
   private final HashTree childrenThree;
   private final MethodCallContext parent;
-  private final DslCodeGenerator codeGenerator;
+  private final MethodCallBuilderRegistry builderRegistry;
   private final Map<Object, Object> entries = new HashMap<>();
   private final List<MethodCallContextEndListener> endListeners = new ArrayList<>();
 
-  protected MethodCallContext(TestElement testElement, HashTree childrenThree,
-      DslCodeGenerator codeGenerator) {
-    this(testElement, childrenThree, null, codeGenerator);
-  }
-
-  protected MethodCallContext(TestElement testElement, HashTree childrenThree,
-      MethodCallContext parent, DslCodeGenerator codeGenerator) {
+  public MethodCallContext(TestElement testElement, HashTree childrenThree,
+      MethodCallContext parent, MethodCallBuilderRegistry builderRegistry) {
     this.testElement = testElement;
     this.childrenThree = childrenThree;
     this.parent = parent;
-    this.codeGenerator = codeGenerator;
+    this.builderRegistry = builderRegistry;
   }
 
   /**
@@ -150,10 +145,8 @@ public class MethodCallContext {
    */
   public MethodCall buildMethodCall() {
     try {
-      MethodCall ret = codeGenerator.getBuilders().stream()
-          .filter(b -> b.matches(this))
+      MethodCall ret = builderRegistry.findBuilderMatchingContext(this)
           .map(b -> b.buildMethodCall(this))
-          .findAny()
           .orElseGet(() -> {
             LOG.warn("No builder found for {}({}). " + UNSUPPORTED_USAGE_WARNING,
                 testElement.getClass(), testElement.getName());
@@ -182,7 +175,7 @@ public class MethodCallContext {
         .map(c -> (TestElement) c)
         .filter(TestElement::isEnabled)
         .map(c -> new MethodCallContext(c, childrenThree.getTree(c), this,
-            codeGenerator).buildMethodCall())
+            builderRegistry).buildMethodCall())
         .collect(Collectors.toList());
   }
 
@@ -203,7 +196,7 @@ public class MethodCallContext {
     child.ifPresent(childrenThree::remove);
     return child
         .map(c -> new MethodCallContext((TestElement) c, childrenThree.getTree(c), this,
-            codeGenerator))
+            builderRegistry))
         .orElse(null);
   }
 
@@ -217,12 +210,13 @@ public class MethodCallContext {
    * found.
    */
   public <T extends MethodCallBuilder> T findBuilder(Class<T> builderClass) {
-    return codeGenerator.findBuilder(builderClass);
+    return builderRegistry.findBuilderByClass(builderClass);
   }
 
   public interface MethodCallContextEndListener {
 
     void execute(MethodCallContext context, MethodCall call);
+
   }
 
 }

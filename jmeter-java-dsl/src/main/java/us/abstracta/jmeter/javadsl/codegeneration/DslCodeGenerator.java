@@ -1,22 +1,17 @@
 package us.abstracta.jmeter.javadsl.codegeneration;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import org.apache.jmeter.testelement.TestElement;
 import org.apache.jorphan.collections.HashTree;
@@ -24,7 +19,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import us.abstracta.jmeter.javadsl.JmeterDsl;
 import us.abstracta.jmeter.javadsl.core.DslTestElement;
-import us.abstracta.jmeter.javadsl.core.TestPlanStats;
 import us.abstracta.jmeter.javadsl.core.controllers.DslRecordingController;
 import us.abstracta.jmeter.javadsl.core.engines.JmeterEnvironment;
 import us.abstracta.jmeter.javadsl.core.testelements.BaseTestElement;
@@ -41,7 +35,7 @@ import us.abstracta.jmeter.javadsl.core.testelements.BaseTestElement;
  * @see MethodCallBuilder
  * @since 0.45
  */
-public class DslCodeGenerator {
+public class DslCodeGenerator implements MethodCallBuilderRegistry {
 
   private static final Logger LOG = LoggerFactory.getLogger(DslCodeGenerator.class);
 
@@ -51,103 +45,6 @@ public class DslCodeGenerator {
     builders.addAll(findCallBuilders(JmeterDsl.class));
     builders.add(new DslRecordingController.CodeBuilder());
     sortBuilders();
-  }
-
-  private void sortBuilders() {
-    builders.sort(Comparator.comparing(MethodCallBuilder::order));
-  }
-
-  /**
-   * Generates DSL code from JMX file.
-   *
-   * @param file is the JMX file from which DSL code will be generated.
-   * @return the generated DSL code.
-   * @throws IOException when there is some problem reading the file.
-   */
-  public String generateCodeFromJmx(File file) throws IOException {
-    String indent = "      ";
-    MethodCall call = buildMethodCallFromJmxFile(file);
-    String testPlanCode = call.buildCode(indent);
-    return String.format(findTestClassTemplate(),
-        buildStaticImports(call.getStaticImports()),
-        buildImports(call.getImports()),
-        testPlanCode.matches("\\s+\\)$") ? testPlanCode : testPlanCode + "\n" + indent);
-  }
-
-  public MethodCall buildMethodCallFromJmxFile(File file) throws IOException {
-    JmeterEnvironment env = new JmeterEnvironment();
-    HashTree tree = env.loadTree(new File(file.getPath()));
-    TestElement testPlanElem = (TestElement) tree.getArray()[0];
-    return new MethodCallContext(testPlanElem, tree.getTree(testPlanElem), this)
-        .buildMethodCall();
-  }
-
-  private String findTestClassTemplate() throws IOException {
-    try (BufferedReader reader = new BufferedReader(
-        new InputStreamReader(getClass().getResourceAsStream("/TestClass.template.java"),
-            StandardCharsets.UTF_8))) {
-      return reader.lines()
-          .collect(Collectors.joining("\n"));
-    }
-  }
-
-  private String buildStaticImports(Set<Class<?>> staticImportClasses) {
-    TreeSet<String> imports = new TreeSet<>();
-    imports.add("org.assertj.core.api.Assertions.assertThat");
-    imports.addAll(staticImportClasses.stream()
-        .map(c -> c.getName() + ".*")
-        .collect(Collectors.toList()));
-    return buildImportsCode(imports, "static ");
-  }
-
-  private String buildImportsCode(TreeSet<String> imports, String importModifier) {
-    return imports.stream()
-        .map(s -> "import " + importModifier + s.replace("$", ".") + ";")
-        .collect(Collectors.joining("\n"));
-  }
-
-  private String buildImports(Set<Class<?>> importClasses) {
-    TreeSet<String> imports = new TreeSet<>();
-    imports.add("org.junit.jupiter.api.Test");
-    Set<Class<?>> classes = new HashSet<>(importClasses);
-    classes.addAll(Arrays.asList(IOException.class, TestPlanStats.class));
-    imports.addAll(classes.stream()
-        .map(Class::getName)
-        .collect(Collectors.toList()));
-    return buildImportsCode(imports, "");
-  }
-
-  /**
-   * Allows registering DSL classes containing builder methods, which can be used to generate DSL
-   * code for.
-   * <p>
-   * This method allows you to register DSL classes from none core modules or your own custom DSL
-   * classes. This is the way DslGenerators can discover new DSL test elements, and their associated
-   * MethodCallBuilder instances, to generate code for.
-   *
-   * @param dslClasses are the classes containing builder methods.
-   * @return the DslCodeGenerator instance for further configuration or usage.
-   */
-  public DslCodeGenerator addBuildersFrom(Class<?>... dslClasses) {
-    builders.addAll(findCallBuilders(dslClasses));
-    sortBuilders();
-    return this;
-  }
-
-  /**
-   * Allows registering MethodCallBuilders that are not associated to a DSL builder method.
-   * <p>
-   * This is helpful when some element has no DSL builder method counterpart, but still there is a
-   * way to convert the element (eg: ignoring it all together, only converting children, etc).
-   *
-   * @param builders list of MethodCallBuilders to register into the generator.
-   * @return the DslCodeGenerator instance for further configuration or usage.
-   * @since 0.50
-   */
-  public DslCodeGenerator addBuilders(MethodCallBuilder... builders) {
-    this.builders.addAll(Arrays.asList(builders));
-    sortBuilders();
-    return this;
   }
 
   private List<MethodCallBuilder> findCallBuilders(Class<?>... dslClasses) {
@@ -185,11 +82,72 @@ public class DslCodeGenerator {
     }
   }
 
-  protected List<MethodCallBuilder> getBuilders() {
-    return builders;
+  private void sortBuilders() {
+    builders.sort(Comparator.comparing(MethodCallBuilder::order));
   }
 
-  protected <T extends MethodCallBuilder> T findBuilder(Class<T> builderClass) {
+  /**
+   * Allows registering DSL classes containing builder methods, which can be used to generate DSL
+   * code for.
+   * <p>
+   * This method allows you to register DSL classes from none core modules or your own custom DSL
+   * classes. This is the way DslGenerators can discover new DSL test elements, and their associated
+   * MethodCallBuilder instances, to generate code for.
+   *
+   * @param dslClasses are the classes containing builder methods.
+   * @return the DslCodeGenerator instance for further configuration or usage.
+   */
+  public DslCodeGenerator addBuildersFrom(Class<?>... dslClasses) {
+    builders.addAll(findCallBuilders(dslClasses));
+    sortBuilders();
+    return this;
+  }
+
+  /**
+   * Allows registering MethodCallBuilders that are not associated to a DSL builder method.
+   * <p>
+   * This is helpful when some element has no DSL builder method counterpart, but still there is a
+   * way to convert the element (eg: ignoring it all together, only converting children, etc).
+   *
+   * @param builders list of MethodCallBuilders to register into the generator.
+   * @return the DslCodeGenerator instance for further configuration or usage.
+   * @since 0.50
+   */
+  public DslCodeGenerator addBuilders(MethodCallBuilder... builders) {
+    this.builders.addAll(Arrays.asList(builders));
+    sortBuilders();
+    return this;
+  }
+
+  /**
+   * Generates DSL code from JMX file.
+   *
+   * @param file is the JMX file from which DSL code will be generated.
+   * @return the generated DSL MethodCall used to generate code from.
+   * @throws IOException when there is some problem reading the file.
+   */
+  public String generateCodeFromJmx(File file) throws IOException {
+    return new DslPerformanceTest(buildMethodCallFromJmxFile(file))
+        .buildCode();
+  }
+
+  public MethodCall buildMethodCallFromJmxFile(File file) throws IOException {
+    JmeterEnvironment env = new JmeterEnvironment();
+    HashTree tree = env.loadTree(new File(file.getPath()));
+    TestElement testPlanElem = (TestElement) tree.getArray()[0];
+    return new MethodCallContext(testPlanElem, tree.getTree(testPlanElem), null, this)
+        .buildMethodCall();
+  }
+
+  @Override
+  public Optional<MethodCallBuilder> findBuilderMatchingContext(MethodCallContext context) {
+    return builders.stream()
+        .filter(b -> b.matches(context))
+        .findAny();
+  }
+
+  @Override
+  public <T extends MethodCallBuilder> T findBuilderByClass(Class<T> builderClass) {
     return builders.stream()
         .filter(builderClass::isInstance)
         .map(builderClass::cast)
