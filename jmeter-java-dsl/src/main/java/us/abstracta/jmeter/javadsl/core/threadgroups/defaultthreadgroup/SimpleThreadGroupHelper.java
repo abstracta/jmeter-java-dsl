@@ -17,6 +17,7 @@ import us.abstracta.jmeter.javadsl.codegeneration.TestElementParamBuilder;
 import us.abstracta.jmeter.javadsl.codegeneration.params.ChildrenParam;
 import us.abstracta.jmeter.javadsl.codegeneration.params.DurationParam;
 import us.abstracta.jmeter.javadsl.codegeneration.params.IntParam;
+import us.abstracta.jmeter.javadsl.codegeneration.params.StringParam;
 import us.abstracta.jmeter.javadsl.core.threadgroups.BaseThreadGroup;
 import us.abstracta.jmeter.javadsl.core.threadgroups.DslDefaultThreadGroup;
 import us.abstracta.jmeter.javadsl.core.util.JmeterFunction;
@@ -162,9 +163,20 @@ public class SimpleThreadGroupHelper extends BaseThreadGroup<DslDefaultThreadGro
         if (!delay.isDefault()) {
           ret.chain("holdFor", delay);
         }
-        if (!duration.isDefault()) {
-          ret.chain("rampToAndHold", threads, rampTime, buildDurationParam(duration, rampTime));
+        if (!isDefaultOrZeroDuration(duration)) {
+          duration = buildDurationParam(duration, rampTime);
+          if (!(threads instanceof IntParam) || !(rampTime instanceof DurationParam)
+              || !(duration instanceof DurationParam)) {
+            threads = new StringParam(threads.getExpression());
+            rampTime = new StringParam(rampTime.getExpression());
+            duration = new StringParam(duration.getExpression());
+          }
+          ret.chain("rampToAndHold", threads, rampTime, duration);
         } else {
+          if (!(threads instanceof IntParam) || !(rampTime instanceof DurationParam)) {
+            threads = new StringParam(threads.getExpression());
+            rampTime = new StringParam(rampTime.getExpression());
+          }
           ret.chain("rampTo", threads, rampTime)
               .chain("holdIterating", iterations);
         }
@@ -177,18 +189,16 @@ public class SimpleThreadGroupHelper extends BaseThreadGroup<DslDefaultThreadGro
           || duration instanceof DurationParam && ((DurationParam) duration).getValue().isZero();
     }
 
-    private DurationParam buildDurationParam(MethodParam duration, MethodParam rampTime) {
+    private MethodParam buildDurationParam(MethodParam duration, MethodParam rampTime) {
       if (duration instanceof DurationParam && rampTime instanceof DurationParam) {
         return new DurationParam(rampTime.isDefault() ? ((DurationParam) duration).getValue()
             : ((DurationParam) duration).getValue().minus(((DurationParam) rampTime).getValue()));
       } else {
-        String expression = rampTime.isDefault()
-            || rampTime instanceof DurationParam && ((DurationParam) rampTime).getValue().isZero()
-            ? duration.getExpression()
+        String expression = isDefaultOrZeroDuration(rampTime) ? duration.getExpression()
             : JmeterFunction.groovy(
                 buildGroovySolvingIntExpression(duration.getExpression()) + " - "
                     + buildGroovySolvingIntExpression(rampTime.getExpression()));
-        return new DurationParam(expression, null);
+        return new StringParam(expression, null);
       }
     }
 
