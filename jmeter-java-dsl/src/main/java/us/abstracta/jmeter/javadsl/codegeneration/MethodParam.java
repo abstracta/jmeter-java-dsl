@@ -79,11 +79,17 @@ public abstract class MethodParam {
   }
 
   protected String buildCode(String indent) {
-    return buildStringLiteral(getExpression());
+    return buildStringLiteral(getExpression(), indent);
   }
 
-  protected static String buildStringLiteral(String value) {
-    return "\"" + value.replaceAll("[\\\\\"\n\t\r]", "\\\\$0") + "\"";
+  protected static String buildStringLiteral(String value, String indent) {
+    return "\"" + value.replace("\\", "\\\\")
+        .replace("\"", "\\\"")
+        .replace("\t", "\\t")
+        .replace("\r", "\\r")
+        .replace("\n", "\\n" + (!indent.isEmpty() ? "\"\n" + indent + "+ \"" : ""))
+        .replaceAll("\n" + indent + "\\+ \"\"$", "")
+        + "\"";
   }
 
   protected static <T> Map<T, String> findConstantNames(Class<?> constantsHolderClass,

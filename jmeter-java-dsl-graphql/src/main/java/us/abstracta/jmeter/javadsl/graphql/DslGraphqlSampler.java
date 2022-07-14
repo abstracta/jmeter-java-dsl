@@ -309,7 +309,7 @@ public class DslGraphqlSampler extends DslBaseHttpSampler<DslGraphqlSampler> {
       }
 
       private String string2Code(String value) {
-        return buildStringLiteral(value);
+        return buildStringLiteral(value, "");
       }
 
     }

@@ -43,10 +43,6 @@ public class MethodCall {
     this.methodName = methodName;
     this.returnType = returnType;
     this.params = Arrays.asList(params);
-    if (params.length > 0 && params[params.length - 1] instanceof ChildrenParam) {
-      childrenMethod = this;
-      childrenParam = (ChildrenParam<?>) params[params.length - 1];
-    }
   }
 
   public static MethodCall fromBuilderMethod(Method method, MethodParam... params) {
@@ -185,9 +181,15 @@ public class MethodCall {
    */
   public MethodCall child(MethodCall child) {
     if (childrenMethod == null) {
-      childrenMethod = findChildrenMethod();
-      chain.add(childrenMethod);
-      childrenParam = (ChildrenParam<?>) childrenMethod.params.get(0);
+      MethodParam lastParam =  params.isEmpty() ? null : params.get(params.size() - 1);
+      if (lastParam instanceof ChildrenParam && chain.isEmpty()) {
+        childrenMethod = this;
+        childrenParam = (ChildrenParam<?>) lastParam;
+      } else {
+        childrenMethod = findChildrenMethod();
+        chain.add(childrenMethod);
+        childrenParam = (ChildrenParam<?>) childrenMethod.params.get(0);
+      }
     }
     childrenParam.addChild(child);
     return this;

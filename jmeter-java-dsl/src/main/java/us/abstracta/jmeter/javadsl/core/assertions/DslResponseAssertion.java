@@ -348,11 +348,11 @@ public class DslResponseAssertion extends DslScopedTestElement<DslResponseAssert
       @Override
       protected String buildCode(String indent) {
         if (collection.size() == 1) {
-          return buildStringLiteral(collection.get(0).getStringValue());
+          return buildStringLiteral(collection.get(0).getStringValue(), indent);
         }
         return "\n"
             + propertyIterator2Stream(collection.iterator())
-            .map(p -> indent + buildStringLiteral(p.getStringValue()))
+            .map(p -> indent + buildStringLiteral(p.getStringValue(), indent))
             .collect(Collectors.joining(",\n"))
             + "\n";
       }

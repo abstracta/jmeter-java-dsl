@@ -351,19 +351,6 @@ public class JmeterDsl {
   }
 
   /**
-   * Same as {@link #transaction(String, ThreadGroupChild...)} but postponing children setting to
-   * allow further configuration before specifying children elements.
-   *
-   * @param name specifies the name to identify the transaction.
-   * @return the transaction instance.
-   * @see DslTransactionController
-   * @since 0.29
-   */
-  public static DslTransactionController transaction(String name) {
-    return new DslTransactionController(name, Collections.emptyList());
-  }
-
-  /**
    * Builds an If Controller that allows to conditionally run specified children.
    *
    * @param condition contains an expression that when evaluated to true tells the controller to run
@@ -649,6 +636,23 @@ public class JmeterDsl {
    * @since 0.25
    */
   public static PercentController percentController(float percent, ThreadGroupChild... children) {
+    return new PercentController(String.valueOf(percent), Arrays.asList(children));
+  }
+
+  /**
+   * Same as {@link #percentController(float, ThreadGroupChild...)} but allowing using JMeter
+   * expressions (eg: ${PERCENT_VAR}) in percent parameter.
+   * <p>
+   * This might be useful to set percents according to different profiles, for example, using
+   * different percents in production vs staging tests
+   *
+   * @param percent  defines a JMeter expression that evaluates to a number between 0 and 100 that
+   *                 defines the percentage of times to execute given children elements.
+   * @param children holds test plan elements to execute when for the given percent of times.
+   * @return the controller instance for further configuration and usage.
+   * @since 0.63
+   */
+  public static PercentController percentController(String percent, ThreadGroupChild... children) {
     return new PercentController(percent, Arrays.asList(children));
   }
 

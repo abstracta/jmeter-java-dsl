@@ -11,6 +11,7 @@ import us.abstracta.jmeter.javadsl.codegeneration.params.DurationParam;
 import us.abstracta.jmeter.javadsl.codegeneration.params.DynamicParam;
 import us.abstracta.jmeter.javadsl.codegeneration.params.EncodingParam;
 import us.abstracta.jmeter.javadsl.codegeneration.params.EnumParam;
+import us.abstracta.jmeter.javadsl.codegeneration.params.FloatParam;
 import us.abstracta.jmeter.javadsl.codegeneration.params.IntParam;
 import us.abstracta.jmeter.javadsl.codegeneration.params.LongParam;
 import us.abstracta.jmeter.javadsl.codegeneration.params.NameParam;
@@ -140,6 +141,20 @@ public class TestElementParamBuilder {
    */
   public MethodParam longParam(String propName) {
     return buildParam(propName, LongParam::new, (Long) null);
+  }
+
+  /**
+   * Generates a MethodParam representing a float test element property.
+   *
+   * @param propName is the name of the property holding a float value. For nested properties (a
+   *                 property that is inside another object property) you can use the slash
+   *                 character to separate the levels (eg: http_config/use_proxy).
+   * @return the MethodParam instance.
+   * @throws UnsupportedOperationException when no float can be parsed from the property value.
+   * @since 0.63
+   */
+  public MethodParam floatParam(String propName) {
+    return buildParam(propName, FloatParam::new, null);
   }
 
   /**

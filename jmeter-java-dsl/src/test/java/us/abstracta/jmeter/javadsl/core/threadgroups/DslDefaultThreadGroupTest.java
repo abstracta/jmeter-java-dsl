@@ -56,7 +56,7 @@ public class DslDefaultThreadGroupTest {
     setProperty(ret, ThreadGroup.RAMP_TIME, rampUpSecs);
     LoopController loopController = new LoopController();
     ret.setSamplerController(loopController);
-    Long zero = Long.valueOf(0);
+    Long zero = 0L;
     if (durationSecs != null && !zero.equals(durationSecs)) {
       loopController.setLoops(-1);
       setProperty(ret, ThreadGroup.DURATION, durationSecs);
@@ -253,7 +253,7 @@ public class DslDefaultThreadGroupTest {
         .rampTo(0, Duration.ofSeconds(DURATION2_SECONDS))
         .buildThreadGroup())
         .isEqualTo(buildUltimateThreadGroup(
-            new int[][]{{THREAD_COUNT, 0, (int) DURATION1_SECONDS, 0, (int) DURATION2_SECONDS}}));
+            new int[][]{{THREAD_COUNT, 0, DURATION1_SECONDS, 0, DURATION2_SECONDS}}));
   }
 
   private TestElement buildUltimateThreadGroup(int[][] schedsProps) {
@@ -511,10 +511,12 @@ public class DslDefaultThreadGroupTest {
 
     public DslTestPlan simpleThreadGroupWithErrorAction() {
       return testPlan(
-          threadGroup(1, 1,
-              httpSampler("http://localhost"),
-              httpSampler("http://myhost")
-          ).sampleErrorAction(SampleErrorAction.STOP_TEST)
+          threadGroup(1, 1)
+              .sampleErrorAction(SampleErrorAction.STOP_TEST)
+              .children(
+                  httpSampler("http://localhost"),
+                  httpSampler("http://myhost")
+              )
       );
     }
 

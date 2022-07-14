@@ -59,15 +59,17 @@ public class DslTestPlanTest extends DslVisualizerTest {
     }
 
     public DslTestPlan completeTestPlan() {
-      return testPlan(
-          threadGroup(1, 1,
-              httpSampler("http://localhost")
-          ),
-          threadGroup(1, 1,
-              httpSampler("http://localhost")
-          )
-      ).sequentialThreadGroups()
-          .tearDownOnlyAfterMainThreadsDone();
+      return testPlan()
+          .sequentialThreadGroups()
+          .tearDownOnlyAfterMainThreadsDone()
+          .children(
+              threadGroup(1, 1,
+                  httpSampler("http://localhost")
+              ),
+              threadGroup(1, 1,
+                  httpSampler("http://localhost")
+              )
+          );
     }
 
   }

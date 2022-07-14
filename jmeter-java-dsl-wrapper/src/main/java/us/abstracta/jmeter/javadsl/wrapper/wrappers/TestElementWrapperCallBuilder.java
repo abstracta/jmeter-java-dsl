@@ -123,7 +123,7 @@ public class TestElementWrapperCallBuilder<T extends TestElement> extends
       } else if (prop instanceof CollectionProperty) {
         return buildCollectionCode((CollectionProperty) prop, indent);
       } else {
-        return buildStringLiteral(prop.getStringValue());
+        return buildStringLiteral(prop.getStringValue(), indent);
       }
     }
 

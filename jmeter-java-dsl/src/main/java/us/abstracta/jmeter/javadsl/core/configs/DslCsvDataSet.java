@@ -327,7 +327,7 @@ public class DslCsvDataSet extends BaseConfigElement {
     @Override
     public String buildCode(String indent) {
       return Arrays.stream(value)
-          .map(MethodParam::buildStringLiteral)
+          .map(s -> MethodParam.buildStringLiteral(s, indent))
           .collect(Collectors.joining(", "));
     }
 
