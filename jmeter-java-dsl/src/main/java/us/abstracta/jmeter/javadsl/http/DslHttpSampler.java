@@ -437,7 +437,9 @@ public class DslHttpSampler extends DslBaseHttpSampler<DslHttpSampler> {
         ret.chain("body", buildRawBody(args));
       } else if (testElem.getSendFileAsPostBody()) {
         HTTPFileArg file = testElem.getHTTPFiles()[0];
-        if (file.getMimeType() != null && !file.getMimeType().isEmpty()) {
+        String fileMimeType = file.getMimeType();
+        if (contentType == null && fileMimeType != null && !fileMimeType.isEmpty()
+            && !fileMimeType.equals(new HTTPFileArg(file.getPath()).getMimeType())) {
           chainContentType(ret, file.getMimeType());
         }
         ret.chain("bodyFile", new StringParam(file.getPath()));

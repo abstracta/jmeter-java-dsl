@@ -14,7 +14,7 @@ public class RpsThreadGroupTest extends JmeterDslTest {
 
   public static final int STAGE_DURATION_SECONDS = 5;
   public static final int BASE_RPS = 1;
-  public static final double THRESHOLD = 0.20;
+  public static final double THRESHOLD = 0.30;
 
   @Test
   public void shouldGetExpectedRequestsCountWhenTestPlanWithRpsByRequest() throws Exception {

@@ -29,6 +29,7 @@ public class DslTestPlanTest extends DslVisualizerTest {
     );
     executor.submit(testPlan::showInGui);
     FrameFixture frame = WindowFinder.findFrame(JFrame.class)
+        .withTimeout(10, TimeUnit.SECONDS)
         .using(robot);
     try {
       frame.requireVisible();

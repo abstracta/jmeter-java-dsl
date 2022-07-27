@@ -563,7 +563,6 @@ public class DslHttpSamplerTest extends JmeterDslTest {
           threadGroup(1, 1,
               httpSampler("http://localhost")
                   .method(HTTPConstants.POST)
-                  .contentType(ContentType.APPLICATION_JSON)
                   .bodyFile("myFile.xml")
           )
       );

@@ -76,7 +76,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-shade-plugin</artifactId>
-        <version>3.2.4</version>
+        <version>3.3.0</version>
         <executions>
           <execution>
             <phase>package</phase>
@@ -88,39 +88,33 @@
               project dependencies should be reviewed (with mvn dependency:tree) to identify any
               dependencies that may not be needed in jmx2dsl and can be excluded  -->
               <artifactSet>
+                <includes>
+                  <include>us.abstracta.jmeter:*</include>
+                  <include>org.apache.jmeter:*</include>
+                  <include>org.slf4j:slf4j-api</include>
+                  <include>org.apache.logging.log4j:log4j-api</include>
+                  <include>org.apache.logging.log4j:log4j-core</include>
+                  <include>org.apache.logging.log4j:log4j-slf4j-impl</include>
+                  <include>org.slf4j:jcl-over-slf4j</include>
+                  <include>com.fasterxml.jackson.core:jackson-core</include>
+                  <include>com.fasterxml.jackson.core:jackson-databind</include>
+                  <include>oro:oro</include>
+                  <include>com.thoughtworks.xstream:xstream</include>
+                  <include>io.github.x-stream:mxparser</include>
+                  <include>xmlpull:xmlpull</include>
+                  <include>org.apache.commons:commons-lang3</include>
+                  <include>commons-io:commons-io</include>
+                  <include>org.apache.httpcomponents:httpcore</include>
+                  <include>org.apache.httpcomponents:httpclient</include>
+                  <include>dnsjava:dnsjava</include>
+                  <include>org.apache.tika:tika-core</include>
+                  <include>com.miglayout:*</include>
+                  <include>kg.apc:jmeter-plugins-casutg</include>
+                  <include>com.blazemeter:jmeter-plugins-random-csv-data-set</include>
+                  <include>info.picocli:*</include>
+                </includes>
                 <excludes>
-                  <exclude>bsf:bsf</exclude>
-                  <exclude>xalan:*</exclude>
-                  <exclude>net.sf.saxon:Saxon-HE</exclude>
-                  <exclude>com.formdev:svgSalamander</exclude>
-                  <exclude>net.java.dev.jna:jna</exclude>
-                  <exclude>org.swinglabs:jxlayer</exclude>
-                  <exclude>org.apache.xmlgraphics:xmlgraphics-commons</exclude>
-                  <exclude>org.freemarker:freemarker</exclude>
-                  <exclude>org.jodd:jodd-*</exclude>
-                  <exclude>org.codehaus.groovy:groovy*</exclude>
-                  <exclude>xerces:xercesImpl</exclude>
-                  <exclude>xml-apis:xml-apis</exclude>
-                  <exclude>com.github.ben-manes.caffeine:caffeine</exclude>
-                  <exclude>org.checkerframework:checker-qual</exclude>
-                  <exclude>org.jsoup:jsoup</exclude>
-                  <exclude>com.helger:*</exclude>
-                  <exclude>org.brotli:dec</exclude>
-                  <exclude>org.apache.tika:*</exclude>
-                  <exclude>org.mozilla:rhino</exclude>
-                  <exclude>commons-logging:commons-logging</exclude>
-                  <exclude>org.apache.commons:commons-jexl*</exclude>
-                  <exclude>org.apache-extras.beanshell:bsh</exclude>
-                  <exclude>javax.mail:mail</exclude>
-                  <exclude>io.burt:jmespath*</exclude>
-                  <exclude>jcharts:jcharts</exclude>
-                  <exclude>net.minidev:*</exclude>
-                  <exclude>org.ow2.asm:asm</exclude>
-                  <exclude>com.jayway.jsonpath:json-path</exclude>
-                  <exclude>net.sf.jtidy:jtidy</exclude>
                   <exclude>kg.apc:jmeter-plugins-charts</exclude>
-                  <exclude>org.eclipse.jetty:*</exclude>
-                  <exclude>org.apache.commons:commons-math3</exclude>
                 </excludes>
               </artifactSet>
               <filters>

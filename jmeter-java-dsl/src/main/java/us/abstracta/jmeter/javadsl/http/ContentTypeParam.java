@@ -42,7 +42,8 @@ public class ContentTypeParam extends FixedParam<ContentType> {
 
   private String findConstantName(ContentType value) {
     return CONSTANT_CONTENT_TYPES.entrySet().stream()
-        .filter(entry -> entry.getKey().toString().equals(value.toString()))
+        .filter(entry -> entry.getKey().getMimeType().equals(value.toString())
+            || entry.getKey().toString().equals(value.toString()))
         .map(Map.Entry::getValue)
         .findAny()
         .orElse(null);

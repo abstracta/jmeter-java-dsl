@@ -26,12 +26,6 @@
       <artifactId>ApacheJMeter_jdbc</artifactId>
       <version>${jmeter.version}</version>
     </dependency>
-    <!-- override jmeter dependency to avoid dependency vulnerabilities -->
-    <dependency>
-      <groupId>org.apache.commons</groupId>
-      <artifactId>commons-dbcp2</artifactId>
-      <version>2.9.0</version>
-    </dependency>
 
     <dependency>
       <groupId>us.abstracta.jmeter</groupId>
@@ -49,7 +43,7 @@
     <dependency>
       <groupId>org.postgresql</groupId>
       <artifactId>postgresql</artifactId>
-      <version>42.3.4</version>
+      <version>42.4.0</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
