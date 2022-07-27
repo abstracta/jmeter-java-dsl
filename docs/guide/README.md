@@ -417,6 +417,10 @@ To be able to run the test you require the `rmi_keystore.jks` file in working di
 In general, prefer using BlazeMeter or OctoPerf options which avoid all the setup and maintenance costs of the infrastructure required by JMeter remote testing, in addition to additional useful features (like reporting capabilities).
 :::
 
+::: tip
+[Here](../../docs/guide/distributed) is an example project using `docker-compose` that starts a jmeter server/slave and executes a test with it. If you want to do a similar setup generate your own keystore and properly tune RMI remote server in server/slave. 
+:::
+
 Check [DistributedJmeterEngine](../../jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/engines/DistributedJmeterEngine.java) and [JMeter documentation](http://jmeter.apache.org/usermanual/remote-test.html) for proper setup and additional options.
 
 ## Advanced threads configuration

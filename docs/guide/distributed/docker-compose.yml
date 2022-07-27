@@ -1,0 +1,15 @@
+version: '3'
+services:
+  test:
+    image: maven:3.8
+    working_dir: /usr/src/test
+    volumes:
+      - ./test:/usr/src/test
+      - ./rmi_keystore.jks:/usr/src/test/rmi_keystore.jks
+      - ~/.m2:/root/.m2
+    command: mvn clean test
+  server:
+    build: jmeter
+    volumes:
+      - ./rmi_keystore.jks:/opt/jmeter/rmi_keystore.jks
+    command: jmeter-server -Dserver.rmi.localport=2020 -Djava.rmi.server.hostname=server
