@@ -50,11 +50,14 @@ public class RpsThreadGroup extends BaseThreadGroup<RpsThreadGroup> {
   private int maxThreads = Integer.MAX_VALUE;
   private double spareThreads = 0.1;
 
+  private boolean sameUserOnEachIteration = true;
+
   private static class TimerSchedule {
 
     private final double fromRps;
     private final double toRps;
     private final long durationSecs;
+
 
     private TimerSchedule(double fromRps, double toRps, Duration durationSecs) {
       this.fromRps = fromRps;
@@ -211,7 +214,7 @@ public class RpsThreadGroup extends BaseThreadGroup<RpsThreadGroup> {
   /**
    * Specifies the initial number of threads to use.
    * <p>
-   * Use this method to start with a bigger pool if you know beforehand that for inital RPS 1 thread
+   * Use this method to start with a bigger pool if you know beforehand that for initial RPS 1 thread
    * would not be enough.
    *
    * @param initThreads specifies the initial number of threads to use by the thread group. By
@@ -236,6 +239,23 @@ public class RpsThreadGroup extends BaseThreadGroup<RpsThreadGroup> {
    */
   public RpsThreadGroup spareThreads(double spareThreads) {
     this.spareThreads = spareThreads;
+    return this;
+  }
+
+  /**
+  * Basically, for default thread group in JMeter, this setting enables (true value)
+  * or disables (false value) cache and cookie reuse
+  * between iterations within the same thread. But in fact for RpsThreadGroup it works differently.
+  * In the case of RpsThreadGroup, this setting will reset
+  * the connection on every iteration, and thus reset the cache and cookies.
+  * @param sameUserOnEachIteration specifies the logic about connection context on thread iteration reset.
+  *                                If value is true, for RpsThreadGroup, it means that connections
+  *                                will be reset on each iteration. If it is false - connections
+  *                                and their context will be keep.
+  * @return the RpsThreadGroup instance to use fluent API to set additional options.
+  **/
+  public RpsThreadGroup setSameUserOnEachIteration(boolean sameUserOnEachIteration) {
+    this.sameUserOnEachIteration = sameUserOnEachIteration;
     return this;
   }
 
@@ -283,6 +303,7 @@ public class RpsThreadGroup extends BaseThreadGroup<RpsThreadGroup> {
             spareThreads));
     ret.setHold(String.valueOf(schedules.stream().mapToLong(s -> s.durationSecs).sum()));
     ret.setUnit(AbstractDynamicThreadGroup.UNIT_SECONDS);
+    ret.setIsSameUserOnNextIteration(sameUserOnEachIteration);
     return ret;
   }
 
