@@ -11,6 +11,14 @@ import static us.abstracta.jmeter.javadsl.JmeterDsl.httpSampler;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.testPlan;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.threadGroup;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import javax.swing.JFrame;
+import org.assertj.swing.core.BasicRobot;
+import org.assertj.swing.core.Robot;
+import org.assertj.swing.finder.WindowFinder;
+import org.assertj.swing.fixture.FrameFixture;
 import org.junit.jupiter.api.Test;
 import us.abstracta.jmeter.javadsl.JmeterDslTest;
 
@@ -112,6 +120,25 @@ public class DslHttpDefaultsTest extends JmeterDslTest {
       assertThat(proxy.proxiedRequest()).isTrue();
     } finally {
       proxy.stop();
+    }
+  }
+
+  @Test
+  public void shouldShowInGuiWhenShowInGui() {
+    Robot robot = BasicRobot.robotWithNewAwtHierarchy();
+    ExecutorService executor = Executors.newSingleThreadExecutor();
+    try {
+      executor.submit(() -> {
+        FrameFixture frame = WindowFinder.findFrame(JFrame.class)
+            .withTimeout(10, TimeUnit.SECONDS)
+            .using(robot);
+        frame.requireVisible();
+        frame.close();
+      });
+      httpDefaults().showInGui();
+    } finally {
+      executor.shutdownNow();
+      robot.cleanUp();
     }
   }
 

@@ -3,10 +3,12 @@ package us.abstracta.jmeter.javadsl.http;
 import java.lang.reflect.Method;
 import java.nio.charset.Charset;
 import java.util.List;
+import org.apache.jmeter.config.Arguments;
 import org.apache.jmeter.config.ConfigTestElement;
 import org.apache.jmeter.protocol.http.config.gui.HttpDefaultsGui;
 import org.apache.jmeter.protocol.http.sampler.HTTPSamplerBase;
 import org.apache.jmeter.testelement.TestElement;
+import org.apache.jmeter.testelement.property.TestElementProperty;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodCall;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodCallContext;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodParam;
@@ -239,6 +241,7 @@ public class DslHttpDefaults extends BaseConfigElement {
     if (encoding != null) {
       ret.setProperty(HTTPSamplerBase.CONTENT_ENCODING, encoding.toString());
     }
+    ret.setProperty(new TestElementProperty(HTTPSamplerBase.ARGUMENTS, new Arguments()));
     if (proxyUrl != null) {
       JmeterUrl parsedUrl = JmeterUrl.valueOf(proxyUrl);
       ret.setProperty(HTTPSamplerBase.PROXYSCHEME, parsedUrl.protocol());

@@ -26,7 +26,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import us.abstracta.jmeter.javadsl.JmeterDslTest;
 import us.abstracta.jmeter.javadsl.core.StringTemplate.StringTemplateAssert;
-import us.abstracta.jmeter.javadsl.util.TestResource;
 
 public class JmeterDslCoreTest extends JmeterDslTest {
 
