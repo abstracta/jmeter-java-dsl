@@ -20,7 +20,7 @@ public class StringParam extends FixedParam<String> {
 
   @Override
   public String buildCode(String indent) {
-    return buildStringLiteral(value, indent);
+    return buildStringLiteral(value == null ? "" : value, indent);
   }
 
 }

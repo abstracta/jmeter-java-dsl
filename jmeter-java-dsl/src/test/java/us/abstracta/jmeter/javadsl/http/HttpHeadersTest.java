@@ -19,6 +19,7 @@ public class HttpHeadersTest {
               httpHeaders()
                   .header("Accept", "application/json")
                   .header("X-My-Header", "my-value")
+                  .header("X-Other-Header", "")
                   .contentType(ContentType.APPLICATION_JSON),
               httpSampler("http://localhost")
           )
