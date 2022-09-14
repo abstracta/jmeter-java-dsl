@@ -69,6 +69,7 @@ public class DslDefaultThreadGroupTest {
     if (durationSecs != null && !zero.equals(durationSecs) || !zero.equals(delaySecs)) {
       ret.setScheduler(true);
     }
+    ret.setIsSameUserOnNextIteration(false);
     return ret;
   }
 

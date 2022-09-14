@@ -2,6 +2,7 @@ package us.abstracta.jmeter.javadsl.http;
 
 import java.lang.reflect.Method;
 import java.nio.charset.Charset;
+import java.time.Duration;
 import java.util.List;
 import org.apache.jmeter.config.Arguments;
 import org.apache.jmeter.config.ConfigTestElement;
@@ -220,6 +221,51 @@ public class DslHttpDefaults extends BaseConfigElement {
    */
   public DslHttpDefaults clientImpl(HttpClientImpl clientImpl) {
     this.clientImpl = clientImpl;
+    return this;
+  }
+
+  /**
+   * Specifies whether to reset (drop and recreate) connections on each thread group iteration or
+   * not.
+   * <p>
+   * By default, connections will be reused to avoid common issues of port and file descriptors
+   * exhaustion requiring OS tuning, even though this means that generated load is not realistic
+   * enough for emulating as if each iteration were a different user. If you need to proper
+   * generation of connections and disconnections between iterations, then consider using this
+   * method.
+   * <p>
+   * When using reset connection for each thread consider tuning OS like explained in "Configure
+   * your environment" section of <a href="https://medium.com/@chientranthien/
+   * how-to-generate-high-load-benchmark-with-jmeter-80e828a67592">this article</a>.
+   * <p>
+   * <b>Warning:</b> This setting is applied at JVM level, which means that it will affect the
+   * entire test plan and potentially other test plans running in the same JVM instance.
+   *
+   * @param enable specifies to reset connections on each thread group iteration when true,
+   *               otherwise reuse connections. By default, connections are reused.
+   * @return the HTTP Defaults instance for further configuration or usage.
+   * @since 0.65
+   */
+  public DslHttpDefaults resetConnectionsBetweenIterations(boolean enable) {
+    System.setProperty(DslBaseHttpSampler.RESET_CONNECTIONS_BETWEEN_ITERATIONS_PROP,
+        String.valueOf(enable));
+    return this;
+  }
+
+  /**
+   * Allows specifying the connections ttl (time-to-live) used to determine how much time a
+   * connection can be kept open.
+   * <p>
+   * This setting allows tuning connections handling avoiding unnecessary resources usage depending
+   * on the use case and server under test settings.
+   *
+   * @param ttl specifies the duration for connections to keep open before they are closed. By
+   *            default, this is set to 1 minute.
+   * @return the HTTP Defaults instance for further configuration or usage.
+   * @since 0.65
+   */
+  public DslHttpDefaults connectionsTtl(Duration ttl) {
+    System.setProperty("httpclient4.time_to_live", String.valueOf(ttl.toMillis()));
     return this;
   }
 

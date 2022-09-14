@@ -2307,6 +2307,36 @@ testPlan(
 )
 ```
 
+#### Connections
+
+jmeter-java-dsl, as JMeter (and also K6), by default **reuses HTTP connections between thread iterations** to avoid common issues with port and file descriptors exhaustion which require manual OS tuning and may manifest in many ways.
+
+This decision implies that load generated from 10 threads and 100 iterations is not the same as 1000 real users with up to 10 concurrent users in a given time, since load imposed by each user connection and disconnection is only generated once for each thread.
+
+If you need for each iteration to reset connections you can use something like this:
+
+```java
+httpDefaults()
+    .resetConnectionsBetweenIterations(true)
+```
+
+If you use this setting you might want to take a look at "Config your environment" section of [this article](https://medium.com/@chientranthien/how-to-generate-high-load-benchmark-with-jmeter-80e828a67592) to avoid port and file descriptors exhaustion.
+
+::: tip
+Connections are configured by default with a TTL (time-to-live) of 1 minute, which you can easily change like this:
+
+```java
+httpDefaults()
+    .connectionTtl(Duration.ofMinutes(10))
+```
+
+* This and previous setting apply at JVM level (due to JMeter limitation), so they affect all requests in same test plan and other ones potentially running in same JVM instance.
+:::
+
+::: warning
+Using `clientImpl(HttpClientImpl.JAVA)` will ignore any of previous settings and will reuse connections depending on JVM implementation.
+:::
+
 #### Embedded resources
 
 Sometimes you may need to reproduce browsers behavior, downloading for a given URL all associated resources (images, frames, etc.).

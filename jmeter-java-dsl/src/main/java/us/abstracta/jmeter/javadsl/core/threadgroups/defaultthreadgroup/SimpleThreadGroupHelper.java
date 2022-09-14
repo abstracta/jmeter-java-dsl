@@ -109,6 +109,7 @@ public class SimpleThreadGroupHelper extends BaseThreadGroup<DslDefaultThreadGro
     if (duration != null || delay != null) {
       ret.setScheduler(true);
     }
+    ret.setIsSameUserOnNextIteration(false);
     return ret;
   }
 

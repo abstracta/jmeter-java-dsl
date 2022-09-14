@@ -13,6 +13,7 @@ import org.apache.jmeter.protocol.http.sampler.HTTPSamplerBase;
 import org.apache.jmeter.protocol.http.sampler.HTTPSamplerProxy;
 import org.apache.jmeter.protocol.http.util.HTTPConstants;
 import org.apache.jmeter.testelement.TestElement;
+import org.apache.jmeter.util.JMeterUtils;
 import org.apache.jorphan.collections.HashTree;
 import us.abstracta.jmeter.javadsl.JmeterDsl;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodCall;
@@ -34,6 +35,9 @@ import us.abstracta.jmeter.javadsl.core.util.JmeterFunction;
  * @since 0.52
  */
 public abstract class DslBaseHttpSampler<T extends DslBaseHttpSampler<?>> extends BaseSampler<T> {
+
+  public static final String RESET_CONNECTIONS_BETWEEN_ITERATIONS_PROP =
+      "httpclient.reset_state_on_thread_group_iteration";
 
   protected String path;
   protected final HttpHeaders headers = new HttpHeaders();
@@ -197,6 +201,9 @@ public abstract class DslBaseHttpSampler<T extends DslBaseHttpSampler<?>> extend
 
   @Override
   protected TestElement buildTestElement() {
+    if (JMeterUtils.getProperty(RESET_CONNECTIONS_BETWEEN_ITERATIONS_PROP) == null) {
+      JMeterUtils.setProperty(RESET_CONNECTIONS_BETWEEN_ITERATIONS_PROP, String.valueOf(false));
+    }
     HTTPSamplerProxy ret = new HTTPSamplerProxy();
     if (protocol != null) {
       ret.setProtocol(protocol);
