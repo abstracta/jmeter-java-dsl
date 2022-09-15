@@ -235,8 +235,8 @@ public class DslHttpDefaults extends BaseConfigElement {
    * method.
    * <p>
    * When using reset connection for each thread consider tuning OS like explained in "Configure
-   * your environment" section of <a href="https://medium.com/@chientranthien/
-   * how-to-generate-high-load-benchmark-with-jmeter-80e828a67592">this article</a>.
+   * your environment" section of
+   * <a href="https://medium.com/@chientranthien/how-to-generate-high-load-benchmark-with-jmeter-80e828a67592">this article</a>.
    * <p>
    * <b>Warning:</b> This setting is applied at JVM level, which means that it will affect the
    * entire test plan and potentially other test plans running in the same JVM instance.
