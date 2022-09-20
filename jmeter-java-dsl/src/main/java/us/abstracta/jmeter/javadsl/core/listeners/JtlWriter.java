@@ -2,10 +2,12 @@ package us.abstracta.jmeter.javadsl.core.listeners;
 
 import java.io.File;
 import java.lang.reflect.Method;
-import java.nio.file.FileAlreadyExistsException;
+import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 import org.apache.jmeter.reporters.ResultCollector;
 import org.apache.jmeter.samplers.SampleSaveConfiguration;
 import org.apache.jmeter.testelement.TestElement;
@@ -16,6 +18,7 @@ import us.abstracta.jmeter.javadsl.codegeneration.MethodCallContext;
 import us.abstracta.jmeter.javadsl.codegeneration.SingleTestElementCallBuilder;
 import us.abstracta.jmeter.javadsl.codegeneration.TestElementParamBuilder;
 import us.abstracta.jmeter.javadsl.codegeneration.params.BoolParam;
+import us.abstracta.jmeter.javadsl.codegeneration.params.StringParam;
 
 /**
  * Allows to generate a result log file (JTL) with data for each sample for a test plan, thread
@@ -66,24 +69,21 @@ public class JtlWriter extends BaseListener {
   protected boolean saveHostname;
   protected boolean saveSamplerData;
   protected boolean saveSubResults = true;
-  protected boolean overwriteJtl = false;
   protected List<String> sampleVariables = Collections.emptyList();
 
-  public JtlWriter(String jtlFile) {
+  public JtlWriter(String directoryPath, String fileName) {
     super("Simple Data Writer", SimpleDataWriter.class);
-    this.jtlFile = jtlFile;
+    File directory = new File(directoryPath);
+    directory.mkdirs();
+    this.jtlFile = directory.toPath()
+        .resolve(fileName != null ? fileName
+            : new SimpleDateFormat("yyyy-MM-dd hh-mm-ss").format(Instant.now()) + " "
+                + UUID.randomUUID() + ".jtl")
+        .toString();
   }
 
   @Override
   public TestElement buildTestElement() {
-    File file = new File(jtlFile);
-    if (file.exists()) {
-      if (overwriteJtl) {
-        file.delete();
-      } else {
-        throw new IllegalArgumentException(new FileAlreadyExistsException(jtlFile));
-      }
-    }
     ResultCollector logger = new ResultCollector();
     logger.setFilename(jtlFile);
     SampleSaveConfiguration config = logger.getSaveConfig();
@@ -645,18 +645,6 @@ public class JtlWriter extends BaseListener {
   }
 
   /**
-   * Allows specifying that if a JTL with provided name exists, then it should be overwritten (and
-   * avoid default generated exception).
-   *
-   * @return the JtlWriter for further configuration or usage. By default, it is set to true.
-   * @since 0.13
-   */
-  public JtlWriter overwriteJtl() {
-    this.overwriteJtl = true;
-    return this;
-  }
-
-  /**
    * Allows specifying JMeter variables to include in generated jtl file.
    * <p>
    * <b>Warning:</b> variables to sample are test plan wide. This means that if you set them in one
@@ -694,7 +682,10 @@ public class JtlWriter extends BaseListener {
     @Override
     protected MethodCall buildMethodCall(ResultCollector collector, MethodCallContext context) {
       TestElementParamBuilder paramBuilder = new TestElementParamBuilder(collector);
-      MethodCall ret = buildMethodCall(paramBuilder.stringParam(ResultCollector.FILENAME));
+      String fileName = paramBuilder.stringParam(ResultCollector.FILENAME).getExpression();
+      String[] fileParts = fileName.split(File.separator, 2);
+      MethodCall ret = buildMethodCall(new StringParam(fileParts.length > 1 ? fileParts[0] : ""),
+          new StringParam(fileParts[fileParts.length - 1]));
       SampleSaveConfiguration config = collector.getSaveConfig();
       if (isAllSet(config)) {
         return ret.chain("withAllFields", new BoolParam(true, false));

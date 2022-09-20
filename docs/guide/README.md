@@ -97,7 +97,7 @@ public class PerformanceTest {
             httpSampler("http://my.service")
         ),
         //this is just to log details of each request stats
-        jtlWriter("test" + Instant.now().toString().replace(":", "-") + ".jtl")
+        jtlWriter("target/jtls")
     ).run();
     assertThat(stats.overall().sampleTimePercentile99()).isLessThan(Duration.ofSeconds(5));
   }
@@ -173,7 +173,7 @@ public class PerformanceTest {
         threadGroup(2, 10,
             httpSampler("http://my.service")
         ),
-        jtlWriter("test.jtl")
+        jtlWriter("target/jtls")
     ).run();
     assertThat(stats.overall().errorsCount()).isEqualTo(0);
   }
@@ -857,7 +857,7 @@ public class PerformanceTest {
         threadGroup(2, 10,
             httpSampler("http://my.service")
         ),
-        jtlWriter("test" + Instant.now().toString().replace(":", "-") + ".jtl")
+        jtlWriter("target/jtls")
     ).run();
     assertThat(stats.overall().sampleTimePercentile99()).isLessThan(Duration.ofSeconds(5));
   }
@@ -1074,7 +1074,7 @@ public class PerformanceTest {
         threadGroup(2, 10,
             httpSampler("http://my.service")
         ),
-        htmlReporter("html-report-" + Instant.now().toString().replace(":", "-"))
+        htmlReporter("reports")
     ).run();
     assertThat(stats.overall().sampleTimePercentile99()).isLessThan(Duration.ofSeconds(5));
   }

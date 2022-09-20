@@ -1,8 +1,6 @@
 package us.abstracta.jmeter.javadsl.core.listeners;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static us.abstracta.jmeter.javadsl.JmeterDsl.htmlReporter;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.httpSampler;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.jsr223PostProcessor;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.jtlWriter;
@@ -11,7 +9,6 @@ import static us.abstracta.jmeter.javadsl.JmeterDsl.testResource;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.threadGroup;
 
 import java.io.IOException;
-import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import org.apache.http.entity.ContentType;
@@ -39,9 +36,14 @@ public class JtlWriterTest extends JmeterDslTest {
         threadGroup(1, TEST_ITERATIONS,
             httpSampler(wiremockUri)
         ),
-        jtlWriter(resultsFilePath.toString())
+        buildJtlWriter(resultsFilePath)
     ).run();
     assertResultsFileResultsCount(resultsFilePath, TEST_ITERATIONS * 3);
+  }
+
+  private static JtlWriter buildJtlWriter(Path resultsFilePath) {
+    return jtlWriter(resultsFilePath.getParent().toString(),
+        resultsFilePath.getFileName().toString());
   }
 
   private void assertResultsFileResultsCount(Path resultsFilePath, int resultsCount)
@@ -58,7 +60,7 @@ public class JtlWriterTest extends JmeterDslTest {
         threadGroup(1, TEST_ITERATIONS,
             httpSampler(wiremockUri),
             httpSampler(wiremockUri),
-            jtlWriter(resultsFilePath.toString())
+            buildJtlWriter(resultsFilePath)
         ),
         threadGroup(1, TEST_ITERATIONS,
             httpSampler(wiremockUri)
@@ -75,21 +77,12 @@ public class JtlWriterTest extends JmeterDslTest {
         threadGroup(1, TEST_ITERATIONS,
             httpSampler(wiremockUri)
                 .children(
-                    jtlWriter(resultsFilePath.toString())
+                    buildJtlWriter(resultsFilePath)
                 ),
             httpSampler(wiremockUri)
         )
     ).run();
     assertResultsFileResultsCount(resultsFilePath, TEST_ITERATIONS);
-  }
-
-  @Test
-  public void shouldThrowExceptionWhenCreatingJtlWriterAndFileAlreadyExists(@TempDir Path tempDir) {
-    assertThrows(FileAlreadyExistsException.class, () -> {
-      Path filePath = tempDir.resolve("test.txt");
-      filePath.toFile().createNewFile();
-      htmlReporter(filePath.toString());
-    });
   }
 
   @Test
@@ -101,7 +94,7 @@ public class JtlWriterTest extends JmeterDslTest {
             httpSampler(wiremockUri)
                 .post(JSON_BODY, ContentType.APPLICATION_JSON)
                 .children(
-                    jtlWriter(resultsFilePath.toString())
+                    buildJtlWriter(resultsFilePath)
                 ),
             httpSampler(wiremockUri)
         )
@@ -124,7 +117,7 @@ public class JtlWriterTest extends JmeterDslTest {
             httpSampler(wiremockUri)
                 .post(JSON_BODY, ContentType.APPLICATION_JSON)
                 .children(
-                    jtlWriter(resultsFilePath.toString())
+                    buildJtlWriter(resultsFilePath)
                         .withAllFields(true)
                 ),
             httpSampler(wiremockUri)
@@ -142,7 +135,8 @@ public class JtlWriterTest extends JmeterDslTest {
             httpSampler(wiremockUri)
                 .children(
                     jsr223PostProcessor("vars.put('my_var', 'my_val')"),
-                    jtlWriter(resultsFilePath.toString()).withVariables("my_var")
+                    buildJtlWriter(resultsFilePath)
+                        .withVariables("my_var")
                 )
         )
     ).run();
@@ -158,7 +152,7 @@ public class JtlWriterTest extends JmeterDslTest {
           threadGroup(1, 1,
               httpSampler("http://localhost")
           ),
-          jtlWriter("results.jtl")
+          jtlWriter("", "results.jtl")
       );
     }
 
@@ -167,7 +161,7 @@ public class JtlWriterTest extends JmeterDslTest {
           threadGroup(1, 1,
               httpSampler("http://localhost")
           ),
-          jtlWriter("results.jtl")
+          jtlWriter("target", "results.jtl")
               .withAllFields()
       );
     }
@@ -177,7 +171,7 @@ public class JtlWriterTest extends JmeterDslTest {
           threadGroup(1, 1,
               httpSampler("http://localhost")
           ),
-          jtlWriter("results.jtl")
+          jtlWriter("", "results.jtl")
               .saveAsXml(true)
               .withElapsedTime(false)
               .withResponseMessage(false)

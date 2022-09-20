@@ -5,7 +5,6 @@ import static com.github.tomakehurst.wiremock.client.WireMock.any;
 import static com.github.tomakehurst.wiremock.client.WireMock.anyUrl;
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.htmlReporter;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.httpSampler;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.testPlan;
@@ -14,8 +13,6 @@ import static us.abstracta.jmeter.javadsl.JmeterDsl.threadGroup;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.nio.file.DirectoryNotEmptyException;
-import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.util.regex.Matcher;
@@ -33,28 +30,13 @@ public class HtmlReporterTest extends JmeterDslTest {
         threadGroup(1, TEST_ITERATIONS,
             httpSampler(wiremockUri)
         ),
-        htmlReporter(reportDir.toString())
+        buildHtmlReporter(reportDir)
     ).run();
     assertThat(reportDir.resolve("index.html").toFile().exists()).isTrue();
   }
 
-  @Test
-  public void shouldThrowExceptionWhenCreatingHtmlReporterWithNonEmptyDirectory(
-      @TempDir Path tempDir) {
-    assertThrows(DirectoryNotEmptyException.class, () -> {
-      tempDir.resolve("test.txt").toFile().createNewFile();
-      htmlReporter(tempDir.toString());
-    });
-  }
-
-  @Test
-  public void shouldThrowExceptionWhenCreatingHtmlReporterWithExistingFileAsDirectory(
-      @TempDir Path tempDir) {
-    assertThrows(FileAlreadyExistsException.class, () -> {
-      Path filePath = tempDir.resolve("test.txt");
-      filePath.toFile().createNewFile();
-      htmlReporter(filePath.toString());
-    });
+  private static HtmlReporter buildHtmlReporter(Path reportDir) throws IOException {
+    return htmlReporter(reportDir.getParent().toString(), reportDir.getFileName().toString());
   }
 
   @Test
@@ -67,7 +49,7 @@ public class HtmlReporterTest extends JmeterDslTest {
         threadGroup(1, TEST_ITERATIONS,
             httpSampler(wiremockUri)
         ),
-        htmlReporter(reportDir.toString())
+        buildHtmlReporter(reportDir)
             .apdexThresholds(threshold, threshold)
     ).run();
     assertThat(extractApdex(reportDir, "overall")).isEqualTo(0.0);
@@ -100,7 +82,7 @@ public class HtmlReporterTest extends JmeterDslTest {
         threadGroup(1, TEST_ITERATIONS,
             httpSampler(SAMPLE_1_LABEL, wiremockUri)
         ),
-        htmlReporter(reportDir.toString())
+        buildHtmlReporter(reportDir)
             .transactionApdexThresholds(SAMPLE_1_LABEL, threshold, threshold)
     ).run();
     assertThat(extractApdex(reportDir, "items")).isEqualTo(0.0);

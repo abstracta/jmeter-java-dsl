@@ -1153,7 +1153,7 @@ public class JmeterDsl {
    * @since 0.11
    */
   public static DslResponseAssertion responseAssertion() {
-    return new DslResponseAssertion((String) null);
+    return new DslResponseAssertion(null);
   }
 
   /**
@@ -1172,13 +1172,38 @@ public class JmeterDsl {
 
   /**
    * Builds a Simple Data Writer to write all collected results to a JTL file.
+   * <p>
+   * This is just a handy short way of generating JTL files using as filename the template:
+   * <pre>{@code <YYYY-MM-DD HH-mm-ss> <UUID>.jtl}</pre>
+   * <p>
+   * If you need to have a predictable name, consider using {@link #jtlWriter(String, String)}
+   * instead.
    *
-   * @param jtlFile is the path of the JTL file where to save the results.
+   * @param directory specifies the directory path where jtl files will be generated in. If the
+   *                  directory does not exist, then it will be created.
    * @return the JtlWriter instance.
+   * @see #jtlWriter(String, String)
    * @see JtlWriter
    */
-  public static JtlWriter jtlWriter(String jtlFile) {
-    return new JtlWriter(jtlFile);
+  public static JtlWriter jtlWriter(String directory) {
+    return new JtlWriter(directory, null);
+  }
+
+  /**
+   * Builds a Simple Data Writer to write all collected results to a JTL file.
+   * <p>
+   * This is particularly helpful when you need to control de file name to do later post-processing
+   * on the file (eg: use CI build ID in the file name).
+   *
+   * @param directory specifies the directory path where jtl file will be generated. If the
+   *                  directory does not exist, then it will be created.
+   * @param fileName  the name to be used for the file. <b>File names should be unique, otherwise
+   *                  the new results will be appended to existing file.</b>
+   * @return the JtlWriter instance.
+   * @since 0.66
+   */
+  public static JtlWriter jtlWriter(String directory, String fileName) {
+    return new JtlWriter(directory, fileName);
   }
 
   /**
@@ -1213,18 +1238,41 @@ public class JmeterDsl {
 
   /**
    * Builds an HTML Reporter which allows easily generating HTML reports for test plans.
+   * <p>
+   * This is just a handy short way of generating html reports following naming template
+   * <pre>{@code <YYYY-MM-DD HH-mm-ss> <UUID>}</pre>
+   * <p>
+   * If you need to have a predictable report name, consider
+   * using {@link #htmlReporter(String, String)} instead.
    *
-   * @param reportDirectory directory where HTML report is generated.
+   * @param reportsDirectory specifies the directory where HTML reports are generated. If the
+   *                         reportsDirectory does not exist, then it will be created.
    * @return the HTML Reporter instance
-   * @throws IOException if reportDirectory is an existing file, or an existing nonempty directory.
-   *                     The idea of this exception is to avoid users unintentionally overwriting
-   *                     previous reports and don't force any particular structure on collection of
-   *                     reports.
+   * @see #htmlReporter(String, String)
    * @see HtmlReporter
    * @since 0.6
    */
-  public static HtmlReporter htmlReporter(String reportDirectory) throws IOException {
-    return new HtmlReporter(reportDirectory);
+  public static HtmlReporter htmlReporter(String reportsDirectory) throws IOException {
+    return new HtmlReporter(reportsDirectory, null);
+  }
+
+  /**
+   * Builds an HTML Reporter which allows easily generating HTML reports for test plans.
+   * <p>
+   * This is particularly helpful when you need to control de report directory name to do later
+   * post-processing on it (eg: use CI build ID in the report directory name).
+   *
+   * @param reportsDirectory specifies the directory where HTML reports are generated. If the
+   *                         reportsDirectory does not exist, then it will be created.
+   * @param name             the name to be used for the report directory. <b>Names should be
+   *                         unique, otherwise the report generation will fail after test plan
+   *                         execution.</b>
+   * @return the HTML Reporter instance
+   * @see HtmlReporter
+   * @since 0.66
+   */
+  public static HtmlReporter htmlReporter(String reportsDirectory, String name) throws IOException {
+    return new HtmlReporter(reportsDirectory, name);
   }
 
   /**

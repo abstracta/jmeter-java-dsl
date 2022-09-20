@@ -2,14 +2,15 @@ package us.abstracta.jmeter.javadsl.core.listeners;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.DirectoryNotEmptyException;
 import java.nio.file.DirectoryStream;
-import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.text.SimpleDateFormat;
 import java.time.Duration;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import org.apache.jmeter.JMeter;
@@ -35,15 +36,14 @@ public class HtmlReporter extends BaseListener {
   protected final ApdexThresholds apdexThresholds = new ApdexThresholds();
   protected final Map<String, ApdexThresholds> labelApdexThresholds = new HashMap<>();
 
-  public HtmlReporter(String reportPath) throws IOException {
+  public HtmlReporter(String reportsDirectoryPath, String name) throws IOException {
     super("Simple Data Writer", SimpleDataWriter.class);
-    reportDirectory = new File(reportPath);
-    if (reportDirectory.isFile()) {
-      throw new FileAlreadyExistsException(reportPath);
-    }
-    if (reportDirectory.isDirectory() && !isEmptyDirectory(reportDirectory)) {
-      throw new DirectoryNotEmptyException(reportPath);
-    }
+    File reportsDirectory = new File(reportsDirectoryPath);
+    reportsDirectory.mkdirs();
+    reportDirectory = reportsDirectory.toPath()
+        .resolve(name != null ? name : new SimpleDateFormat("yyyy-MM-dd hh-mm-ss").format(
+            Instant.now()) + " " + UUID.randomUUID())
+        .toFile();
   }
 
   private boolean isEmptyDirectory(File reportDirectory) throws IOException {

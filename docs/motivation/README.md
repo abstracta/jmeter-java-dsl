@@ -11,9 +11,9 @@ There are many tools to script performance/load tests, being [JMeter](http://jme
 
 ### JMeter
 
-JMeter is great for people with no programming knowledge since it provides a graphical interface to create test plans and run them. Additionally, it is the most popular tool (with a lot of supporting tools built on it) and has a big amount of supported protocols and plugins that makes it very versatile.
+JMeter is great for people with no programming knowledge since it provides a graphical interface to create test plans and run them. Additionally, it is the most popular tool (with a lot of supporting tools built on it) and has a big amount of supported protocols and plugins making it very versatile.
 
-But, JMeter has some problems as well: sometimes might be slow to create test plans in JMeter GUI, and you can't get the full picture of the test plan unless you dig in every tree node to check its properties. Furthermore, it doesn't provide a simple programmer friendly API (you can check [here](https://www.blazemeter.com/blog/5-ways-launch-jmeter-test-without-using-jmeter-gui/) for an example on how to run JMeter programmatically without jmeter-java-dsl), nor a Git friendly format (too verbose and hard to review). For example, for this test plan:
+But, JMeter has some downsides as well: sometimes might be slow to create test plans in JMeter GUI and you can't get the full picture of the test plan unless you dig in every tree node to check its properties. Furthermore, it doesn't provide a simple programmer friendly API (you can check [here](https://www.blazemeter.com/blog/5-ways-launch-jmeter-test-without-using-jmeter-gui/) for an example on how to run JMeter programmatically without jmeter-java-dsl), nor a Git friendly format (too verbose and hard to review). For example, for this test plan:
 
 ```java
 import static org.assertj.core.api.Assertions.assertThat;
@@ -36,7 +36,7 @@ public class PerformanceTest {
           .post("{\"name\": \"test\"}", ContentType.APPLICATION_JSON)
       ),
       //this is just to log details of each request stats
-      jtlWriter("test" + Instant.now().toString().replace(":", "-") + ".jtl")
+      jtlWriter("target/jtls")
     ).run();
     assertThat(stats.overall().sampleTimePercentile99()).isLessThan(Duration.ofSeconds(5));
   }
@@ -48,11 +48,11 @@ In JMeter, you would need a JMX file like [this](../../docs/motivation/sample.jm
 
 ### Gatling
 
-Gatling does provide a simple API and a Git friendly format, but requires scala knowledge and environment. Additionally, it doesn't provide as rich environment as JMeter (protocol support, plugins, tools) and requires learning a new framework for testing (if you already use JMeter, which is the most popular tool).
+Gatling does provide a simple API and a Git friendly format, but requires scala knowledge and environment [[1](#gatling-java)]. Additionally, it doesn't provide as rich environment as JMeter (protocol support, plugins, tools) and requires learning a new framework for testing (if you already use JMeter, which is the most popular tool).
 
 ### Taurus
 
-[Taurus](https://gettaurus.org/) is another open-source tool that allows specifying tests in a Git friendly yaml syntax, and provides additional features like pass/fail criteria and easier CI/CD integration. But, this tool requires a python environment, in addition to the java environment. Additionally, there is no built-in GUI or IDE auto-completion support, which makes it harder to discover and learn the actual syntax. Finally, Taurus syntax only supports a subset of the features JMeter provides, which reduces scope usage.
+[Taurus](https://gettaurus.org/) is another open-source tool that allows specifying tests in a Git friendly yaml syntax, and provides additional features like pass/fail criteria and easier CI/CD integration. But, this tool requires a python environment, in addition to the java environment. Additionally, there is no built-in GUI or IDE auto-completion support, which makes it harder to discover and learn the actual syntax. Finally, Taurus syntax only supports a subset of the features JMeter provides.
 
 ### ruby-dsl
 

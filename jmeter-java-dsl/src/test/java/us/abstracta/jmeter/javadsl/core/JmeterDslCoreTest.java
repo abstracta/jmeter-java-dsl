@@ -104,7 +104,7 @@ public class JmeterDslCoreTest extends JmeterDslTest {
                 .post(JSON_BODY, ContentType.APPLICATION_JSON),
             httpSampler("http://localhost")
         ),
-        jtlWriter("results.jtl")
+        jtlWriter("", "results.jtl")
     ).saveAsJmx(filePath.toString());
     StringTemplateAssert.assertThat(filePath)
         .matches(testResource(TEST_PLAN_RESOURCE_PATH));

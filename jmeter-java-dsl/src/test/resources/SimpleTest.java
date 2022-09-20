@@ -32,7 +32,7 @@ public class PerformanceTest {
             .post("{\"var\":\"val\"}", ContentType.APPLICATION_JSON),
           httpSampler("http://localhost")
         ),
-        jtlWriter("results.jtl")
+        jtlWriter("", "results.jtl")
       )
       .run();
     assertThat(stats.overall().errorsCount()).isEqualTo(0);

@@ -33,7 +33,8 @@ public class DslJsr223SamplerTest {
   }
 
   private JtlWriter buildJtlWriter(Path resultsFilePath) {
-    return jtlWriter(resultsFilePath.toString())
+    return jtlWriter(resultsFilePath.getParent().toString(),
+        resultsFilePath.getFileName().toString())
         .withAllFields(false)
         .saveAsXml(true)
         .withResponseCode(true)

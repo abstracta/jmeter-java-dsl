@@ -42,7 +42,7 @@ public class PerformanceTest {
           .post("{\"name\": \"test\"}", ContentType.APPLICATION_JSON)
       ),
       //this is just to log details of each request stats
-      jtlWriter("test" + Instant.now().toString().replace(":", "-") + ".jtl")
+      jtlWriter("target/jtls")
     ).run();
     assertThat(stats.overall().sampleTimePercentile99()).isLessThan(Duration.ofSeconds(5));
   }
