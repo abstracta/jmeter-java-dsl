@@ -31,7 +31,7 @@ import us.abstracta.jmeter.javadsl.core.listeners.DslVisualizer;
 /**
  * Shows a popup window including live graphs and stats using JMeter built-in Summary Report and
  * graphs plugins.
- *
+ * <p>
  * If dashboardVisualizer is added at testPlan level it will show information about all samples in
  * the test plan, if added at thread group level it will only show info for samplers contained
  * within it, if added as a sampler child, then only that sampler samples will be shown.

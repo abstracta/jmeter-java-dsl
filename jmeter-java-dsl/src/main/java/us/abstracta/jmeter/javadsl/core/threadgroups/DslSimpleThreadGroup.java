@@ -13,11 +13,11 @@ import org.apache.jmeter.threads.AbstractThreadGroup;
  * methods.
  * @since 0.33
  */
-public abstract class DslSimpleThreadGroup<T extends DslSimpleThreadGroup<?>> extends
+public abstract class DslSimpleThreadGroup<T extends DslSimpleThreadGroup<T>> extends
     BaseThreadGroup<T> {
 
-  private int threadCount = 1;
-  private int iterations = 1;
+  protected int threadCount = 1;
+  protected int iterations = 1;
 
   protected DslSimpleThreadGroup(String name, Class<? extends JMeterGUIComponent> guiClass,
       List<ThreadGroupChild> children) {
@@ -31,7 +31,7 @@ public abstract class DslSimpleThreadGroup<T extends DslSimpleThreadGroup<?>> ex
    * @param iterations contains number of iterations to run in each thread of the thread group. When
    * -1 is specified, then the thread group will have no limit of iterations and will run until some
    * other condition (like on error and stopping on error is configured) stops the thread group. By
-   * default this value is initialized to 1.
+   * default, this value is initialized to 1.
    * @return the thread group for further configuration or usage.
    */
   public T iterations(int iterations) {
@@ -52,7 +52,7 @@ public abstract class DslSimpleThreadGroup<T extends DslSimpleThreadGroup<?>> ex
 
   /**
    * Allows specifying thread group children elements (samplers, listeners, post processors, etc.).
-   *
+   * <p>
    * This method is just an alternative to the constructor specification of children, and is handy
    * when you want to keep general thread group settings together and then specify children (instead
    * of specifying children and at the end alternative settings like iterations).

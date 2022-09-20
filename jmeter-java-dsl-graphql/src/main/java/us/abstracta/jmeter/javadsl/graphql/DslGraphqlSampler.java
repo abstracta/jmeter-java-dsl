@@ -35,7 +35,7 @@ import us.abstracta.jmeter.javadsl.http.DslBaseHttpSampler;
  * compared to httpSampler.
  * <p>
  * This sampler is based on HTTP Sampler, so all configurations affecting http sampler (headers,
- * cookies, cache, system properties, etc) affect this sampler.
+ * cookies, cache, system properties, etc.) affect this sampler.
  *
  * @since 0.52
  */
@@ -44,10 +44,10 @@ public class DslGraphqlSampler extends DslBaseHttpSampler<DslGraphqlSampler> {
   private static final String DEFAULT_NAME = "GraphQL HTTP Request";
   private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
-  private final String query;
-  private String operationName;
-  private final Map<String, Object> variables = new LinkedHashMap<>();
-  private String variablesJson;
+  protected String query;
+  protected String operationName;
+  protected final Map<String, Object> variables = new LinkedHashMap<>();
+  protected String variablesJson;
 
   public DslGraphqlSampler(String name, String url, String query) {
     super(name != null ? name : DEFAULT_NAME, url, GraphQLHTTPSamplerGui.class);
@@ -59,8 +59,7 @@ public class DslGraphqlSampler extends DslBaseHttpSampler<DslGraphqlSampler> {
    * Builds a GraphQL HTTP Request sampler to invoke GraphQL operations.
    *
    * @param url specifies URL where the GraphQL service is attending requests.
-   * @return the GraphQL HTTP Request sampler instance which can be used to define additional
-   * settings like operation name, variables, headers, pre &amp; post processors, etc.
+   * @return the sampler for further configuration or usage.
    * @see DslGraphqlSampler
    */
   public static DslGraphqlSampler graphqlSampler(String url, String query) {
@@ -82,12 +81,12 @@ public class DslGraphqlSampler extends DslBaseHttpSampler<DslGraphqlSampler> {
 
   /**
    * Specifies the GraphQL operation name to send in the request.
-   *
+   * <p>
    * <a href="https://graphql.org/learn/queries/#operation-name">Here</a> you can find additional
    * information about operation name purposes.
    *
    * @param operationName is the name to send in the GraphQL request.
-   * @return the sampler instance for further configuration or usage.
+   * @return the sampler for further configuration or usage.
    */
   public DslGraphqlSampler operationName(String operationName) {
     this.operationName = operationName;
@@ -96,7 +95,7 @@ public class DslGraphqlSampler extends DslBaseHttpSampler<DslGraphqlSampler> {
 
   /**
    * Specifies a GraphQL variable to send in the request.
-   *
+   * <p>
    * <a href="https://graphql.org/learn/queries/#variablese">Here</a> you can find additional
    * information about variables purposes.
    *
@@ -104,9 +103,9 @@ public class DslGraphqlSampler extends DslBaseHttpSampler<DslGraphqlSampler> {
    * @param value specifies the value associated to the variable. This value is serialized into
    *              json, so for non-primitive values (int, long, boolean, float, double, string,
    *              etc.) make sure they can be properly serialized by jackson library or use
-   *              {@link #rawVariable(String, String)} or {@link #variables(String)} method
+   *              {@link #rawVariable(String, String)} or {@link #variablesJson(String)} method
    *              instead.
-   * @return the sampler instance for further configuration or usage.
+   * @return the sampler for further configuration or usage.
    * @throws IllegalArgumentException when provided value object can't be serialized by jackson.
    */
   public DslGraphqlSampler variable(String name, Object value) {
@@ -132,7 +131,7 @@ public class DslGraphqlSampler extends DslBaseHttpSampler<DslGraphqlSampler> {
    *
    * @param name  specifies the name of the variable.
    * @param value the raw JSON string part to be set as variable value.
-   * @return the sampler instance for further configuration or usage.
+   * @return the sampler for further configuration or usage.
    * @since 0.54
    */
   public DslGraphqlSampler rawVariable(String name, String value) {
@@ -148,23 +147,7 @@ public class DslGraphqlSampler extends DslBaseHttpSampler<DslGraphqlSampler> {
    * is a limiting factor.
    *
    * @param variables specifies all variables to be sent in GraphQL request in JSON Object format.
-   * @return the sampler instance for further configuration or usage.
-   * @see #variable(String, Object)
-   * @deprecated as of 0.54 use {@link #variablesJson(String)} instead.
-   */
-  public DslGraphqlSampler variables(String variables) {
-    return variablesJson(variables);
-  }
-
-  /**
-   * Allows specifying variables in a string in JSON format as JMeter sampler does.
-   * <p>
-   * In general prefer using {@link #variable(String, Object)} instead, which is simpler, and avoids
-   * potential format issues. Use this method in corner cases when {@link #variable(String, Object)}
-   * is a limiting factor.
-   *
-   * @param variables specifies all variables to be sent in GraphQL request in JSON Object format.
-   * @return the sampler instance for further configuration or usage.
+   * @return the sampler for further configuration or usage.
    * @see #variable(String, Object)
    */
   public DslGraphqlSampler variablesJson(String variables) {

@@ -6,7 +6,7 @@ import org.apache.jmeter.testelement.TestElement;
 
 /**
  * Allows extracting part of a JSON response using JMESPath to store into a variable.
- *
+ * <p>
  * By default, the JMESPath is configured to extract from the main sample (does not include sub
  * samples) response body the first match of the JMESPath. If no match is found, then variable will
  * be assigned empty string.
@@ -15,7 +15,7 @@ import org.apache.jmeter.testelement.TestElement;
  */
 public class DslJsonExtractor extends DslVariableExtractor<DslJsonExtractor> {
 
-  private final String jmesPath;
+  protected String jmesPath;
 
   public DslJsonExtractor(String varName, String jmesPath) {
     super("JSON JMESPath Extractor", JMESPathExtractorGui.class, varName);
@@ -35,7 +35,7 @@ public class DslJsonExtractor extends DslVariableExtractor<DslJsonExtractor> {
    * <variableName>_matchNr}, and default value is assigned to {@code <variableName>}.
    *
    * @param matchNumber specifies the match number to use.
-   * @return the DslJsonExtractor to allow fluent usage and setting other properties.
+   * @return the extractor for further configuration and usage.
    */
   public DslJsonExtractor matchNumber(int matchNumber) {
     this.matchNumber = matchNumber;
@@ -54,7 +54,7 @@ public class DslJsonExtractor extends DslVariableExtractor<DslJsonExtractor> {
    * When not specified, then the variable will be assigned to empty string.
    *
    * @param defaultValue specifies the default value to be used.
-   * @return the DslJsonExtractor to allow fluent usage and setting other properties.
+   * @return the extractor for further configuration and usage.
    */
   public DslJsonExtractor defaultValue(String defaultValue) {
     this.defaultValue = defaultValue;

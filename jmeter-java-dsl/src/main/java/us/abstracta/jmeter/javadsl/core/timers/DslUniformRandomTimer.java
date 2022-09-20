@@ -30,8 +30,8 @@ import us.abstracta.jmeter.javadsl.codegeneration.params.LongParam;
  */
 public class DslUniformRandomTimer extends BaseTimer {
 
-  private final long minimumMillis;
-  private final long maximumMillis;
+  protected long minimumMillis;
+  protected long maximumMillis;
 
   public DslUniformRandomTimer(long minimumMillis, long maximumMillis) {
     super("Uniform Random Timer", UniformRandomTimerGui.class);

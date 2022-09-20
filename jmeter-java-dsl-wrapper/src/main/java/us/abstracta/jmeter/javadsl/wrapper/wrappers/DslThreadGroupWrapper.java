@@ -21,18 +21,13 @@ import us.abstracta.jmeter.javadsl.core.threadgroups.BaseThreadGroup;
 public class DslThreadGroupWrapper extends BaseThreadGroup<DslThreadGroupWrapper> implements
     TestElementWrapper<DslThreadGroupWrapper> {
 
-  private final TestElementWrapperHelper<AbstractThreadGroup> helper;
+  protected final TestElementWrapperHelper<AbstractThreadGroup> helper;
 
   public DslThreadGroupWrapper(String name, AbstractThreadGroup testElement,
       AbstractThreadGroupGui guiComponent) {
     super(solveName(name, testElement, guiComponent), solveGuiClass(testElement, guiComponent),
         Collections.emptyList());
     this.helper = new TestElementWrapperHelper<>(testElement, guiComponent);
-  }
-
-  @Override
-  public DslThreadGroupWrapper children(ThreadGroupChild... children) {
-    return super.children(children);
   }
 
   @Override

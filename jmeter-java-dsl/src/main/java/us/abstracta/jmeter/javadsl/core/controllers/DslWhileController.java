@@ -20,9 +20,9 @@ import us.abstracta.jmeter.javadsl.core.util.PropertyScriptBuilder.PropertyScrip
  *
  * @since 0.27
  */
-public class DslWhileController extends BaseController {
+public class DslWhileController extends BaseController<DslWhileController> {
 
-  private final DslScriptBuilder conditionBuilder;
+  protected DslScriptBuilder conditionBuilder;
 
   public DslWhileController(String name, String condition, List<ThreadGroupChild> children) {
     this(name, new PropertyScriptBuilder(condition), children);

@@ -36,7 +36,7 @@ import us.abstracta.jmeter.javadsl.core.BuildTreeContext;
  */
 public class DslVariables extends BaseConfigElement {
 
-  private final Map<String, String> vars = new LinkedHashMap<>();
+  protected final Map<String, String> vars = new LinkedHashMap<>();
 
   public DslVariables() {
     super("User Defined Variables", ArgumentsPanel.class);

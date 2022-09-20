@@ -257,16 +257,19 @@ public class MethodCall {
     if (params.length == 1 && params[0].isDefault()) {
       return this;
     }
-    Method method = findMethodInClassHierarchyMatchingParams(methodName, returnType, params);
     /*
     when chaining methods with booleans in some cases the parameter is required, and in some others
     is not.
      */
-    if (method == null && params.length == 1 && params[0] instanceof BoolParam) {
+    Method method = null;
+    if (params.length == 1 && params[0] instanceof BoolParam) {
       method = findMethodInClassHierarchyMatchingParams(methodName, returnType, new MethodParam[0]);
       if (method != null) {
         params = new MethodParam[0];
       }
+    }
+    if (method == null) {
+      method = findMethodInClassHierarchyMatchingParams(methodName, returnType, params);
     }
     if (method == null) {
       throw buildNoMatchingMethodFoundException(

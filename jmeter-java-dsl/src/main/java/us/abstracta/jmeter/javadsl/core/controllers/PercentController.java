@@ -27,10 +27,10 @@ import us.abstracta.jmeter.javadsl.core.threadgroups.BaseThreadGroup.ThreadGroup
  *
  * @since 0.25
  */
-public class PercentController extends BaseController {
+public class PercentController extends BaseController<PercentController> {
 
-  private final String percent;
-  private boolean perThread;
+  protected String percent;
+  protected boolean perThread;
 
   public PercentController(String percent, List<ThreadGroupChild> children) {
     super("Percent Selector Controller", ThroughputControllerGui.class, children);
@@ -38,36 +38,30 @@ public class PercentController extends BaseController {
   }
 
   /**
-   * Specifies if percent control should be applied per thread or shared by all threads.
+   * Specifies to apply percent control per thread instead of shared by all threads.
    * <p>
    * This might be useful when a more deterministic behavior is required per thread, and each thread
    * execution has to be controlled, instead of relying on in general threads execution percentage.
    *
-   * @param perThread specifies, when true, to applies percent control per thread. Otherwise, it
-   *                  controls percent execution across all threads. When not specified, the latter
-   *                  is used.
-   * @return the percent controller for further configuration or usage.
-   * @since 0.63
+   * @return the controller for further configuration or usage.
+   * @since 0.66
    */
-  public PercentController perThread(boolean perThread) {
-    this.perThread = perThread;
-    return this;
+  public PercentController perThread() {
+    return perThread(true);
   }
 
   /**
-   * Allows specifying controller children elements (samplers, listeners, post processors, etc.).
+   * Same as {@link #perThread()} but allowing to enable or disable it.
    * <p>
-   * This method is just an alternative to the constructor specification of children, and is handy
-   * when you want to keep general controller settings together and then specify children (instead
-   * of specifying percent and children, and at the end alternative settings like per thread
-   * percentage control).
+   * This is helpful when the resolution is taken at runtime.
    *
-   * @param children list of test elements to add as children of the transaction.
-   * @return the altered transaction.
+   * @param enable specifies to enable or disable the setting. By default, it is set to false.
+   * @return the controller for further configuration or usage.
+   * @see #perThread()
    * @since 0.63
    */
-  public PercentController children(ThreadGroupChild... children) {
-    super.addChildren(children);
+  public PercentController perThread(boolean enable) {
+    perThread = enable;
     return this;
   }
 

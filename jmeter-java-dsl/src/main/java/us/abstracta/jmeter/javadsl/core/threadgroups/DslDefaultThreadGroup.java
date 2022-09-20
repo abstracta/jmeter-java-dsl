@@ -32,7 +32,7 @@ import us.abstracta.jmeter.javadsl.core.util.SingleSeriesTimelinePanel;
 public class DslDefaultThreadGroup extends BaseThreadGroup<DslDefaultThreadGroup> {
 
   private static final Integer ZERO = 0;
-  private final List<Stage> stages = new ArrayList<>();
+  protected final List<Stage> stages = new ArrayList<>();
 
   public DslDefaultThreadGroup(String name, int threads, int iterations,
       List<ThreadGroupChild> children) {
@@ -101,7 +101,7 @@ public class DslDefaultThreadGroup extends BaseThreadGroup<DslDefaultThreadGroup
    *                    end the test plan. Since JMeter only supports specifying times in seconds,
    *                    if you specify a smaller granularity (like milliseconds) it will be rounded
    *                    up to seconds.
-   * @return the DslThreadGroup instance to use fluent API to set additional options.
+   * @return the thread group for further configuration or usage.
    * @throws IllegalStateException if used after an iterations stage, since JMeter does not provide
    *                               built-in thread group to support such scenario.
    * @since 0.18
@@ -129,7 +129,7 @@ public class DslDefaultThreadGroup extends BaseThreadGroup<DslDefaultThreadGroup
    * @param threadCount a JMeter expression that returns the number of threads to ramp to.
    * @param duration    a JMeter expression that returns the number of seconds to take for the
    *                    ramp.
-   * @return the DslThreadGroup instance to use fluent API to set additional options.
+   * @return the thread group for further configuration or usage.
    * @see #rampTo(int, Duration)
    * @since 0.57
    */
@@ -187,7 +187,7 @@ public class DslDefaultThreadGroup extends BaseThreadGroup<DslDefaultThreadGroup
    *                 ending the test plan. Since JMeter only supports specifying times in seconds,
    *                 if you specify a smaller granularity (like milliseconds) it will be rounded up
    *                 to seconds.
-   * @return the DslThreadGroup instance to use fluent API to set additional options.
+   * @return the thread group for further configuration or usage.
    * @see #rampTo(int, Duration)
    * @since 0.18
    */
@@ -210,7 +210,7 @@ public class DslDefaultThreadGroup extends BaseThreadGroup<DslDefaultThreadGroup
    *
    * @param duration a JMeter expression that returns the number of seconds to hold current thread
    *                 groups.
-   * @return the DslThreadGroup instance to use fluent API to set additional options.
+   * @return the thread group for further configuration or usage.
    * @see #holdFor(Duration)
    * @since 0.57
    */
@@ -235,13 +235,13 @@ public class DslDefaultThreadGroup extends BaseThreadGroup<DslDefaultThreadGroup
   /**
    * Specifies to keep current number of threads until they execute the given number of iterations
    * each.
-   *
+   * <p>
    * <b>Warning: </b> holding for iterations can be added to a thread group that has an initial
    * stage with 0 threads followed by a stage ramping up, or only a stage ramping up, or no stages
    * at all.
    *
    * @param iterations number of iterations to execute the test plan steps each thread.
-   * @return the DslThreadGroup instance to use fluent API to set additional options.
+   * @return the thread group for further configuration or usage.
    * @throws IllegalStateException when adding iterations would result in not supported JMeter
    *                               thread group.
    * @since 0.18
@@ -268,7 +268,7 @@ public class DslDefaultThreadGroup extends BaseThreadGroup<DslDefaultThreadGroup
    *
    * @param iterations a JMeter expression that returns the number of iterations for current threads
    *                   to execute.
-   * @return the DslThreadGroup instance to use fluent API to set additional options.
+   * @return the thread group for further configuration or usage.
    * @see #holdIterating(int)
    * @since 0.57
    */
@@ -299,7 +299,7 @@ public class DslDefaultThreadGroup extends BaseThreadGroup<DslDefaultThreadGroup
    *                     of threads.
    * @param holdDuration duration to hold the given number of threads, after the ramp, until moving
    *                     to next stage or ending the test plan.
-   * @return the DslThreadGroup instance to use fluent API to set additional options.
+   * @return the thread group for further configuration or usage.
    * @see #rampTo(int, Duration)
    * @see #holdFor(Duration)
    * @since 0.18
@@ -327,7 +327,7 @@ public class DslDefaultThreadGroup extends BaseThreadGroup<DslDefaultThreadGroup
    *                     ramp.
    * @param holdDuration a JMeter expression that returns the number of seconds to hold current
    *                     thread groups.
-   * @return the DslThreadGroup instance to use fluent API to set additional options.
+   * @return the thread group for further configuration or usage.
    * @see #rampToAndHold(int, Duration, Duration)
    * @since 0.57
    */
@@ -346,7 +346,7 @@ public class DslDefaultThreadGroup extends BaseThreadGroup<DslDefaultThreadGroup
    * settings like ramp-up period).
    *
    * @param children list of test elements to add as children of the thread group.
-   * @return the altered thread group to allow for fluent API usage.
+   * @return the thread group for further configuration or usage.
    * @since 0.12
    */
   @Override
@@ -362,17 +362,6 @@ public class DslDefaultThreadGroup extends BaseThreadGroup<DslDefaultThreadGroup
       guiClass = UltimateThreadGroupGui.class;
       return new UltimateThreadGroupHelper(stages).buildThreadGroup();
     }
-  }
-
-  /**
-   * Shows a graph with a timeline of planned threads count execution for this test plan.
-   *
-   * @since 0.18
-   * @deprecated as of 0.26, use {@link #showTimeline()} instead.
-   */
-  @Deprecated
-  public void showThreadsTimeline() {
-    showTimeline();
   }
 
   /**

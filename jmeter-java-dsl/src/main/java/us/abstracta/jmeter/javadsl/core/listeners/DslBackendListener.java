@@ -13,11 +13,11 @@ import org.apache.jmeter.visualizers.backend.BackendListenerGui;
  *
  * @since 0.20
  */
-public abstract class DslBackendListener extends BaseListener {
+public abstract class DslBackendListener<T extends DslBackendListener<T>> extends BaseListener {
 
   protected final String url;
-  private final Class<? extends BackendListenerClient> listenerClass;
-  private int queueSize = 5000;
+  protected final Class<? extends BackendListenerClient> listenerClass;
+  protected int queueSize = 5000;
 
   protected DslBackendListener(Class<? extends BackendListenerClient> listenerClass, String url) {
     super("Backend Listener", BackendListenerGui.class);
@@ -26,8 +26,8 @@ public abstract class DslBackendListener extends BaseListener {
   }
 
   /**
-   * Specifies the length of sample results queue used to asynchronously send the information to
-   * backend.
+   * Specifies the length of sample results queue used to asynchronously send the information to the
+   * backend service.
    * <p>
    * When the queue reaches this limit, then the test plan execution will be affected since sample
    * results will get blocked until there is space in the queue, affecting the general execution of
@@ -35,10 +35,12 @@ public abstract class DslBackendListener extends BaseListener {
    * <p>
    * When not specified, this value defaults to 5000.
    *
-   * @param queueSize the size of the queue to use
+   * @param queueSize the size of the queue to use.
+   * @return the listener for further configuration or usage.
    */
-  protected void setQueueSize(int queueSize) {
+  public T queueSize(int queueSize) {
     this.queueSize = queueSize;
+    return (T) this;
   }
 
   @Override

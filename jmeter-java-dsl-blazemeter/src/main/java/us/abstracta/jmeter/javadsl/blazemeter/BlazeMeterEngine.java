@@ -72,7 +72,7 @@ public class BlazeMeterEngine implements DslJmeterEngine {
    * When not specified, the test name defaults to "jmeter-java-dsl".
    *
    * @param testName specifies the name of the test to update or create in BlazeMeter.
-   * @return the modified instance for fluent API usage.
+   * @return the engine for further configuration or usage.
    */
   public BlazeMeterEngine testName(String testName) {
     this.testName = testName;
@@ -89,7 +89,7 @@ public class BlazeMeterEngine implements DslJmeterEngine {
    * authentication token) is used.
    *
    * @param projectId is the ID of the project to be used to run the test.
-   * @return the modified instance for fluent API usage.
+   * @return the engine for further configuration or usage.
    */
   public BlazeMeterEngine projectId(long projectId) {
     this.projectId = projectId;
@@ -113,7 +113,7 @@ public class BlazeMeterEngine implements DslJmeterEngine {
    *
    * @param testTimeout to be used as time limit for test execution. If execution takes more than
    *                    this, then a TimeoutException will be thrown by the engine.
-   * @return the modified instance for fluent API usage.
+   * @return the engine for further configuration or usage.
    */
   public BlazeMeterEngine testTimeout(Duration testTimeout) {
     this.testTimeout = testTimeout;
@@ -138,7 +138,7 @@ public class BlazeMeterEngine implements DslJmeterEngine {
    *
    * @param availableDataTimeout to wait for available data after a test ends, before throwing a
    *                             TimeoutException.
-   * @return the modified instance for fluent API usage.
+   * @return the engine for further configuration or usage.
    */
   public BlazeMeterEngine availableDataTimeout(Duration availableDataTimeout) {
     this.availableDataTimeout = availableDataTimeout;
@@ -154,7 +154,7 @@ public class BlazeMeterEngine implements DslJmeterEngine {
    * specified) will be used.
    *
    * @param totalUsers number of virtual users to run the test with.
-   * @return the modified instance for fluent API usage.
+   * @return the engine for further configuration or usage.
    */
   public BlazeMeterEngine totalUsers(int totalUsers) {
     this.totalUsers = totalUsers;
@@ -179,7 +179,7 @@ public class BlazeMeterEngine implements DslJmeterEngine {
    * specified) will be used.
    *
    * @param rampUp duration that BlazeMeter will take to spin up all the virtual users.
-   * @return the modified instance for fluent API usage.
+   * @return the engine for further configuration or usage.
    */
   public BlazeMeterEngine rampUpFor(Duration rampUp) {
     this.rampUp = rampUp;
@@ -198,7 +198,7 @@ public class BlazeMeterEngine implements DslJmeterEngine {
    * When specified, this value overwrites any value specified in JMeter test plans thread groups.
    *
    * @param iterations for each virtual users to execute.
-   * @return the modified instance for fluent API usage.
+   * @return the engine for further configuration or usage.
    */
   public BlazeMeterEngine iterations(int iterations) {
     this.iterations = iterations;
@@ -221,7 +221,7 @@ public class BlazeMeterEngine implements DslJmeterEngine {
    * When specified, this value overwrites any value specified in JMeter test plans thread groups.
    *
    * @param holdFor duration to keep virtual users running after the rampUp period.
-   * @return the modified instance for fluent API usage.
+   * @return the engine for further configuration or usage.
    */
   public BlazeMeterEngine holdFor(Duration holdFor) {
     this.holdFor = holdFor;
@@ -252,7 +252,7 @@ public class BlazeMeterEngine implements DslJmeterEngine {
    * BlazeMeter billing plan if no previous test run exists.
    *
    * @param threadsPerEngine the number of threads/virtual users to execute per BlazeMeter engine.
-   * @return the modified instance for fluent API usage.
+   * @return the engine for further configuration or usage.
    */
   public BlazeMeterEngine threadsPerEngine(int threadsPerEngine) {
     this.threadsPerEngine = threadsPerEngine;
@@ -263,10 +263,24 @@ public class BlazeMeterEngine implements DslJmeterEngine {
    * Specifies that the test run will use BlazeMeter debug run feature, not consuming credits but
    * limited up to 10 threads and 5 minutes or 100 iterations.
    *
-   * @return the modified instance for fluent API usage.
+   * @return the engine for further configuration or usage.
    */
   public BlazeMeterEngine useDebugRun() {
-    this.useDebugRun = true;
+    return useDebugRun(true);
+  }
+
+  /**
+   * Same as {@link #useDebugRun()} but allowing to enable or disable the settign.
+   * <p>
+   * This is helpful when the resolution is taken at runtime.
+   *
+   * @param enable specifies to enable or disable the setting. By default, it is set to false.
+   * @return the engine for further configuration or usage.
+   * @see #useDebugRun()
+   * @since 0.66
+   */
+  public BlazeMeterEngine useDebugRun(boolean enable) {
+    this.useDebugRun = enable;
     return this;
   }
 

@@ -23,7 +23,8 @@ import us.abstracta.jmeter.javadsl.core.testelements.DslJsr223TestElement;
  *
  * @since 0.6
  */
-public class DslJsr223PostProcessor extends DslJsr223TestElement implements DslPostProcessor {
+public class DslJsr223PostProcessor extends DslJsr223TestElement<DslJsr223PostProcessor> implements
+    DslPostProcessor {
 
   private static final String DEFAULT_NAME = "JSR223 PostProcessor";
 

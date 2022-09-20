@@ -25,14 +25,14 @@ import us.abstracta.jmeter.javadsl.core.testelements.DslScopedTestElement;
 public class DslResponseAssertion extends DslScopedTestElement<DslResponseAssertion> implements
     DslAssertion {
 
-  private static final String DEFAULT_NAME = "Response Assertion";
+  protected static final String DEFAULT_NAME = "Response Assertion";
 
-  private TargetField fieldToTest = TargetField.RESPONSE_BODY;
-  private boolean ignoreStatus;
-  private List<String> testStrings = new ArrayList<>();
-  private TestStringStrategy testStrategy = TestStringStrategy.SUBSTRING;
-  private boolean invertCheck;
-  private boolean anyMatch;
+  protected TargetField fieldToTest = TargetField.RESPONSE_BODY;
+  protected boolean ignoreStatus;
+  protected List<String> testStrings = new ArrayList<>();
+  protected TestStringStrategy testStrategy = TestStringStrategy.SUBSTRING;
+  protected boolean invertCheck;
+  protected boolean anyMatch;
 
   public DslResponseAssertion(String name) {
     super(name != null ? name : DEFAULT_NAME, AssertionGui.class);
@@ -44,8 +44,7 @@ public class DslResponseAssertion extends DslScopedTestElement<DslResponseAssert
    * When not specified it will apply the given assertion to the response body.
    *
    * @param fieldToTest specifies the field to apply the assertion to.
-   * @return the Response Assertion to allow configuring other potential settings in a fluent API
-   * way.
+   * @return the response assertion for further configuration or usage.
    * @see TargetField
    */
   public DslResponseAssertion fieldToTest(TargetField fieldToTest) {
@@ -67,26 +66,38 @@ public class DslResponseAssertion extends DslScopedTestElement<DslResponseAssert
    * then if this flag is enabled, any previous assertion result in same sampler will be ignored
    * (marked as success). So, consider setting this flag in first response assertion only.
    *
-   * @return the Response Assertion to allow configuring other potential settings in a fluent API
-   * way.
+   * @return the response assertion for further configuration or usage.
    */
   public DslResponseAssertion ignoreStatus() {
-    this.ignoreStatus = true;
+    return ignoreStatus(true);
+  }
+
+  /**
+   * Same as {@link #ignoreStatus()} but allowing to enable or disable it.
+   * <p>
+   * This is helpful when the resolution is taken at runtime.
+   *
+   * @param enable specifies to enable or disable the setting. By default, it is set to false.
+   * @return the response assertion for further configuration or usage.
+   * @see #ignoreStatus()
+   * @since 0.66
+   */
+  public DslResponseAssertion ignoreStatus(boolean enable) {
+    ignoreStatus = enable;
     return this;
   }
 
   /**
    * Checks if the specified {@link #fieldToTest(TargetField)} contains the given substrings.
    * <p>
-   * By default the main sample (not sub samples) response body will be checked, and all supplied
+   * By default, the main sample (not sub samples) response body will be checked, and all supplied
    * substrings must be contained. Review other methods in this class if you need to check
    * substrings but in some other ways (eg: in response headers, any match is enough, or none of
    * specified substrings should be contained).
    *
    * @param substrings list of strings to be searched in the given field to test (by default
    *                   response body).
-   * @return the Response Assertion to allow configuring other potential settings in a fluent API
-   * way.
+   * @return the response assertion for further configuration or usage.
    */
   public DslResponseAssertion containsSubstrings(String... substrings) {
     return testStrings(substrings, TestStringStrategy.SUBSTRING);
@@ -101,7 +112,7 @@ public class DslResponseAssertion extends DslScopedTestElement<DslResponseAssert
   /**
    * Compares the configured {@link #fieldToTest(TargetField)} to the given strings for equality.
    * <p>
-   * By default the main sample (not sub samples) response body will be checked, and all supplied
+   * By default, the main sample (not sub samples) response body will be checked, and all supplied
    * strings must be equal to the body (in default setting only makes sense to specify one string).
    * Review other methods in this class if you need to check equality to entire strings but in some
    * other ways (eg: in response headers, any match is enough, or none of specified strings should
@@ -109,7 +120,7 @@ public class DslResponseAssertion extends DslScopedTestElement<DslResponseAssert
    *
    * @param strings list of strings to be compared against the given field to test (by default
    *                response body).
-   * @return the Response Assertion to allow configuring other potential settings in a fluent API
+   * @return the response assertion for further configuration or usage.
    */
   public DslResponseAssertion equalsToStrings(String... strings) {
     return testStrings(strings, TestStringStrategy.EQUALS);
@@ -119,20 +130,20 @@ public class DslResponseAssertion extends DslScopedTestElement<DslResponseAssert
    * Checks if the configured {@link #fieldToTest(TargetField)} contains matches for given regular
    * expressions.
    * <p>
-   * By default the main sample (not sub samples) response body will be checked, and all supplied
+   * By default, the main sample (not sub samples) response body will be checked, and all supplied
    * regular expressions must contain a match in the body. Review other methods in this class if you
    * need to check regular expressions matches are contained but in some other ways (eg: in response
    * headers, any regex match is enough, or none of specified regex should be contained in the field
    * value).
    * <p>
-   * By default regular expressions evaluate in multi-line mode, which means that '.' does not match
-   * new lines, '^' matches start of lines and '$' matches end of lines. To use single-line mode
-   * prefix '(?s)' to the regular expressions. Regular expressions are also by default
+   * By default, regular expressions evaluate in multi-line mode, which means that '.' does not
+   * match new lines, '^' matches start of lines and '$' matches end of lines. To use single-line
+   * mode prefix '(?s)' to the regular expressions. Regular expressions are also by default
    * case-sensitive, which can be changed to insensitive by adding '(?i)' to the regex.
    *
    * @param regexes list of regular expressions to search for matches in the field to test (by
    *                default response body).
-   * @return the Response Assertion to allow configuring other potential settings in a fluent API
+   * @return the response assertion for further configuration or usage.
    */
   public DslResponseAssertion containsRegexes(String... regexes) {
     return testStrings(regexes, TestStringStrategy.CONTAINS_REGEX);
@@ -142,19 +153,19 @@ public class DslResponseAssertion extends DslScopedTestElement<DslResponseAssert
    * Checks if the configured {@link #fieldToTest(TargetField)} matches (completely, and not just
    * part of it) given regular expressions.
    * <p>
-   * By default the main sample (not sub samples) response body will be checked, and all supplied
+   * By default, the main sample (not sub samples) response body will be checked, and all supplied
    * regular expressions must match the entire body. Review other methods in this class if you need
    * to check regular expressions matches but in some other ways (eg: in response headers, any regex
    * match is enough, or none of specified regex should be matched with the field value).
    * <p>
-   * By default regular expressions evaluate in multi-line mode, which means that '.' does not match
-   * new lines, '^' matches start of lines and '$' matches end of lines. To use single-line mode
-   * prefix '(?s)' to the regular expressions. Regular expressions are also by default
+   * By default, regular expressions evaluate in multi-line mode, which means that '.' does not
+   * match new lines, '^' matches start of lines and '$' matches end of lines. To use single-line
+   * mode prefix '(?s)' to the regular expressions. Regular expressions are also by default
    * case-sensitive, which can be changed to insensitive by adding '(?i)' to the regex.
    *
    * @param regexes list of regular expressions the field to test (by default response body) must
    *                match.
-   * @return the Response Assertion to allow configuring other potential settings in a fluent API
+   * @return the response assertion for further configuration or usage.
    */
   public DslResponseAssertion matchesRegexes(String... regexes) {
     return testStrings(regexes, TestStringStrategy.MATCHES_REGEX);
@@ -188,10 +199,24 @@ public class DslResponseAssertion extends DslScopedTestElement<DslResponseAssert
    * Keep in mind that order of invocations of methods in response assertion is irrelevant (so
    * {@code invertCheck().matchAny()} gets the same result as {@code matchAny().invertCheck()}).
    *
-   * @return the Response Assertion to allow configuring other potential settings in a fluent API
+   * @return the response assertion for further configuration or usage.
    */
   public DslResponseAssertion invertCheck() {
-    this.invertCheck = !this.invertCheck;
+    return invertCheck(true);
+  }
+
+  /**
+   * Same as {@link #invertCheck()} but allowing to enable or disable it.
+   * <p>
+   * This is helpful when the resolution is taken at runtime.
+   *
+   * @param enable specifies to enable or disable the setting. By default, it is set to false.
+   * @return the response assertion for further configuration or usage.
+   * @see #invertCheck()
+   * @since 0.66
+   */
+  public DslResponseAssertion invertCheck(boolean enable) {
+    this.invertCheck = enable;
     return this;
   }
 
@@ -200,7 +225,7 @@ public class DslResponseAssertion extends DslScopedTestElement<DslResponseAssert
    * <p>
    * This is the same as the "Or" option in Response Assertion in JMeter GUI.
    * <p>
-   * By default when you use something like this:
+   * By default, when you use something like this:
    *
    * <pre>{@code
    *    responseAssertion().containsSubstrings("success", "OK")
@@ -218,10 +243,24 @@ public class DslResponseAssertion extends DslScopedTestElement<DslResponseAssert
    * <p>
    * Which you can interpret as {@code containsSubstring("success") || containsSubstring("OK")}.
    *
-   * @return the Response Assertion to allow configuring other potential settings in a fluent API
+   * @return the response assertion for further configuration or usage.
    */
   public DslResponseAssertion anyMatch() {
-    this.anyMatch = true;
+    return anyMatch(true);
+  }
+
+  /**
+   * Same as {@link #anyMatch()} but allowing to enable or disable it.
+   * <p>
+   * This is helpful when the resolution is taken at runtime.
+   *
+   * @param enable specifies to enable or disable the setting. By default, it is set to false.
+   * @return the response assertion for further configuration or usage.
+   * @see #anyMatch()
+   * @since 0.66
+   */
+  public DslResponseAssertion anyMatch(boolean enable) {
+    anyMatch = enable;
     return this;
   }
 
@@ -296,7 +335,7 @@ public class DslResponseAssertion extends DslScopedTestElement<DslResponseAssert
 
   }
 
-  private enum TestStringStrategy {
+  public enum TestStringStrategy {
     CONTAINS_REGEX(ResponseAssertion::setToContainsType),
     MATCHES_REGEX(ResponseAssertion::setToMatchType),
     SUBSTRING(ResponseAssertion::setToSubstringType),

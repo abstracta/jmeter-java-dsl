@@ -30,11 +30,11 @@ import us.abstracta.jmeter.javadsl.core.testelements.DslJsr223TestElement;
  *
  * @since 0.22
  */
-public class DslJsr223Sampler extends DslJsr223TestElement implements DslSampler {
+public class DslJsr223Sampler extends DslJsr223TestElement<DslJsr223Sampler> implements DslSampler {
 
   private static final String DEFAULT_NAME = "JSR223 Sampler";
 
-  private final List<SamplerChild> children = new ArrayList<>();
+  protected final List<SamplerChild> children = new ArrayList<>();
 
   public DslJsr223Sampler(String name, String script) {
     super(name, DEFAULT_NAME, script);
@@ -50,7 +50,7 @@ public class DslJsr223Sampler extends DslJsr223TestElement implements DslSampler
    * information from response, assert response contents, etc.
    *
    * @param children list of test elements to add as children of this sampler.
-   * @return the altered sampler to allow for fluent API usage.
+   * @return the sampler for further configuration or usage.
    */
   public DslJsr223Sampler children(SamplerChild... children) {
     this.children.addAll(Arrays.asList(children));

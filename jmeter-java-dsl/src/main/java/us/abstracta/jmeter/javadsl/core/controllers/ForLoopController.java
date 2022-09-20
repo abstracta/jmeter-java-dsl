@@ -8,17 +8,17 @@ import us.abstracta.jmeter.javadsl.core.threadgroups.BaseThreadGroup.ThreadGroup
 
 /**
  * Allows running part of a test plan a given number of times inside one thread group iteration.
- *
+ * <p>
  * Internally this uses JMeter Loop Controller.
- *
+ * <p>
  * JMeter automatically creates a variable named {@code __jm__<controllerName>__idx} which contains
  * the index of the iteration starting with zero.
  *
  * @since 0.27
  */
-public class ForLoopController extends BaseController {
+public class ForLoopController extends BaseController<ForLoopController> {
 
-  private final String count;
+  protected String count;
 
   public ForLoopController(String name, String count, List<ThreadGroupChild> children) {
     super(name != null ? name : "for", LoopControlPanel.class, children);

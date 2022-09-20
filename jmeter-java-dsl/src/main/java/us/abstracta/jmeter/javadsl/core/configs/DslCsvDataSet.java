@@ -61,7 +61,7 @@ public class DslCsvDataSet extends BaseConfigElement {
    *
    * @param delimiter specifies the delimiter. By default, it uses commas (,) as delimiters. If you
    *                  need to use tabs, then specify "\\t".
-   * @return the DslCsvDataSet for further configuration.
+   * @return the dataset for further configuration or usage.
    */
   public DslCsvDataSet delimiter(String delimiter) {
     this.delimiter = delimiter;
@@ -78,7 +78,7 @@ public class DslCsvDataSet extends BaseConfigElement {
    *                 from JMeter default, to have more consistent test plan execution). This might
    *                 require to be changed but in general is good to have all files in same encoding
    *                 (eg: UTF-8).
-   * @return the DslCsvDataSet for further configuration.
+   * @return the dataset for further configuration or usage.
    */
   public DslCsvDataSet encoding(String encoding) {
     this.encoding = encoding;
@@ -95,7 +95,7 @@ public class DslCsvDataSet extends BaseConfigElement {
    *                 from JMeter default, to have more consistent test plan execution). This might
    *                 require to be changed but in general is good to have all files in same encoding
    *                 (eg: UTF-8).
-   * @return the DslCsvDataSet for further configuration.
+   * @return the dataset for further configuration or usage.
    */
   public DslCsvDataSet encoding(Charset encoding) {
     this.encoding = encoding.name();
@@ -112,7 +112,7 @@ public class DslCsvDataSet extends BaseConfigElement {
    * headers, which will not be good).
    *
    * @param variableNames names of variables to be extracted from the CSV file.
-   * @return the DslCsvDataSet for further configuration.
+   * @return the dataset  for further configuration or usage.
    */
   public DslCsvDataSet variableNames(String... variableNames) {
     this.variableNames = variableNames;
@@ -125,10 +125,24 @@ public class DslCsvDataSet extends BaseConfigElement {
    * This should only be used in conjunction with {@link #variableNames(String...)} to overwrite
    * existing CSV headers names.
    *
-   * @return the DslCsvDataSet for further configuration.
+   * @return the dataset for further configuration or usage.
    */
   public DslCsvDataSet ignoreFirstLine() {
-    this.ignoreFirstLine = true;
+    return ignoreFirstLine(true);
+  }
+
+  /**
+   * Same as {@link #ignoreFirstLine()} but allowing to enable or disable it.
+   * <p>
+   * This is helpful when the resolution is taken at runtime.
+   *
+   * @param enable specifies to enable or disable the setting. By default, it is set to false.
+   * @return the dataset for further configuration or usage.
+   * @see #ignoreFirstLine()
+   * @since 0.66
+   */
+  public DslCsvDataSet ignoreFirstLine(boolean enable) {
+    this.ignoreFirstLine = enable;
     return this;
   }
 
@@ -138,10 +152,24 @@ public class DslCsvDataSet extends BaseConfigElement {
    * This method will automatically internally set JMeter test element property "recycle on EOF", so
    * you don't need to worry about such property.
    *
-   * @return the DslCsvDataSet for further configuration.
+   * @return the dataset for further configuration or usage.
    */
   public DslCsvDataSet stopThreadOnEOF() {
-    this.stopThread = true;
+    return stopThreadOnEOF(true);
+  }
+
+  /**
+   * Same as {@link #stopThreadOnEOF()} but allowing to enable or disable it.
+   * <p>
+   * This is helpful when the resolution is taken at runtime.
+   *
+   * @param enable specifies to enable or disable the setting. By default, it is set to false.
+   * @return the dataset for further configuration or usage.
+   * @see #stopThreadOnEOF()
+   * @since 0.66
+   */
+  public DslCsvDataSet stopThreadOnEOF(boolean enable) {
+    this.stopThread = enable;
     return this;
   }
 
@@ -152,7 +180,7 @@ public class DslCsvDataSet extends BaseConfigElement {
    *                  all threads share the CSV information, meaning that any thread iteration will
    *                  advance the consumption of the file (the file is a singleton). When
    *                  {@link #randomOrder()} is used, THREAD_GROUP shared mode is not supported.
-   * @return the DslCsvDataSet for further configuration.
+   * @return the dataset for further configuration or usage.
    * @see Sharing
    */
   public DslCsvDataSet sharedIn(Sharing shareMode) {
@@ -163,19 +191,33 @@ public class DslCsvDataSet extends BaseConfigElement {
   /**
    * Specifies to get file lines in random order instead of sequentially iterating over them.
    * <p>
-   * When this method is invoked <a
-   * href="https://github.com/Blazemeter/jmeter-bzm-plugins/blob/master/random-csv-data-set/RandomCSVDataSetConfig.md">Random
+   * When this method is invoked
+   * <a href="https://github.com/Blazemeter/jmeter-bzm-plugins/blob/master/random-csv-data-set/RandomCSVDataSetConfig.md">Random
    * CSV Data Set plugin</a> is used.
-   *
+   * <p>
    * <b>Warning:</b> Getting lines in random order has a performance penalty.
-   *
+   * <p>
    * <b>Warning:</b> When random order is enabled, share mode THREAD_GROUP is not supported.
    *
-   * @return the DslCsvDataSet for further configuration.
+   * @return the dataset for further configuration or usage.
    * @since 0.36
    */
   public DslCsvDataSet randomOrder() {
-    this.randomOrder = true;
+    return randomOrder(true);
+  }
+
+  /**
+   * Same as {@link #randomOrder()} but allowing to enable or disable it.
+   * <p>
+   * This is helpful when the resolution is taken at runtime.
+   *
+   * @param enable specifies to enable or disable the setting. By default, it is set to false.
+   * @return the dataset for further configuration or usage.
+   * @see #randomOrder()
+   * @since 0.66
+   */
+  public DslCsvDataSet randomOrder(boolean enable) {
+    this.randomOrder = enable;
     return this;
   }
 

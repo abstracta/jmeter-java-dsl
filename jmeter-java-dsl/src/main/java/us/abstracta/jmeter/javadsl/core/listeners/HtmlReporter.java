@@ -31,9 +31,9 @@ import org.apache.jmeter.visualizers.SimpleDataWriter;
  */
 public class HtmlReporter extends BaseListener {
 
-  private final File reportDirectory;
-  private final ApdexThresholds apdexThresholds = new ApdexThresholds();
-  private final Map<String, ApdexThresholds> labelApdexThresholds = new HashMap<>();
+  protected File reportDirectory;
+  protected final ApdexThresholds apdexThresholds = new ApdexThresholds();
+  protected final Map<String, ApdexThresholds> labelApdexThresholds = new HashMap<>();
 
   public HtmlReporter(String reportPath) throws IOException {
     super("Simple Data Writer", SimpleDataWriter.class);
@@ -53,15 +53,15 @@ public class HtmlReporter extends BaseListener {
     }
   }
 
-  private static class ApdexThresholds {
+  public static class ApdexThresholds {
 
-    private Duration satisfied;
-    private Duration tolerated;
+    public Duration satisfied;
+    public Duration tolerated;
 
     private ApdexThresholds() {
     }
 
-    private ApdexThresholds(Duration satisfied, Duration tolerated) {
+    public ApdexThresholds(Duration satisfied, Duration tolerated) {
       this.satisfied = satisfied;
       this.tolerated = tolerated;
     }
@@ -200,9 +200,8 @@ public class HtmlReporter extends BaseListener {
    * @since 0.59
    */
   public HtmlReporter transactionApdexThresholds(String sampleLabelRegex,
-      Duration satisfiedThreshold,
-      Duration toleratedThreshold) {
-    this.labelApdexThresholds.put(sampleLabelRegex,
+      Duration satisfiedThreshold, Duration toleratedThreshold) {
+    labelApdexThresholds.put(sampleLabelRegex,
         new ApdexThresholds(satisfiedThreshold, toleratedThreshold));
     return this;
   }

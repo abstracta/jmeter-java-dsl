@@ -24,7 +24,8 @@ import us.abstracta.jmeter.javadsl.core.testelements.DslJsr223TestElement;
  *
  * @since 0.7
  */
-public class DslJsr223PreProcessor extends DslJsr223TestElement implements DslPreProcessor {
+public class DslJsr223PreProcessor extends DslJsr223TestElement<DslJsr223PreProcessor> implements
+    DslPreProcessor {
 
   private static final String DEFAULT_NAME = "JSR223 PreProcessor";
 

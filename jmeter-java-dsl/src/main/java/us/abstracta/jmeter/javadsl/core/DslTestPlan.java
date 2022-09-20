@@ -31,13 +31,14 @@ import us.abstracta.jmeter.javadsl.core.threadgroups.DslDefaultThreadGroup;
  *
  * @since 0.1
  */
-public class DslTestPlan extends TestElementContainer<TestPlanChild> {
+public class DslTestPlan extends TestElementContainer<DslTestPlan, TestPlanChild> {
 
-  private boolean tearDownAfterMainThreadsShutDown = true;
-  private boolean serializeThreadGroups = false;
+  private static final String DEFAULT_NAME = "Test Plan";
+  protected boolean serializeThreadGroups = false;
+  protected boolean tearDownOnlyAfterMainThreadsDone = false;
 
   public DslTestPlan(List<TestPlanChild> children) {
-    super("Test Plan", TestPlanGui.class, children);
+    super(DEFAULT_NAME, TestPlanGui.class, children);
   }
 
   /**
@@ -47,7 +48,22 @@ public class DslTestPlan extends TestElementContainer<TestPlanChild> {
    * @since 0.40
    */
   public DslTestPlan sequentialThreadGroups() {
-    this.serializeThreadGroups = true;
+    return sequentialThreadGroups(true);
+  }
+
+  /**
+   * Specifies to run thread groups one after the other, instead of running them in parallel.
+   * <p>
+   * Same as {@link #sequentialThreadGroups()} but allowing to enable/disable the setting during
+   * runtime.
+   *
+   * @param enable specifies to run thread groups one after the other when set to true, or in
+   *               parallel when false. By default, is set to false.
+   * @return the test plan for further configuration or usage.
+   * @since 0.65
+   */
+  public DslTestPlan sequentialThreadGroups(boolean enable) {
+    this.serializeThreadGroups = enable;
     return this;
   }
 
@@ -61,11 +77,28 @@ public class DslTestPlan extends TestElementContainer<TestPlanChild> {
    * behavior not running teardown thread groups in such cases, which might be helpful if teardown
    * thread group has only to run on clean test plan completion.
    *
-   * @return this instance for fluent API usage.
+   * @return the test plan for further configuration or usage.
    * @since 0.40
    */
   public DslTestPlan tearDownOnlyAfterMainThreadsDone() {
-    this.tearDownAfterMainThreadsShutDown = false;
+    return tearDownOnlyAfterMainThreadsDone(true);
+  }
+
+  /**
+   * Allows running tear down thread groups only after main thread groups ends cleanly (due to
+   * iterations or time limit).
+   * <p>
+   * By default, JMeter automatically executes tear down thread groups when a test plan stops due to
+   * unscheduled event like sample error when stop test is configured in thread group, invocation of
+   * `ctx.getEngine().askThreadsToStop()` in jsr223 element, etc. This method allows to disable such
+   * behavior not running teardown thread groups in such cases, which might be helpful if teardown
+   * thread group has only to run on clean test plan completion.
+   *
+   * @return this instance for fluent API usage.
+   * @since 0.65
+   */
+  public DslTestPlan tearDownOnlyAfterMainThreadsDone(boolean enabled) {
+    this.tearDownOnlyAfterMainThreadsDone = enabled;
     return this;
   }
 
@@ -73,7 +106,7 @@ public class DslTestPlan extends TestElementContainer<TestPlanChild> {
   protected TestElement buildTestElement() {
     TestPlan ret = new TestPlan();
     ret.setUserDefinedVariables(new Arguments());
-    ret.setTearDownOnShutdown(this.tearDownAfterMainThreadsShutDown);
+    ret.setTearDownOnShutdown(!this.tearDownOnlyAfterMainThreadsDone);
     ret.setSerialized(this.serializeThreadGroups);
     return ret;
   }
@@ -179,8 +212,7 @@ public class DslTestPlan extends TestElementContainer<TestPlanChild> {
    * @since 0.56
    */
   public DslTestPlan children(TestPlanChild... children) {
-    addChildren(children);
-    return this;
+    return super.children(children);
   }
 
   /**

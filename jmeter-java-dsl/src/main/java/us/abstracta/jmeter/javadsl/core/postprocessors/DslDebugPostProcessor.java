@@ -27,10 +27,10 @@ import us.abstracta.jmeter.javadsl.core.testelements.BaseTestElement;
  */
 public class DslDebugPostProcessor extends BaseTestElement implements DslPostProcessor {
 
-  private boolean includeSamplerProperties = false;
-  private boolean includeVariables = true;
-  private boolean includeJmeterProperties = false;
-  private boolean includeSystemProperties = false;
+  protected boolean includeSamplerProperties = false;
+  protected boolean includeVariables = true;
+  protected boolean includeJmeterProperties = false;
+  protected boolean includeSystemProperties = false;
 
   public DslDebugPostProcessor() {
     super("Debug PostProcessor", TestBeanGUI.class);
@@ -54,6 +54,20 @@ public class DslDebugPostProcessor extends BaseTestElement implements DslPostPro
   }
 
   /**
+   * Specifies to include parent sampler properties (parameters of the sampler) in sub sample
+   * response body.
+   * <p>
+   * This is just a shorter way to enable {@link #samplerProperties(boolean)}.
+   *
+   * @return the post processor for further configuration or usage.
+   * @see #samplerProperties(boolean)
+   * @since 0.66
+   */
+  public DslDebugPostProcessor samplerProperties() {
+    return samplerProperties(true);
+  }
+
+  /**
    * Specifies if parent sampler properties (parameters of the sampler) should or not be included in
    * sub sample response body.
    * <p>
@@ -61,11 +75,25 @@ public class DslDebugPostProcessor extends BaseTestElement implements DslPostPro
    *
    * @param include if true, sampler properties will be included in sub sample response body,
    *                otherwise they won't. By default, sampler properties are not included.
-   * @return the debug post processor for further configuration or usage.
+   * @return the post processor for further configuration or usage.
    */
   public DslDebugPostProcessor samplerProperties(boolean include) {
     includeSamplerProperties = include;
     return this;
+  }
+
+  /**
+   * Specifies to include JMeter properties (test plan parameters, or info shared by threads) in sub
+   * sample response body.
+   * <p>
+   * This is just a shorter way to enable {@link #jmeterProperties(boolean)}.
+   *
+   * @return the post processor for further configuration or usage.
+   * @see #jmeterProperties(boolean)
+   * @since 0.66
+   */
+  public DslDebugPostProcessor jmeterProperties() {
+    return jmeterProperties(true);
   }
 
   /**
@@ -77,11 +105,25 @@ public class DslDebugPostProcessor extends BaseTestElement implements DslPostPro
    *
    * @param include if true, JMeter properties will be included in sub sample response body,
    *                otherwise they won't. By default, JMeter properties are not included.
-   * @return the debug post processor for further configuration or usage.
+   * @return the post processor for further configuration or usage.
    */
   public DslDebugPostProcessor jmeterProperties(boolean include) {
     includeJmeterProperties = include;
     return this;
+  }
+
+  /**
+   * Specifies to include system properties (JVM parameters and properties) in sub sample response
+   * body.
+   * <p>
+   * This is just a shorter way to enable {@link #systemProperties(boolean)}.
+   *
+   * @return the post processor for further configuration or usage.
+   * @see #systemProperties(boolean)
+   * @since 0.66
+   */
+  public DslDebugPostProcessor systemProperties() {
+    return systemProperties(true);
   }
 
   /**
@@ -95,7 +137,7 @@ public class DslDebugPostProcessor extends BaseTestElement implements DslPostPro
    *
    * @param include if true, system properties will be included in sub sample response body,
    *                otherwise they won't. By default, system properties are not included.
-   * @return the debug post processor for further configuration or usage.
+   * @return the post processor for further configuration or usage.
    */
   public DslDebugPostProcessor systemProperties(boolean include) {
     includeSystemProperties = include;

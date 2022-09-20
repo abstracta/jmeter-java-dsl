@@ -8,7 +8,7 @@ import org.apache.jmeter.testelement.TestElement;
 /**
  * Provides simple means for extracting into a variable a part of a request or response using just
  * left and right boundaries surrounding the desired text.
- *
+ * <p>
  * By default, the extractor is configured to extract from the main sample (does not include sub
  * samples) response body the first found match. If no match is found, then the variable will not be
  * created or modified.
@@ -17,9 +17,9 @@ import org.apache.jmeter.testelement.TestElement;
  */
 public class DslBoundaryExtractor extends DslVariableExtractor<DslBoundaryExtractor> {
 
-  private final String leftBoundary;
-  private final String rightBoundary;
-  private TargetField fieldToCheck = TargetField.RESPONSE_BODY;
+  protected String leftBoundary;
+  protected String rightBoundary;
+  protected TargetField fieldToCheck = TargetField.RESPONSE_BODY;
 
   public DslBoundaryExtractor(String varName, String leftBoundary, String rightBoundary) {
     super("Boundary Extractor", BoundaryExtractorGui.class, varName);
@@ -41,7 +41,7 @@ public class DslBoundaryExtractor extends DslVariableExtractor<DslBoundaryExtrac
    * <variableName>_matchNr}, and default value is assigned to {@code <variableName>}.
    *
    * @param matchNumber specifies the match number to use.
-   * @return the DslBoundaryExtractor to allow fluent usage and setting other properties.
+   * @return the extractor for further configuration or usage.
    */
   public DslBoundaryExtractor matchNumber(int matchNumber) {
     this.matchNumber = matchNumber;
@@ -60,7 +60,7 @@ public class DslBoundaryExtractor extends DslVariableExtractor<DslBoundaryExtrac
    * When not specified then the variable will not be set if no match is found.
    *
    * @param defaultValue specifies the default value to be used.
-   * @return the DslBoundaryExtractor to allow fluent usage and setting other properties.
+   * @return the extractor for further configuration or usage.
    */
   public DslBoundaryExtractor defaultValue(String defaultValue) {
     this.defaultValue = defaultValue;
@@ -73,7 +73,7 @@ public class DslBoundaryExtractor extends DslVariableExtractor<DslBoundaryExtrac
    * When not specified then the extractor will be applied to the response body.
    *
    * @param fieldToCheck field to apply the extractor to.
-   * @return the DslBoundaryExtractor to allow fluent usage and setting other properties.
+   * @return the extractor for further configuration or usage.
    * @see TargetField
    */
   public DslBoundaryExtractor fieldToCheck(TargetField fieldToCheck) {

@@ -37,37 +37,37 @@ import us.abstracta.jmeter.javadsl.codegeneration.params.BoolParam;
  */
 public class JtlWriter extends BaseListener {
 
-  private final String jtlFile;
-  private boolean saveAsXml;
-  private boolean saveElapsedTime = true;
-  private boolean saveResponseMessage = true;
-  private boolean saveSuccess = true;
-  private boolean saveSentByteCount = true;
-  private boolean saveResponseFilename;
-  private boolean saveEncoding;
-  private boolean saveIdleTime = true;
-  private boolean saveResponseHeaders;
-  private boolean saveAssertionResults = true;
-  private boolean saveFieldNames = true;
-  private boolean saveLabel = true;
-  private boolean saveThreadName = true;
-  private boolean saveAssertionFailureMessage = true;
-  private boolean saveActiveThreadCounts = true;
-  private boolean saveLatency = true;
-  private boolean saveSampleAndErrorCounts;
-  private boolean saveRequestHeaders;
-  private boolean saveResponseData;
-  private boolean saveTimeStamp = true;
-  private boolean saveResponseCode = true;
-  private boolean saveDataType = true;
-  private boolean saveReceivedByteCount = true;
-  private boolean saveUrl = true;
-  private boolean saveConnectTime = true;
-  private boolean saveHostname;
-  private boolean saveSamplerData;
-  private boolean saveSubResults = true;
-  private boolean overwriteJtl = false;
-  private List<String> sampleVariables = Collections.emptyList();
+  protected String jtlFile;
+  protected boolean saveAsXml;
+  protected boolean saveElapsedTime = true;
+  protected boolean saveResponseMessage = true;
+  protected boolean saveSuccess = true;
+  protected boolean saveSentByteCount = true;
+  protected boolean saveResponseFilename;
+  protected boolean saveEncoding;
+  protected boolean saveIdleTime = true;
+  protected boolean saveResponseHeaders;
+  protected boolean saveAssertionResults = true;
+  protected boolean saveFieldNames = true;
+  protected boolean saveLabel = true;
+  protected boolean saveThreadName = true;
+  protected boolean saveAssertionFailureMessage = true;
+  protected boolean saveActiveThreadCounts = true;
+  protected boolean saveLatency = true;
+  protected boolean saveSampleAndErrorCounts;
+  protected boolean saveRequestHeaders;
+  protected boolean saveResponseData;
+  protected boolean saveTimeStamp = true;
+  protected boolean saveResponseCode = true;
+  protected boolean saveDataType = true;
+  protected boolean saveReceivedByteCount = true;
+  protected boolean saveUrl = true;
+  protected boolean saveConnectTime = true;
+  protected boolean saveHostname;
+  protected boolean saveSamplerData;
+  protected boolean saveSubResults = true;
+  protected boolean overwriteJtl = false;
+  protected List<String> sampleVariables = Collections.emptyList();
 
   public JtlWriter(String jtlFile) {
     super("Simple Data Writer", SimpleDataWriter.class);
@@ -122,6 +122,19 @@ public class JtlWriter extends BaseListener {
   }
 
   /**
+   * Allows setting to include all fields in XML format.
+   * <p>
+   * This is just a shorter way of using {@link #withAllFields(boolean)} with true setting.
+   *
+   * @return the JtlWriter for further configuration or usage.
+   * @see #withAllFields(boolean)
+   * @since 0.66
+   */
+  public JtlWriter withAllFields() {
+    return withAllFields(true);
+  }
+
+  /**
    * Allows setting if all or none fields are enabled when saving the JTL.
    * <p>
    * If you enable them all, then XML format will be used.
@@ -137,7 +150,7 @@ public class JtlWriter extends BaseListener {
    * fields thoughtfully.
    *
    * @param enabled specifies whether enable or disable all fields.
-   * @return the JtlWriter instance to be able to specify additional options in a fluent API way.
+   * @return the JtlWriter for further configuration or usage.
    * @since 0.13
    */
   public JtlWriter withAllFields(boolean enabled) {
@@ -178,8 +191,9 @@ public class JtlWriter extends BaseListener {
    * Take into consideration that some fields (like requestHeaders, responseHeaders, etc.) will only
    * be saved when XML format is used.
    *
-   * @param enabled specifies whether enable XML format saving, or disable it (and use CSV).
-   * @return the JtlWriter instance to be able to specify additional options in a fluent API way.
+   * @param enabled specifies whether enable XML format saving, or disable it (and use CSV). By
+   *                default, it is set to false.
+   * @return the JtlWriter for further configuration or usage.
    * @since 0.13
    */
   public JtlWriter saveAsXml(boolean enabled) {
@@ -194,8 +208,9 @@ public class JtlWriter extends BaseListener {
    * This is usually the most important metric to collect during a performance test, so in general
    * this should be included.
    *
-   * @param enabled specifies whether enable or disable inclusion of elapsed time.
-   * @return the JtlWriter instance to be able to specify additional options in a fluent API way.
+   * @param enabled specifies whether enable or disable inclusion of elapsed time. By default, it is
+   *                set to true.
+   * @return the JtlWriter for further configuration or usage.
    * @since 0.13
    */
   public JtlWriter withElapsedTime(boolean enabled) {
@@ -210,8 +225,9 @@ public class JtlWriter extends BaseListener {
    * This property is usually handy to trace potential issues, specially the ones that are not
    * standard issues (like HTTPConnectionExceptions) which are not deducible from response code.
    *
-   * @param enabled specifies whether enable or disable inclusion of response message.
-   * @return the JtlWriter instance to be able to specify additional options in a fluent API way.
+   * @param enabled specifies whether enable or disable inclusion of response message. By default,
+   *                it is set to true.
+   * @return the JtlWriter for further configuration or usage.
    * @since 0.13
    */
   public JtlWriter withResponseMessage(boolean enabled) {
@@ -226,8 +242,9 @@ public class JtlWriter extends BaseListener {
    * This property is usually handy to easily identify if a request failed or not (either due to
    * default JMeter logic, or due to some assertion check or post processor alteration).
    *
-   * @param enabled specifies whether enable or disable inclusion of success field.
-   * @return the JtlWriter instance to be able to specify additional options in a fluent API way.
+   * @param enabled specifies whether enable or disable inclusion of success field. By default, it
+   *                is set to true.
+   * @return the JtlWriter for further configuration or usage.
    * @since 0.13
    */
   public JtlWriter withSuccess(boolean enabled) {
@@ -242,8 +259,9 @@ public class JtlWriter extends BaseListener {
    * This property is helpful when requests are dynamically generated or when you want to easily
    * evaluate how much data/load has been transferred to the server.
    *
-   * @param enabled specifies whether enable or disable inclusion of sent bytes count.
-   * @return the JtlWriter instance to be able to specify additional options in a fluent API way.
+   * @param enabled specifies whether enable or disable inclusion of sent bytes count. By default,
+   *                it is set to true.
+   * @return the JtlWriter for further configuration or usage.
    * @since 0.13
    */
   public JtlWriter withSentByteCount(boolean enabled) {
@@ -252,14 +270,15 @@ public class JtlWriter extends BaseListener {
   }
 
   /**
-   * Allows setting whether or not to include response file name (name of file stored by {@link
-   * ResponseFileSaver}) field in generated JTL.
+   * Allows setting whether or not to include response file name (name of file stored by
+   * {@link ResponseFileSaver}) field in generated JTL.
    * <p>
    * This property is helpful when ResponseFileSaver is used to easily trace the request response
    * contents and don't have to include them in JTL file itself.
    *
-   * @param enabled specifies whether enable or disable inclusion of response file name.
-   * @return the JtlWriter instance to be able to specify additional options in a fluent API way.
+   * @param enabled specifies whether enable or disable inclusion of response file name. By default,
+   *                it is set to false.
+   * @return the JtlWriter for further configuration or usage.
    * @since 0.13
    */
   public JtlWriter withResponseFilename(boolean enabled) {
@@ -271,8 +290,9 @@ public class JtlWriter extends BaseListener {
    * Allows setting whether or not to include the response encoding (eg: UTF-8, ISO-8859-1, etc.)
    * field in generated JTL.
    *
-   * @param enabled specifies whether enable or disable inclusion of response encoding.
-   * @return the JtlWriter instance to be able to specify additional options in a fluent API way.
+   * @param enabled specifies whether enable or disable inclusion of response encoding. By default,
+   *                it is set to false.
+   * @return the JtlWriter for further configuration or usage.
    * @since 0.13
    */
   public JtlWriter withEncoding(boolean enabled) {
@@ -284,8 +304,9 @@ public class JtlWriter extends BaseListener {
    * Allows setting whether or not to include the Idle time (milliseconds spent in JMeter
    * processing, but not sampling, generally 0) field in generated JTL.
    *
-   * @param enabled specifies whether enable or disable inclusion of idle time.
-   * @return the JtlWriter instance to be able to specify additional options in a fluent API way.
+   * @param enabled specifies whether enable or disable inclusion of idle time. By default, it is
+   *                set to true.
+   * @return the JtlWriter for further configuration or usage.
    * @since 0.13
    */
   public JtlWriter withIdleTime(boolean enabled) {
@@ -296,12 +317,13 @@ public class JtlWriter extends BaseListener {
   /**
    * Allows setting whether or not to include response headers (eg: HTTP headers like Content-Type
    * and the like) field in generated JTL.
-   *
+   * <p>
    * <b>Note:</b> this field will only be saved if {@link #saveAsXml(boolean)} is also set to
    * true.
    *
-   * @param enabled specifies whether enable or disable inclusion of response headers.
-   * @return the JtlWriter instance to be able to specify additional options in a fluent API way.
+   * @param enabled specifies whether enable or disable inclusion of response headers. By default,
+   *                it is set to false.
+   * @return the JtlWriter for further configuration or usage.
    * @since 0.13
    */
   public JtlWriter withResponseHeaders(boolean enabled) {
@@ -312,14 +334,15 @@ public class JtlWriter extends BaseListener {
   /**
    * Allows setting whether or not to include assertion results (with name, success field, and
    * potential error message) info in generated JTL.
-   *
+   * <p>
    * <b>Note:</b> this will only be saved if {@link #saveAsXml(boolean)} is also set to
    * true.
    * <p>
    * This info is handy when tracing why requests are marked as failure and exact reason.
    *
-   * @param enabled specifies whether enable or disable inclusion of assertion results.
-   * @return the JtlWriter instance to be able to specify additional options in a fluent API way.
+   * @param enabled specifies whether enable or disable inclusion of assertion results. By default,
+   *                it is set to true.
+   * @return the JtlWriter for further configuration or usage.
    * @since 0.13
    */
   public JtlWriter withAssertionResults(boolean enabled) {
@@ -330,12 +353,13 @@ public class JtlWriter extends BaseListener {
   /**
    * Allows setting whether or not to include assertion results (with name, success field, and
    * potential error message) info in generated JTL.
-   *
+   * <p>
    * <b>Note:</b> this will only be saved if {@link #saveAsXml(boolean)} is set to false (or not
    * set, which defaults XML save to false).
    *
-   * @param enabled specifies whether enable or disable inclusion of assertion results.
-   * @return the JtlWriter instance to be able to specify additional options in a fluent API way.
+   * @param enabled specifies whether enable or disable inclusion of assertion results. By default,
+   *                it is set to true.
+   * @return the JtlWriter for further configuration or usage.
    * @since 0.13
    */
   public JtlWriter withFieldNames(boolean enabled) {
@@ -349,8 +373,9 @@ public class JtlWriter extends BaseListener {
    * <p>
    * In general, you should enable this field to properly identify results to associated samplers.
    *
-   * @param enabled specifies whether enable or disable inclusion of sample labels.
-   * @return the JtlWriter instance to be able to specify additional options in a fluent API way.
+   * @param enabled specifies whether enable or disable inclusion of sample labels. By default, it
+   *                is set to true.
+   * @return the JtlWriter for further configuration or usage.
    * @since 0.13
    */
   public JtlWriter withLabel(boolean enabled) {
@@ -364,8 +389,9 @@ public class JtlWriter extends BaseListener {
    * This is helpful to identify the requests generated by each thread and allow tracing
    * "correlated" requests (requests that are associated to previous requests in same thread).
    *
-   * @param enabled specifies whether enable or disable inclusion of thread name.
-   * @return the JtlWriter instance to be able to specify additional options in a fluent API way.
+   * @param enabled specifies whether enable or disable inclusion of thread name. By default, it is
+   *                set to true.
+   * @return the JtlWriter for further configuration or usage.
    * @since 0.13
    */
   public JtlWriter withThreadName(boolean enabled) {
@@ -378,8 +404,9 @@ public class JtlWriter extends BaseListener {
    * <p>
    * This is helpful to trace potential reason of a request being marked as failure.
    *
-   * @param enabled specifies whether enable or disable inclusion of assertion failure message.
-   * @return the JtlWriter instance to be able to specify additional options in a fluent API way.
+   * @param enabled specifies whether enable or disable inclusion of assertion failure message. By
+   *                default, it is set to true.
+   * @return the JtlWriter for further configuration or usage.
    * @since 0.13
    */
   public JtlWriter withAssertionFailureMessage(boolean enabled) {
@@ -394,8 +421,9 @@ public class JtlWriter extends BaseListener {
    * This is helpful to know under how much load (concurrent requests) is the tested service at the
    * moment the request was done.
    *
-   * @param enabled specifies whether enable or disable inclusion of active thread counts.
-   * @return the JtlWriter instance to be able to specify additional options in a fluent API way.
+   * @param enabled specifies whether enable or disable inclusion of active thread counts. By
+   *                default, it is set to true.
+   * @return the JtlWriter for further configuration or usage.
    * @since 0.13
    */
   public JtlWriter withActiveThreadCounts(boolean enabled) {
@@ -410,8 +438,9 @@ public class JtlWriter extends BaseListener {
    * This is usually helpful to identify how fast does the tested service takes to answer, taking
    * out the time spent in transferring response data.
    *
-   * @param enabled specifies whether enable or disable inclusion of latency time.
-   * @return the JtlWriter instance to be able to specify additional options in a fluent API way.
+   * @param enabled specifies whether enable or disable inclusion of latency time. By default, it is
+   *                set to true.
+   * @return the JtlWriter for further configuration or usage.
    * @since 0.13
    */
   public JtlWriter withLatency(boolean enabled) {
@@ -427,8 +456,9 @@ public class JtlWriter extends BaseListener {
    * or failure. But there are some scenarios where these counts might be greater, for example when
    * controllers results are being included.
    *
-   * @param enabled specifies whether enable or disable inclusion of sample counts.
-   * @return the JtlWriter instance to be able to specify additional options in a fluent API way.
+   * @param enabled specifies whether enable or disable inclusion of sample counts. By default, it
+   *                is set to false.
+   * @return the JtlWriter for further configuration or usage.
    * @since 0.13
    */
   public JtlWriter withSampleAndErrorCounts(boolean enabled) {
@@ -439,12 +469,13 @@ public class JtlWriter extends BaseListener {
   /**
    * Allows setting whether or not to include request headers (eg: HTTP headers like User-Agent and
    * the like) field in generated JTL.
-   *
+   * <p>
    * <b>Note:</b> this field will only be saved if {@link #saveAsXml(boolean)} is also set to
    * true.
    *
-   * @param enabled specifies whether enable or disable inclusion of request headers.
-   * @return the JtlWriter instance to be able to specify additional options in a fluent API way.
+   * @param enabled specifies whether enable or disable inclusion of request headers. By default, it
+   *                is set to false.
+   * @return the JtlWriter for further configuration or usage.
    * @since 0.13
    */
   public JtlWriter withRequestHeaders(boolean enabled) {
@@ -454,15 +485,16 @@ public class JtlWriter extends BaseListener {
 
   /**
    * Allows setting whether or not to include response body field in generated JTL.
-   *
+   * <p>
    * <b>Note:</b> this field will only be saved if {@link #saveAsXml(boolean)} is also set to
    * true.
    * <p>
-   * This is usually helpful for tracing the response obtained by each sample. Consider using {@link
-   * ResponseFileSaver} to get a file for each response body.
+   * This is usually helpful for tracing the response obtained by each sample. Consider using
+   * {@link ResponseFileSaver} to get a file for each response body.
    *
-   * @param enabled specifies whether enable or disable inclusion of response body.
-   * @return the JtlWriter instance to be able to specify additional options in a fluent API way.
+   * @param enabled specifies whether enable or disable inclusion of response body. By default, it
+   *                is set to false.
+   * @return the JtlWriter for further configuration or usage.
    * @since 0.13
    */
   public JtlWriter withResponseData(boolean enabled) {
@@ -474,8 +506,9 @@ public class JtlWriter extends BaseListener {
    * Allows setting whether or not to include timestamp (epoch when the sample started) field in
    * generated JTL.
    *
-   * @param enabled specifies whether enable or disable inclusion of timestamps.
-   * @return the JtlWriter instance to be able to specify additional options in a fluent API way.
+   * @param enabled specifies whether enable or disable inclusion of timestamps. By default, it is
+   *                set to true.
+   * @return the JtlWriter for further configuration or usage.
    * @since 0.13
    */
   public JtlWriter withTimeStamp(boolean enabled) {
@@ -489,8 +522,9 @@ public class JtlWriter extends BaseListener {
    * This field allows to quickly identify different reasons for failure in server (eg: bad request,
    * service temporally unavailable, etc.).
    *
-   * @param enabled specifies whether enable or disable inclusion of response codes.
-   * @return the JtlWriter instance to be able to specify additional options in a fluent API way.
+   * @param enabled specifies whether enable or disable inclusion of response codes. By default, it
+   *                is set to true.
+   * @return the JtlWriter for further configuration or usage.
    * @since 0.13
    */
   public JtlWriter withResponseCode(boolean enabled) {
@@ -502,8 +536,9 @@ public class JtlWriter extends BaseListener {
    * Allows setting whether or not to include response data type (i.e.: binary or text) field in
    * generated JTL.
    *
-   * @param enabled specifies whether enable or disable inclusion of response data types.
-   * @return the JtlWriter instance to be able to specify additional options in a fluent API way.
+   * @param enabled specifies whether enable or disable inclusion of response data types. By
+   *                default, it is set to true.
+   * @return the JtlWriter for further configuration or usage.
    * @since 0.13
    */
   public JtlWriter withDataType(boolean enabled) {
@@ -518,8 +553,9 @@ public class JtlWriter extends BaseListener {
    * This property is helpful to measure how much load is the network getting and how much
    * information is the tested service generating.
    *
-   * @param enabled specifies whether enable or disable inclusion of received bytes counts.
-   * @return the JtlWriter instance to be able to specify additional options in a fluent API way.
+   * @param enabled specifies whether enable or disable inclusion of received bytes counts. By
+   *                default, it is set to true.
+   * @return the JtlWriter for further configuration or usage.
    * @since 0.13
    */
   public JtlWriter withReceivedByteCount(boolean enabled) {
@@ -533,8 +569,9 @@ public class JtlWriter extends BaseListener {
    * This property is helpful when URLs are dynamically generated and may vary for the sample
    * sampler
    *
-   * @param enabled specifies whether enable or disable inclusion of urls.
-   * @return the JtlWriter instance to be able to specify additional options in a fluent API way.
+   * @param enabled specifies whether enable or disable inclusion of urls. By default, it is set to
+   *                true.
+   * @return the JtlWriter for further configuration or usage.
    * @since 0.13
    */
   public JtlWriter withUrl(boolean enabled) {
@@ -549,8 +586,9 @@ public class JtlWriter extends BaseListener {
    * This is usually helpful to identify issues in network latency when connecting or server load
    * when serving connection requests.
    *
-   * @param enabled specifies whether enable or disable inclusion of connect time.
-   * @return the JtlWriter instance to be able to specify additional options in a fluent API way.
+   * @param enabled specifies whether enable or disable inclusion of connect time. By default, it is
+   *                set to true.
+   * @return the JtlWriter for further configuration or usage.
    * @since 0.13
    */
   public JtlWriter withConnectTime(boolean enabled) {
@@ -565,8 +603,9 @@ public class JtlWriter extends BaseListener {
    * This particularly helpful when running JMeter in a distributed fashion to identify which node
    * the sample result is associated to.
    *
-   * @param enabled specifies whether enable or disable inclusion of host names.
-   * @return the JtlWriter instance to be able to specify additional options in a fluent API way.
+   * @param enabled specifies whether enable or disable inclusion of host names. By default, it is
+   *                set to false.
+   * @return the JtlWriter for further configuration or usage.
    * @since 0.13
    */
   public JtlWriter withHostname(boolean enabled) {
@@ -577,12 +616,13 @@ public class JtlWriter extends BaseListener {
   /**
    * Allows setting whether or not to include sampler data (like cookies, HTTP method, request body
    * and redirection URL) entries in generated JTL.
-   *
+   * <p>
    * <b>Note:</b> this field will only be saved if {@link #saveAsXml(boolean)} is also set to
    * true.
    *
-   * @param enabled specifies whether enable or disable inclusion of sample data.
-   * @return the JtlWriter instance to be able to specify additional options in a fluent API way.
+   * @param enabled specifies whether enable or disable inclusion of sample data. By default, it is
+   *                set to false.
+   * @return the JtlWriter for further configuration or usage.
    * @since 0.13
    */
   public JtlWriter withSamplerData(boolean enabled) {
@@ -594,8 +634,9 @@ public class JtlWriter extends BaseListener {
    * Allows setting whether or not to include sub results (like redirects) entries in generated
    * JTL.
    *
-   * @param enabled specifies whether enable or disable inclusion of sub results.
-   * @return the JtlWriter instance to be able to specify additional options in a fluent API way.
+   * @param enabled specifies whether enable or disable inclusion of sub results. By default, it is
+   *                set to true.
+   * @return the JtlWriter for further configuration or usage.
    * @since 0.13
    */
   public JtlWriter withSubResults(boolean enabled) {
@@ -607,7 +648,7 @@ public class JtlWriter extends BaseListener {
    * Allows specifying that if a JTL with provided name exists, then it should be overwritten (and
    * avoid default generated exception).
    *
-   * @return the JtlWriter instance to be able to specify additional options in a fluent API way.
+   * @return the JtlWriter for further configuration or usage. By default, it is set to true.
    * @since 0.13
    */
   public JtlWriter overwriteJtl() {
@@ -617,13 +658,13 @@ public class JtlWriter extends BaseListener {
 
   /**
    * Allows specifying JMeter variables to include in generated jtl file.
-   *
+   * <p>
    * <b>Warning:</b> variables to sample are test plan wide. This means that if you set them in one
    * jtl writer, they will appear in all jtl writers used in the test plan. Moreover, if you set
    * them in different jtl writers, only variables set on latest one will be considered.
    *
    * @param variables names of JMeter variables to include in jtl file.
-   * @return the JtlWriter instance to be able to specify additional options in a fluent API way.
+   * @return the JtlWriter for further configuration or usage.
    * @since 0.22
    */
   public JtlWriter withVariables(String... variables) {

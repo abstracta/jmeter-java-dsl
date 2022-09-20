@@ -31,16 +31,16 @@ import us.abstracta.jmeter.javadsl.http.DslHttpSampler.HttpClientImpl;
  */
 public class DslHttpDefaults extends BaseConfigElement {
 
-  private String protocol;
-  private String host;
-  private String port;
-  private String path;
-  private Charset encoding;
-  private String proxyUrl;
-  private String proxyUser;
-  private String proxyPassword;
-  private boolean downloadEmbeddedResources;
-  private HttpClientImpl clientImpl;
+  protected String protocol;
+  protected String host;
+  protected String port;
+  protected String path;
+  protected Charset encoding;
+  protected String proxyUrl;
+  protected String proxyUser;
+  protected String proxyPassword;
+  protected boolean downloadEmbeddedResources;
+  protected HttpClientImpl clientImpl;
 
   public DslHttpDefaults() {
     super("HTTP Request Defaults", HttpDefaultsGui.class);
@@ -57,7 +57,7 @@ public class DslHttpDefaults extends BaseConfigElement {
    *
    * @param url specifies the default URL to be used by HTTP samplers. It might contain the path or
    *            not.
-   * @return the HTTP Defaults instance for further configuration or usage.
+   * @return the config element for further configuration or usage.
    */
   public DslHttpDefaults url(String url) {
     /*
@@ -83,7 +83,7 @@ public class DslHttpDefaults extends BaseConfigElement {
    * and use this method sparingly.
    *
    * @param protocol contains protocol value to be used (e.g.: http, https, etc).
-   * @return the HTTP Defaults instance for further configuration or usage.
+   * @return the config element for further configuration or usage.
    * @since 0.49
    */
   public DslHttpDefaults protocol(String protocol) {
@@ -102,7 +102,7 @@ public class DslHttpDefaults extends BaseConfigElement {
    * and use this method sparingly.
    *
    * @param host contains server name without protocol (no http/https) and path.
-   * @return the HTTP Defaults instance for further configuration or usage.
+   * @return the config element for further configuration or usage.
    * @since 0.49
    */
   public DslHttpDefaults host(String host) {
@@ -121,7 +121,7 @@ public class DslHttpDefaults extends BaseConfigElement {
    * and use this method sparingly.
    *
    * @param port contains port value to be used.
-   * @return the HTTP Defaults instance for further configuration or usage.
+   * @return the config element for further configuration or usage.
    * @since 0.49
    */
   public DslHttpDefaults port(int port) {
@@ -140,7 +140,7 @@ public class DslHttpDefaults extends BaseConfigElement {
    * and use this method sparingly.
    *
    * @param path contains URL path to be used by samplers.
-   * @return the HTTP Defaults instance for further configuration or usage.
+   * @return the config element for further configuration or usage.
    * @since 0.49
    */
   public DslHttpDefaults path(String path) {
@@ -154,7 +154,7 @@ public class DslHttpDefaults extends BaseConfigElement {
    * This can be overwritten by {@link DslHttpSampler#encoding(Charset)}.
    *
    * @param encoding specifies the charset to be used by default.
-   * @return the HTTP Defaults instance for further configuration or usage.
+   * @return the config element for further configuration or usage.
    * @see DslHttpSampler#encoding(Charset)
    */
   public DslHttpDefaults encoding(Charset encoding) {
@@ -166,11 +166,25 @@ public class DslHttpDefaults extends BaseConfigElement {
    * Allows enabling automatic download of HTML embedded resources (images, iframes, etc) by
    * default.
    *
-   * @return the HTTP Defaults instance for further configuration or usage.
+   * @return the config element for further configuration or usage.
    * @see DslHttpSampler#downloadEmbeddedResources()
    */
   public DslHttpDefaults downloadEmbeddedResources() {
-    this.downloadEmbeddedResources = true;
+    return downloadEmbeddedResources(true);
+  }
+
+  /**
+   * Same as {@link #downloadEmbeddedResources()} but allowing to enable and disable the setting.
+   * <p>
+   * This is helpful when the resolution is taken at runtime.
+   *
+   * @param enable specifies to enable or disable the setting. By default, it is set to false.
+   * @return the config element for further configuration or usage.
+   * @see #downloadEmbeddedResources()
+   * @since 0.66
+   */
+  public DslHttpDefaults downloadEmbeddedResources(boolean enable) {
+    this.downloadEmbeddedResources = enable;
     return this;
   }
 
@@ -215,7 +229,7 @@ public class DslHttpDefaults extends BaseConfigElement {
    *
    * @param clientImpl the HTTP client implementation to use. If none is specified, then
    *                   {@link DslHttpSampler.HttpClientImpl#HTTP_CLIENT} is used.
-   * @return the HTTP Defaults instance for further configuration or usage.
+   * @return the config element for further configuration or usage.
    * @see DslHttpSampler.HttpClientImpl
    * @see DslHttpSampler#clientImpl(HttpClientImpl)
    */
@@ -225,8 +239,7 @@ public class DslHttpDefaults extends BaseConfigElement {
   }
 
   /**
-   * Specifies whether to reset (drop and recreate) connections on each thread group iteration or
-   * not.
+   * Specifies to reset (drop and recreate) connections on each thread group iteration.
    * <p>
    * By default, connections will be reused to avoid common issues of port and file descriptors
    * exhaustion requiring OS tuning, even though this means that generated load is not realistic
@@ -241,9 +254,21 @@ public class DslHttpDefaults extends BaseConfigElement {
    * <b>Warning:</b> This setting is applied at JVM level, which means that it will affect the
    * entire test plan and potentially other test plans running in the same JVM instance.
    *
+   * @return the config element for further configuration or usage.
+   * @since 0.66
+   */
+  public DslHttpDefaults resetConnectionsBetweenIterations() {
+    return resetConnectionsBetweenIterations(true);
+  }
+
+  /**
+   * Same as {@link #resetConnectionsBetweenIterations()} but allowing to enable or disable setting.
+   * <p>
+   * This is helpful when the resolution is taken at runtime.
+   *
    * @param enable specifies to reset connections on each thread group iteration when true,
    *               otherwise reuse connections. By default, connections are reused.
-   * @return the HTTP Defaults instance for further configuration or usage.
+   * @return the config element for further configuration or usage.
    * @since 0.65
    */
   public DslHttpDefaults resetConnectionsBetweenIterations(boolean enable) {
@@ -261,7 +286,7 @@ public class DslHttpDefaults extends BaseConfigElement {
    *
    * @param ttl specifies the duration for connections to keep open before they are closed. By
    *            default, this is set to 1 minute.
-   * @return the HTTP Defaults instance for further configuration or usage.
+   * @return the config element for further configuration or usage.
    * @since 0.65
    */
   public DslHttpDefaults connectionsTtl(Duration ttl) {

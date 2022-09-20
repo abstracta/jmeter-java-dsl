@@ -16,9 +16,9 @@ import us.abstracta.jmeter.javadsl.core.threadgroups.BaseThreadGroup.ThreadGroup
  *
  * @since 0.50
  */
-public class DslRecordingController extends BaseController {
+public class DslRecordingController extends BaseController<DslRecordingController> {
 
-  protected DslRecordingController(List<ThreadGroupChild> children) {
+  public DslRecordingController(List<ThreadGroupChild> children) {
     super("Recording Controller", RecordController.class, children);
   }
 

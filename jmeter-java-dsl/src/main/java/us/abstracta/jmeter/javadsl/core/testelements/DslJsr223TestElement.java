@@ -20,10 +20,11 @@ import us.abstracta.jmeter.javadsl.core.util.DslScriptBuilder.DslScriptVars;
  *
  * @since 0.8
  */
-public abstract class DslJsr223TestElement extends BaseTestElement {
+public abstract class DslJsr223TestElement<T extends DslJsr223TestElement<T>> extends
+    BaseTestElement {
 
-  private final DslScriptBuilder scriptBuilder;
-  private String language = "groovy";
+  protected DslScriptBuilder scriptBuilder;
+  protected String language = "groovy";
 
   public DslJsr223TestElement(String name, String defaultName, String script) {
     super(name != null ? name : defaultName, TestBeanGUI.class);
@@ -43,9 +44,9 @@ public abstract class DslJsr223TestElement extends BaseTestElement {
     return ret;
   }
 
-  public DslJsr223TestElement language(String language) {
+  public T language(String language) {
     this.language = language;
-    return this;
+    return (T) this;
   }
 
   @Override

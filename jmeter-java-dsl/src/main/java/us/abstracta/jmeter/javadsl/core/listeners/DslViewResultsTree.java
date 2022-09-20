@@ -26,7 +26,7 @@ import us.abstracta.jmeter.javadsl.core.BuildTreeContext;
 public class DslViewResultsTree extends DslVisualizer {
 
   private static final String MAX_RESULTS_PROPERTY_NAME = "view.results.tree.max_results";
-  private int resultsLimit;
+  protected int resultsLimit;
 
   public DslViewResultsTree() {
     super("View Results Tree", ViewResultsFullVisualizer.class);
@@ -42,7 +42,7 @@ public class DslViewResultsTree extends DslVisualizer {
    *
    * @param resultsLimit the maximum number of sample results to show. When not set the default
    *                     value is 500.
-   * @return the dsl element to allow using it in fluent API style.
+   * @return the visualizer for further configuration or usage.
    */
   public DslViewResultsTree resultsLimit(int resultsLimit) {
     this.resultsLimit = resultsLimit;

@@ -10,10 +10,10 @@ import us.abstracta.jmeter.javadsl.core.listeners.DslBackendListener;
  *
  * @since 0.20
  */
-public class ElasticsearchBackendListener extends DslBackendListener {
+public class ElasticsearchBackendListener extends DslBackendListener<ElasticsearchBackendListener> {
 
-  private String username;
-  private String password;
+  protected String username;
+  protected String password;
 
   public ElasticsearchBackendListener(String url) {
     super(ElasticsearchBackendClient.class, url);
@@ -36,24 +36,11 @@ public class ElasticsearchBackendListener extends DslBackendListener {
    *
    * @param username to use to authenticate to InfluxDB
    * @param password to use to authenticate to InfluxDB
-   * @return this instance for fluent API usage.
+   * @return the listener for further configuration or usage.
    */
   public ElasticsearchBackendListener credentials(String username, String password) {
     this.username = username;
     this.password = password;
-    return this;
-  }
-
-  /**
-   * Specifies the length of sample results queue used to asynchronously send the information to
-   * Elasticsearch.
-   *
-   * @param queueSize the size of the queue to use
-   * @return this instance for fluent API usage.
-   * @see #setQueueSize(int)
-   */
-  public ElasticsearchBackendListener queueSize(int queueSize) {
-    setQueueSize(queueSize);
     return this;
   }
 

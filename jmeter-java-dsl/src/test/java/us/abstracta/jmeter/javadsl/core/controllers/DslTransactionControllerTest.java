@@ -34,7 +34,7 @@ public class DslTransactionControllerTest extends JmeterDslTest {
     TestPlanStats stats = testPlan(
         threadGroup(1, 1,
             transaction("My Transaction")
-                .generateParentSample(true)
+                .generateParentSample()
                 .children(
                     httpSampler(wiremockUri)
                 )
@@ -62,8 +62,8 @@ public class DslTransactionControllerTest extends JmeterDslTest {
       return testPlan(
           threadGroup(1, 1,
               transaction("test")
-                  .generateParentSample(true)
-                  .includeTimersAndProcessorsTime(true)
+                  .generateParentSample()
+                  .includeTimersAndProcessorsTime()
                   .children(
                       httpSampler("http://localhost"),
                       httpSampler("http://mysite.com")

@@ -19,10 +19,10 @@ import org.slf4j.Logger;
 
 /**
  * Handles creation of dynamic expressions used in test plan.
- *
+ * <p>
  * This class allows either to set the expression plainly as it should be evaluated by JMeter, or
  * provide Java code that is converted to groovy script for JMeter execution.
- *
+ * <p>
  * Any test element that wants to be able to handle an expression that can be set both with string
  * or java code, should extend {@link DslScriptBuilder.DslScript} and {@link
  * DslScriptBuilder.DslScriptVars} providing variables that are available for groovy scripts in the

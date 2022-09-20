@@ -11,20 +11,20 @@ import us.abstracta.jmeter.javadsl.core.threadgroups.BaseThreadGroup.ThreadGroup
 
 /**
  * Allows grouping requests that need to execute in parallel.
- *
+ * <p>
  * This element uses
  * <a href="https://github.com/Blazemeter/jmeter-bzm-plugins/blob/master/parallel/Parallel.md">
  * Parallel Controller plugin</a>, check its documentation for more details.
- *
+ * <p>
  * By default, this element executes unlimited amount of parallel requests ang generate no
  * additional sample result. Check provided methods to change this behavior.
  *
  * @since 0.30
  */
-public class ParallelController extends BaseController {
+public class ParallelController extends BaseController<ParallelController> {
 
-  private boolean generateParent = false;
-  private Integer maxThreads;
+  protected boolean generateParent = false;
+  protected Integer maxThreads;
 
   public ParallelController(String name, List<ThreadGroupChild> children) {
     super(name == null ? "bzm - Parallel Controller" : name, ParallelControllerGui.class, children);
@@ -43,7 +43,7 @@ public class ParallelController extends BaseController {
   /**
    * Same as {@link #parallelController(ThreadGroupChild...)} but allowing to set a name on
    * controller.
-   *
+   * <p>
    * Setting the name of the controller is particularly useful when using {@link
    * #generateParentSample(boolean)} to focus on transaction steps and properly identify associated
    * metrics.
@@ -51,7 +51,7 @@ public class ParallelController extends BaseController {
    * @param name is the label assigned to the Parallel Controller, which will appear in collected
    * metrics when {@link #generateParentSample(boolean)} is used.
    * @param children test elements to execute in parallel.
-   * @return the Parallel Controller for additional configuration and usage.
+   * @return the controller for further configuration or usage.
    * @see #parallelController(ThreadGroupChild...)
    */
   public static ParallelController parallelController(String name,
@@ -63,7 +63,7 @@ public class ParallelController extends BaseController {
    * Same as {@link #parallelController(ThreadGroupChild...)} but postponing children specification
    * to allow specifying additional settings first.
    *
-   * @return he Parallel Controller for additional configuration and usage.
+   * @return the controller for further configuration or usage.
    * @see #parallelController(ThreadGroupChild...)
    * @since 0.30.1
    */
@@ -75,7 +75,7 @@ public class ParallelController extends BaseController {
    * Same as {@link #parallelController(String, ThreadGroupChild...)} but postponing children
    * specification to allow specifying additional settings first.
    *
-   * @return he Parallel Controller for additional configuration and usage.
+   * @return the controller for further configuration or usage.
    * @see #parallelController(String, ThreadGroupChild...)
    * @since 0.30.1
    */
@@ -84,20 +84,32 @@ public class ParallelController extends BaseController {
   }
 
   /**
-   * Specifies whether or not to generate a sample result containing children elements results as
+   * Specifies whether to generate a sample result containing children elements results as
    * sub results.
-   *
+   * <p>
    * Take into consideration that when this option is enabled, then only the parallel controller
    * sample result metrics will appear in metrics like summary results and similar. When generate
    * parent sample is used, consider always using a name for the controller to properly identify it
    * in collected metrics.
    *
-   * @param generateParent when set to true a sample result containing children elements results as
-   * sub results will be generated. This
-   * @return the Parallel Controller for additional configuration and usage.
+   * @return the controller for further configuration or usage.
+   * @since 0.66
    */
-  public ParallelController generateParentSample(boolean generateParent) {
-    this.generateParent = generateParent;
+  public ParallelController generateParentSample() {
+    return generateParentSample(true);
+  }
+
+  /**
+   * Same as {@link #generateParentSample()} but allowing to enable and disable the setting.
+   * <p>
+   * This is helpful when the resolution is taken at runtime.
+   *
+   * @param enable specifies to enable or disable the setting. By default, it is set to false.
+   * @return the controller for further configuration or usage.
+   * @see #generateParentSample()
+   */
+  public ParallelController generateParentSample(boolean enable) {
+    this.generateParent = enable;
     return this;
   }
 
@@ -105,25 +117,10 @@ public class ParallelController extends BaseController {
    * Allows limiting the number of threads used to execute children elements in parallel.
    *
    * @param maxThreads number of threads to use. When not specified, no limit is set.
-   * @return the Parallel Controller for additional configuration and usage.
+   * @return the controller for further configuration or usage.
    */
   public ParallelController maxThreads(int maxThreads) {
     this.maxThreads = maxThreads;
-    return this;
-  }
-
-  /**
-   * Allows specifying controller children elements (samplers, listeners, post processors, etc.).
-   *
-   * This method is just an alternative to the constructor specification of children, and is handy
-   * when you want to specify controller settings and then specify children.
-   *
-   * @param children list of test elements to add as children of the controller.
-   * @return he Parallel Controller for additional configuration and usage.
-   * @since 0.30.1
-   */
-  public ParallelController children(ThreadGroupChild... children) {
-    addChildren(children);
     return this;
   }
 

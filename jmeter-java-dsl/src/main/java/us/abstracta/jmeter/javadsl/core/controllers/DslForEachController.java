@@ -25,10 +25,10 @@ import us.abstracta.jmeter.javadsl.core.threadgroups.BaseThreadGroup.ThreadGroup
  *
  * @since 0.44
  */
-public class DslForEachController extends BaseController {
+public class DslForEachController extends BaseController<DslForEachController> {
 
-  private final String varsPrefix;
-  private final String iterationVarName;
+  protected String varsPrefix;
+  protected String iterationVarName;
 
   public DslForEachController(String name, String varsPrefix, String iterationVarName,
       List<ThreadGroupChild> children) {

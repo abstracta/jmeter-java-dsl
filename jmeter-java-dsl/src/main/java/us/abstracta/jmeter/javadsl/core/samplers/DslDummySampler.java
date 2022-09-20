@@ -19,14 +19,14 @@ import us.abstracta.jmeter.javadsl.core.util.JmeterFunction;
  */
 public class DslDummySampler extends BaseSampler<DslDummySampler> {
 
-  private final String responseBody;
-  private boolean successful = true;
-  private String responseCode = "200";
-  private String responseMessage = "OK";
-  private String responseTime = JmeterFunction.from("__Random", 50, 500);
-  private boolean simulateResponseTime;
-  private String url = "";
-  private String requestBody = "";
+  protected String responseBody;
+  protected boolean successful = true;
+  protected String responseCode = "200";
+  protected String responseMessage = "OK";
+  protected String responseTime = JmeterFunction.from("__Random", 50, 500);
+  protected boolean simulateResponseTime;
+  protected String url = "";
+  protected String requestBody = "";
 
   public DslDummySampler(String name, String responseBody) {
     super(name == null ? "jp@gc - Dummy Sampler" : name, DummySamplerGui.class);
@@ -39,7 +39,7 @@ public class DslDummySampler extends BaseSampler<DslDummySampler> {
    * @param successful when true, generated sample result will be successful, otherwise it will be
    *                   marked as failure. When not specified, successful sample results are
    *                   generated.
-   * @return the Dummy Sampler instance for further configuration or usage.
+   * @return the sampler for further configuration or usage.
    */
   public DslDummySampler successful(boolean successful) {
     this.successful = successful;
@@ -50,7 +50,7 @@ public class DslDummySampler extends BaseSampler<DslDummySampler> {
    * Specifies the response code included in generated sample results.
    *
    * @param code defines the response code included in sample results. When not set, 200 is used.
-   * @return the Dummy Sampler instance for further configuration or usage.
+   * @return the sampler for further configuration or usage.
    */
   public DslDummySampler responseCode(String code) {
     this.responseCode = code;
@@ -62,7 +62,7 @@ public class DslDummySampler extends BaseSampler<DslDummySampler> {
    *
    * @param message defines the response message included in sample results. When not set, OK is
    *                used.
-   * @return the Dummy Sampler instance for further configuration or usage.
+   * @return the sampler for further configuration or usage.
    */
   public DslDummySampler responseMessage(String message) {
     this.responseMessage = message;
@@ -74,7 +74,7 @@ public class DslDummySampler extends BaseSampler<DslDummySampler> {
    *
    * @param responseTime defines the response time associated to the sample results. When not set, a
    *                     randomly calculated value between 50 and 500 milliseconds is used.
-   * @return the Dummy Sampler instance for further configuration or usage.
+   * @return the sampler for further configuration or usage.
    */
   public DslDummySampler responseTime(Duration responseTime) {
     this.responseTime = String.valueOf(responseTime.toMillis());
@@ -92,7 +92,7 @@ public class DslDummySampler extends BaseSampler<DslDummySampler> {
    *
    * @param simulate when true enables simulation of response times, when false no wait is done
    *                 speeding up test plan execution. By default, simulation is disabled.
-   * @return the Dummy Sampler instance for further configuration or usage.
+   * @return the sampler for further configuration or usage.
    */
   public DslDummySampler simulateResponseTime(boolean simulate) {
     this.simulateResponseTime = simulate;
@@ -107,7 +107,7 @@ public class DslDummySampler extends BaseSampler<DslDummySampler> {
    *
    * @param url defines the URL associated to generated sample results. When not set, an empty URL
    *            is used.
-   * @return the Dummy Sampler instance for further configuration or usage.
+   * @return the sampler for further configuration or usage.
    */
   public DslDummySampler url(String url) {
     this.url = url;
@@ -122,7 +122,7 @@ public class DslDummySampler extends BaseSampler<DslDummySampler> {
    *
    * @param requestBody defines the request body associated to generated sample results. When not
    *                    set, an empty body is used.
-   * @return the Dummy Sampler instance for further configuration or usage.
+   * @return the sampler for further configuration or usage.
    */
   public DslDummySampler requestBody(String requestBody) {
     this.requestBody = requestBody;

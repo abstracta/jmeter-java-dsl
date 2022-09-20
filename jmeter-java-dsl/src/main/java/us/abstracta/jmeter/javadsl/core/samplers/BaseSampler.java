@@ -17,8 +17,8 @@ import us.abstracta.jmeter.javadsl.http.DslHttpSampler;
  *
  * @since 0.1
  */
-public abstract class BaseSampler<T extends BaseSampler<?>> extends
-    TestElementContainer<BaseSampler.SamplerChild> implements DslSampler {
+public abstract class BaseSampler<T extends BaseSampler<T>> extends
+    TestElementContainer<T, BaseSampler.SamplerChild> implements DslSampler {
 
   protected BaseSampler(String name, Class<? extends JMeterGUIComponent> guiClass) {
     super(name, guiClass, Collections.emptyList());
@@ -32,7 +32,7 @@ public abstract class BaseSampler<T extends BaseSampler<?>> extends
    * @return the altered sampler to allow for fluent API usage.
    */
   public T children(SamplerChild... children) {
-    return (T) addChildren(children);
+    return super.children(children);
   }
 
   /**

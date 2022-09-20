@@ -24,7 +24,7 @@ import us.abstracta.jmeter.javadsl.core.util.SingleSeriesTimelinePanel;
 /**
  * Configures a thread group which dynamically adapts the number of threads and pauses to match a
  * given rps.
- *
+ * <p>
  * <b>Warning:</b> by default the thread group uses unbounded maximum number of threads, but this
  * is not a good practice since it might impose unexpected load on load generator (CPU or memory may
  * run out). It is advisable to always set a maximum number of threads. Check
@@ -43,18 +43,18 @@ import us.abstracta.jmeter.javadsl.core.util.SingleSeriesTimelinePanel;
 public class RpsThreadGroup extends BaseThreadGroup<RpsThreadGroup> {
 
   private static int timerId = 1;
-  private final List<TimerSchedule> schedules = new ArrayList<>();
-  private double lastRps = 1;
-  private EventType counting = EventType.REQUESTS;
-  private int initThreads = 1;
-  private int maxThreads = Integer.MAX_VALUE;
-  private double spareThreads = 0.1;
+  protected final List<TimerSchedule> schedules = new ArrayList<>();
+  protected double lastRps = 1;
+  protected EventType counting = EventType.REQUESTS;
+  protected int initThreads = 1;
+  protected int maxThreads = Integer.MAX_VALUE;
+  protected double spareThreads = 0.1;
 
-  private static class TimerSchedule {
+  public static class TimerSchedule {
 
-    private final double fromRps;
-    private final double toRps;
-    private final long durationSecs;
+    public final double fromRps;
+    public final double toRps;
+    public final long durationSecs;
 
     private TimerSchedule(double fromRps, double toRps, Duration durationSecs) {
       this.fromRps = fromRps;
@@ -116,7 +116,7 @@ public class RpsThreadGroup extends BaseThreadGroup<RpsThreadGroup> {
    *                 test plan. Since JMeter only supports specifying times in seconds, if you
    *                 specify a smaller granularity (like milliseconds) it will be rounded up to
    *                 seconds.
-   * @return the RpsThreadGroup instance to use fluent API to set additional options.
+   * @return the thread group for further configuration and usage.
    */
   public RpsThreadGroup rampTo(double rps, Duration duration) {
     if (rps < 0) {
@@ -138,7 +138,7 @@ public class RpsThreadGroup extends BaseThreadGroup<RpsThreadGroup> {
    * @param duration duration to hold the current RPS until moving to next stage or ending the test
    *                 plan. Since JMeter only supports specifying times in seconds, if you specify a
    *                 smaller granularity (like milliseconds) it will be rounded up to seconds.
-   * @return the RpsThreadGroup instance to use fluent API to set additional options.
+   * @return the thread group for further configuration and usage.
    * @see #rampTo(double, Duration)
    */
   public RpsThreadGroup holdFor(Duration duration) {
@@ -160,7 +160,7 @@ public class RpsThreadGroup extends BaseThreadGroup<RpsThreadGroup> {
    * @param rampDuration duration taken to reach the given RPS.
    * @param holdDuration duration to hold the given RPS after the ramp, until moving to next stage
    *                     or ending the test plan.
-   * @return the RpsThreadGroup instance to use fluent API to set additional options.
+   * @return the thread group for further configuration and usage.
    * @see #rampTo(double, Duration)
    * @see #holdFor(Duration)
    */
@@ -179,7 +179,7 @@ public class RpsThreadGroup extends BaseThreadGroup<RpsThreadGroup> {
    *
    * @param counting specifies what event type to use to control the RPS. When not specified
    *                 requests are counted.
-   * @return the RpsThreadGroup instance to use fluent API to set additional options.
+   * @return the thread group for further configuration and usage.
    */
   public RpsThreadGroup counting(EventType counting) {
     this.counting = counting;
@@ -188,20 +188,20 @@ public class RpsThreadGroup extends BaseThreadGroup<RpsThreadGroup> {
 
   /**
    * Specifies the maximum number of threads to use.
-   *
+   * <p>
    * <b>Warning:</b> this value should be big enough to be able to reach the maximum desired RPS,
    * otherwise the maximum RPS will not be able to be met. If you have requests that have maximum
    * response time (or iteration time, if you are counting iteration instead of requests, see:
    * {@link #counting(EventType)}) R seconds, and need to reach T maximum RPS, then you should set
    * this value to R*T.
-   *
+   * <p>
    * <b>Warning:</b> by default, maximum threads are unbounded, but this means that you may run out
    * of memory or consume too much CPU. Is a good practice to always set this value to avoid
    * unexpected load on generator that may affect performance test in some undesired ways.
    *
-   * @param maxThreads specifies the maximum threads to use by the thread group. By default is
+   * @param maxThreads specifies the maximum threads to use by the thread group. By default, is
    *                   unbounded.
-   * @return the RpsThreadGroup instance to use fluent API to set additional options.
+   * @return the thread group for further configuration and usage.
    */
   public RpsThreadGroup maxThreads(int maxThreads) {
     this.maxThreads = maxThreads;
@@ -215,8 +215,8 @@ public class RpsThreadGroup extends BaseThreadGroup<RpsThreadGroup> {
    * would not be enough.
    *
    * @param initThreads specifies the initial number of threads to use by the thread group. By
-   *                    default is 1.
-   * @return the RpsThreadGroup instance to use fluent API to set additional options.
+   *                    default, is 1.
+   * @return the thread group for further configuration and usage.
    */
   public RpsThreadGroup initThreads(int initThreads) {
     this.initThreads = initThreads;
@@ -231,8 +231,8 @@ public class RpsThreadGroup extends BaseThreadGroup<RpsThreadGroup> {
    *
    * @param spareThreads specifies either the number of spare threads (if the value is greater than
    *                     1) or the percent (if &lt;= 1) from the current active threads count. By
-   *                     default is 0.1 (10% of active threads).
-   * @return the RpsThreadGroup instance to use fluent API to set additional options.
+   *                     default, is 0.1 (10% of active threads).
+   * @return the thread group for further configuration and usage.
    */
   public RpsThreadGroup spareThreads(double spareThreads) {
     this.spareThreads = spareThreads;

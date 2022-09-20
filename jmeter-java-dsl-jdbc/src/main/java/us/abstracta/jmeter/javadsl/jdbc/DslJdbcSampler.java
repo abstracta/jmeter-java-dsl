@@ -25,13 +25,13 @@ import us.abstracta.jmeter.javadsl.core.samplers.BaseSampler;
  */
 public class DslJdbcSampler extends BaseSampler<DslJdbcSampler> {
 
-  private final String poolName;
-  private final String query;
-  private final List<QueryParameter> params = new ArrayList<>();
-  private final List<String> vars = new ArrayList<>();
-  private String resultsVar;
-  private Duration timeout;
-  private QueryType queryType;
+  protected String poolName;
+  protected String query;
+  protected final List<QueryParameter> params = new ArrayList<>();
+  protected final List<String> vars = new ArrayList<>();
+  protected String resultsVar;
+  protected Duration timeout;
+  protected QueryType queryType;
 
   public DslJdbcSampler(String name, String poolName, String query) {
     super(name != null ? name : "JDBC Request", TestBeanGUI.class);
@@ -39,14 +39,14 @@ public class DslJdbcSampler extends BaseSampler<DslJdbcSampler> {
     this.query = query;
   }
 
-  private static class QueryParameter {
+  protected static class QueryParameter {
 
     private static final Map<Integer, String> JDBC_TYPE_TO_PROPERTY_VALUE =
         buildJdbcTypeToPropertyValueMapping();
 
-    private final Object value;
-    private final int jdbcType;
-    private final JdbcParamMode mode;
+    public final Object value;
+    public final int jdbcType;
+    public final JdbcParamMode mode;
 
     private QueryParameter(Object value, int jdbcType, JdbcParamMode mode) {
       this.value = value;
@@ -190,7 +190,7 @@ public class DslJdbcSampler extends BaseSampler<DslJdbcSampler> {
    * @param jdbcParamType sets the type of the parameter, being the value one of {@link
    *                      java.sql.Types} defined ones, or a specific one for the database that is
    *                      not included in Types class.
-   * @return the DslJdbcSampler for further configuration or usage.
+   * @return the sampler for further configuration or usage.
    * @see java.sql.Types
    */
   public DslJdbcSampler param(Object value, int jdbcParamType) {
@@ -210,7 +210,7 @@ public class DslJdbcSampler extends BaseSampler<DslJdbcSampler> {
    *                      java.sql.Types} defined ones, or a specific one for the database that is
    *                      not included in Types class.
    * @param mode          specifies the {@link JdbcParamMode} for the parameter.
-   * @return the DslJdbcSampler for further configuration or usage.
+   * @return the sampler for further configuration or usage.
    * @see #param(Object, int)
    * @see JdbcParamMode
    */
@@ -245,7 +245,7 @@ public class DslJdbcSampler extends BaseSampler<DslJdbcSampler> {
    * parameter output name, and the value is the associated value.
    *
    * @param resultsVar specifies the name of the variable where to store the list of row maps.
-   * @return the DslJdbcSampler for further configuration or usage.
+   * @return the sampler for further configuration or usage.
    */
   public DslJdbcSampler resultsVar(String resultsVar) {
     this.resultsVar = resultsVar;
@@ -254,7 +254,7 @@ public class DslJdbcSampler extends BaseSampler<DslJdbcSampler> {
 
   /**
    * Allows specifying a maximum amount of time a query can take before it fails.
-   *
+   * <p>
    * <b>Warning:</b> by default the timeout is not set, which differs from default JMeter component
    * default behavior that sets it to 0 (infinity timeout). We decided to do this since we consider
    * setting an infinity timeout to be a bad practices and additionally some database drivers might
@@ -272,7 +272,7 @@ public class DslJdbcSampler extends BaseSampler<DslJdbcSampler> {
    *                <p>
    *                Since JDBC only supports specifying times in seconds, if you specify a smaller
    *                granularity (like milliseconds) it will be rounded up to seconds.
-   * @return the DslJdbcSampler for further configuration or usage.
+   * @return the sampler for further configuration or usage.
    */
   public DslJdbcSampler timeout(Duration timeout) {
     this.timeout = timeout;
@@ -285,7 +285,7 @@ public class DslJdbcSampler extends BaseSampler<DslJdbcSampler> {
    * <p>
    * When this method is used, query string is ignored (so you can set it to null).
    *
-   * @return the DslJdbcSampler for further configuration or usage.
+   * @return the sampler for further configuration or usage.
    */
   public DslJdbcSampler commit() {
     this.queryType = QueryType.COMMIT;
@@ -298,7 +298,7 @@ public class DslJdbcSampler extends BaseSampler<DslJdbcSampler> {
    * <p>
    * When this method is used, query string is ignored (so you can set it to null).
    *
-   * @return the DslJdbcSampler for further configuration or usage.
+   * @return the sampler for further configuration or usage.
    */
   public DslJdbcSampler rollback() {
     this.queryType = QueryType.ROLLBACK;
@@ -325,7 +325,7 @@ public class DslJdbcSampler extends BaseSampler<DslJdbcSampler> {
    * fail, and this method allows you to explicitly specify it.
    *
    * @param queryType the type of query to assign to use with the JDBC Driver.
-   * @return the DslJdbcSampler for further configuration or usage.
+   * @return the sampler for further configuration or usage.
    * @see QueryType
    */
   public DslJdbcSampler queryType(QueryType queryType) {

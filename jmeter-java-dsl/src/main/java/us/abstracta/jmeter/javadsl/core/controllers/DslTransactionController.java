@@ -21,62 +21,67 @@ import us.abstracta.jmeter.javadsl.core.threadgroups.BaseThreadGroup.ThreadGroup
  *
  * @since 0.14
  */
-public class DslTransactionController extends BaseController {
+public class DslTransactionController extends BaseController<DslTransactionController> {
 
-  private boolean includeTimers = false;
-  private boolean generateParentSample = false;
+  protected boolean includeTimers = false;
+  protected boolean generateParentSample = false;
 
   public DslTransactionController(String name, List<ThreadGroupChild> children) {
     super(name, TransactionControllerGui.class, children);
   }
 
   /**
-   * Allows enabling/disabling inclusion of time spent in timers and pre- and post-processors in
-   * sample results.
+   * Specifies to include time spent in timers and pre- and post-processors in sample results.
    *
-   * @param includeTimers specifies, when set to true, to include timers and pre- and
-   *                      post-processors time in sample results. By default, timers and pre- and
-   *                      post-processors are not included in transaction sample results times.
-   * @return the Transaction Controller for further configuration or usage.
+   * @return the controller for further configuration or usage.
+   * @since 0.66
+   */
+  public DslTransactionController includeTimersAndProcessorsTime() {
+    return includeTimersAndProcessorsTime(true);
+  }
+
+  /**
+   * Same as {@link #includeTimersAndProcessorsTime()} but allowing to enable or disable it.
+   * <p>
+   * This is helpful when the resolution is taken at runtime.
+   *
+   * @param enable specifies to enable or disable the setting. By default, it is set to false.
+   * @return the controller for further configuration or usage.
+   * @see #includeTimersAndProcessorsTime()
    * @since 0.29
    */
-  public DslTransactionController includeTimersAndProcessorsTime(boolean includeTimers) {
-    this.includeTimers = includeTimers;
+  public DslTransactionController includeTimersAndProcessorsTime(boolean enable) {
+    includeTimers = enable;
     return this;
   }
 
   /**
-   * Allows enabling/disabling creation of sample result as parent of children samplers.
+   * Specifies to create a sample result as parent of children samplers.
    * <p>
    * It is useful in some scenarios to get transaction sample results as parent of children samplers
    * to focus mainly in transactions and not be concerned about each particular request. Enabling
    * parent sampler helps in this regard, only reporting the transactions in summary reports, and
    * not the transaction children results.
    *
-   * @param generateParentSample specifies to generate parent sample when true, or disable it. By
-   *                             default parent sample generation is disabled.
-   * @return the Transaction Controller for further configuration or usage.
-   * @since 0.29
+   * @return the controller for further configuration or usage.
+   * @since 0.66
    */
-  public DslTransactionController generateParentSample(boolean generateParentSample) {
-    this.generateParentSample = generateParentSample;
-    return this;
+  public DslTransactionController generateParentSample() {
+    return generateParentSample(true);
   }
 
   /**
-   * Allows specifying transaction children elements (samplers, listeners, post processors, etc.).
+   * Same as {@link #generateParentSample()} but allowing to enable or disable it.
    * <p>
-   * This method is just an alternative to the constructor specification of children, and is handy
-   * when you want to keep general transactions settings together and then specify children (instead
-   * of specifying name and children, and at the end alternative settings like generating parent
-   * sample).
+   * This is helpful when the resolution is taken at runtime.
    *
-   * @param children list of test elements to add as children of the transaction.
-   * @return the altered transaction.
+   * @param enable specifies to enable or disable the setting. By default, it is set to false.
+   * @return the controller for further configuration or usage.
+   * @see #generateParentSample()
    * @since 0.29
    */
-  public DslTransactionController children(ThreadGroupChild... children) {
-    super.addChildren(children);
+  public DslTransactionController generateParentSample(boolean enable) {
+    generateParentSample = enable;
     return this;
   }
 

@@ -13,17 +13,17 @@ import us.abstracta.jmeter.javadsl.core.DslTestPlan;
  * Abstracts logic for {@link DslTestElement} that can nest other test elements.
  *
  * @param <T> is type of test elements that can be nested by this class.
- *
- * Check {@link DslTestPlan} for an example.
- *
+ *            <p>
+ *            Check {@link DslTestPlan} for an example.
  * @since 0.1
  */
-public abstract class TestElementContainer<T extends DslTestElement> extends BaseTestElement {
+public abstract class TestElementContainer<T extends TestElementContainer<T, C>,
+    C extends DslTestElement> extends BaseTestElement {
 
-  protected final List<T> children = new ArrayList<>();
+  protected final List<C> children = new ArrayList<>();
 
   protected TestElementContainer(String name, Class<? extends JMeterGUIComponent> guiClass,
-      List<T> children) {
+      List<C> children) {
     super(name, guiClass);
     this.children.addAll(children);
   }
@@ -35,11 +35,18 @@ public abstract class TestElementContainer<T extends DslTestElement> extends Bas
    * @param children list of test elements to add as children of this sampler.
    * @return the altered sampler to allow for fluent API usage.
    * @since 0.12
+   * @deprecated as of 0.66, this method should no longer be used
    */
   @SafeVarargs
-  protected final TestElementContainer<T> addChildren(T... children) {
+  @Deprecated
+  protected final TestElementContainer<T, C> addChildren(C... children) {
+    return children(children);
+  }
+
+  @SuppressWarnings("unchecked")
+  protected T children(C... children) {
     this.children.addAll(Arrays.asList(children));
-    return this;
+    return (T) this;
   }
 
   @Override

@@ -8,10 +8,10 @@ import us.abstracta.jmeter.javadsl.core.testelements.DslScopedTestElement;
  *
  * @since 0.28
  */
-public abstract class DslVariableExtractor<T> extends DslScopedTestElement<T> implements
-    DslPostProcessor {
+public abstract class DslVariableExtractor<T extends DslVariableExtractor<T>> extends
+    DslScopedTestElement<T> implements DslPostProcessor {
 
-  protected final String varName;
+  protected String varName;
   protected int matchNumber = 1;
   protected String defaultValue;
 

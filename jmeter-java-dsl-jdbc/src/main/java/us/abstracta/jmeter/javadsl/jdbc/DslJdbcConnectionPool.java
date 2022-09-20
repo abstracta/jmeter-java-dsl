@@ -20,14 +20,15 @@ public class DslJdbcConnectionPool extends BaseConfigElement {
 
   private static final Map<Integer, String> TRANSACTION_ISOLATION_TO_PROPERTY_VALUE =
       buildTransactionIsolationToPropertyValueMapping();
-  private final Class<? extends Driver> driverClass;
-  private final String url;
-  private String user;
-  private String password;
-  private boolean autoCommit = true;
-  private int maxConnections;
-  private Duration maxConnectionWait = Duration.ofSeconds(10);
-  private int transactionIsolation = -1;
+
+  protected Class<? extends Driver> driverClass;
+  protected String url;
+  protected String user;
+  protected String password;
+  protected boolean autoCommit = true;
+  protected int maxConnections;
+  protected Duration maxConnectionWait = Duration.ofSeconds(10);
+  protected int transactionIsolation = -1;
 
   public DslJdbcConnectionPool(String name, Class<? extends Driver> driverClass, String url) {
     super(name, TestBeanGUI.class);
@@ -50,7 +51,7 @@ public class DslJdbcConnectionPool extends BaseConfigElement {
    * Allows setting the username required to connect to the database.
    *
    * @param user is the username to connect to the database with.
-   * @return the DslJdbcConnectionPool instance for further configuration or usage.
+   * @return the config element for further configuration or usage.
    */
   public DslJdbcConnectionPool user(String user) {
     this.user = user;
@@ -61,7 +62,7 @@ public class DslJdbcConnectionPool extends BaseConfigElement {
    * Allows setting the password required to connect to the database.
    *
    * @param password is the password to connect to the database with.
-   * @return the DslJdbcConnectionPool instance for further configuration or usage.
+   * @return the config element for further configuration or usage.
    */
   public DslJdbcConnectionPool password(String password) {
     this.password = password;
@@ -83,8 +84,8 @@ public class DslJdbcConnectionPool extends BaseConfigElement {
    *
    * @param enabled specifies whether auto-commit is enabled or disabled by default. The connection
    *                behavior can be changed at any point in time by {@link
-   *                DslJdbcSampler#autoCommit(boolean)}.
-   * @return the DslJdbcConnectionPool instance for further configuration or usage.
+   *                DslJdbcSampler#autoCommit(boolean)}. By default, this is enabled.
+   * @return the config element for further configuration or usage.
    */
   public DslJdbcConnectionPool autoCommit(boolean enabled) {
     this.autoCommit = enabled;
@@ -104,7 +105,7 @@ public class DslJdbcConnectionPool extends BaseConfigElement {
    * @param maxConnections specifies the maximum number of connections to use to connect to the
    *                       Database. 0 means one connection per thread. When set to a value
    *                       different from 0, then connections are shared by JMeter threads.
-   * @return the DslJdbcConnectionPool instance for further configuration or usage.
+   * @return the config element for further configuration or usage.
    */
   public DslJdbcConnectionPool maxConnections(int maxConnections) {
     this.maxConnections = maxConnections;
@@ -120,10 +121,10 @@ public class DslJdbcConnectionPool extends BaseConfigElement {
    * behavior. I.e.: set it to a value that is big enough for usual behavior not to fail, but low
    * enough for detecting unusual/unexpected behavior.
    *
-   * @param maxConnectionWait duration to wait for a connection until an error arises. By default
+   * @param maxConnectionWait duration to wait for a connection until an error arises. By default,
    *                          this is set to 10 seconds. If set to 0 seconds, it means that it will
    *                          wait indefinitely for the connection (which is not advisable).
-   * @return the DslJdbcConnectionPool instance for further configuration or usage.
+   * @return the config element for further configuration or usage.
    */
   public DslJdbcConnectionPool maxConnectionWait(Duration maxConnectionWait) {
     this.maxConnectionWait = maxConnectionWait;
@@ -144,7 +145,7 @@ public class DslJdbcConnectionPool extends BaseConfigElement {
    *                             Connection#TRANSACTION_SERIALIZABLE}. By default is set to -1,
    *                             which means that it will use the default level for the connection
    *                             string, session or database.
-   * @return the DslJdbcConnectionPool instance for further configuration or usage.
+   * @return the config element for further configuration or usage.
    * @see java.sql.Connection
    */
   public DslJdbcConnectionPool transactionIsolation(int transactionIsolation) {

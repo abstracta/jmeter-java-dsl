@@ -13,7 +13,8 @@ import us.abstracta.jmeter.javadsl.core.threadgroups.BaseThreadGroup.ThreadGroup
 /**
  * Selects a child in each iteration according to specified relative weights.
  * <p>
- * Internally this uses <a href="https://github.com/Blazemeter/jmeter-bzm-plugins/blob/master/wsc/WeightedSwitchController.md">
+ * Internally this uses <a
+ * href="https://github.com/Blazemeter/jmeter-bzm-plugins/blob/master/wsc/WeightedSwitchController.md">
  * BlazeMeter Weighted Switch Controller plugin</a>.
  * <p>
  * This controller is handy when you want part of the test plan to act in a probabilistic manner
@@ -25,7 +26,7 @@ import us.abstracta.jmeter.javadsl.core.threadgroups.BaseThreadGroup.ThreadGroup
  *
  * @since 0.53
  */
-public class DslWeightedSwitchController extends BaseController {
+public class DslWeightedSwitchController extends BaseController<DslWeightedSwitchController> {
 
   public static final long DEFAULT_WEIGHT = 100;
 
@@ -44,7 +45,7 @@ public class DslWeightedSwitchController extends BaseController {
    *               samplers or controllers, their default assigned weight will be 100.
    * @param child  is the element to add as controller child that will be selected for execution
    *               during iterations according to given weight.
-   * @return the altered controller for further configuration and usage.
+   * @return the controller for further configuration and usage.
    */
   public DslWeightedSwitchController child(long weight, DslController child) {
     return addWeightedChild(weight, child);
@@ -58,7 +59,7 @@ public class DslWeightedSwitchController extends BaseController {
    *               samplers or controllers, their default assigned weight will be 100.
    * @param child  is the element to add as controller child that will be selected for execution
    *               during iterations according to given weight.
-   * @return the altered controller for further configuration and usage.
+   * @return the controller for further configuration and usage.
    */
   public DslWeightedSwitchController child(long weight, DslSampler child) {
     return addWeightedChild(weight, child);
@@ -102,11 +103,10 @@ public class DslWeightedSwitchController extends BaseController {
    * 100.
    *
    * @param children list of test elements to add as children of this controller.
-   * @return the altered controller for further configuration and usage.
+   * @return the controller for further configuration and usage.
    */
   public DslWeightedSwitchController children(ThreadGroupChild... children) {
-    addChildren(children);
-    return this;
+    return super.children(children);
   }
 
   @Override

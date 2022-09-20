@@ -168,7 +168,7 @@ public class JtlWriterTest extends JmeterDslTest {
               httpSampler("http://localhost")
           ),
           jtlWriter("results.jtl")
-              .withAllFields(true)
+              .withAllFields()
       );
     }
 

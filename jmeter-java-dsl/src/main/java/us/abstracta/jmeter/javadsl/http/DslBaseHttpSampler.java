@@ -34,19 +34,19 @@ import us.abstracta.jmeter.javadsl.core.util.JmeterFunction;
  * @param <T> type of the sampler used to provide proper fluent API methods.
  * @since 0.52
  */
-public abstract class DslBaseHttpSampler<T extends DslBaseHttpSampler<?>> extends BaseSampler<T> {
+public abstract class DslBaseHttpSampler<T extends DslBaseHttpSampler<T>> extends BaseSampler<T> {
 
   public static final String RESET_CONNECTIONS_BETWEEN_ITERATIONS_PROP =
       "httpclient.reset_state_on_thread_group_iteration";
 
   protected String path;
   protected final HttpHeaders headers = new HttpHeaders();
-  private String protocol;
-  private String host;
-  private String port;
-  private String proxyUrl;
-  private String proxyUser;
-  private String proxyPassword;
+  protected String protocol;
+  protected String host;
+  protected String port;
+  protected String proxyUrl;
+  protected String proxyUser;
+  protected String proxyPassword;
 
   public DslBaseHttpSampler(String name, String url, Class<? extends JMeterGUIComponent> guiClass) {
     super(name, guiClass);
@@ -71,7 +71,7 @@ public abstract class DslBaseHttpSampler<T extends DslBaseHttpSampler<?>> extend
    * and use this method sparingly.
    *
    * @param protocol contains protocol value to be used (e.g.: http, https, etc).
-   * @return the altered sampler to allow for fluent API usage.
+   * @return the sampler for further configuration or usage.
    */
   public T protocol(String protocol) {
     this.protocol = protocol;
@@ -89,7 +89,7 @@ public abstract class DslBaseHttpSampler<T extends DslBaseHttpSampler<?>> extend
    * and use this method sparingly.
    *
    * @param host contains server name without protocol (no http/https) and path.
-   * @return the altered sampler to allow for fluent API usage.
+   * @return the sampler for further configuration or usage.
    */
   public T host(String host) {
     this.host = host;
@@ -107,7 +107,7 @@ public abstract class DslBaseHttpSampler<T extends DslBaseHttpSampler<?>> extend
    * and use this method sparingly.
    *
    * @param port contains port value to be used.
-   * @return the altered sampler to allow for fluent API usage.
+   * @return the sampler for further configuration or usage.
    */
   public T port(int port) {
     this.port = String.valueOf(port);
@@ -122,7 +122,7 @@ public abstract class DslBaseHttpSampler<T extends DslBaseHttpSampler<?>> extend
    *
    * @param name  of the HTTP header.
    * @param value of the HTTP header.
-   * @return the altered sampler to allow for fluent API usage.
+   * @return the sampler for further configuration or usage.
    */
   public T header(String name, String value) {
     headers.header(name, value);
@@ -148,17 +148,17 @@ public abstract class DslBaseHttpSampler<T extends DslBaseHttpSampler<?>> extend
    */
   public T header(String name, Function<PreProcessorVars, String> valueSupplier) {
     String variableNamePrefix = "PRE_PROCESSOR_HEADER~";
-    headers.header(name, JmeterFunction.var(variableNamePrefix + name));
-    return children(
-        jsr223PreProcessor(s -> s.vars.put(variableNamePrefix + name, valueSupplier.apply(s)))
-    );
+    return header(name, JmeterFunction.var(variableNamePrefix + name))
+        .children(
+            jsr223PreProcessor(s -> s.vars.put(variableNamePrefix + name, valueSupplier.apply(s)))
+        );
   }
 
   /**
    * Allows to easily specify the Content-Type HTTP header to be used by the sampler.
    *
    * @param contentType value to send as Content-Type header.
-   * @return the altered sampler to allow for fluent API usage.
+   * @return the sampler for further configuration or usage.
    */
   public T contentType(ContentType contentType) {
     headers.contentType(contentType);
@@ -176,10 +176,10 @@ public abstract class DslBaseHttpSampler<T extends DslBaseHttpSampler<?>> extend
    * If your proxy requires authentication check {@link #proxy(String, String, String)}.
    *
    * @param url specifies the proxy url. For example http://myproxy:8181.
-   * @return the http sampler for further configuration or usage.
+   * @return the sampler for further configuration or usage.
    */
   public T proxy(String url) {
-    this.proxyUrl = url;
+    proxyUrl = url;
     return (T) this;
   }
 
@@ -189,13 +189,13 @@ public abstract class DslBaseHttpSampler<T extends DslBaseHttpSampler<?>> extend
    * @param url      specifies the proxy url. For example http://myproxy:8181.
    * @param username specifies the username used to authenticate with the proxy.
    * @param password specifies the password used to authenticate with the proxy.
-   * @return the http sampler for further configuration or usage.
+   * @return the sampler for further configuration or usage.
    * @see #proxy(String)
    */
   public T proxy(String url, String username, String password) {
-    this.proxyUrl = url;
-    this.proxyUser = username;
-    this.proxyPassword = password;
+    proxyUrl = url;
+    proxyUser = username;
+    proxyPassword = password;
     return (T) this;
   }
 

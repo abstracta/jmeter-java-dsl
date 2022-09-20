@@ -20,22 +20,23 @@ import us.abstracta.jmeter.javadsl.codegeneration.params.EnumParam.EnumPropertyV
  *            API methods).
  * @since 0.11
  */
-public abstract class DslScopedTestElement<T> extends BaseTestElement {
+public abstract class DslScopedTestElement<T extends DslScopedTestElement<T>> extends
+    BaseTestElement {
 
-  private Scope scope = Scope.MAIN_SAMPLE;
-  private String scopeVariable;
+  protected Scope scope = Scope.MAIN_SAMPLE;
+  protected String scopeVariable;
 
   protected DslScopedTestElement(String name, Class<? extends JMeterGUIComponent> guiClass) {
     super(name, guiClass);
   }
 
   /**
-   * Allows specifying if the extractor should be specified to main sample and/or sub samples.
+   * Allows specifying if the element should be applied to main sample and/or sub samples.
    * <p>
-   * When not specified the regular extractor will only apply to main sample.
+   * When not specified the element will only apply to main sample.
    *
-   * @param scope specifying to what sample result apply the regular extractor to.
-   * @return the DslRegexExtractor to allow fluent usage and setting other properties.
+   * @param scope specifying to what sample result apply the element to.
+   * @return the DSL element for further configuration or usage.
    * @see Scope
    */
   public T scope(Scope scope) {
@@ -44,13 +45,13 @@ public abstract class DslScopedTestElement<T> extends BaseTestElement {
   }
 
   /**
-   * Allows specifying that the regular extractor should be applied to the contents of a given
-   * JMeter variable.
+   * Allows specifying that the element should be applied to the contents of a given JMeter
+   * variable.
    * <p>
    * This setting overrides any setting on scope and fieldToCheck.
    *
-   * @param scopeVariable specifies the name of the variable to apply the regular extractor to.
-   * @return the DslRegexExtractor to allow fluent usage and setting other properties.
+   * @param scopeVariable specifies the name of the variable to apply the element to.
+   * @return the DSL element for further configuration or usage.
    */
   public T scopeVariable(String scopeVariable) {
     this.scopeVariable = scopeVariable;

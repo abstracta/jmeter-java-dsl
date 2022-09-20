@@ -27,12 +27,11 @@ import us.abstracta.jmeter.javadsl.core.BuildTreeContext;
  */
 public class TestElementWrapperHelper<T extends TestElement> {
 
-  private final T testElement;
-  private final JMeterGUIComponent guiComponent;
-  private final Map<String, Object> props = new HashMap<>();
+  public final T testElement;
+  public final JMeterGUIComponent guiComponent;
+  public final Map<String, Object> props = new HashMap<>();
 
-  public TestElementWrapperHelper(T testElement,
-      JMeterGUIComponent guiComponent) {
+  public TestElementWrapperHelper(T testElement, JMeterGUIComponent guiComponent) {
     this.testElement = testElement;
     this.guiComponent = guiComponent;
   }

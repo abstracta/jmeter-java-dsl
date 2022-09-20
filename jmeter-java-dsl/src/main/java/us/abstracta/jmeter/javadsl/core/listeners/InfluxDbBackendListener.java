@@ -11,14 +11,14 @@ import org.apache.jmeter.visualizers.backend.influxdb.InfluxdbBackendListenerCli
  *
  * @since 0.4
  */
-public class InfluxDbBackendListener extends DslBackendListener {
+public class InfluxDbBackendListener extends DslBackendListener<InfluxDbBackendListener> {
 
-  private String title = "Test jmeter-java-dsl " + Instant.now().toString();
-  private String token;
-  private final Map<String, String> tags = new HashMap<>();
-  private String samplersRegex;
-  private String measurement;
-  private String applicationName;
+  protected String title = "Test jmeter-java-dsl " + Instant.now().toString();
+  protected String token;
+  protected final Map<String, String> tags = new HashMap<>();
+  protected String samplersRegex;
+  protected String measurement;
+  protected String applicationName;
 
   public InfluxDbBackendListener(String url) {
     super(InfluxdbBackendListenerClient.class, url);
@@ -34,7 +34,7 @@ public class InfluxDbBackendListener extends DslBackendListener {
    * When not specified, this will default to "jmeter-java-dsl" plus the current timestamp.
    *
    * @param title to be included in started and ended annotations.
-   * @return this instance for fluent API usage.
+   * @return the listener for further configuration or usage.
    */
   public InfluxDbBackendListener title(String title) {
     this.title = title;
@@ -48,24 +48,10 @@ public class InfluxDbBackendListener extends DslBackendListener {
    * for more details.
    *
    * @param token to use to authenticate to InfluxDB
-   * @return this instance for fluent API usage.
+   * @return the listener for further configuration or usage.
    */
   public InfluxDbBackendListener token(String token) {
     this.token = token;
-    return this;
-  }
-
-  /**
-   * Specifies the length of sample results queue used to asynchronously send the information to
-   * InfluxDB.
-   *
-   * @param queueSize the size of the queue to use
-   * @return this instance for fluent API usage.
-   * @see #setQueueSize(int)
-   * @since 0.32
-   */
-  public InfluxDbBackendListener queueSize(int queueSize) {
-    setQueueSize(queueSize);
     return this;
   }
 
@@ -75,7 +61,7 @@ public class InfluxDbBackendListener extends DslBackendListener {
    * @param name  specifies the name of the tag. Take into consideration that, in contrast to JMeter
    *              GUI, no <pre>TAG_</pre> prefix should be included.
    * @param value specifies the value of the tag.
-   * @return this instance for fluent API usage.
+   * @return the listener for further configuration or usage.
    */
   public InfluxDbBackendListener tag(String name, String value) {
     tags.put(name, value);
@@ -87,7 +73,7 @@ public class InfluxDbBackendListener extends DslBackendListener {
    * InfluxDB.
    *
    * @param measurement specifies the name of the measurement.
-   * @return this instance for fluent API usage.
+   * @return the listener for further configuration or usage.
    * @since 0.38
    */
   public InfluxDbBackendListener measurement(String measurement) {
@@ -102,7 +88,7 @@ public class InfluxDbBackendListener extends DslBackendListener {
    * measurement, from other applications.
    *
    * @param applicationName specifies the name of the application tag.
-   * @return this instance for fluent API usage.
+   * @return the listener for further configuration or usage.
    * @since 0.38
    */
   public InfluxDbBackendListener application(String applicationName) {
@@ -119,7 +105,7 @@ public class InfluxDbBackendListener extends DslBackendListener {
    * For example ^[^_].*" - will exclude samplers which labels start with symbol "_".
    *
    * @param samplersRegex specifies the name of the samplersRegex.
-   * @return this instance for fluent API usage.
+   * @return the listener for further configuration or usage.
    * @since 0.38
    */
   public InfluxDbBackendListener samplersRegex(String samplersRegex) {

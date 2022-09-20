@@ -17,10 +17,10 @@ import us.abstracta.jmeter.javadsl.core.threadgroups.BaseThreadGroup.ThreadGroup
  *            methods.
  * @since 0.33
  */
-public abstract class BaseThreadGroup<T extends BaseThreadGroup<?>> extends
-    TestElementContainer<ThreadGroupChild> implements DslThreadGroup {
+public abstract class BaseThreadGroup<T extends BaseThreadGroup<T>> extends
+    TestElementContainer<T, ThreadGroupChild> implements DslThreadGroup {
 
-  private SampleErrorAction sampleErrorAction = SampleErrorAction.CONTINUE;
+  protected SampleErrorAction sampleErrorAction = SampleErrorAction.CONTINUE;
 
   protected BaseThreadGroup(String name, Class<? extends JMeterGUIComponent> guiClass,
       List<ThreadGroupChild> children) {
@@ -30,10 +30,10 @@ public abstract class BaseThreadGroup<T extends BaseThreadGroup<?>> extends
   /**
    * Specifies what action to be taken when a sample error is detected.
    *
-   * @param sampleErrorAction specifies the action to be taken on sample error. By default thread
+   * @param sampleErrorAction specifies the action to be taken on sample error. By default, thread
    *                          groups just ignores the error and continue with following sample in
    *                          children elements.
-   * @return the altered thread group to allow for fluent API usage.
+   * @return the thread group for further configuration or usage.
    * @see SampleErrorAction
    */
   public T sampleErrorAction(SampleErrorAction sampleErrorAction) {
@@ -45,10 +45,10 @@ public abstract class BaseThreadGroup<T extends BaseThreadGroup<?>> extends
    * Allows specifying thread group children elements (samplers, listeners, post processors, etc.).
    *
    * @param children list of test elements to add as children of the thread group.
-   * @return the altered thread group to allow for fluent API usage.
+   * @return the thread group for further configuration or usage.
    */
   public T children(ThreadGroupChild... children) {
-    return (T) addChildren(children);
+    return super.children(children);
   }
 
   @Override

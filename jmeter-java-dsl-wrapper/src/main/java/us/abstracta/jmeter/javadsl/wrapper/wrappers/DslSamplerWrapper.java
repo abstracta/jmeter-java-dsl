@@ -18,7 +18,7 @@ import us.abstracta.jmeter.javadsl.core.samplers.BaseSampler;
 public class DslSamplerWrapper extends BaseSampler<DslSamplerWrapper> implements
     TestElementWrapper<DslSamplerWrapper> {
 
-  private final TestElementWrapperHelper<Sampler> helper;
+  protected final TestElementWrapperHelper<Sampler> helper;
 
   public DslSamplerWrapper(String name, Sampler testElement, AbstractSamplerGui guiComponent) {
     super(solveName(name, testElement, guiComponent), solveGuiClass(testElement, guiComponent));

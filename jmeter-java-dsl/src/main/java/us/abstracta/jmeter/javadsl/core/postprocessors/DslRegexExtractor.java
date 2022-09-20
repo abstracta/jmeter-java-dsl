@@ -24,9 +24,9 @@ import us.abstracta.jmeter.javadsl.codegeneration.params.StringParam;
  */
 public class DslRegexExtractor extends DslVariableExtractor<DslRegexExtractor> {
 
-  private final String regex;
-  private String template = "$1$";
-  private TargetField fieldToCheck = TargetField.RESPONSE_BODY;
+  protected String regex;
+  protected String template = "$1$";
+  protected TargetField fieldToCheck = TargetField.RESPONSE_BODY;
 
   public DslRegexExtractor(String varName, String regex) {
     super("Regular Expression Extractor", RegexExtractorGui.class, varName);
@@ -47,7 +47,7 @@ public class DslRegexExtractor extends DslVariableExtractor<DslRegexExtractor> {
    * <variableName>_matchNr}, and default value is assigned to {@code <variableName>}.
    *
    * @param matchNumber specifies the match number to use.
-   * @return the DslRegexExtractor to allow fluent usage and setting other properties.
+   * @return the extractor for further configuration or usage.
    */
   public DslRegexExtractor matchNumber(int matchNumber) {
     this.matchNumber = matchNumber;
@@ -70,7 +70,7 @@ public class DslRegexExtractor extends DslVariableExtractor<DslRegexExtractor> {
    * When not specified {@code $1$ will be used}.
    *
    * @param template specifies template to use for storing in the JMeter variable.
-   * @return the DslRegexExtractor to allow fluent usage and setting other properties.
+   * @return the extractor for further configuration or usage.
    */
   public DslRegexExtractor template(String template) {
     this.template = template;
@@ -89,7 +89,7 @@ public class DslRegexExtractor extends DslVariableExtractor<DslRegexExtractor> {
    * When not specified then the variable will not be set if no match is found.
    *
    * @param defaultValue specifies the default value to be used.
-   * @return the DslRegexExtractor to allow fluent usage and setting other properties.
+   * @return the extractor for further configuration or usage.
    */
   public DslRegexExtractor defaultValue(String defaultValue) {
     this.defaultValue = defaultValue;
@@ -102,7 +102,7 @@ public class DslRegexExtractor extends DslVariableExtractor<DslRegexExtractor> {
    * When not specified then the regular extractor will be applied to the response body.
    *
    * @param fieldToCheck field to apply the regular extractor to.
-   * @return the DslRegexExtractor to allow fluent usage and setting other properties.
+   * @return the extractor for further configuration or usage.
    * @see TargetField
    */
   public DslRegexExtractor fieldToCheck(TargetField fieldToCheck) {

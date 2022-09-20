@@ -11,17 +11,16 @@ import org.apache.jmeter.control.GenericController;
 import org.apache.jmeter.control.gui.AbstractControllerGui;
 import org.apache.jmeter.testelement.TestElement;
 import us.abstracta.jmeter.javadsl.core.controllers.BaseController;
-import us.abstracta.jmeter.javadsl.core.threadgroups.BaseThreadGroup.ThreadGroupChild;
 
 /**
  * Is a {@link TestElementWrapper} for JMeter controllers.
  *
  * @since 0.41
  */
-public class DslControllerWrapper extends BaseController implements
+public class DslControllerWrapper extends BaseController<DslControllerWrapper> implements
     TestElementWrapper<DslControllerWrapper> {
 
-  private final TestElementWrapperHelper<Controller> helper;
+  protected final TestElementWrapperHelper<Controller> helper;
 
   public DslControllerWrapper(String name, Controller testElement,
       AbstractControllerGui guiComponent) {
@@ -33,16 +32,6 @@ public class DslControllerWrapper extends BaseController implements
   public DslControllerWrapper prop(String name, Object value) {
     helper.prop(name, value);
     return this;
-  }
-
-  /**
-   * Allows specifying controller children elements (samplers, listeners, post processors, etc.).
-   *
-   * @param children list of test elements to add as children of the controller.
-   * @return the altered controller for further configuration or usage.
-   */
-  public DslControllerWrapper children(ThreadGroupChild... children) {
-    return (DslControllerWrapper) addChildren(children);
   }
 
   @Override

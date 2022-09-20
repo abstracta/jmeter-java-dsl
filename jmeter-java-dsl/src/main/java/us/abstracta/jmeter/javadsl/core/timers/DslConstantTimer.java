@@ -28,7 +28,7 @@ import us.abstracta.jmeter.javadsl.codegeneration.params.LongParam;
  */
 public class DslConstantTimer extends BaseTimer {
 
-  private final long durationMillis;
+  protected long durationMillis;
 
   public DslConstantTimer(long durationMillis) {
     super("Constant Timer", ConstantTimerGui.class);

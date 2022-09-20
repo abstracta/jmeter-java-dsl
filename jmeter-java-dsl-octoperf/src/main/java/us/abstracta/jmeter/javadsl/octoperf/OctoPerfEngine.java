@@ -88,7 +88,7 @@ public class OctoPerfEngine implements DslJmeterEngine {
    * When not specified, the project name defaults to "jmeter-java-dsl".
    *
    * @param projectName specifies the name of the project to use in OctoPerf.
-   * @return the modified instance for fluent API usage.
+   * @return the engine for further configuration or usage.
    */
   public OctoPerfEngine projectName(String projectName) {
     this.projectName = projectName;
@@ -103,7 +103,7 @@ public class OctoPerfEngine implements DslJmeterEngine {
    * When not specified, then 1 will be used.
    *
    * @param totalUsers number of virtual users to run the test with.
-   * @return the modified instance for fluent API usage.
+   * @return the engine for further configuration or usage.
    */
   public OctoPerfEngine totalUsers(int totalUsers) {
     this.totalUsers = totalUsers;
@@ -123,7 +123,7 @@ public class OctoPerfEngine implements DslJmeterEngine {
    * When not specified, 0 will be used.
    *
    * @param rampUp duration that OctoPerf will take to spin up all the virtual users.
-   * @return the modified instance for fluent API usage.
+   * @return the engine for further configuration or usage.
    */
   public OctoPerfEngine rampUpFor(Duration rampUp) {
     this.rampUp = rampUp;
@@ -137,7 +137,7 @@ public class OctoPerfEngine implements DslJmeterEngine {
    * When not specified it will use 10 seconds by default.
    *
    * @param holdFor duration to keep virtual users running after the rampUp period.
-   * @return the modified instance for fluent API usage.
+   * @return the engine for further configuration or usage.
    */
   public OctoPerfEngine holdFor(Duration holdFor) {
     this.holdFor = holdFor;
@@ -161,7 +161,7 @@ public class OctoPerfEngine implements DslJmeterEngine {
    *
    * @param testTimeout to be used as time limit for test execution. If execution takes more than
    *                    this, then a TimeoutException will be thrown by the engine.
-   * @return the modified instance for fluent API usage.
+   * @return the engine for further configuration or usage.
    */
   public OctoPerfEngine testTimeout(Duration testTimeout) {
     this.testTimeout = testTimeout;
@@ -176,8 +176,9 @@ public class OctoPerfEngine implements DslJmeterEngine {
    * before creating new ones, all virtual users and scenarios previously created by jmeter-java-dsl
    * (the ones that contain jmeter-java-dsl tag). This method allows to disable such logic.
    *
-   * @param enabled specifies to enable the automatic clean up or disable it when false.
-   * @return the modified instance for fluent API usage.
+   * @param enabled specifies to enable the automatic clean up or disable it when false. By default,
+   *                this is set to true.
+   * @return the engine for further configuration or usage.
    */
   public OctoPerfEngine projectCleanUp(boolean enabled) {
     this.projectCleanUp = enabled;

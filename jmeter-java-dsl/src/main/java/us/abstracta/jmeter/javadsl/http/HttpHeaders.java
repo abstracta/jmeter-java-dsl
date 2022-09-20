@@ -34,7 +34,7 @@ import us.abstracta.jmeter.javadsl.core.configs.BaseConfigElement;
  */
 public class HttpHeaders extends BaseConfigElement {
 
-  private final Map<String, String> headers = new LinkedHashMap<>();
+  protected final Map<String, String> headers = new LinkedHashMap<>();
 
   public HttpHeaders() {
     super("HTTP Header Manager", HeaderPanel.class);
@@ -48,7 +48,7 @@ public class HttpHeaders extends BaseConfigElement {
    *
    * @param name  of the HTTP header.
    * @param value of the HTTP header.
-   * @return the altered HttpHeaders to allow for fluent API usage.
+   * @return the config element for further configuration or usage.
    */
   public HttpHeaders header(String name, String value) {
     headers.put(name, value);
@@ -59,12 +59,11 @@ public class HttpHeaders extends BaseConfigElement {
    * Allows to easily specify the Content-Type HTTP header.
    *
    * @param contentType value to use as Content-Type header.
-   * @return the altered HttpHeaders to allow for fluent API usage.
+   * @return the config element for further configuration or usage.
    * @since 0.42
    */
   public HttpHeaders contentType(ContentType contentType) {
-    headers.put(HTTPConstants.HEADER_CONTENT_TYPE, contentType.toString());
-    return this;
+    return header(HTTPConstants.HEADER_CONTENT_TYPE, contentType.toString());
   }
 
   public boolean isEmpty() {

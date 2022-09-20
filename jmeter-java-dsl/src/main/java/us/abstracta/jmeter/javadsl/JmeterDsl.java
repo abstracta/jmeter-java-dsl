@@ -1153,7 +1153,7 @@ public class JmeterDsl {
    * @since 0.11
    */
   public static DslResponseAssertion responseAssertion() {
-    return new DslResponseAssertion(null);
+    return new DslResponseAssertion((String) null);
   }
 
   /**

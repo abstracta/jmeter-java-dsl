@@ -58,7 +58,7 @@ public class PercentControllerTest extends JmeterDslTest {
       return testPlan(
           threadGroup(1, 1,
               percentController(10.0f)
-                  .perThread(true)
+                  .perThread()
                   .children(
                       httpSampler("http://myservice")
                   )

@@ -19,7 +19,7 @@ import us.abstracta.jmeter.javadsl.core.testelements.MultiLevelTestElement;
 public class MultiLevelTestElementWrapper extends BaseTestElement implements MultiLevelTestElement,
     TestElementWrapper<MultiLevelTestElement> {
 
-  private final TestElementWrapperHelper<TestElement> helper;
+  protected final TestElementWrapperHelper<TestElement> helper;
 
   public MultiLevelTestElementWrapper(String name, TestElement testElement,
       JMeterGUIComponent guiComponent) {
