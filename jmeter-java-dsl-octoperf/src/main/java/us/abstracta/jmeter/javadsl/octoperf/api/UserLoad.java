@@ -9,6 +9,7 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import org.apache.jmeter.threads.ThreadGroup;
 import us.abstracta.jmeter.javadsl.core.threadgroups.BaseThreadGroup.SampleErrorAction;
 
 public class UserLoad {
@@ -71,6 +72,15 @@ public class UserLoad {
       this.userload = userLoad;
       this.rampup = rampUpMillis;
       this.peak = peakMillis;
+    }
+
+    public static UserLoadRampUp fromThreadGroup(ThreadGroup threadGroup) {
+      if (threadGroup == null) {
+        return new UserLoadRampUp(1, 0, 10000);
+      }
+      return new UserLoadRampUp(threadGroup.getNumThreads(),
+          threadGroup.getRampUp() * 1000L,
+          threadGroup.getDuration() != 0 ? threadGroup.getDuration() * 1000L : 10000);
     }
 
   }

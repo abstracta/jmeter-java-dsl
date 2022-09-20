@@ -15,6 +15,7 @@ import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 import org.apache.jorphan.collections.HashTree;
 import org.apache.jorphan.collections.ListedHashTree;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import us.abstracta.jmeter.javadsl.core.BuildTreeContext;
@@ -55,9 +56,9 @@ public class OctoPerfEngine implements DslJmeterEngine {
 
   private final String apiKey;
   private String projectName = "jmeter-java-dsl";
-  private int totalUsers = 1;
-  private Duration rampUp = Duration.ZERO;
-  private Duration holdFor = Duration.ofSeconds(10);
+  private Integer totalUsers = null;
+  private Duration rampUp = null;
+  private Duration holdFor = null;
   private Duration testTimeout = Duration.ofHours(1);
   private boolean projectCleanUp = true;
 
@@ -100,7 +101,9 @@ public class OctoPerfEngine implements DslJmeterEngine {
    * <p>
    * This value overwrites any value specified in JMeter test plans thread groups.
    * <p>
-   * When not specified, then 1 will be used.
+   * When no configuration is given for totalUsers, rampUpFor or holdFor, then configuration will be
+   * taken from the first default thread group found in the test plan. Otherwise, when no totalUsers
+   * is specified, 1 user will be used.
    *
    * @param totalUsers number of virtual users to run the test with.
    * @return the engine for further configuration or usage.
@@ -120,7 +123,9 @@ public class OctoPerfEngine implements DslJmeterEngine {
    * <p>
    * This value overwrites any value specified in JMeter test plans thread groups.
    * <p>
-   * When not specified, 0 will be used.
+   * When no configuration is given for totalUsers, rampUpFor or holdFor, then configuration will be
+   * taken from the first default thread group found in the test plan. Otherwise, when no ramp up is
+   * specified, 0 ramp-up will be used.
    *
    * @param rampUp duration that OctoPerf will take to spin up all the virtual users.
    * @return the engine for further configuration or usage.
@@ -134,7 +139,10 @@ public class OctoPerfEngine implements DslJmeterEngine {
    * Specifies the duration of time to keep the virtual users running, after the rampUp period.
    * <p>
    * When specified, this value overwrites any value specified in JMeter test plans thread groups.
-   * When not specified it will use 10 seconds by default.
+   * <p>
+   * When no configuration is given for totalUsers, rampUpFor or holdFor, then configuration will be
+   * taken from the first default thread group found in the test plan. Otherwise, when no hold for
+   * is specified, 10 seconds hold for will be used.
    *
    * @param holdFor duration to keep virtual users running after the rampUp period.
    * @return the engine for further configuration or usage.
@@ -195,12 +203,14 @@ public class OctoPerfEngine implements DslJmeterEngine {
       if (projectCleanUp) {
         cleanUpProject(project, client);
       }
-      saveTestPlanTo(testPlan, jmxFile);
+      JmeterEnvironment env = new JmeterEnvironment();
+      HashTree tree = buildTree(testPlan);
+      saveTestPlanTo(jmxFile, tree, env);
       LOG.info("Importing JMX file into project...");
       List<VirtualUser> vus = client.importJmx(project, jmxFile);
       vus.forEach(vu -> LOG.info("Created virtual user {}", vu.getUrl()));
       tagVirtualUsers(vus, client);
-      Scenario scenario = buildScenario(user, project, vus, client);
+      Scenario scenario = buildScenario(user, project, vus, tree, client);
       BenchReport report = client.runScenario(scenario);
       LOG.info("Running scenario in {}", report.getUrl());
       Instant testStart = Instant.now();
@@ -250,19 +260,23 @@ public class OctoPerfEngine implements DslJmeterEngine {
     }
   }
 
-  private void saveTestPlanTo(DslTestPlan testPlan, File jmxFile) throws IOException {
-    JmeterEnvironment env = new JmeterEnvironment();
+  private void saveTestPlanTo(File jmxFile, HashTree tree, JmeterEnvironment env)
+      throws IOException {
     try (FileOutputStream output = new FileOutputStream(jmxFile.getPath())) {
-      HashTree tree = new ListedHashTree();
-      BuildTreeContext context = new BuildTreeContext();
-      context.buildTreeFor(testPlan, tree);
       env.saveTree(tree, output);
-      context.getVisualizers().forEach((v, e) ->
-          LOG.warn(
-              "OctoPerfEngine does not currently support displaying visualizers. Ignoring {}.",
-              v.getClass().getSimpleName())
-      );
     }
+  }
+
+  private HashTree buildTree(DslTestPlan testPlan) {
+    HashTree ret = new ListedHashTree();
+    BuildTreeContext context = new BuildTreeContext();
+    context.buildTreeFor(testPlan, ret);
+    context.getVisualizers().forEach((v, e) ->
+        LOG.warn(
+            "OctoPerfEngine does not currently support displaying visualizers. Ignoring {}.",
+            v.getClass().getSimpleName())
+    );
+    return ret;
   }
 
   private void tagVirtualUsers(List<VirtualUser> vus, OctoPerfClient client) throws IOException {
@@ -273,18 +287,27 @@ public class OctoPerfEngine implements DslJmeterEngine {
   }
 
   private Scenario buildScenario(User user, Project project, List<VirtualUser> vus,
-      OctoPerfClient client)
+      HashTree tree, OctoPerfClient client)
       throws IOException {
     Provider provider = client.findProviderByWorkspace(project.getWorkspace());
     String defaultRegion = provider.getRegions().keySet().iterator().next();
     List<UserLoad> userLoads = vus.stream()
         .map(vu -> new UserLoad(vu.getId(), provider.getId(), defaultRegion,
-            new UserLoadRampUp(totalUsers, rampUp.toMillis(), holdFor.toMillis())))
+            buildUserLoadConfig(tree)))
         .collect(Collectors.toList());
     Scenario ret = client.createScenario(
         new Scenario(user, project, projectName, userLoads, TAGS));
     LOG.info("Created scenario {}", ret.getUrl());
     return ret;
+  }
+
+  @NotNull
+  private UserLoadRampUp buildUserLoadConfig(HashTree tree) {
+    return (totalUsers == null && rampUp == null && holdFor == null)
+        ? UserLoadRampUp.fromThreadGroup(extractFirstThreadGroup(tree))
+        : new UserLoadRampUp(totalUsers != null ? totalUsers : 1,
+            rampUp != null ? rampUp.toMillis() : 0,
+            holdFor != null ? holdFor.toMillis() : 10000);
   }
 
   private BenchResult awaitTestEnd(BenchReport report, Instant testStart, OctoPerfClient client)

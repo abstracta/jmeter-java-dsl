@@ -2,8 +2,10 @@ package us.abstracta.jmeter.javadsl.blazemeter.api;
 
 import java.io.File;
 import java.time.Duration;
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
+import org.apache.jmeter.control.LoopController;
+import org.apache.jmeter.threads.ThreadGroup;
 
 public class TestConfig {
 
@@ -11,7 +13,7 @@ public class TestConfig {
   private long projectId;
   private final boolean shouldSendReportEmail = false;
   private final Configuration configuration = new Configuration();
-  private final List<Execution> overrideExecutions = Collections.singletonList(new Execution());
+  private final List<ExecutionConfig> overrideExecutions = new ArrayList<>();
 
   public TestConfig name(String name) {
     this.name = name;
@@ -28,28 +30,9 @@ public class TestConfig {
     return this;
   }
 
-  public TestConfig totalUsers(Integer totalUsers) {
-    this.overrideExecutions.get(0).concurrency = totalUsers;
-    return this;
-  }
-
-  public TestConfig rampUp(Duration rampUp) {
-    this.overrideExecutions.get(0).rampUp = buildDurationMinutesString(rampUp);
-    return this;
-  }
-
-  private String buildDurationMinutesString(Duration duration) {
-    return duration != null ? Math.round(Math.ceil((double) duration.getSeconds() / 60)) + "m"
-        : null;
-  }
-
-  public TestConfig iterations(Integer iterations) {
-    this.overrideExecutions.get(0).iterations = iterations;
-    return this;
-  }
-
-  public TestConfig holdFor(Duration holdFor) {
-    this.overrideExecutions.get(0).holdFor = buildDurationMinutesString(holdFor);
+  public TestConfig execConfig(ExecutionConfig config) {
+    overrideExecutions.clear();
+    overrideExecutions.add(config);
     return this;
   }
 
@@ -67,12 +50,36 @@ public class TestConfig {
 
   }
 
-  private static class Execution {
+  public static class ExecutionConfig {
 
     private Integer concurrency;
     private String rampUp;
     private Integer iterations;
     private String holdFor;
+
+    public ExecutionConfig(Integer totalUsers, Duration rampUp, Integer iterations,
+        Duration holdFor) {
+      concurrency = totalUsers;
+      this.rampUp = buildDurationMinutesString(rampUp);
+      this.iterations = iterations;
+      this.holdFor = buildDurationMinutesString(holdFor);
+    }
+
+    private String buildDurationMinutesString(Duration duration) {
+      return duration != null ? Math.round(Math.ceil((double) duration.getSeconds() / 60)) + "m"
+          : null;
+    }
+
+    public static ExecutionConfig fromThreadGroup(ThreadGroup threadGroup) {
+      if (threadGroup == null) {
+        return new ExecutionConfig(1, Duration.ZERO, null, Duration.ofSeconds(10));
+      }
+      LoopController loop = (LoopController) threadGroup.getSamplerController();
+      return new ExecutionConfig(threadGroup.getNumThreads(),
+          Duration.ofSeconds(threadGroup.getRampUp()),
+          loop.getLoops() != 0 ? loop.getLoops() : null,
+          threadGroup.getDuration() != 0 ? Duration.ofSeconds(threadGroup.getDuration()) : null);
+    }
 
   }
 

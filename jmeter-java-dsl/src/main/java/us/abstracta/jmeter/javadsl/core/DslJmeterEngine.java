@@ -1,7 +1,10 @@
 package us.abstracta.jmeter.javadsl.core;
 
 import java.io.IOException;
+import java.util.Optional;
 import java.util.concurrent.TimeoutException;
+import org.apache.jmeter.threads.ThreadGroup;
+import org.apache.jorphan.collections.HashTree;
 
 /**
  * Interface to be implemented by classes allowing to run a DslTestPlan in different engines.
@@ -24,5 +27,14 @@ public interface DslJmeterEngine {
    */
   TestPlanStats run(DslTestPlan testPlan)
       throws IOException, InterruptedException, TimeoutException;
+
+  default ThreadGroup extractFirstThreadGroup(HashTree tree) {
+    HashTree testPlanTree = tree.getTree(tree.list().iterator().next());
+    return (ThreadGroup) testPlanTree.list().stream()
+        // we don't want to catch subclasses (setup & teardown), only exact class.
+        .filter(e -> e.getClass() == ThreadGroup.class)
+        .findFirst()
+        .orElse(null);
+  }
 
 }

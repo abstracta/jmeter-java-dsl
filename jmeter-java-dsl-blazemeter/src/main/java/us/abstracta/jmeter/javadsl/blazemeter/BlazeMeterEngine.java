@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import us.abstracta.jmeter.javadsl.blazemeter.api.Project;
 import us.abstracta.jmeter.javadsl.blazemeter.api.Test;
 import us.abstracta.jmeter.javadsl.blazemeter.api.TestConfig;
+import us.abstracta.jmeter.javadsl.blazemeter.api.TestConfig.ExecutionConfig;
 import us.abstracta.jmeter.javadsl.blazemeter.api.TestRun;
 import us.abstracta.jmeter.javadsl.blazemeter.api.TestRunConfig;
 import us.abstracta.jmeter.javadsl.blazemeter.api.TestRunRequestStats;
@@ -150,8 +151,9 @@ public class BlazeMeterEngine implements DslJmeterEngine {
    * <p>
    * This value overwrites any value specified in JMeter test plans thread groups.
    * <p>
-   * When not specified, then the last test run (with same name) value or 1 (if none has ever been
-   * specified) will be used.
+   * When no configuration is given for totalUsers, rampUpFor, iterations or holdFor, then
+   * configuration will be taken from the first default thread group found in the test plan.
+   * Otherwise, when no totalUsers is specified, 1 total user for will be used.
    *
    * @param totalUsers number of virtual users to run the test with.
    * @return the engine for further configuration or usage.
@@ -175,8 +177,9 @@ public class BlazeMeterEngine implements DslJmeterEngine {
    * granular than minutes, so, if you use a finer grain duration, it will be rounded up to minutes
    * (eg: if you specify 61 seconds, this will be translated into 2 minutes).
    * <p>
-   * When not specified, the last test run (with same name) value or 0 (if none has ever been
-   * specified) will be used.
+   * When no configuration is given for totalUsers, rampUpFor, iterations or holdFor, then
+   * configuration will be taken from the first default thread group found in the test plan.
+   * Otherwise, when no ramp up is specified, 0 ramp up will be used.
    *
    * @param rampUp duration that BlazeMeter will take to spin up all the virtual users.
    * @return the engine for further configuration or usage.
@@ -195,7 +198,9 @@ public class BlazeMeterEngine implements DslJmeterEngine {
    * When neither iterations and holdFor are specified, then the last test run configuration is
    * used, or the criteria specified in the JMeter test plan if no previous test run exists.
    * <p>
-   * When specified, this value overwrites any value specified in JMeter test plans thread groups.
+   * When no configuration is given for totalUsers, rampUpFor, iterations or holdFor, then
+   * configuration will be taken from the first default thread group found in the test plan.
+   * Otherwise, when no iterations are specified, infinite iterations will be used.
    *
    * @param iterations for each virtual users to execute.
    * @return the engine for further configuration or usage.
@@ -218,7 +223,9 @@ public class BlazeMeterEngine implements DslJmeterEngine {
    * granular than minutes, so, if you use a finer grain duration, it will be rounded up to minutes
    * (eg: if you specify 61 seconds, this will be translated into 2 minutes).
    * <p>
-   * When specified, this value overwrites any value specified in JMeter test plans thread groups.
+   * When no configuration is given for totalUsers, rampUpFor, iterations or holdFor, then
+   * configuration will be taken from the first default thread group found in the test plan.
+   * Otherwise, when no hold for or iterations are specified, 10 seconds hold for will be used.
    *
    * @param holdFor duration to keep virtual users running after the rampUp period.
    * @return the engine for further configuration or usage.
@@ -294,9 +301,11 @@ public class BlazeMeterEngine implements DslJmeterEngine {
      */
     File jmxFile = Files.createTempDirectory("jmeter-dsl").resolve("test.jmx").toFile();
     try {
-      saveTestPlanTo(testPlan, jmxFile);
+      JmeterEnvironment env = new JmeterEnvironment();
+      HashTree tree = buildTree(testPlan);
+      saveTestPlanTo(jmxFile, tree, env);
       Test test = client.findTestByName(testName, project).orElse(null);
-      TestConfig testConfig = buildTestConfig(project, jmxFile);
+      TestConfig testConfig = buildTestConfig(project, jmxFile, tree);
       if (test != null) {
         client.updateTest(test, testConfig);
         LOG.info("Updated test {}", test.getUrl());
@@ -322,30 +331,38 @@ public class BlazeMeterEngine implements DslJmeterEngine {
         : client.findProjectById(this.projectId, appBaseUrl);
   }
 
-  private void saveTestPlanTo(DslTestPlan testPlan, File jmxFile) throws IOException {
-    JmeterEnvironment env = new JmeterEnvironment();
+  private HashTree buildTree(DslTestPlan testPlan) throws IOException {
+    HashTree ret = new ListedHashTree();
+    BuildTreeContext context = new BuildTreeContext();
+    context.buildTreeFor(testPlan, ret);
+    context.getVisualizers().forEach((v, e) ->
+        LOG.warn(
+            "BlazeMeterEngine does not currently support displaying visualizers. Ignoring {}.",
+            v.getClass().getSimpleName())
+    );
+    return ret;
+  }
+
+  private void saveTestPlanTo(File jmxFile, HashTree tree, JmeterEnvironment env)
+      throws IOException {
     try (FileOutputStream output = new FileOutputStream(jmxFile.getPath())) {
-      HashTree tree = new ListedHashTree();
-      BuildTreeContext context = new BuildTreeContext();
-      context.buildTreeFor(testPlan, tree);
       env.saveTree(tree, output);
-      context.getVisualizers().forEach((v, e) ->
-          LOG.warn(
-              "BlazeMeterEngine does not currently support displaying visualizers. Ignoring {}.",
-              v.getClass().getSimpleName())
-      );
     }
   }
 
-  private TestConfig buildTestConfig(Project project, File jmxFile) {
+  private TestConfig buildTestConfig(Project project, File jmxFile, HashTree tree) {
+    ExecutionConfig execConfig =
+        (totalUsers == null && rampUp == null && iterations == null && holdFor == null)
+            ? ExecutionConfig.fromThreadGroup(extractFirstThreadGroup(tree))
+            : new ExecutionConfig(totalUsers != null ? totalUsers : 1,
+                rampUp != null ? rampUp : Duration.ZERO,
+                iterations != null ? iterations : -1,
+                holdFor != null ? holdFor : (iterations != null ? null : Duration.ofSeconds(10)));
     return new TestConfig()
         .name(testName)
         .projectId(project.getId())
         .jmxFile(jmxFile)
-        .totalUsers(totalUsers)
-        .rampUp(rampUp)
-        .iterations(iterations)
-        .holdFor(holdFor)
+        .execConfig(execConfig)
         .threadsPerEngine(threadsPerEngine);
   }
 
