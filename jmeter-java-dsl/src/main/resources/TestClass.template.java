@@ -29,7 +29,7 @@ public class PerformanceTest {
                 .build(),
             summaryListener);
     TestExecutionSummary summary = summaryListener.getSummary();
-    summary.printFailuresTo(new PrintWriter(System.out));
+    summary.printFailuresTo(new PrintWriter(System.err));
     System.exit(summary.getTotalFailureCount() > 0 ? 1 : 0);
   }
 

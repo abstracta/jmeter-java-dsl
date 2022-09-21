@@ -31,9 +31,9 @@ public class DslPerformanceTest {
 
   private String buildDependencies() {
     TreeSet<String> dependencyPaths = new TreeSet<>(Arrays.asList(
-        "org.junit.jupiter:junit-jupiter-engine:5.8.2",
-        "org.junit.platform:junit-platform-launcher:1.8.2",
-        "org.assertj:assertj-core:3.22.0"
+        "org.junit.jupiter:junit-jupiter-engine:5.9.0",
+        "org.junit.platform:junit-platform-launcher:1.9.0",
+        "org.assertj:assertj-core:3.23.1"
     ));
     dependencyPaths.addAll(dependencies.entrySet().stream()
         .filter(e -> testPlanMethodCall.getStaticImports().contains(e.getKey())

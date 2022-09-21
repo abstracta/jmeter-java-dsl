@@ -76,7 +76,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-shade-plugin</artifactId>
-        <version>3.3.0</version>
+        <version>3.4.0</version>
         <executions>
           <execution>
             <phase>package</phase>
@@ -113,6 +113,11 @@
                   <include>kg.apc:jmeter-plugins-casutg</include>
                   <include>com.blazemeter:jmeter-plugins-random-csv-data-set</include>
                   <include>info.picocli:*</include>
+                  <include>com.fifesoft:rsyntaxtextarea</include>
+                  <include>com.github.weisj:darklaf-extensions-rsyntaxarea</include>
+                  <include>com.github.weisj:darklaf-theme</include>
+                  <include>com.github.weisj:darklaf-core</include>
+                  <include>com.github.weisj:darklaf-utils</include>
                 </includes>
                 <excludes>
                   <exclude>kg.apc:jmeter-plugins-charts</exclude>
