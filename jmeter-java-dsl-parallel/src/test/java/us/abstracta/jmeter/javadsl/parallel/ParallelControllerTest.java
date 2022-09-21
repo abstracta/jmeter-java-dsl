@@ -7,9 +7,12 @@ import static us.abstracta.jmeter.javadsl.JmeterDsl.threadGroup;
 import static us.abstracta.jmeter.javadsl.parallel.ParallelController.parallelController;
 
 import java.util.concurrent.CyclicBarrier;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
 import us.abstracta.jmeter.javadsl.JmeterDslTest;
+import us.abstracta.jmeter.javadsl.codegeneration.MethodCallBuilderTest;
+import us.abstracta.jmeter.javadsl.core.DslTestPlan;
 
 public class ParallelControllerTest extends JmeterDslTest {
 
@@ -28,6 +31,40 @@ public class ParallelControllerTest extends JmeterDslTest {
             )
         )
     ).run();
+  }
+
+  @Nested
+  public class CodeBuilderTest extends MethodCallBuilderTest {
+
+    public CodeBuilderTest() {
+      codeGenerator.addBuildersFrom(ParallelController.class);
+    }
+
+    public DslTestPlan testPlanWithParallelController() {
+      return testPlan(
+          threadGroup(1, 1,
+              parallelController(
+                  httpSampler("http://localhost"),
+                  httpSampler("http://localhost")
+              )
+          )
+      );
+    }
+
+    public DslTestPlan testPlanWithParallelWithNonDefaultSettings() {
+      return testPlan(
+          threadGroup(1, 1,
+              parallelController()
+                  .generateParentSample()
+                  .maxThreads(5)
+                  .children(
+                      httpSampler("http://localhost"),
+                      httpSampler("http://localhost")
+                  )
+          )
+      );
+    }
+
   }
 
 }

@@ -12,6 +12,7 @@ import picocli.CommandLine.Parameters;
 import us.abstracta.jmeter.javadsl.JmeterDsl;
 import us.abstracta.jmeter.javadsl.codegeneration.DslCodeGenerator;
 import us.abstracta.jmeter.javadsl.graphql.DslGraphqlSampler;
+import us.abstracta.jmeter.javadsl.parallel.ParallelController;
 import us.abstracta.jmeter.javadsl.wrapper.WrapperJmeterDsl;
 
 @Command(name = "jmx2dsl", mixinStandardHelpOptions = true,
@@ -40,6 +41,7 @@ public class Jmx2Dsl implements Callable<Integer> {
     DslCodeGenerator codeGenerator = new DslCodeGenerator();
     addBuildersFrom(JmeterDsl.class, "jmeter-java-dsl", codeGenerator);
     addBuildersFrom(DslGraphqlSampler.class, "jmeter-java-dsl-graphql", codeGenerator);
+    addBuildersFrom(ParallelController.class, "jmeter-java-dsl-parallel", codeGenerator);
     addBuildersFrom(WrapperJmeterDsl.class, "jmeter-java-dsl-wrapper", codeGenerator);
     System.out.println(codeGenerator.generateCodeFromJmx(jmxFile));
     return 0;

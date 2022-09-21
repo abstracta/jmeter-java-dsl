@@ -2,10 +2,16 @@ package us.abstracta.jmeter.javadsl.parallel;
 
 import com.blazemeter.jmeter.controller.ParallelControllerGui;
 import com.blazemeter.jmeter.controller.ParallelSampler;
+import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import org.apache.jmeter.testelement.TestElement;
+import us.abstracta.jmeter.javadsl.codegeneration.MethodCall;
+import us.abstracta.jmeter.javadsl.codegeneration.MethodCallContext;
+import us.abstracta.jmeter.javadsl.codegeneration.SingleTestElementCallBuilder;
+import us.abstracta.jmeter.javadsl.codegeneration.TestElementParamBuilder;
+import us.abstracta.jmeter.javadsl.codegeneration.params.ChildrenParam;
 import us.abstracta.jmeter.javadsl.core.controllers.BaseController;
 import us.abstracta.jmeter.javadsl.core.threadgroups.BaseThreadGroup.ThreadGroupChild;
 
@@ -23,11 +29,12 @@ import us.abstracta.jmeter.javadsl.core.threadgroups.BaseThreadGroup.ThreadGroup
  */
 public class ParallelController extends BaseController<ParallelController> {
 
+  public static final String DEFAULT_NAME = "bzm - Parallel Controller";
   protected boolean generateParent = false;
   protected Integer maxThreads;
 
   public ParallelController(String name, List<ThreadGroupChild> children) {
-    super(name == null ? "bzm - Parallel Controller" : name, ParallelControllerGui.class, children);
+    super(name == null ? DEFAULT_NAME : name, ParallelControllerGui.class, children);
   }
 
   /**
@@ -44,12 +51,12 @@ public class ParallelController extends BaseController<ParallelController> {
    * Same as {@link #parallelController(ThreadGroupChild...)} but allowing to set a name on
    * controller.
    * <p>
-   * Setting the name of the controller is particularly useful when using {@link
-   * #generateParentSample(boolean)} to focus on transaction steps and properly identify associated
-   * metrics.
+   * Setting the name of the controller is particularly useful when using
+   * {@link #generateParentSample(boolean)} to focus on transaction steps and properly identify
+   * associated metrics.
    *
-   * @param name is the label assigned to the Parallel Controller, which will appear in collected
-   * metrics when {@link #generateParentSample(boolean)} is used.
+   * @param name     is the label assigned to the Parallel Controller, which will appear in
+   *                 collected metrics when {@link #generateParentSample(boolean)} is used.
    * @param children test elements to execute in parallel.
    * @return the controller for further configuration or usage.
    * @see #parallelController(ThreadGroupChild...)
@@ -68,7 +75,7 @@ public class ParallelController extends BaseController<ParallelController> {
    * @since 0.30.1
    */
   public static ParallelController parallelController() {
-    return parallelController(new ParallelController(null, Collections.emptyList()));
+    return parallelController((String) null);
   }
 
   /**
@@ -84,8 +91,8 @@ public class ParallelController extends BaseController<ParallelController> {
   }
 
   /**
-   * Specifies whether to generate a sample result containing children elements results as
-   * sub results.
+   * Specifies whether to generate a sample result containing children elements results as sub
+   * results.
    * <p>
    * Take into consideration that when this option is enabled, then only the parallel controller
    * sample result metrics will appear in metrics like summary results and similar. When generate
@@ -133,6 +140,26 @@ public class ParallelController extends BaseController<ParallelController> {
       ret.setLimitMaxThreadNumber(true);
     }
     return ret;
+  }
+
+  public static class CodeBuilder extends SingleTestElementCallBuilder<ParallelSampler> {
+
+    public CodeBuilder(List<Method> builderMethods) {
+      super(ParallelSampler.class, builderMethods);
+    }
+
+    @Override
+    protected MethodCall buildMethodCall(ParallelSampler testElement, MethodCallContext context) {
+      TestElementParamBuilder paramBuilder = new TestElementParamBuilder(testElement);
+      MethodCall ret = buildMethodCall(paramBuilder.nameParam(DEFAULT_NAME),
+          new ChildrenParam<>(ThreadGroupChild[].class))
+          .chain("generateParentSample", paramBuilder.boolParam("PARENT_SAMPLE", false));
+      if (!paramBuilder.boolParam("LIMIT_MAX_THREAD_NUMBER", false).isDefault()) {
+        ret.chain("maxThreads", paramBuilder.intParam("MAX_THREAD_NUMBER"));
+      }
+      return ret;
+    }
+
   }
 
 }

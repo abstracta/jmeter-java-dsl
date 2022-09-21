@@ -2,10 +2,25 @@ package us.abstracta.jmeter.javadsl.core.controllers;
 
 import com.blazemeter.jmeter.control.WeightedSwitchController;
 import com.blazemeter.jmeter.control.WeightedSwitchControllerGui;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import kg.apc.jmeter.JMeterPluginsUtils;
 import org.apache.jmeter.gui.util.PowerTableModel;
 import org.apache.jmeter.testelement.TestElement;
+import org.apache.jmeter.testelement.property.CollectionProperty;
+import org.apache.jmeter.testelement.property.JMeterProperty;
 import org.apache.jorphan.collections.HashTree;
+import us.abstracta.jmeter.javadsl.codegeneration.MethodCall;
+import us.abstracta.jmeter.javadsl.codegeneration.MethodCallContext;
+import us.abstracta.jmeter.javadsl.codegeneration.MethodParam;
+import us.abstracta.jmeter.javadsl.codegeneration.SingleTestElementCallBuilder;
+import us.abstracta.jmeter.javadsl.codegeneration.TestElementParamBuilder;
+import us.abstracta.jmeter.javadsl.codegeneration.params.ChildrenParam;
+import us.abstracta.jmeter.javadsl.codegeneration.params.LongParam;
 import us.abstracta.jmeter.javadsl.core.BuildTreeContext;
 import us.abstracta.jmeter.javadsl.core.samplers.DslSampler;
 import us.abstracta.jmeter.javadsl.core.threadgroups.BaseThreadGroup.ThreadGroupChild;
@@ -118,7 +133,7 @@ public class DslWeightedSwitchController extends BaseController<DslWeightedSwitc
   public HashTree buildTreeUnder(HashTree parent, BuildTreeContext context) {
     WeightedSwitchController controller = (WeightedSwitchController) buildConfiguredTestElement();
     HashTree ret = parent.add(controller);
-    PowerTableModel model = buildDataModel();
+    PowerTableModel model = buildTableModel();
     for (ThreadGroupChild child : children) {
       HashTree childTree = context.buildChild(child, ret);
       if (child instanceof WeightedChild) {
@@ -140,7 +155,7 @@ public class DslWeightedSwitchController extends BaseController<DslWeightedSwitc
         .orElseThrow(IllegalStateException::new);
   }
 
-  private PowerTableModel buildDataModel() {
+  private static PowerTableModel buildTableModel() {
     return new PowerTableModel(
         new String[]{"Name", WeightedSwitchController.WEIGHTS, "Enabled"},
         new Class[]{String.class, String.class, String.class}
@@ -149,6 +164,95 @@ public class DslWeightedSwitchController extends BaseController<DslWeightedSwitc
 
   private void addWeightedChildToModel(String name, long weight, PowerTableModel model) {
     model.addRow(new String[]{name, String.valueOf(weight), "true"});
+  }
+
+  public static class CodeBuilder extends SingleTestElementCallBuilder<WeightedSwitchController> {
+
+    public CodeBuilder(List<Method> builderMethods) {
+      super(WeightedSwitchController.class, builderMethods);
+    }
+
+    @Override
+    protected MethodCall buildMethodCall(WeightedSwitchController testElement,
+        MethodCallContext context) {
+      MethodCall ret = buildMethodCall();
+      Map<String, Long> weights = extractSamplersWeights(testElement);
+      chainChildren(ret, context, weights);
+      return ret;
+    }
+
+    private void chainChildren(MethodCall ret, MethodCallContext context,
+        Map<String, Long> weights) {
+      List<MethodCall> childrenCalls = new ArrayList<>();
+      List<Object> children = new ArrayList<>(context.getChildrenTree().list());
+      for (Object child : children) {
+        String childName = ((TestElement) child).getName();
+        MethodCall childCall = context.removeChild(t -> t == child).buildMethodCall();
+        if (weights.containsKey(childName)) {
+          appendChildrenCalls(childrenCalls, ret);
+          childrenCalls = new ArrayList<>();
+          ret.chain("child", new LongParam(weights.get(childName)), new ChildParam(childCall));
+        } else {
+          childrenCalls.add(childCall);
+        }
+      }
+      appendChildrenCalls(childrenCalls, ret);
+    }
+
+    private void appendChildrenCalls(List<MethodCall> children, MethodCall ret) {
+      if (!children.isEmpty()) {
+        ret.chain("children", new ChildrenParam<>(ThreadGroupChild[].class, children));
+      }
+    }
+
+    public Map<String, Long> extractSamplersWeights(WeightedSwitchController testElement) {
+      TestElementParamBuilder paramBuilder = new TestElementParamBuilder(testElement);
+      CollectionProperty weightsProp = (CollectionProperty) paramBuilder.prop(
+          WeightedSwitchController.WEIGHTS);
+      PowerTableModel tableModel = buildTableModel();
+      JMeterPluginsUtils.collectionPropertyToTableModelRows(weightsProp, tableModel);
+      Map<String, Long> ret = new HashMap<>();
+      for (int i = 0; i < tableModel.getRowCount(); i++) {
+        Object[] rowData = tableModel.getRowData(i);
+        long weight = Long.parseLong(stringProp(rowData[1]));
+        if (weight != DEFAULT_WEIGHT) {
+          ret.put(stringProp(rowData[0]), weight);
+        }
+      }
+      return ret;
+    }
+
+    private static String stringProp(Object val) {
+      return ((JMeterProperty) val).getStringValue();
+    }
+
+  }
+
+  private static class ChildParam extends MethodParam {
+
+    private final MethodCall child;
+
+    protected ChildParam(MethodCall child) {
+      super(DslSampler.class.isAssignableFrom(child.getReturnType()) ? DslSampler.class
+          : DslController.class, null);
+      this.child = child;
+    }
+
+    @Override
+    public Set<Class<?>> getStaticImports() {
+      return child.getStaticImports();
+    }
+
+    @Override
+    public Set<Class<?>> getImports() {
+      return child.getImports();
+    }
+
+    @Override
+    public String buildCode(String indent) {
+      return child.buildCode(indent);
+    }
+
   }
 
 }

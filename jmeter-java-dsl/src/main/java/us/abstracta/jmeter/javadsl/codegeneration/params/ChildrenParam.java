@@ -41,10 +41,15 @@ public class ChildrenParam<T> extends MethodParam {
       {DslListener.class}
   };
 
-  private final List<MethodCall> children = new ArrayList<>();
+  private final List<MethodCall> children;
 
   public ChildrenParam(Class<T> childrenClass) {
+    this(childrenClass, new ArrayList<>());
+  }
+
+  public ChildrenParam(Class<T> childrenClass, List<MethodCall> children) {
     super(checkChildrenType(childrenClass), null);
+    this.children = children;
   }
 
   private static <T> Class<T> checkChildrenType(Class<T> childrenClass) {
@@ -53,6 +58,11 @@ public class ChildrenParam<T> extends MethodParam {
           + "class for the children. Eg use TestPlanChild[].class");
     }
     return childrenClass;
+  }
+
+  @Override
+  public boolean isDefault() {
+    return children.isEmpty();
   }
 
   @Override

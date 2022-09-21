@@ -1174,7 +1174,7 @@ public class JmeterDsl {
    * Builds a Simple Data Writer to write all collected results to a JTL file.
    * <p>
    * This is just a handy short way of generating JTL files using as filename the template:
-   * <pre>{@code <YYYY-MM-DD HH-mm-ss> <UUID>.jtl}</pre>
+   * <pre>{@code <yyyy-MM-dd HH-mm-ss> <UUID>.jtl}</pre>
    * <p>
    * If you need to have a predictable name, consider using {@link #jtlWriter(String, String)}
    * instead.
@@ -1240,7 +1240,7 @@ public class JmeterDsl {
    * Builds an HTML Reporter which allows easily generating HTML reports for test plans.
    * <p>
    * This is just a handy short way of generating html reports following naming template
-   * <pre>{@code <YYYY-MM-DD HH-mm-ss> <UUID>}</pre>
+   * <pre>{@code <yyyy-MM-dd HH-mm-ss> <UUID>}</pre>
    * <p>
    * If you need to have a predictable report name, consider
    * using {@link #htmlReporter(String, String)} instead.

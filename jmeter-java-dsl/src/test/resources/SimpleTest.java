@@ -3,9 +3,9 @@
 These commented lines make the class executable if you have jbang installed by making file
 executable (eg: chmod +x ./PerformanceTest.java) and just executing it with ./PerformanceTest.java
 */
-//DEPS org.assertj:assertj-core:3.22.0
-//DEPS org.junit.jupiter:junit-jupiter-engine:5.8.2
-//DEPS org.junit.platform:junit-platform-launcher:1.8.2
+//DEPS org.assertj:assertj-core:3.23.1
+//DEPS org.junit.jupiter:junit-jupiter-engine:5.9.0
+//DEPS org.junit.platform:junit-platform-launcher:1.9.0
 //DEPS us.abstracta.jmeter:jmeter-java-dsl
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -50,7 +50,7 @@ public class PerformanceTest {
                 .build(),
             summaryListener);
     TestExecutionSummary summary = summaryListener.getSummary();
-    summary.printFailuresTo(new PrintWriter(System.out));
+    summary.printFailuresTo(new PrintWriter(System.err));
     System.exit(summary.getTotalFailureCount() > 0 ? 1 : 0);
   }
 

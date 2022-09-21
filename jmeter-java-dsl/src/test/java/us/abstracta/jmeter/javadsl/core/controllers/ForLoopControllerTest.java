@@ -13,8 +13,11 @@ import static us.abstracta.jmeter.javadsl.JmeterDsl.testPlan;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.threadGroup;
 
 import com.github.tomakehurst.wiremock.client.WireMock;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import us.abstracta.jmeter.javadsl.JmeterDslTest;
+import us.abstracta.jmeter.javadsl.codegeneration.MethodCallBuilderTest;
+import us.abstracta.jmeter.javadsl.core.DslTestPlan;
 import us.abstracta.jmeter.javadsl.core.TestPlanStats;
 
 public class ForLoopControllerTest extends JmeterDslTest {
@@ -70,6 +73,21 @@ public class ForLoopControllerTest extends JmeterDslTest {
         )
     ).run();
     assertThat(stats.overall().samplesCount()).isEqualTo(TEST_ITERATIONS * (1 +LOOP_ITERATIONS));
+  }
+
+  @Nested
+  public class CodeBuilderTest extends MethodCallBuilderTest {
+
+    public DslTestPlan testPlanWithForLoopController() {
+      return testPlan(
+          threadGroup(1, 1,
+              forLoopController("for", 5,
+                  httpSampler("http://localhost")
+              )
+          )
+      );
+    }
+
   }
 
 }

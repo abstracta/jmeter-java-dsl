@@ -35,6 +35,11 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
+      <groupId>us.abstracta.jmeter</groupId>
+      <artifactId>jmeter-java-dsl-parallel</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
       <groupId>info.picocli</groupId>
       <artifactId>picocli</artifactId>
       <version>${picocli.version}</version>
@@ -111,7 +116,10 @@
                   <include>org.apache.tika:tika-core</include>
                   <include>com.miglayout:*</include>
                   <include>kg.apc:jmeter-plugins-casutg</include>
+                  <include>kg.apc:jmeter-plugins-cmn-jmeter</include>
                   <include>com.blazemeter:jmeter-plugins-random-csv-data-set</include>
+                  <include>com.blazemeter:jmeter-plugins-wsc</include>
+                  <include>com.blazemeter:jmeter-parallel</include>
                   <include>info.picocli:*</include>
                   <include>com.fifesoft:rsyntaxtextarea</include>
                   <include>com.github.weisj:darklaf-extensions-rsyntaxarea</include>

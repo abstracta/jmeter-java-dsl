@@ -7,8 +7,11 @@ import static us.abstracta.jmeter.javadsl.JmeterDsl.testPlan;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.threadGroup;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.whileController;
 
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import us.abstracta.jmeter.javadsl.JmeterDslTest;
+import us.abstracta.jmeter.javadsl.codegeneration.MethodCallBuilderTest;
+import us.abstracta.jmeter.javadsl.core.DslTestPlan;
 import us.abstracta.jmeter.javadsl.core.TestPlanStats;
 import us.abstracta.jmeter.javadsl.http.DslHttpSampler;
 
@@ -63,6 +66,21 @@ public class DslWhileControllerTest extends JmeterDslTest {
         )
     ).run();
     assertThat(stats.overall().samplesCount()).isEqualTo(CALLS);
+  }
+
+  @Nested
+  public class CodeBuilderTest extends MethodCallBuilderTest {
+
+    public DslTestPlan testPlanWithWhileController() {
+      return testPlan(
+          threadGroup(1, 1,
+              whileController("while","${X} == 1",
+                  httpSampler("http://localhost")
+              )
+          )
+      );
+    }
+
   }
 
 }

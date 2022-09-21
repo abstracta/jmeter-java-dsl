@@ -146,9 +146,9 @@ Could generate something like following output:
 These commented lines make the class executable if you have jbang installed by making file
 executable (eg: chmod +x ./PerformanceTest.java) and just executing it with ./PerformanceTest.java
 */
-//DEPS org.assertj:assertj-core:3.22.0
-//DEPS org.junit.jupiter:junit-jupiter-engine:5.8.2
-//DEPS org.junit.platform:junit-platform-launcher:1.8.2
+//DEPS org.assertj:assertj-core:3.23.1
+//DEPS org.junit.jupiter:junit-jupiter-engine:5.9.0
+//DEPS org.junit.platform:junit-platform-launcher:1.9.0
 //DEPS us.abstracta.jmeter:jmeter-java-dsl:0.65
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -156,7 +156,6 @@ import static us.abstracta.jmeter.javadsl.JmeterDsl.*;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import org.apache.http.entity.ContentType;
 import org.junit.jupiter.api.Test;
 import org.junit.platform.engine.discovery.DiscoverySelectors;
 import org.junit.platform.launcher.core.LauncherDiscoveryRequestBuilder;
@@ -190,7 +189,7 @@ public class PerformanceTest {
                 .build(),
             summaryListener);
     TestExecutionSummary summary = summaryListener.getSummary();
-    summary.printFailuresTo(new PrintWriter(System.out));
+    summary.printFailuresTo(new PrintWriter(System.err));
     System.exit(summary.getTotalFailureCount() > 0 ? 1 : 0);
   }
 
@@ -206,7 +205,7 @@ Review and try generated code before executing it as is. I.e: tune thread groups
 :::
 
 ::: warning
-`jmx2dsl` is currently a **work in progress** and it is in it's first trial versions. 
+`jmx2dsl` is currently a **work in progress**. 
 
 Only part of DSL supported features are currently converted, and for the ones code generation is implemented, only most common scenarios and properties are considered.
 
@@ -727,7 +726,7 @@ This approach is particularly helpful when debugging extractors, allowing to see
 In general, prefer using [Post processor with IDE debugger breakpoint](#post-processor-breakpoints) in initial stages of test plan development, testing with just 1 thread in thread groups, and use this later approach when trying to debug issues that are reproducible only in multiple threads executions or in particular environment that requires offline analysis (analyze collected information after test plan execution).
 
 ::: tip
-Use this element in combination with `resultsTreeVisualizer` to review live executions, or use `jtlWriter` with `withAllFields(true)` or `saveAsXml(true)` and `saveResponseData(true)` to generate a jtl file for later analysis.
+Use this element in combination with `resultsTreeVisualizer` to review live executions, or use `jtlWriter` with `withAllFields()` or `saveAsXml(true)` and `saveResponseData(true)` to generate a jtl file for later analysis.
 :::
 
 ::: tip
@@ -865,7 +864,15 @@ public class PerformanceTest {
 }
 ```
 
-By default, `jtlWriter` will write most used information to evaluate performance of tested service. If you want to trace all the information of each request you may use `jtlWriter` with `withAllFields(true)` option. Doing this will provide all the information at the cost of additional computation and resources usage (less resources for actual load testing). You can tune which fields to include or not with `jtlWriter` and only log what you need, check [JtlWriter](../../jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/listeners/JtlWriter.java) for more details.
+By default, `jtlWriter` will write most used information to evaluate performance of tested service. If you want to trace all the information of each request you may use `jtlWriter` with `withAllFields()` option. Doing this will provide all the information at the cost of additional computation and resources usage (less resources for actual load testing). You can tune which fields to include or not with `jtlWriter` and only log what you need, check [JtlWriter](../../jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/listeners/JtlWriter.java) for more details.
+
+::: tip
+`jtlWriter` will automatically generate `.jtl` files applying this format: `<yyyy-MM-dd HH-mm-ss> <UUID>.jtl`. 
+
+If you need a specific file name, for example for later postprocessing logic (eg: using CI build ID), you can specify it by using `jtlWriter(directory, fileName)`.
+
+When specifying the file name, make sure to use unique names, otherwise the JTL contents may be appended to previous existing jtl files. 
+:::
 
 An additional option, specially targeted towards logging sample responses, is `responseFileSaver` which automatically generates a file for each received response. Here is an example:
 
@@ -1083,7 +1090,11 @@ public class PerformanceTest {
 ```
 
 ::: warning
-`htmlReporter` will throw an exception if provided directory path is a nonempty directory or file
+`htmlReporter` will generate one directory for each generated report applying following template: `<yyyy-MM-dd HH-mm-ss> <UUID>`.
+
+If you need a particular name for the report directory, for example for postprocessing logic (eg: adding CI build ID), you can use `htmlReporter(reportsDirectory, name)` to specify the name.
+
+Make sure when specifying the name for it to be unique, otherwise report generation will fail after test plan execution.
 :::
 
 ### Live built-in graphs and stats
@@ -2317,7 +2328,7 @@ If you need for each iteration to reset connections you can use something like t
 
 ```java
 httpDefaults()
-    .resetConnectionsBetweenIterations(true)
+    .resetConnectionsBetweenIterations()
 ```
 
 If you use this setting you might want to take a look at "Config your environment" section of [this article](https://medium.com/@chientranthien/how-to-generate-high-load-benchmark-with-jmeter-80e828a67592) to avoid port and file descriptors exhaustion.

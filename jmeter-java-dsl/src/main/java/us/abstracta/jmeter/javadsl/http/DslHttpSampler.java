@@ -418,7 +418,7 @@ public class DslHttpSampler extends DslBaseHttpSampler<DslHttpSampler> {
         MethodCallContext buildContext) {
       TestElementParamBuilder paramBuilder = new TestElementParamBuilder(testElem);
       MethodParam method = HttpMethodParam.from(paramBuilder);
-      MethodCallContext headers = buildContext.removeChild(HeaderManager.class);
+      MethodCallContext headers = buildContext.removeChild(HeaderManager.class::isInstance);
       String contentType = removeContentTypeHeader(headers);
       Arguments args = testElem.getArguments();
       if (method instanceof StringParam && !method.isDefault() && HTTPConstants.POST.equals(

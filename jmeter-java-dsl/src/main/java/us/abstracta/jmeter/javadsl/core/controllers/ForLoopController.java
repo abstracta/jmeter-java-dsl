@@ -1,9 +1,15 @@
 package us.abstracta.jmeter.javadsl.core.controllers;
 
+import java.lang.reflect.Method;
 import java.util.List;
 import org.apache.jmeter.control.LoopController;
 import org.apache.jmeter.control.gui.LoopControlPanel;
 import org.apache.jmeter.testelement.TestElement;
+import us.abstracta.jmeter.javadsl.codegeneration.MethodCall;
+import us.abstracta.jmeter.javadsl.codegeneration.MethodCallContext;
+import us.abstracta.jmeter.javadsl.codegeneration.SingleTestElementCallBuilder;
+import us.abstracta.jmeter.javadsl.codegeneration.TestElementParamBuilder;
+import us.abstracta.jmeter.javadsl.codegeneration.params.ChildrenParam;
 import us.abstracta.jmeter.javadsl.core.threadgroups.BaseThreadGroup.ThreadGroupChild;
 
 /**
@@ -30,6 +36,22 @@ public class ForLoopController extends BaseController<ForLoopController> {
     LoopController ret = new LoopController();
     ret.setLoops(count);
     return ret;
+  }
+
+  public static class CodeBuilder extends SingleTestElementCallBuilder<LoopController> {
+
+    public CodeBuilder(List<Method> builderMethods) {
+      super(LoopController.class, builderMethods);
+    }
+
+    @Override
+    protected MethodCall buildMethodCall(LoopController testElement, MethodCallContext context) {
+      TestElementParamBuilder paramBuilder = new TestElementParamBuilder(testElement,
+          "LoopController");
+      return buildMethodCall(paramBuilder.nameParam(null), paramBuilder.intParam("loops"),
+          new ChildrenParam<>(ThreadGroupChild[].class));
+    }
+
   }
 
 }

@@ -1,9 +1,15 @@
 package us.abstracta.jmeter.javadsl.core.controllers;
 
+import java.lang.reflect.Method;
 import java.util.List;
 import org.apache.jmeter.control.WhileController;
 import org.apache.jmeter.control.gui.WhileControllerGui;
 import org.apache.jmeter.testelement.TestElement;
+import us.abstracta.jmeter.javadsl.codegeneration.MethodCall;
+import us.abstracta.jmeter.javadsl.codegeneration.MethodCallContext;
+import us.abstracta.jmeter.javadsl.codegeneration.SingleTestElementCallBuilder;
+import us.abstracta.jmeter.javadsl.codegeneration.TestElementParamBuilder;
+import us.abstracta.jmeter.javadsl.codegeneration.params.ChildrenParam;
 import us.abstracta.jmeter.javadsl.core.threadgroups.BaseThreadGroup.ThreadGroupChild;
 import us.abstracta.jmeter.javadsl.core.util.DslScriptBuilder;
 import us.abstracta.jmeter.javadsl.core.util.PropertyScriptBuilder;
@@ -44,6 +50,23 @@ public class DslWhileController extends BaseController<DslWhileController> {
     String condition = conditionBuilder.build();
     ret.setCondition(condition);
     return ret;
+  }
+
+  public static class CodeBuilder extends SingleTestElementCallBuilder<WhileController> {
+
+    public CodeBuilder(List<Method> builderMethods) {
+      super(WhileController.class, builderMethods);
+    }
+
+    @Override
+    protected MethodCall buildMethodCall(WhileController testElement, MethodCallContext context) {
+      TestElementParamBuilder paramBuilder = new TestElementParamBuilder(testElement,
+          "WhileController");
+      return buildMethodCall(paramBuilder.nameParam(null),
+          paramBuilder.stringParam("condition"),
+          new ChildrenParam<>(ThreadGroupChild[].class));
+    }
+
   }
 
 }

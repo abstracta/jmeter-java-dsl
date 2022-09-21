@@ -1,14 +1,17 @@
 package us.abstracta.jmeter.javadsl.codegeneration;
 
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import org.apache.jmeter.config.ConfigElement;
 import org.apache.jmeter.testelement.TestElement;
 import org.apache.jorphan.collections.HashTree;
+import org.apache.jorphan.collections.ListedHashTree;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,18 +32,27 @@ public class MethodCallContext {
       + "children's conversions and ease manual code completion.";
 
   private final TestElement testElement;
-  private final HashTree childrenThree;
+  private final HashTree childrenTree;
   private final MethodCallContext parent;
   private final MethodCallBuilderRegistry builderRegistry;
   private final Map<Object, Object> entries = new HashMap<>();
   private final List<MethodCallContextEndListener> endListeners = new ArrayList<>();
 
-  public MethodCallContext(TestElement testElement, HashTree childrenThree,
+  public MethodCallContext(TestElement testElement, HashTree childrenTree,
       MethodCallContext parent, MethodCallBuilderRegistry builderRegistry) {
     this.testElement = testElement;
-    this.childrenThree = childrenThree;
+    // sorting simplifies code builder
+    this.childrenTree = childrenTree == null ? new ListedHashTree() : sortTree(childrenTree);
     this.parent = parent;
     this.builderRegistry = builderRegistry;
+  }
+
+  private HashTree sortTree(HashTree tree) {
+    ListedHashTree ret = new ListedHashTree();
+    tree.list().stream()
+        .sorted(Comparator.comparingInt(k -> k instanceof ConfigElement ? 0 : 1))
+        .forEach(k -> ret.set(k, sortTree(tree.getTree(k))));
+    return ret;
   }
 
   /**
@@ -89,7 +101,7 @@ public class MethodCallContext {
    * @return the JMeter test plan children subtree.
    */
   public HashTree getChildrenTree() {
-    return childrenThree;
+    return childrenTree;
   }
 
   /**
@@ -171,10 +183,10 @@ public class MethodCallContext {
   }
 
   private List<MethodCall> buildChildrenMethodCalls() {
-    return childrenThree == null ? Collections.emptyList() : childrenThree.list().stream()
+    return childrenTree.list().stream()
         .map(c -> (TestElement) c)
         .filter(TestElement::isEnabled)
-        .map(c -> new MethodCallContext(c, childrenThree.getTree(c), this,
+        .map(c -> new MethodCallContext(c, childrenTree.getTree(c), this,
             builderRegistry).buildMethodCall())
         .collect(Collectors.toList());
   }
@@ -184,18 +196,18 @@ public class MethodCallContext {
    * <p>
    * If multiple instances exists, then only the first one is removed.
    *
-   * @param testElementClass specifies the class of the test elements to be removed.
+   * @param filter specifies condition to be matched by test element to be removed.
    * @return the context associated to the removed test element, or null if no test element is
    * found.
    */
-  public MethodCallContext removeChild(Class<? extends TestElement> testElementClass) {
-    Optional<?> child = childrenThree.list().stream()
-        .filter(testElementClass::isInstance)
-        .map(testElementClass::cast)
+  public MethodCallContext removeChild(Predicate<TestElement> filter) {
+    Optional<?> child = childrenTree.list().stream()
+        .map(o -> (TestElement) o)
+        .filter(filter)
         .findAny();
-    child.ifPresent(childrenThree::remove);
+    child.ifPresent(childrenTree::remove);
     return child
-        .map(c -> new MethodCallContext((TestElement) c, childrenThree.getTree(c), this,
+        .map(c -> new MethodCallContext((TestElement) c, childrenTree.getTree(c), this,
             builderRegistry))
         .orElse(null);
   }

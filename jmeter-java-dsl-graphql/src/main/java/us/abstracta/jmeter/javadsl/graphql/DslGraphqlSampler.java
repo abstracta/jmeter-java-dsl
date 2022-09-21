@@ -249,7 +249,7 @@ public class DslGraphqlSampler extends DslBaseHttpSampler<DslGraphqlSampler> {
     }
 
     private void setHeaders(MethodCall ret, MethodCallContext buildContext) {
-      MethodCallContext headers = buildContext.removeChild(HeaderManager.class);
+      MethodCallContext headers = buildContext.removeChild(HeaderManager.class::isInstance);
       String contentType = removeContentTypeHeader(headers);
       if (!ContentType.APPLICATION_JSON.toString().equals(contentType)) {
         chainContentType(ret, contentType);

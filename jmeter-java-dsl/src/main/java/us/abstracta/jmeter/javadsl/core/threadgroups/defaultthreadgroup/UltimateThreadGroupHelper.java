@@ -41,7 +41,7 @@ public class UltimateThreadGroupHelper extends BaseThreadGroup<DslDefaultThreadG
   @Override
   public AbstractThreadGroup buildThreadGroup() {
     UltimateThreadGroup ret = new UltimateThreadGroup();
-    PowerTableModel table = buildUltimateThreadGroupTableModel();
+    PowerTableModel table = buildTableModel();
     buildUltimateThreadGroupSchedules(stages).forEach(s -> table.addRow(s.buildTableRow()));
     ret.setData(JMeterPluginsUtils.tableModelRowsToCollectionProperty(table,
         UltimateThreadGroup.DATA_PROPERTY));
@@ -52,7 +52,7 @@ public class UltimateThreadGroupHelper extends BaseThreadGroup<DslDefaultThreadG
     return ret;
   }
 
-  private static PowerTableModel buildUltimateThreadGroupTableModel() {
+  private static PowerTableModel buildTableModel() {
     return new PowerTableModel(UltimateThreadGroupGui.columnIdentifiers,
         UltimateThreadGroupGui.columnClasses);
   }
@@ -186,7 +186,7 @@ public class UltimateThreadGroupHelper extends BaseThreadGroup<DslDefaultThreadG
 
     private List<UltimateThreadSchedule> schedulesProp(TestElementParamBuilder testElement) {
       JMeterProperty schedulesProp = testElement.prop(UltimateThreadGroup.DATA_PROPERTY);
-      PowerTableModel tableModel = buildUltimateThreadGroupTableModel();
+      PowerTableModel tableModel = buildTableModel();
       JMeterPluginsUtils.collectionPropertyToTableModelRows((CollectionProperty) schedulesProp,
           tableModel);
       List<UltimateThreadSchedule> ret = new ArrayList<>();
