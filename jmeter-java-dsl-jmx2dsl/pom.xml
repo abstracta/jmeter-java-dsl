@@ -123,6 +123,7 @@
                   <include>com.miglayout:*</include>
                   <include>kg.apc:jmeter-plugins-casutg</include>
                   <include>kg.apc:jmeter-plugins-cmn-jmeter</include>
+                  <include>kg.apc:jmeter-plugins-dummy</include>
                   <include>com.blazemeter:jmeter-plugins-random-csv-data-set</include>
                   <include>com.blazemeter:jmeter-plugins-wsc</include>
                   <include>com.blazemeter:jmeter-parallel</include>

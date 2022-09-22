@@ -1,13 +1,20 @@
 package us.abstracta.jmeter.javadsl.core.samplers;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static us.abstracta.jmeter.javadsl.JmeterDsl.*;
+import static us.abstracta.jmeter.javadsl.JmeterDsl.dummySampler;
+import static us.abstracta.jmeter.javadsl.JmeterDsl.jsr223PostProcessor;
+import static us.abstracta.jmeter.javadsl.JmeterDsl.jsr223PreProcessor;
+import static us.abstracta.jmeter.javadsl.JmeterDsl.testPlan;
+import static us.abstracta.jmeter.javadsl.JmeterDsl.threadGroup;
 
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 import org.apache.jmeter.samplers.SampleResult;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import us.abstracta.jmeter.javadsl.codegeneration.MethodCallBuilderTest;
+import us.abstracta.jmeter.javadsl.core.DslTestPlan;
 
 public class DslDummySamplerTest {
 
@@ -98,6 +105,35 @@ public class DslDummySamplerTest {
             RESPONSE_BODY));
     assertThat(actualResponseTime).isGreaterThanOrEqualTo(responseTime.toMillis());
     assertThat(processingTime).isGreaterThanOrEqualTo(actualResponseTime);
+  }
+
+  @Nested
+  public class CodeBuilderTest extends MethodCallBuilderTest {
+
+    public DslTestPlan testPlanWithDummySampler() {
+      return testPlan(
+          threadGroup(1, 1,
+              dummySampler("OK")
+                  .responseTime(Duration.ofMillis(100))
+          )
+      );
+    }
+
+    public DslTestPlan testPlanWithDummySamplerAndNonDefaultSettings() {
+      return testPlan(
+          threadGroup(1, 1,
+              dummySampler("mySampler", "OK")
+                  .successful(false)
+                  .responseCode("404")
+                  .responseMessage("NOT_FOUND")
+                  .responseTime("${__Random(50, 500)}")
+                  .simulateResponseTime(true)
+                  .url("http://localhost")
+                  .requestBody("TEST")
+          )
+      );
+    }
+
   }
 
 }

@@ -1,10 +1,18 @@
 package us.abstracta.jmeter.javadsl.core.samplers;
 
+import java.lang.reflect.Method;
 import java.time.Duration;
+import java.time.temporal.ChronoUnit;
+import java.util.List;
 import kg.apc.jmeter.dummy.DummyElement;
 import kg.apc.jmeter.samplers.DummySampler;
 import kg.apc.jmeter.samplers.DummySamplerGui;
 import org.apache.jmeter.testelement.TestElement;
+import us.abstracta.jmeter.javadsl.codegeneration.MethodCall;
+import us.abstracta.jmeter.javadsl.codegeneration.MethodCallContext;
+import us.abstracta.jmeter.javadsl.codegeneration.SingleTestElementCallBuilder;
+import us.abstracta.jmeter.javadsl.codegeneration.TestElementParamBuilder;
+import us.abstracta.jmeter.javadsl.codegeneration.params.DurationParam;
 import us.abstracta.jmeter.javadsl.core.util.JmeterFunction;
 
 /**
@@ -19,17 +27,21 @@ import us.abstracta.jmeter.javadsl.core.util.JmeterFunction;
  */
 public class DslDummySampler extends BaseSampler<DslDummySampler> {
 
+  private static final String DEFAULT_NAME = "jp@gc - Dummy Sampler";
+  private static final String DEFAULT_RESPONSE_CODE = "200";
+  private static final String DEFAULT_RESPONSE_MESSAGE = "OK";
+
   protected String responseBody;
   protected boolean successful = true;
-  protected String responseCode = "200";
-  protected String responseMessage = "OK";
+  protected String responseCode = DEFAULT_RESPONSE_CODE;
+  protected String responseMessage = DEFAULT_RESPONSE_MESSAGE;
   protected String responseTime = JmeterFunction.from("__Random", 50, 500);
   protected boolean simulateResponseTime;
   protected String url = "";
   protected String requestBody = "";
 
   public DslDummySampler(String name, String responseBody) {
-    super(name == null ? "jp@gc - Dummy Sampler" : name, DummySamplerGui.class);
+    super(name == null ? DEFAULT_NAME : name, DummySamplerGui.class);
     this.responseBody = responseBody;
   }
 
@@ -78,6 +90,24 @@ public class DslDummySampler extends BaseSampler<DslDummySampler> {
    */
   public DslDummySampler responseTime(Duration responseTime) {
     this.responseTime = String.valueOf(responseTime.toMillis());
+    return this;
+  }
+
+  /**
+   * Same as {@link #responseTime(Duration)} but allowing to specify a JMeter expression for
+   * evaluation.
+   * <p>
+   * This is useful when you want response time to be calculated dynamically. For example,
+   * <pre>{@code ${__Random(50, 500)}}</pre>
+   *
+   * @param responseTime specifies the JMeter expression to be used to calculate response times for
+   *                     the sampler.
+   * @return the sampler for further configuration or usage.
+   * @see #responseTime(Duration)
+   * @since 0.66
+   */
+  public DslDummySampler responseTime(String responseTime) {
+    this.responseTime = responseTime;
     return this;
   }
 
@@ -142,6 +172,31 @@ public class DslDummySampler extends BaseSampler<DslDummySampler> {
     dummy.setURL(url);
     dummy.setRequestData(requestBody);
     return ret;
+  }
+
+  public static class CodeBuilder extends SingleTestElementCallBuilder<DummySampler> {
+
+    public CodeBuilder(List<Method> builderMethods) {
+      super(DummySampler.class, builderMethods);
+    }
+
+    @Override
+    protected MethodCall buildMethodCall(DummySampler testElement, MethodCallContext context) {
+      TestElementParamBuilder paramBuilder = new TestElementParamBuilder(testElement);
+      return buildMethodCall(paramBuilder.nameParam(DEFAULT_NAME),
+          paramBuilder.stringParam("RESPONSE_DATA"))
+          .chain("successful", paramBuilder.boolParam("SUCCESFULL", true))
+          .chain("responseCode", paramBuilder.stringParam("RESPONSE_CODE", DEFAULT_RESPONSE_CODE))
+          .chain("responseMessage",
+              paramBuilder.stringParam("RESPONSE_MESSAGE", DEFAULT_RESPONSE_MESSAGE))
+          .chain("responseTime", paramBuilder.buildParam("RESPONSE_TIME",
+              (expression, defaultValue) -> new DurationParam(expression, null, ChronoUnit.MILLIS),
+              null))
+          .chain("simulateResponseTime", paramBuilder.boolParam("WAITING", false))
+          .chain("url", paramBuilder.stringParam("URL"))
+          .chain("requestBody", paramBuilder.stringParam("REQUEST_DATA"));
+    }
+
   }
 
 }

@@ -10,8 +10,11 @@ import static us.abstracta.jmeter.javadsl.JmeterDsl.threadGroup;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import org.apache.jmeter.samplers.SampleResult;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import us.abstracta.jmeter.javadsl.codegeneration.MethodCallBuilderTest;
+import us.abstracta.jmeter.javadsl.core.DslTestPlan;
 import us.abstracta.jmeter.javadsl.core.listeners.JtlWriter;
 
 public class DslJsr223SamplerTest {
@@ -61,6 +64,28 @@ public class DslJsr223SamplerTest {
         )
     ).run();
     assertThatJtlContentIsExpectedForCustomSample(resultsFilePath);
+  }
+
+  @Nested
+  public class CodeBuilderTest extends MethodCallBuilderTest {
+
+    public DslTestPlan testPlanWithJsr223Sampler() {
+      return testPlan(
+          threadGroup(1, 1,
+              jsr223Sampler("println 'sample'")
+          )
+      );
+    }
+
+    public DslTestPlan testPlanWithJsr223SamplerAndNonDefaultSettings() {
+      return testPlan(
+          threadGroup(1, 1,
+              jsr223Sampler("console.log(\"sample\")")
+                  .language("javascript")
+          )
+      );
+    }
+
   }
 
 }

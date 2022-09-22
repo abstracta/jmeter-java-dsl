@@ -95,7 +95,7 @@ public abstract class DslJsr223TestElement<T extends DslJsr223TestElement<T>> ex
 
     private final String defaultName;
 
-    public Jsr223TestElementCallBuilder(Class<T> testElementClass, String defaultName,
+    protected Jsr223TestElementCallBuilder(Class<T> testElementClass, String defaultName,
         List<Method> builderMethods) {
       super(testElementClass, builderMethods);
       this.defaultName = defaultName;

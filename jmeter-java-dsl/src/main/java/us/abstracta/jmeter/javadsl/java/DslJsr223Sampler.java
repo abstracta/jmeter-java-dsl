@@ -1,5 +1,6 @@
 package us.abstracta.jmeter.javadsl.java;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -86,6 +87,14 @@ public class DslJsr223Sampler extends DslJsr223TestElement<DslJsr223Sampler> imp
         JMeterContext ctx, JMeterVariables vars, Properties props, Sampler sampler, Logger log) {
       super(label, prev, ctx, vars, props, sampler, log);
       this.sampleResult = sampleResult;
+    }
+
+  }
+
+  public static class CodeBuilder extends Jsr223TestElementCallBuilder<JSR223Sampler> {
+
+    public CodeBuilder(List<Method> builderMethods) {
+      super(JSR223Sampler.class, DEFAULT_NAME, builderMethods);
     }
 
   }
