@@ -10,8 +10,11 @@ import static us.abstracta.jmeter.javadsl.JmeterDsl.testPlan;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.threadGroup;
 
 import org.apache.http.entity.ContentType;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import us.abstracta.jmeter.javadsl.JmeterDslTest;
+import us.abstracta.jmeter.javadsl.codegeneration.MethodCallBuilderTest;
+import us.abstracta.jmeter.javadsl.core.DslTestPlan;
 
 public class DslJsr223PreProcessorTest extends JmeterDslTest {
 
@@ -52,6 +55,36 @@ public class DslJsr223PreProcessorTest extends JmeterDslTest {
 
   public static String buildRequestBody() {
     return REQUEST_BODY;
+  }
+
+  @Nested
+  public class CodeBuilderTest extends MethodCallBuilderTest {
+
+    public DslTestPlan testPlanWithJsr223PreProcessor() {
+      return testPlan(
+          threadGroup(1, 1,
+              httpSampler("http://localhost")
+                  .children(
+                      jsr223PreProcessor("println 'preRequest'")
+                  )
+
+          )
+      );
+    }
+
+    public DslTestPlan testPlanWithJsr223PreProcessorAndNonDefaultSettings() {
+      return testPlan(
+          threadGroup(1, 1,
+              httpSampler("http://localhost")
+                  .children(
+                      jsr223PreProcessor("myScript", "console.log(\"preRequest\")")
+                          .language("javascript")
+                  )
+
+          )
+      );
+    }
+
   }
 
 }

@@ -1,6 +1,8 @@
 package us.abstracta.jmeter.javadsl.core.testelements;
 
+import java.lang.reflect.Method;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import org.apache.jmeter.samplers.SampleResult;
@@ -11,6 +13,10 @@ import org.apache.jmeter.threads.JMeterContext;
 import org.apache.jmeter.threads.JMeterVariables;
 import org.apache.jmeter.util.JSR223TestElement;
 import org.slf4j.Logger;
+import us.abstracta.jmeter.javadsl.codegeneration.MethodCall;
+import us.abstracta.jmeter.javadsl.codegeneration.MethodCallContext;
+import us.abstracta.jmeter.javadsl.codegeneration.SingleTestElementCallBuilder;
+import us.abstracta.jmeter.javadsl.codegeneration.TestElementParamBuilder;
 import us.abstracta.jmeter.javadsl.core.util.DslScriptBuilder;
 import us.abstracta.jmeter.javadsl.core.util.DslScriptBuilder.DslScript;
 import us.abstracta.jmeter.javadsl.core.util.DslScriptBuilder.DslScriptVars;
@@ -80,6 +86,28 @@ public abstract class DslJsr223TestElement<T extends DslJsr223TestElement<T>> ex
         JMeterVariables vars, Properties props, Sampler sampler, Logger log) {
       super(prev, ctx, vars, props, sampler, log);
       this.label = label;
+    }
+
+  }
+
+  protected static class Jsr223TestElementCallBuilder<T extends TestElement> extends
+      SingleTestElementCallBuilder<T> {
+
+    private final String defaultName;
+
+    public Jsr223TestElementCallBuilder(Class<T> testElementClass, String defaultName,
+        List<Method> builderMethods) {
+      super(testElementClass, builderMethods);
+      this.defaultName = defaultName;
+    }
+
+    @Override
+    protected MethodCall buildMethodCall(T testElement,
+        MethodCallContext context) {
+      TestElementParamBuilder paramBuilder = new TestElementParamBuilder(testElement);
+      return buildMethodCall(paramBuilder.nameParam(defaultName),
+          paramBuilder.stringParam("script"))
+          .chain("language", paramBuilder.stringParam("scriptLanguage", DEFAULT_LANGUAGE));
     }
 
   }

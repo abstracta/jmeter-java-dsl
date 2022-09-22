@@ -11,10 +11,6 @@ import org.apache.jmeter.threads.JMeterContext;
 import org.apache.jmeter.threads.JMeterVariables;
 import org.apache.jmeter.util.JSR223TestElement;
 import org.slf4j.Logger;
-import us.abstracta.jmeter.javadsl.codegeneration.MethodCall;
-import us.abstracta.jmeter.javadsl.codegeneration.MethodCallContext;
-import us.abstracta.jmeter.javadsl.codegeneration.SingleTestElementCallBuilder;
-import us.abstracta.jmeter.javadsl.codegeneration.TestElementParamBuilder;
 import us.abstracta.jmeter.javadsl.core.testelements.DslJsr223TestElement;
 
 /**
@@ -66,19 +62,10 @@ public class DslJsr223PostProcessor extends DslJsr223TestElement<DslJsr223PostPr
 
   }
 
-  public static class CodeBuilder extends SingleTestElementCallBuilder<JSR223PostProcessor> {
+  public static class CodeBuilder extends Jsr223TestElementCallBuilder<JSR223PostProcessor> {
 
     public CodeBuilder(List<Method> builderMethods) {
-      super(JSR223PostProcessor.class, builderMethods);
-    }
-
-    @Override
-    protected MethodCall buildMethodCall(JSR223PostProcessor testElement,
-        MethodCallContext context) {
-      TestElementParamBuilder paramBuilder = new TestElementParamBuilder(testElement);
-      return buildMethodCall(paramBuilder.nameParam(DEFAULT_NAME),
-          paramBuilder.stringParam("script"))
-          .chain("language", paramBuilder.stringParam("scriptLanguage", DEFAULT_LANGUAGE));
+      super(JSR223PostProcessor.class, DEFAULT_NAME, builderMethods);
     }
 
   }

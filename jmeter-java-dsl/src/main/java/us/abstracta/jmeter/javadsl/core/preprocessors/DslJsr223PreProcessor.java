@@ -1,6 +1,8 @@
 package us.abstracta.jmeter.javadsl.core.preprocessors;
 
+import java.lang.reflect.Method;
 import java.util.Collections;
+import java.util.List;
 import java.util.Properties;
 import org.apache.jmeter.modifiers.JSR223PreProcessor;
 import org.apache.jmeter.samplers.SampleResult;
@@ -57,6 +59,14 @@ public class DslJsr223PreProcessor extends DslJsr223TestElement<DslJsr223PreProc
     public PreProcessorVars(String label, SampleResult prev, JMeterContext ctx,
         JMeterVariables vars, Properties props, Sampler sampler, Logger log) {
       super(label, prev, ctx, vars, props, sampler, log);
+    }
+
+  }
+
+  public static class CodeBuilder extends Jsr223TestElementCallBuilder<JSR223PreProcessor> {
+
+    public CodeBuilder(List<Method> builderMethods) {
+      super(JSR223PreProcessor.class, DEFAULT_NAME, builderMethods);
     }
 
   }
