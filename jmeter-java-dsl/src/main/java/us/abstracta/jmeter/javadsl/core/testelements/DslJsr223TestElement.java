@@ -23,8 +23,10 @@ import us.abstracta.jmeter.javadsl.core.util.DslScriptBuilder.DslScriptVars;
 public abstract class DslJsr223TestElement<T extends DslJsr223TestElement<T>> extends
     BaseTestElement {
 
+  protected static final String DEFAULT_LANGUAGE = "groovy";
+
   protected DslScriptBuilder scriptBuilder;
-  protected String language = "groovy";
+  protected String language = DEFAULT_LANGUAGE;
 
   public DslJsr223TestElement(String name, String defaultName, String script) {
     super(name != null ? name : defaultName, TestBeanGUI.class);

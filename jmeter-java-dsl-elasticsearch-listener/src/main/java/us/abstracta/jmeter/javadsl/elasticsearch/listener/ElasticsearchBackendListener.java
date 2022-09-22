@@ -78,7 +78,7 @@ public class ElasticsearchBackendListener extends DslBackendListener<Elasticsear
   public static class CodeBuilder extends BackendListenerCodeBuilder {
 
     public CodeBuilder(List<Method> builderMethods) {
-      super(builderMethods, ElasticsearchBackendClient.class);
+      super(ElasticsearchBackendClient.class, builderMethods);
     }
 
     @Override

@@ -150,7 +150,7 @@ public class InfluxDbBackendListener extends DslBackendListener<InfluxDbBackendL
   public static class CodeBuilder extends BackendListenerCodeBuilder {
 
     public CodeBuilder(List<Method> builderMethods) {
-      super(builderMethods, InfluxdbBackendListenerClient.class);
+      super(InfluxdbBackendListenerClient.class, builderMethods);
     }
 
     protected MethodCall buildBackendListenerCall(Map<String, String> args,

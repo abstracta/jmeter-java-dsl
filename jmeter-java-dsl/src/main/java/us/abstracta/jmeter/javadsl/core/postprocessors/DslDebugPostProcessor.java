@@ -1,8 +1,14 @@
 package us.abstracta.jmeter.javadsl.core.postprocessors;
 
+import java.lang.reflect.Method;
+import java.util.List;
 import org.apache.jmeter.extractor.DebugPostProcessor;
 import org.apache.jmeter.testbeans.gui.TestBeanGUI;
 import org.apache.jmeter.testelement.TestElement;
+import us.abstracta.jmeter.javadsl.codegeneration.MethodCall;
+import us.abstracta.jmeter.javadsl.codegeneration.MethodCallContext;
+import us.abstracta.jmeter.javadsl.codegeneration.SingleTestElementCallBuilder;
+import us.abstracta.jmeter.javadsl.codegeneration.TestElementParamBuilder;
 import us.abstracta.jmeter.javadsl.core.testelements.BaseTestElement;
 
 /**
@@ -152,6 +158,25 @@ public class DslDebugPostProcessor extends BaseTestElement implements DslPostPro
     ret.setDisplayJMeterProperties(includeJmeterProperties);
     ret.setDisplaySystemProperties(includeSystemProperties);
     return ret;
+  }
+
+  public static class CodeBuilder extends SingleTestElementCallBuilder<DebugPostProcessor> {
+
+    public CodeBuilder(List<Method> builderMethods) {
+      super(DebugPostProcessor.class, builderMethods);
+    }
+
+    @Override
+    protected MethodCall buildMethodCall(DebugPostProcessor testElement,
+        MethodCallContext context) {
+      TestElementParamBuilder paramBuilder = new TestElementParamBuilder(testElement);
+      return buildMethodCall()
+          .chain("jmeterVariables", paramBuilder.boolParam("displayJMeterVariables", true))
+          .chain("samplerProperties", paramBuilder.boolParam("displaySamplerProperties", false))
+          .chain("jmeterProperties", paramBuilder.boolParam("displayJMeterProperties", false))
+          .chain("systemProperties", paramBuilder.boolParam("displaySystemProperties", false));
+    }
+
   }
 
 }

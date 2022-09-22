@@ -6,8 +6,11 @@ import static us.abstracta.jmeter.javadsl.JmeterDsl.*;
 
 import java.io.IOException;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import us.abstracta.jmeter.javadsl.JmeterDslTest;
+import us.abstracta.jmeter.javadsl.codegeneration.MethodCallBuilderTest;
+import us.abstracta.jmeter.javadsl.core.DslTestPlan;
 
 public class DslDebugPostProcessorTest extends JmeterDslTest {
 
@@ -56,6 +59,33 @@ public class DslDebugPostProcessorTest extends JmeterDslTest {
     assertThat(subSampleResponseBody).matches(
         "(?s)SamplerProperties:\n.*JMeterProperties:\n.*SystemProperties:\n.*");
     assertThat(subSampleResponseBody).doesNotContain("JMeterVariables:");
+  }
+
+  @Nested
+  public class CodeBuilderTest extends MethodCallBuilderTest {
+
+    public DslTestPlan testPlanWithDebugPostProcessor() {
+      return testPlan(
+          threadGroup(1, 1,
+              httpSampler("http://localhost"),
+              debugPostProcessor()
+          )
+      );
+    }
+
+    public DslTestPlan testPlanWithDebugPostProcessorAndNoneDefaultSettings() {
+      return testPlan(
+          threadGroup(1, 1,
+              httpSampler("http://localhost"),
+              debugPostProcessor()
+                  .jmeterVariables(false)
+                  .samplerProperties()
+                  .jmeterProperties()
+                  .systemProperties()
+          )
+      );
+    }
+
   }
 
 }

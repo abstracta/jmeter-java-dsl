@@ -1,8 +1,12 @@
 package us.abstracta.jmeter.javadsl.core.postprocessors;
 
+import java.lang.reflect.Method;
+import java.util.List;
 import org.apache.jmeter.extractor.json.jmespath.JMESPathExtractor;
 import org.apache.jmeter.extractor.json.jmespath.gui.JMESPathExtractorGui;
 import org.apache.jmeter.testelement.TestElement;
+import us.abstracta.jmeter.javadsl.codegeneration.MethodCall;
+import us.abstracta.jmeter.javadsl.codegeneration.TestElementParamBuilder;
 
 /**
  * Allows extracting part of a JSON response using JMESPath to store into a variable.
@@ -70,6 +74,33 @@ public class DslJsonExtractor extends DslVariableExtractor<DslJsonExtractor> {
     ret.setMatchNumber(String.valueOf(matchNumber));
     ret.setDefaultValue(defaultValue);
     return ret;
+  }
+
+  public static class CodeBuilder extends ScopedTestElementCallBuilder<JMESPathExtractor> {
+
+    public CodeBuilder(List<Method> builderMethods) {
+      super(JMESPathExtractor.class, builderMethods);
+    }
+
+    @Override
+    protected MethodCall buildScopedMethodCall(JMESPathExtractor testElement) {
+      TestElementParamBuilder paramBuilder = buildParamBuilder(testElement);
+      return buildMethodCall(paramBuilder.stringParam("referenceName"),
+          paramBuilder.stringParam("jmesPathExpr"));
+    }
+
+    private TestElementParamBuilder buildParamBuilder(JMESPathExtractor testElement) {
+      return new TestElementParamBuilder(testElement, "JMESExtractor");
+    }
+
+    @Override
+    protected void chainScopedElementAdditionalOptions(MethodCall ret,
+        JMESPathExtractor testElement) {
+      TestElementParamBuilder paramBuilder = buildParamBuilder(testElement);
+      ret.chain("matchNumber", paramBuilder.intParam("matchNumber", 1));
+      ret.chain("defaultValue", paramBuilder.stringParam("defaultValue"));
+    }
+
   }
 
 }

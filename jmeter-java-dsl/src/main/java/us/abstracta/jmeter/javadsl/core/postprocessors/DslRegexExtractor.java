@@ -212,7 +212,7 @@ public class DslRegexExtractor extends DslVariableExtractor<DslRegexExtractor> {
     }
 
     @Override
-    protected void chainAdditionalOptions(MethodCall ret, RegexExtractor testElement) {
+    protected void chainScopedElementAdditionalOptions(MethodCall ret, RegexExtractor testElement) {
       TestElementParamBuilder paramBuilder = buildParamBuilder(testElement);
       ret.chain("fieldToCheck", paramBuilder.enumParam("useHeaders", TargetField.RESPONSE_BODY));
       ret.chain("matchNumber", paramBuilder.intParam("match_number", 1));
@@ -221,15 +221,13 @@ public class DslRegexExtractor extends DslVariableExtractor<DslRegexExtractor> {
     }
 
     private MethodParam buildDefaultParam(TestElementParamBuilder regexParamBuilder) {
-      MethodParam defaultParam;
       MethodParam param = regexParamBuilder.boolParam("default_empty_value", false);
       if (!param.isDefault()) {
-        defaultParam = new StringParam("");
+        return new StringParam("");
       } else {
         MethodParam sourceDefaultParam = regexParamBuilder.stringParam("default");
-        defaultParam = sourceDefaultParam.isDefault() ? new StringParam(null) : sourceDefaultParam;
+        return sourceDefaultParam.isDefault() ? new StringParam(null) : sourceDefaultParam;
       }
-      return defaultParam;
     }
 
   }

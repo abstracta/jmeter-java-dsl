@@ -136,13 +136,13 @@ public abstract class DslScopedTestElement<T extends DslScopedTestElement<T>> ex
       } else {
         ret.chain("scopeVariable", scopeVar);
       }
-      chainAdditionalOptions(ret, testElement);
+      chainScopedElementAdditionalOptions(ret, testElement);
       return ret;
     }
 
     protected abstract MethodCall buildScopedMethodCall(T testElement);
 
-    protected abstract void chainAdditionalOptions(MethodCall ret, T testElement);
+    protected abstract void chainScopedElementAdditionalOptions(MethodCall ret, T testElement);
 
   }
 

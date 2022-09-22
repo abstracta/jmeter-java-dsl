@@ -12,9 +12,13 @@ import static us.abstracta.jmeter.javadsl.JmeterDsl.httpSampler;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.testPlan;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.threadGroup;
 
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import us.abstracta.jmeter.javadsl.JmeterDslTest;
+import us.abstracta.jmeter.javadsl.codegeneration.MethodCallBuilderTest;
+import us.abstracta.jmeter.javadsl.core.DslTestPlan;
 import us.abstracta.jmeter.javadsl.core.postprocessors.DslBoundaryExtractor.TargetField;
+import us.abstracta.jmeter.javadsl.core.testelements.DslScopedTestElement.Scope;
 
 public class DslBoundaryExtractorTest extends JmeterDslTest {
 
@@ -58,6 +62,49 @@ public class DslBoundaryExtractorTest extends JmeterDslTest {
         )
     ).run();
     verify(getRequestedFor(urlEqualTo(BOUNDARY_PATH + USER_QUERY_PARAMETER + USER)));
+  }
+
+  @Nested
+  public class CodeBuilderTest extends MethodCallBuilderTest {
+
+    public DslTestPlan simpleBoundaryExtractor() {
+      return testPlan(
+          threadGroup(1, 1,
+              httpSampler("http://localhost")
+                  .children(
+                      boundaryExtractor("EXTRACTED_USER", "user=", "&")
+                  )
+          )
+      );
+    }
+
+    public DslTestPlan completeBoundaryExtractor() {
+      return testPlan(
+          threadGroup(1, 1,
+              httpSampler("http://localhost")
+                  .children(
+                      boundaryExtractor("EXTRACTED_USER", "user=", "&")
+                          .scope(Scope.ALL_SAMPLES)
+                          .fieldToCheck(TargetField.REQUEST_HEADERS)
+                          .matchNumber(0)
+                          .defaultValue("NO_MATCH")
+                  )
+          )
+      );
+    }
+
+    public DslTestPlan variableScopedBoundaryExtractor() {
+      return testPlan(
+          threadGroup(1, 1,
+              httpSampler("http://localhost")
+                  .children(
+                      boundaryExtractor("EXTRACTED_USER", "user=", "&")
+                          .scopeVariable("otherVar")
+                  )
+          )
+      );
+    }
+
   }
 
 }

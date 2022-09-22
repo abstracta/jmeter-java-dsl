@@ -365,7 +365,8 @@ public class DslResponseAssertion extends DslScopedTestElement<DslResponseAssert
     }
 
     @Override
-    protected void chainAdditionalOptions(MethodCall ret, ResponseAssertion testElement) {
+    protected void chainScopedElementAdditionalOptions(MethodCall ret,
+        ResponseAssertion testElement) {
       TestElementParamBuilder paramBuilder = new TestElementParamBuilder(testElement, "Assertion");
       ret.chain("fieldToTest", paramBuilder.enumParam("test_field", TargetField.RESPONSE_BODY));
       ret.chain("ignoreStatus", paramBuilder.boolParam("assume_success", false));

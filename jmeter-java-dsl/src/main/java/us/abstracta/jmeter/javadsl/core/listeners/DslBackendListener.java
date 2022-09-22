@@ -85,8 +85,8 @@ public abstract class DslBackendListener<T extends DslBackendListener<T>> extend
 
     private final Class<? extends BackendListenerClient> backendListenerClass;
 
-    public BackendListenerCodeBuilder(List<Method> builderMethods,
-        Class<? extends BackendListenerClient> backendListenerClass) {
+    public BackendListenerCodeBuilder(Class<? extends BackendListenerClient> backendListenerClass,
+        List<Method> builderMethods) {
       super(builderMethods);
       this.backendListenerClass = backendListenerClass;
     }

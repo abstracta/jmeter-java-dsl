@@ -1,9 +1,16 @@
 package us.abstracta.jmeter.javadsl.core.postprocessors;
 
+import java.lang.reflect.Method;
+import java.util.List;
 import org.apache.jmeter.extractor.BoundaryExtractor;
 import org.apache.jmeter.extractor.RegexExtractor;
 import org.apache.jmeter.extractor.gui.BoundaryExtractorGui;
 import org.apache.jmeter.testelement.TestElement;
+import us.abstracta.jmeter.javadsl.codegeneration.MethodCall;
+import us.abstracta.jmeter.javadsl.codegeneration.MethodParam;
+import us.abstracta.jmeter.javadsl.codegeneration.TestElementParamBuilder;
+import us.abstracta.jmeter.javadsl.codegeneration.params.EnumParam.EnumPropertyValue;
+import us.abstracta.jmeter.javadsl.codegeneration.params.StringParam;
 
 /**
  * Provides simple means for extracting into a variable a part of a request or response using just
@@ -103,7 +110,7 @@ public class DslBoundaryExtractor extends DslVariableExtractor<DslBoundaryExtrac
   /**
    * Used to specify the field the extractor will apply to.
    */
-  public enum TargetField {
+  public enum TargetField implements EnumPropertyValue {
     /**
      * Applies the extractor to the plain string of the response body.
      */
@@ -144,6 +151,50 @@ public class DslBoundaryExtractor extends DslVariableExtractor<DslBoundaryExtrac
 
     TargetField(String propertyValue) {
       this.propertyValue = propertyValue;
+    }
+
+    @Override
+    public String propertyValue() {
+      return propertyValue;
+    }
+
+  }
+
+  public static class CodeBuilder extends ScopedTestElementCallBuilder<BoundaryExtractor> {
+
+    public CodeBuilder(List<Method> builderMethods) {
+      super(BoundaryExtractor.class, builderMethods);
+    }
+
+    @Override
+    protected MethodCall buildScopedMethodCall(BoundaryExtractor testElement) {
+      TestElementParamBuilder paramBuilder = buildParamBuilder(testElement);
+      return buildMethodCall(paramBuilder.stringParam("refname"),
+          paramBuilder.stringParam("lboundary"), paramBuilder.stringParam("rboundary"));
+    }
+
+    private TestElementParamBuilder buildParamBuilder(BoundaryExtractor testElement) {
+      return new TestElementParamBuilder(testElement, "BoundaryExtractor");
+    }
+
+    @Override
+    protected void chainScopedElementAdditionalOptions(MethodCall ret,
+        BoundaryExtractor testElement) {
+      TestElementParamBuilder paramBuilder = buildParamBuilder(testElement);
+      ret.chain("fieldToCheck",
+          paramBuilder.enumParam("useHeaders", TargetField.RESPONSE_BODY));
+      ret.chain("matchNumber", paramBuilder.intParam("match_number", 1));
+      ret.chain("defaultValue", buildDefaultParam(paramBuilder));
+    }
+
+    private MethodParam buildDefaultParam(TestElementParamBuilder paramBuilder) {
+      MethodParam param = paramBuilder.boolParam("default_empty_value", false);
+      if (!param.isDefault()) {
+        return new StringParam("");
+      } else {
+        MethodParam sourceDefaultParam = paramBuilder.stringParam("default");
+        return sourceDefaultParam.isDefault() ? new StringParam(null) : sourceDefaultParam;
+      }
     }
 
   }
