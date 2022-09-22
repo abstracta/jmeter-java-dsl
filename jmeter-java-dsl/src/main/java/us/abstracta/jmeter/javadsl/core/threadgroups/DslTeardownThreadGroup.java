@@ -1,5 +1,6 @@
 package us.abstracta.jmeter.javadsl.core.threadgroups;
 
+import java.lang.reflect.Method;
 import java.util.List;
 import org.apache.jmeter.threads.AbstractThreadGroup;
 import org.apache.jmeter.threads.PostThreadGroup;
@@ -27,13 +28,23 @@ import org.apache.jmeter.threads.gui.PostThreadGroupGui;
  */
 public class DslTeardownThreadGroup extends DslSimpleThreadGroup<DslTeardownThreadGroup> {
 
+  private static final String DEFAULT_NAME = "tearDown Thread Group";
+
   public DslTeardownThreadGroup(String name, List<ThreadGroupChild> children) {
-    super(name != null ? name : "tearDown Thread Group", PostThreadGroupGui.class, children);
+    super(name != null ? name : DEFAULT_NAME, PostThreadGroupGui.class, children);
   }
 
   @Override
   protected AbstractThreadGroup buildSimpleThreadGroup() {
     return new PostThreadGroup();
+  }
+
+  public static class CodeBuilder extends SimpleThreadGroupCodeBuilder<PostThreadGroup> {
+
+    public CodeBuilder(List<Method> builderMethods) {
+      super(PostThreadGroup.class, DEFAULT_NAME, builderMethods);
+    }
+
   }
 
 }

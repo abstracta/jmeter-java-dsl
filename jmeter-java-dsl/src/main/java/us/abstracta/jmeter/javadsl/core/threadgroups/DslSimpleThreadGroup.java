@@ -1,16 +1,24 @@
 package us.abstracta.jmeter.javadsl.core.threadgroups;
 
+import java.lang.reflect.Method;
 import java.util.List;
 import org.apache.jmeter.control.LoopController;
 import org.apache.jmeter.gui.JMeterGUIComponent;
+import org.apache.jmeter.testelement.TestElement;
 import org.apache.jmeter.threads.AbstractThreadGroup;
+import org.apache.jmeter.threads.ThreadGroup;
+import us.abstracta.jmeter.javadsl.codegeneration.MethodCall;
+import us.abstracta.jmeter.javadsl.codegeneration.MethodCallContext;
+import us.abstracta.jmeter.javadsl.codegeneration.SingleTestElementCallBuilder;
+import us.abstracta.jmeter.javadsl.codegeneration.TestElementParamBuilder;
+import us.abstracta.jmeter.javadsl.codegeneration.params.ChildrenParam;
 
 /**
  * Contains common logic for thread groups that only require children in constructor and provide
  * simple settings (like iterations, threads, etc).
  *
  * @param <T> is the type of the thread group. Used for proper contract definition of fluent builder
- * methods.
+ *            methods.
  * @since 0.33
  */
 public abstract class DslSimpleThreadGroup<T extends DslSimpleThreadGroup<T>> extends
@@ -29,9 +37,10 @@ public abstract class DslSimpleThreadGroup<T extends DslSimpleThreadGroup<T>> ex
    * group for each configured thread.
    *
    * @param iterations contains number of iterations to run in each thread of the thread group. When
-   * -1 is specified, then the thread group will have no limit of iterations and will run until some
-   * other condition (like on error and stopping on error is configured) stops the thread group. By
-   * default, this value is initialized to 1.
+   *                   -1 is specified, then the thread group will have no limit of iterations and
+   *                   will run until some other condition (like on error and stopping on error is
+   *                   configured) stops the thread group. By default, this value is initialized to
+   *                   1.
    * @return the thread group for further configuration or usage.
    */
   public T iterations(int iterations) {
@@ -76,5 +85,30 @@ public abstract class DslSimpleThreadGroup<T extends DslSimpleThreadGroup<T>> ex
   }
 
   protected abstract AbstractThreadGroup buildSimpleThreadGroup();
+
+  protected abstract static class SimpleThreadGroupCodeBuilder<T extends TestElement> extends
+      SingleTestElementCallBuilder<T> {
+
+    private final String defaultName;
+
+    protected SimpleThreadGroupCodeBuilder(Class<T> testElementClass, String defaultName,
+        List<Method> builderMethods) {
+      super(testElementClass, builderMethods);
+      this.defaultName = defaultName;
+    }
+
+    @Override
+    protected MethodCall buildMethodCall(T testElement, MethodCallContext context) {
+      TestElementParamBuilder paramBuilder = new TestElementParamBuilder(testElement);
+      return buildMethodCall(paramBuilder.nameParam(defaultName),
+          new ChildrenParam<>(ThreadGroupChild[].class))
+          .chain("threadCount", paramBuilder.intParam(ThreadGroup.NUM_THREADS, 1))
+          .chain("iterations",
+              paramBuilder.intParam(ThreadGroup.MAIN_CONTROLLER + "/" + LoopController.LOOPS, 1))
+          .chain("sampleErrorAction", paramBuilder.enumParam(AbstractThreadGroup.ON_SAMPLE_ERROR,
+              SampleErrorAction.CONTINUE));
+    }
+
+  }
 
 }

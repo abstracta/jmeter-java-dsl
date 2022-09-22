@@ -9,8 +9,12 @@ import static us.abstracta.jmeter.javadsl.JmeterDsl.setupThreadGroup;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.testPlan;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.threadGroup;
 
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import us.abstracta.jmeter.javadsl.JmeterDslTest;
+import us.abstracta.jmeter.javadsl.codegeneration.MethodCallBuilderTest;
+import us.abstracta.jmeter.javadsl.core.DslTestPlan;
+import us.abstracta.jmeter.javadsl.core.threadgroups.BaseThreadGroup.SampleErrorAction;
 
 public class DslSetupThreadGroupTest extends JmeterDslTest {
 
@@ -28,6 +32,31 @@ public class DslSetupThreadGroupTest extends JmeterDslTest {
         )
     ).run();
     verify(getRequestedFor(urlEqualTo("/" + propVal)));
+  }
+
+  @Nested
+  public class CodeBuilderTest extends MethodCallBuilderTest {
+
+    public DslTestPlan testPlanWithSetupThreadGroup() {
+      return testPlan(
+          setupThreadGroup(
+              httpSampler("http://localhost")
+          )
+      );
+    }
+
+    public DslTestPlan testPlanWithSetupThreadGroupAndNonDefaultSettings() {
+      return testPlan(
+          setupThreadGroup()
+              .threadCount(5)
+              .iterations(2)
+              .sampleErrorAction(SampleErrorAction.STOP_TEST)
+              .children(
+                  httpSampler("http://localhost")
+              )
+      );
+    }
+
   }
 
 }
