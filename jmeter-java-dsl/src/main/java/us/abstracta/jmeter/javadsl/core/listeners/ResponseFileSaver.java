@@ -1,8 +1,14 @@
 package us.abstracta.jmeter.javadsl.core.listeners;
 
+import java.lang.reflect.Method;
+import java.util.List;
 import org.apache.jmeter.reporters.ResultSaver;
 import org.apache.jmeter.reporters.gui.ResultSaverGui;
 import org.apache.jmeter.testelement.TestElement;
+import us.abstracta.jmeter.javadsl.codegeneration.MethodCall;
+import us.abstracta.jmeter.javadsl.codegeneration.MethodCallContext;
+import us.abstracta.jmeter.javadsl.codegeneration.SingleTestElementCallBuilder;
+import us.abstracta.jmeter.javadsl.codegeneration.TestElementParamBuilder;
 
 /**
  * Generates one file for each response of a sample/request.
@@ -32,6 +38,20 @@ public class ResponseFileSaver extends BaseListener {
     ResultSaver ret = new ResultSaver();
     ret.setFilename(fileNamePrefix);
     return ret;
+  }
+
+  public static class CodeBuilder extends SingleTestElementCallBuilder<ResultSaver> {
+
+    public CodeBuilder(List<Method> builderMethods) {
+      super(ResultSaver.class, builderMethods);
+    }
+
+    @Override
+    protected MethodCall buildMethodCall(ResultSaver testElement, MethodCallContext context) {
+      return buildMethodCall(
+          new TestElementParamBuilder(testElement).stringParam(ResultSaver.FILENAME));
+    }
+
   }
 
 }

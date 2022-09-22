@@ -15,6 +15,7 @@ import org.influxdb.dto.QueryResult;
 import org.influxdb.impl.InfluxDBResultMapper;
 import org.influxdb.querybuilder.BuiltQuery.QueryBuilder;
 import org.jetbrains.annotations.NotNull;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,6 +23,8 @@ import org.testcontainers.containers.InfluxDBContainer;
 import org.testcontainers.containers.output.Slf4jLogConsumer;
 import org.testcontainers.utility.DockerImageName;
 import us.abstracta.jmeter.javadsl.JmeterDslTest;
+import us.abstracta.jmeter.javadsl.codegeneration.MethodCallBuilderTest;
+import us.abstracta.jmeter.javadsl.core.DslTestPlan;
 
 public class InfluxDbBackendListenerTest extends JmeterDslTest {
 
@@ -79,6 +82,38 @@ public class InfluxDbBackendListenerTest extends JmeterDslTest {
   private void renameMapKey(String fromKey, String toKey, Map<String, Long> map) {
     map.put(toKey, map.get(fromKey));
     map.remove(fromKey);
+  }
+
+  @Nested
+  public class CodeBuilderTest extends MethodCallBuilderTest {
+
+    public DslTestPlan testPlanWithInfluxDbListener() {
+      return testPlan(
+          threadGroup(1, 1,
+              httpSampler("http://localhost"),
+              influxDbListener("http://localhost?db=jmeter")
+                  .title("My Title")
+          )
+      );
+    }
+
+    public DslTestPlan testPlanWithInfluxDbListenerAndNonDefaultSettings() {
+      return testPlan(
+          threadGroup(1, 1,
+              httpSampler("http://localhost"),
+              influxDbListener("http://localhost?db=jmeter")
+                  .token("MyToken")
+                  .title("MyTitle")
+                  .application("MyApp")
+                  .measurement("MyMeassure")
+                  .samplersRegex("MySample")
+                  .tag("MyTag", "MyVal")
+                  .tag("MyOtherTag", "MyOtherVal")
+                  .queueSize(10)
+          )
+      );
+    }
+
   }
 
 }

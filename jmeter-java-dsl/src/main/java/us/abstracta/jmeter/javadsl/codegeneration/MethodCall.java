@@ -254,7 +254,7 @@ public class MethodCall {
    */
   public MethodCall chain(String methodName, MethodParam... params) {
     // this eases chaining don't having to check in client code for this condition
-    if (params.length == 1 && params[0].isDefault()) {
+    if (params.length > 0 && Arrays.stream(params).allMatch(MethodParam::isDefault)) {
       return this;
     }
     /*

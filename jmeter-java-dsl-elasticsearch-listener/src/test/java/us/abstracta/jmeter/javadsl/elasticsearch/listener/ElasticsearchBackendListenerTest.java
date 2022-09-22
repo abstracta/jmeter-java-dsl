@@ -27,9 +27,12 @@ import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.bucket.MultiBucketsAggregation;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms.Bucket;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.testcontainers.elasticsearch.ElasticsearchContainer;
 import us.abstracta.jmeter.javadsl.JmeterDslTest;
+import us.abstracta.jmeter.javadsl.codegeneration.MethodCallBuilderTest;
+import us.abstracta.jmeter.javadsl.core.DslTestPlan;
 
 public class ElasticsearchBackendListenerTest extends JmeterDslTest {
 
@@ -107,6 +110,26 @@ public class ElasticsearchBackendListenerTest extends JmeterDslTest {
     ret.put(OVERALL_STATS_LABEL,
         buckets.stream().mapToLong(MultiBucketsAggregation.Bucket::getDocCount).sum());
     return ret;
+  }
+
+  @Nested
+  public class CodeBuilderTest extends MethodCallBuilderTest {
+
+    public CodeBuilderTest() {
+      codeGenerator.addBuildersFrom(ElasticsearchBackendListener.class);
+    }
+
+    public DslTestPlan testPlanWithElasticSearchListener() {
+      return testPlan(
+          threadGroup(1, 1,
+              httpSampler("http://localhost"),
+              elasticsearchListener("http://localhost/jmeter")
+                  .credentials("user", "pass")
+                  .queueSize(5)
+          )
+      );
+    }
+
   }
 
 }

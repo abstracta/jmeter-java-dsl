@@ -11,9 +11,12 @@ import static us.abstracta.jmeter.javadsl.JmeterDsl.testPlan;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.threadGroup;
 
 import java.nio.file.Path;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import us.abstracta.jmeter.javadsl.JmeterDslTest;
+import us.abstracta.jmeter.javadsl.codegeneration.MethodCallBuilderTest;
+import us.abstracta.jmeter.javadsl.core.DslTestPlan;
 
 public class ResponseFileSaverTest extends JmeterDslTest {
 
@@ -43,6 +46,20 @@ public class ResponseFileSaverTest extends JmeterDslTest {
     String[] responseFiles = tempDir.toFile().list((dir, name) -> name.startsWith(
         RESPONSE_FILE_PREFIX));
     assertThat(responseFiles).hasSize(TEST_ITERATIONS);
+  }
+
+  @Nested
+  public class CodeBuilderTest extends MethodCallBuilderTest {
+
+    public DslTestPlan testPlanWithResponseFileSaver() {
+      return testPlan(
+          threadGroup(1, 1,
+              httpSampler("http://localhost"),
+              responseFileSaver("response")
+          )
+      );
+    }
+
   }
 
 }

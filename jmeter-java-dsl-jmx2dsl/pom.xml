@@ -40,6 +40,11 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
+      <groupId>us.abstracta.jmeter</groupId>
+      <artifactId>jmeter-java-dsl-elasticsearch-listener</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
       <groupId>info.picocli</groupId>
       <artifactId>picocli</artifactId>
       <version>${picocli.version}</version>
@@ -109,6 +114,7 @@
                   <include>xmlpull:xmlpull</include>
                   <include>org.apache.commons:commons-lang3</include>
                   <include>org.apache.commons:commons-collections4</include>
+                  <include>org.apache.commons:commons-math3</include>
                   <include>commons-io:commons-io</include>
                   <include>org.apache.httpcomponents:httpcore</include>
                   <include>org.apache.httpcomponents:httpclient</include>
@@ -126,6 +132,7 @@
                   <include>com.github.weisj:darklaf-theme</include>
                   <include>com.github.weisj:darklaf-core</include>
                   <include>com.github.weisj:darklaf-utils</include>
+                  <include>com.github.delirius325:jmeter-elasticsearch-backend-listener</include>
                 </includes>
                 <excludes>
                   <exclude>kg.apc:jmeter-plugins-charts</exclude>
