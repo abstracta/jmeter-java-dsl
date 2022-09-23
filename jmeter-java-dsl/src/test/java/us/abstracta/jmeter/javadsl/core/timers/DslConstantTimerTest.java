@@ -6,6 +6,7 @@ import static us.abstracta.jmeter.javadsl.JmeterDsl.httpSampler;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.testPlan;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.threadGroup;
 
+import java.time.Duration;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import us.abstracta.jmeter.javadsl.JmeterDslTest;
@@ -17,14 +18,14 @@ public class DslConstantTimerTest extends JmeterDslTest {
 
   @Test
   public void shouldLastAtLeastConfiguredTimeWhenUsingConstantTimer() throws Exception {
-    long durationMillis = 5000;
+    Duration timerDuration = Duration.ofSeconds(5);
     TestPlanStats stats = testPlan(
         threadGroup(1, 1,
-            constantTimer(durationMillis),
+            constantTimer(timerDuration),
             httpSampler(wiremockUri)
         )
     ).run();
-    assertThat(stats.duration().toMillis()).isGreaterThan(durationMillis);
+    assertThat(stats.duration()).isGreaterThan(timerDuration);
   }
 
   @Nested
@@ -33,7 +34,7 @@ public class DslConstantTimerTest extends JmeterDslTest {
     public DslTestPlan testPlanWithConstantTimer() {
       return testPlan(
           threadGroup(1, 1,
-              constantTimer(1000),
+              constantTimer(Duration.ofSeconds(1)),
               httpSampler("http://localhost")
           )
       );

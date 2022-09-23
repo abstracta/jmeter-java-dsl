@@ -1,6 +1,6 @@
 ///usr/bin/env jbang "$0" "$@" ; exit $?
 /*
-These commented lines make the class executable if you have jbang installed by making file
+These commented lines make the class executable if you have jbang installed by making the file
 executable (eg: chmod +x ./PerformanceTest.java) and just executing it with ./PerformanceTest.java
 */
 //DEPS org.assertj:assertj-core:3.23.1
@@ -76,8 +76,8 @@ public class PerformanceTest {
   }
 
   /*
-   This method is only included to make test class self executable. You can remove it when
-   executing tests with maven, gradle or some other tool.
+   This method is only included to make the test class self-executable. You can remove it when
+   executing tests with maven, gradle, or some other tool.
    */
   public static void main(String[] args) {
     SummaryGeneratingListener summaryListener = new SummaryGeneratingListener();

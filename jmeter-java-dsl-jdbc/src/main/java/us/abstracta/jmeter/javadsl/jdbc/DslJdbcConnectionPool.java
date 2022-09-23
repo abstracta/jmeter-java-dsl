@@ -4,7 +4,6 @@ import java.lang.reflect.Method;
 import java.sql.Connection;
 import java.sql.Driver;
 import java.time.Duration;
-import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -19,7 +18,6 @@ import us.abstracta.jmeter.javadsl.codegeneration.MethodCallContext;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodParam;
 import us.abstracta.jmeter.javadsl.codegeneration.SingleTestElementCallBuilder;
 import us.abstracta.jmeter.javadsl.codegeneration.TestElementParamBuilder;
-import us.abstracta.jmeter.javadsl.codegeneration.params.DurationParam;
 import us.abstracta.jmeter.javadsl.core.configs.BaseConfigElement;
 
 /**
@@ -209,10 +207,8 @@ public class DslJdbcConnectionPool extends BaseConfigElement {
           .chain("password", paramBuilder.stringParam("password"))
           .chain("autoCommit", paramBuilder.boolParam("autocommit", true))
           .chain("maxConnections", paramBuilder.intParam("poolMax", 0))
-          .chain("maxConnectionWait", paramBuilder.buildParam("timeout",
-              (expression, defaultValue) -> new DurationParam(expression, defaultValue,
-                  ChronoUnit.MILLIS),
-              DEFAULT_MAX_CONNECTION_WAIT))
+          .chain("maxConnectionWait",
+              paramBuilder.durationParamMillis("timeout", DEFAULT_MAX_CONNECTION_WAIT))
           .chain("transactionIsolation", new TransactionIsolationParam(
               testElement.getPropertyAsString("transactionIsolation")));
     }

@@ -2,6 +2,7 @@ package us.abstracta.jmeter.javadsl.codegeneration;
 
 import java.nio.charset.Charset;
 import java.time.Duration;
+import java.time.temporal.ChronoUnit;
 import java.util.function.BiFunction;
 import org.apache.jmeter.testelement.TestElement;
 import org.apache.jmeter.testelement.property.JMeterProperty;
@@ -234,6 +235,22 @@ public class TestElementParamBuilder {
    */
   public MethodParam durationParam(String propName) {
     return durationParam(propName, null);
+  }
+
+  /**
+   * Gets a MethodParam representing a test element property containing a duration (in
+   * milliseconds).
+   *
+   * @param propName     is the name of the property. For nested properties (a property that is
+   *                     inside another object property) you can use the slash character to separate
+   *                     the levels (eg: http_config/use_proxy).
+   * @param defaultValue the default value assigned to the JMeter test element property.
+   * @return the {@link MethodParam} instance.
+   */
+  public MethodParam durationParamMillis(String propName, Duration defaultValue) {
+    return buildParam(propName,
+        (expression, defValue) -> new DurationParam(expression, defValue, ChronoUnit.MILLIS),
+        defaultValue);
   }
 
   /**

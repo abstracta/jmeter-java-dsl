@@ -1,6 +1,7 @@
 package us.abstracta.jmeter.javadsl.core.timers;
 
 import java.lang.reflect.Method;
+import java.time.Duration;
 import java.util.List;
 import org.apache.jmeter.testelement.TestElement;
 import org.apache.jmeter.timers.ConstantTimer;
@@ -11,7 +12,7 @@ import us.abstracta.jmeter.javadsl.codegeneration.MethodCallContext;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodParam;
 import us.abstracta.jmeter.javadsl.codegeneration.SingleTestElementCallBuilder;
 import us.abstracta.jmeter.javadsl.codegeneration.TestElementParamBuilder;
-import us.abstracta.jmeter.javadsl.codegeneration.params.LongParam;
+import us.abstracta.jmeter.javadsl.codegeneration.params.DurationParam;
 
 /**
  * Allows using JMeter Constant Timers which pause the thread for a given period.
@@ -28,17 +29,17 @@ import us.abstracta.jmeter.javadsl.codegeneration.params.LongParam;
  */
 public class DslConstantTimer extends BaseTimer {
 
-  protected long durationMillis;
+  protected Duration duration;
 
-  public DslConstantTimer(long durationMillis) {
+  public DslConstantTimer(Duration duration) {
     super("Constant Timer", ConstantTimerGui.class);
-    this.durationMillis = durationMillis;
+    this.duration = duration;
   }
 
   @Override
   protected TestElement buildTestElement() {
     ConstantTimer ret = new ConstantTimer();
-    ret.setDelay(String.valueOf(durationMillis));
+    ret.setDelay(String.valueOf(duration.toMillis()));
     return ret;
   }
 
@@ -51,13 +52,14 @@ public class DslConstantTimer extends BaseTimer {
     @Override
     protected MethodCall buildMethodCall(ConstantTimer testElement, MethodCallContext context) {
       TestElementParamBuilder paramBuilder = new TestElementParamBuilder(testElement);
-      MethodParam delay = paramBuilder.longParam(RandomTimer.DELAY);
-      if (!(delay instanceof LongParam)) {
+      MethodParam delay = paramBuilder.durationParamMillis(RandomTimer.DELAY, null);
+      if (!(delay instanceof DurationParam)) {
         throw new UnsupportedOperationException("Using JMeter expressions in timer properties is "
             + "still not supported. Request it in the GitHub repository as an issue and we will "
             + "add support for it.");
       }
-      return ((LongParam) delay).getValue() == 0 ? MethodCall.emptyCall() : buildMethodCall(delay);
+      return ((DurationParam) delay).getValue().isZero() ? MethodCall.emptyCall()
+          : buildMethodCall(delay);
     }
 
   }

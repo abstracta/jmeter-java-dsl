@@ -1295,28 +1295,29 @@ public class JmeterDsl {
    *
    * @param durationMillis specifies the number of milliseconds for the timer to wait.
    * @return the timer for usage in test plan.
+   * @see #constantTimer(Duration)
    * @since 0.62
+   * @deprecated as of 0.66, use {@link #constantTimer(Duration)}
    */
+  @Deprecated
   public static DslConstantTimer constantTimer(long durationMillis) {
-    return new DslConstantTimer(durationMillis);
+    return constantTimer(Duration.ofMillis(durationMillis));
+  }
+
+  /**
+   * Builds a Constant Timer which pauses the thread with for a given duration.
+   *
+   * @param duration specifies the duration for the timer to wait.
+   * @return the timer for usage in test plan.
+   * @since 0.66
+   */
+  public static DslConstantTimer constantTimer(Duration duration) {
+    return new DslConstantTimer(duration);
   }
 
   /**
    * Builds a Uniform Random Timer which pauses the thread with a random time with uniform
    * distribution.
-   *
-   * <p>
-   * The timer uses the minimumMillis and maximumMillis to define the range of values to be used in
-   * the uniformly distributed selected value. These values differ from the parameters used in
-   * JMeter Uniform Random Timer element to make it simpler for general users to use. The generated
-   * JMeter test element uses as "constant delay offset" the minimumMillis value, and as "maximum
-   * random delay" (maximumMillis - minimumMillis) value.
-   * </p>
-   *
-   * <p>
-   * EXAMPLE: wait at least 3 seconds and maximum of 10 seconds
-   * {@code uniformRandomTimer(3000,10000)}
-   * <p>
    *
    * @param minimumMillis is used to set the constant delay of the Uniform Random Timer.
    * @param maximumMillis is used to set the maximum time the timer will be paused and will be used
@@ -1324,10 +1325,42 @@ public class JmeterDsl {
    *                      minimumMillis).
    * @return The Uniform Random Timer instance
    * @see DslUniformRandomTimer
+   * @see #uniformRandomTimer(Duration, Duration)
    * @since 0.16
+   * @deprecated as of 0.66, use {@link #uniformRandomTimer(Duration, Duration)}
    */
+  @Deprecated
   public static DslUniformRandomTimer uniformRandomTimer(long minimumMillis, long maximumMillis) {
-    return new DslUniformRandomTimer(minimumMillis, maximumMillis);
+    return uniformRandomTimer(Duration.ofMillis(minimumMillis), Duration.ofMillis(maximumMillis));
+  }
+
+  /**
+   * Builds a Uniform Random Timer which pauses the thread with a random time with uniform
+   * distribution.
+   *
+   * <p>
+   * The timer uses the minimum and maximum durations to define the range of values to be used in
+   * the uniformly distributed selected value. These values differ from the parameters used in
+   * JMeter Uniform Random Timer element to make it simpler for general users to use. The generated
+   * JMeter test element uses as "constant delay offset" the minimum value, and as "maximum
+   * random delay" (maximum - minimum) value.
+   * </p>
+   *
+   * <p>
+   * EXAMPLE: wait at least 3 seconds and maximum of 10 seconds
+   * {@code uniformRandomTimer(Duration.ofSeconds(3), Duration.ofSeconds(10))}
+   * <p>
+   *
+   * @param minimum is used to set the constant delay of the Uniform Random Timer.
+   * @param maximum is used to set the maximum time the timer will be paused and will be used
+   *                      to obtain the random delay from the result of (maximum -
+   *                      minimum).
+   * @return The Uniform Random Timer instance
+   * @see DslUniformRandomTimer
+   * @since 0.66
+   */
+  public static DslUniformRandomTimer uniformRandomTimer(Duration minimum, Duration maximum) {
+    return new DslUniformRandomTimer(minimum, maximum);
   }
 
   /**

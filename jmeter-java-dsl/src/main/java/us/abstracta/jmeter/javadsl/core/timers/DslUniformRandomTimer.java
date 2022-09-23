@@ -1,6 +1,7 @@
 package us.abstracta.jmeter.javadsl.core.timers;
 
 import java.lang.reflect.Method;
+import java.time.Duration;
 import java.util.List;
 import org.apache.jmeter.testelement.TestElement;
 import org.apache.jmeter.timers.RandomTimer;
@@ -12,7 +13,7 @@ import us.abstracta.jmeter.javadsl.codegeneration.MethodParam;
 import us.abstracta.jmeter.javadsl.codegeneration.SingleTestElementCallBuilder;
 import us.abstracta.jmeter.javadsl.codegeneration.TestElementParamBuilder;
 import us.abstracta.jmeter.javadsl.codegeneration.params.DoubleParam;
-import us.abstracta.jmeter.javadsl.codegeneration.params.LongParam;
+import us.abstracta.jmeter.javadsl.codegeneration.params.DurationParam;
 
 /**
  * Allows specifying JMeter Uniform Random Timers which pause the thread with a random time with
@@ -30,21 +31,21 @@ import us.abstracta.jmeter.javadsl.codegeneration.params.LongParam;
  */
 public class DslUniformRandomTimer extends BaseTimer {
 
-  protected long minimumMillis;
-  protected long maximumMillis;
+  protected Duration minimum;
+  protected Duration maximum;
 
-  public DslUniformRandomTimer(long minimumMillis, long maximumMillis) {
+  public DslUniformRandomTimer(Duration minimum, Duration maximum) {
     super("Uniform Random Timer", UniformRandomTimerGui.class);
-    this.minimumMillis = minimumMillis;
-    this.maximumMillis = maximumMillis;
+    this.minimum = minimum;
+    this.maximum = maximum;
 
   }
 
   @Override
   protected TestElement buildTestElement() {
     UniformRandomTimer urt = new UniformRandomTimer();
-    urt.setRange(maximumMillis - minimumMillis);
-    urt.setDelay(String.valueOf(minimumMillis));
+    urt.setRange(maximum.minus(minimum).toMillis());
+    urt.setDelay(String.valueOf(minimum.toMillis()));
     return urt;
   }
 
@@ -58,15 +59,16 @@ public class DslUniformRandomTimer extends BaseTimer {
     protected MethodCall buildMethodCall(UniformRandomTimer testElement,
         MethodCallContext context) {
       TestElementParamBuilder paramBuilder = new TestElementParamBuilder(testElement);
-      MethodParam delay = paramBuilder.longParam(RandomTimer.DELAY);
+      MethodParam delay = paramBuilder.durationParamMillis(RandomTimer.DELAY, null);
       MethodParam range = paramBuilder.doubleParam(RandomTimer.RANGE);
-      if (!(delay instanceof LongParam) || !(range instanceof DoubleParam)) {
+      if (!(delay instanceof DurationParam) || !(range instanceof DoubleParam)) {
         throw new UnsupportedOperationException("Using JMeter expressions in timer properties is "
             + "still not supported. Request it in the GitHub repository as an issue and we will "
             + "add support for it.");
       }
-      return buildMethodCall(delay, new LongParam(
-          ((LongParam) delay).getValue() + Math.round(((DoubleParam) range).getValue())));
+      Duration rangeDuration = Duration.ofMillis(Math.round(((DoubleParam) range).getValue()));
+      return buildMethodCall(delay,
+          new DurationParam(((DurationParam) delay).getValue().plus(rangeDuration)));
     }
 
   }

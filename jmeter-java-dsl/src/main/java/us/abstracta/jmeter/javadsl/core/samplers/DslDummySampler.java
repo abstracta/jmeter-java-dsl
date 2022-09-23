@@ -2,7 +2,6 @@ package us.abstracta.jmeter.javadsl.core.samplers;
 
 import java.lang.reflect.Method;
 import java.time.Duration;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 import kg.apc.jmeter.dummy.DummyElement;
 import kg.apc.jmeter.samplers.DummySampler;
@@ -12,7 +11,6 @@ import us.abstracta.jmeter.javadsl.codegeneration.MethodCall;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodCallContext;
 import us.abstracta.jmeter.javadsl.codegeneration.SingleTestElementCallBuilder;
 import us.abstracta.jmeter.javadsl.codegeneration.TestElementParamBuilder;
-import us.abstracta.jmeter.javadsl.codegeneration.params.DurationParam;
 import us.abstracta.jmeter.javadsl.core.util.JmeterFunction;
 
 /**
@@ -189,9 +187,7 @@ public class DslDummySampler extends BaseSampler<DslDummySampler> {
           .chain("responseCode", paramBuilder.stringParam("RESPONSE_CODE", DEFAULT_RESPONSE_CODE))
           .chain("responseMessage",
               paramBuilder.stringParam("RESPONSE_MESSAGE", DEFAULT_RESPONSE_MESSAGE))
-          .chain("responseTime", paramBuilder.buildParam("RESPONSE_TIME",
-              (expression, defaultValue) -> new DurationParam(expression, null, ChronoUnit.MILLIS),
-              null))
+          .chain("responseTime", paramBuilder.durationParamMillis("RESPONSE_TIME", null))
           .chain("simulateResponseTime", paramBuilder.boolParam("WAITING", false))
           .chain("url", paramBuilder.stringParam("URL"))
           .chain("requestBody", paramBuilder.stringParam("REQUEST_DATA"));

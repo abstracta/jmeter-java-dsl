@@ -5,11 +5,11 @@ actionText: User Guide →
 actionLink: /guide/
 features:
 - title: 💙 Git, IDE & Programmers Friendly
-  details: Simple way of defining performance tests which takes advantage of IDEs autocompletion and inline documentation.
+  details: Simple way of defining performance tests that takes advantage of IDEs autocompletion and inline documentation.
 - title: 💪 JMeter ecosystem & community
-  details: Use the most popular performance tool and take advantage of wide support of protocols and tools.
+  details: Use the most popular performance tool and take advantage of the wide support of protocols and tools.
 - title: 😎 Built-in features & extensibility
-  details: Built-in additional features which ease usage (like <a href="guide/#dsl-code-generation-from-jmx-file">jmx2dsl</a>)  and CI/CD pipelines integration. 
+  details: Built-in additional features which ease usage (like <a href="guide/#dsl-code-generation-from-jmx-file">jmx2dsl</a>)  and CI/CD pipelines integration.
 ---
 
 ## Example
