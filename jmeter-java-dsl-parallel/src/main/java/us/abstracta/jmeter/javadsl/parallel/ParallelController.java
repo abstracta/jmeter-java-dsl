@@ -100,7 +100,7 @@ public class ParallelController extends BaseController<ParallelController> {
    * in collected metrics.
    *
    * @return the controller for further configuration or usage.
-   * @since 0.66
+   * @since 1.0
    */
   public ParallelController generateParentSample() {
     return generateParentSample(true);

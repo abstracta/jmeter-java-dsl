@@ -128,7 +128,7 @@ public class JtlWriter extends BaseListener {
    *
    * @return the JtlWriter for further configuration or usage.
    * @see #withAllFields(boolean)
-   * @since 0.66
+   * @since 1.0
    */
   public JtlWriter withAllFields() {
     return withAllFields(true);

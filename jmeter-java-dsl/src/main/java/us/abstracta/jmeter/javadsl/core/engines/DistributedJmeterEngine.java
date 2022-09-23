@@ -69,7 +69,7 @@ public class DistributedJmeterEngine extends EmbeddedJmeterEngine {
    * @param enable specifies to enable or disable the setting. By default, it is set to false.
    * @return the DistributedJMeterEngine instance for further configuration or usage.
    * @see #stopEnginesOnTestEnd()
-   * @since 0.66
+   * @since 1.0
    */
   public DistributedJmeterEngine stopEnginesOnTestEnd(boolean enable) {
     stopEngines = enable;

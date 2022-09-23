@@ -44,7 +44,7 @@ public class PercentController extends BaseController<PercentController> {
    * execution has to be controlled, instead of relying on in general threads execution percentage.
    *
    * @return the controller for further configuration or usage.
-   * @since 0.66
+   * @since 1.0
    */
   public PercentController perThread() {
     return perThread(true);

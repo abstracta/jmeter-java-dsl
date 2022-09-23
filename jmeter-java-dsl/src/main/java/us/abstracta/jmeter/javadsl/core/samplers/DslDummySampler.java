@@ -102,7 +102,7 @@ public class DslDummySampler extends BaseSampler<DslDummySampler> {
    *                     the sampler.
    * @return the sampler for further configuration or usage.
    * @see #responseTime(Duration)
-   * @since 0.66
+   * @since 1.0
    */
   public DslDummySampler responseTime(String responseTime) {
     this.responseTime = responseTime;

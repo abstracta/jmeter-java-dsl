@@ -137,7 +137,7 @@ public class DslCsvDataSet extends BaseConfigElement {
    * @param enable specifies to enable or disable the setting. By default, it is set to false.
    * @return the dataset for further configuration or usage.
    * @see #ignoreFirstLine()
-   * @since 0.66
+   * @since 1.0
    */
   public DslCsvDataSet ignoreFirstLine(boolean enable) {
     this.ignoreFirstLine = enable;
@@ -164,7 +164,7 @@ public class DslCsvDataSet extends BaseConfigElement {
    * @param enable specifies to enable or disable the setting. By default, it is set to false.
    * @return the dataset for further configuration or usage.
    * @see #stopThreadOnEOF()
-   * @since 0.66
+   * @since 1.0
    */
   public DslCsvDataSet stopThreadOnEOF(boolean enable) {
     this.stopThread = enable;
@@ -213,7 +213,7 @@ public class DslCsvDataSet extends BaseConfigElement {
    * @param enable specifies to enable or disable the setting. By default, it is set to false.
    * @return the dataset for further configuration or usage.
    * @see #randomOrder()
-   * @since 0.66
+   * @since 1.0
    */
   public DslCsvDataSet randomOrder(boolean enable) {
     this.randomOrder = enable;

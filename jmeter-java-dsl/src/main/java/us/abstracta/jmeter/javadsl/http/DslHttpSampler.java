@@ -294,7 +294,7 @@ public class DslHttpSampler extends DslBaseHttpSampler<DslHttpSampler> {
    *
    * @param enable specifies to enable or disable the setting. By default, it is set to false.
    * @return the sampler for further configuration or usage.
-   * @since 0.66
+   * @since 1.0
    */
   public DslHttpSampler downloadEmbeddedResources(boolean enable) {
     this.downloadEmbeddedResources = enable;

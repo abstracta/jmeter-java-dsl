@@ -67,7 +67,7 @@ public class DslDebugPostProcessor extends BaseTestElement implements DslPostPro
    *
    * @return the post processor for further configuration or usage.
    * @see #samplerProperties(boolean)
-   * @since 0.66
+   * @since 1.0
    */
   public DslDebugPostProcessor samplerProperties() {
     return samplerProperties(true);
@@ -96,7 +96,7 @@ public class DslDebugPostProcessor extends BaseTestElement implements DslPostPro
    *
    * @return the post processor for further configuration or usage.
    * @see #jmeterProperties(boolean)
-   * @since 0.66
+   * @since 1.0
    */
   public DslDebugPostProcessor jmeterProperties() {
     return jmeterProperties(true);
@@ -126,7 +126,7 @@ public class DslDebugPostProcessor extends BaseTestElement implements DslPostPro
    *
    * @return the post processor for further configuration or usage.
    * @see #systemProperties(boolean)
-   * @since 0.66
+   * @since 1.0
    */
   public DslDebugPostProcessor systemProperties() {
     return systemProperties(true);

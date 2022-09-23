@@ -181,7 +181,7 @@ public class DslHttpDefaults extends BaseConfigElement {
    * @param enable specifies to enable or disable the setting. By default, it is set to false.
    * @return the config element for further configuration or usage.
    * @see #downloadEmbeddedResources()
-   * @since 0.66
+   * @since 1.0
    */
   public DslHttpDefaults downloadEmbeddedResources(boolean enable) {
     this.downloadEmbeddedResources = enable;
@@ -255,7 +255,7 @@ public class DslHttpDefaults extends BaseConfigElement {
    * entire test plan and potentially other test plans running in the same JVM instance.
    *
    * @return the config element for further configuration or usage.
-   * @since 0.66
+   * @since 1.0
    */
   public DslHttpDefaults resetConnectionsBetweenIterations() {
     return resetConnectionsBetweenIterations(true);

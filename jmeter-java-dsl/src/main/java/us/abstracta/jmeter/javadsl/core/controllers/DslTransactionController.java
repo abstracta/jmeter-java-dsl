@@ -34,7 +34,7 @@ public class DslTransactionController extends BaseController<DslTransactionContr
    * Specifies to include time spent in timers and pre- and post-processors in sample results.
    *
    * @return the controller for further configuration or usage.
-   * @since 0.66
+   * @since 1.0
    */
   public DslTransactionController includeTimersAndProcessorsTime() {
     return includeTimersAndProcessorsTime(true);
@@ -64,7 +64,7 @@ public class DslTransactionController extends BaseController<DslTransactionContr
    * not the transaction children results.
    *
    * @return the controller for further configuration or usage.
-   * @since 0.66
+   * @since 1.0
    */
   public DslTransactionController generateParentSample() {
     return generateParentSample(true);

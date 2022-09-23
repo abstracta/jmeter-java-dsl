@@ -28,21 +28,6 @@ public abstract class TestElementContainer<T extends TestElementContainer<T, C>,
     this.children.addAll(children);
   }
 
-  /**
-   * Allows specifying children test elements for the sampler, which allows for example extracting
-   * information from HTTP response, alter HTTP request, assert HTTP response contents, etc.
-   *
-   * @param children list of test elements to add as children of this sampler.
-   * @return the altered sampler to allow for fluent API usage.
-   * @since 0.12
-   * @deprecated as of 0.66, this method should no longer be used
-   */
-  @SafeVarargs
-  @Deprecated
-  protected final TestElementContainer<T, C> addChildren(C... children) {
-    return children(children);
-  }
-
   @SuppressWarnings("unchecked")
   protected T children(C... children) {
     this.children.addAll(Arrays.asList(children));

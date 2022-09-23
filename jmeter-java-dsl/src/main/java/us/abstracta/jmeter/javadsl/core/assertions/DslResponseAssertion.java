@@ -80,7 +80,7 @@ public class DslResponseAssertion extends DslScopedTestElement<DslResponseAssert
    * @param enable specifies to enable or disable the setting. By default, it is set to false.
    * @return the response assertion for further configuration or usage.
    * @see #ignoreStatus()
-   * @since 0.66
+   * @since 1.0
    */
   public DslResponseAssertion ignoreStatus(boolean enable) {
     ignoreStatus = enable;
@@ -213,7 +213,7 @@ public class DslResponseAssertion extends DslScopedTestElement<DslResponseAssert
    * @param enable specifies to enable or disable the setting. By default, it is set to false.
    * @return the response assertion for further configuration or usage.
    * @see #invertCheck()
-   * @since 0.66
+   * @since 1.0
    */
   public DslResponseAssertion invertCheck(boolean enable) {
     this.invertCheck = enable;
@@ -257,7 +257,7 @@ public class DslResponseAssertion extends DslScopedTestElement<DslResponseAssert
    * @param enable specifies to enable or disable the setting. By default, it is set to false.
    * @return the response assertion for further configuration or usage.
    * @see #anyMatch()
-   * @since 0.66
+   * @since 1.0
    */
   public DslResponseAssertion anyMatch(boolean enable) {
     anyMatch = enable;

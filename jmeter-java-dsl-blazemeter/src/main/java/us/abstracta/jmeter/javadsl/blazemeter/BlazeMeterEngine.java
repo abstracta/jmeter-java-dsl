@@ -284,7 +284,7 @@ public class BlazeMeterEngine implements DslJmeterEngine {
    * @param enable specifies to enable or disable the setting. By default, it is set to false.
    * @return the engine for further configuration or usage.
    * @see #useDebugRun()
-   * @since 0.66
+   * @since 1.0
    */
   public BlazeMeterEngine useDebugRun(boolean enable) {
     this.useDebugRun = enable;

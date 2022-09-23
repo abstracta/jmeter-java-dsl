@@ -27,7 +27,7 @@ public abstract class BaseController<T extends BaseController<T>> extends
    * @param children set of elements to be included in the controller. This list is appended to any
    *                 children defined in controller builder method.
    * @return a new controller instance for further configuration or usage.
-   * @since 0.66
+   * @since 1.0
    */
   @Override
   public T children(ThreadGroupChild... children) {

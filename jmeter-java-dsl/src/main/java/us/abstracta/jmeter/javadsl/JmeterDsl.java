@@ -1200,7 +1200,7 @@ public class JmeterDsl {
    * @param fileName  the name to be used for the file. <b>File names should be unique, otherwise
    *                  the new results will be appended to existing file.</b>
    * @return the JtlWriter instance.
-   * @since 0.66
+   * @since 1.0
    */
   public static JtlWriter jtlWriter(String directory, String fileName) {
     return new JtlWriter(directory, fileName);
@@ -1269,7 +1269,7 @@ public class JmeterDsl {
    *                         execution.</b>
    * @return the HTML Reporter instance
    * @see HtmlReporter
-   * @since 0.66
+   * @since 1.0
    */
   public static HtmlReporter htmlReporter(String reportsDirectory, String name) throws IOException {
     return new HtmlReporter(reportsDirectory, name);
@@ -1291,47 +1291,14 @@ public class JmeterDsl {
   }
 
   /**
-   * Builds a Constant Timer which pauses the thread with for a given number of milliseconds.
-   *
-   * @param durationMillis specifies the number of milliseconds for the timer to wait.
-   * @return the timer for usage in test plan.
-   * @see #constantTimer(Duration)
-   * @since 0.62
-   * @deprecated as of 0.66, use {@link #constantTimer(Duration)}
-   */
-  @Deprecated
-  public static DslConstantTimer constantTimer(long durationMillis) {
-    return constantTimer(Duration.ofMillis(durationMillis));
-  }
-
-  /**
    * Builds a Constant Timer which pauses the thread with for a given duration.
    *
    * @param duration specifies the duration for the timer to wait.
    * @return the timer for usage in test plan.
-   * @since 0.66
+   * @since 1.0
    */
   public static DslConstantTimer constantTimer(Duration duration) {
     return new DslConstantTimer(duration);
-  }
-
-  /**
-   * Builds a Uniform Random Timer which pauses the thread with a random time with uniform
-   * distribution.
-   *
-   * @param minimumMillis is used to set the constant delay of the Uniform Random Timer.
-   * @param maximumMillis is used to set the maximum time the timer will be paused and will be used
-   *                      to obtain the random delay from the result of (maximumMillis -
-   *                      minimumMillis).
-   * @return The Uniform Random Timer instance
-   * @see DslUniformRandomTimer
-   * @see #uniformRandomTimer(Duration, Duration)
-   * @since 0.16
-   * @deprecated as of 0.66, use {@link #uniformRandomTimer(Duration, Duration)}
-   */
-  @Deprecated
-  public static DslUniformRandomTimer uniformRandomTimer(long minimumMillis, long maximumMillis) {
-    return uniformRandomTimer(Duration.ofMillis(minimumMillis), Duration.ofMillis(maximumMillis));
   }
 
   /**
@@ -1357,7 +1324,7 @@ public class JmeterDsl {
    *                      minimum).
    * @return The Uniform Random Timer instance
    * @see DslUniformRandomTimer
-   * @since 0.66
+   * @since 1.0
    */
   public static DslUniformRandomTimer uniformRandomTimer(Duration minimum, Duration maximum) {
     return new DslUniformRandomTimer(minimum, maximum);
