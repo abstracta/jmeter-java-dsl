@@ -488,7 +488,7 @@ public class DslHttpSampler extends DslBaseHttpSampler<DslHttpSampler> {
 
     private static class HttpMethodParam extends StringParam {
 
-      private static final Map<String, String> CONSTANT_METHODS = findConstantNames(
+      private static final Map<String, String> CONSTANT_METHODS = findConstantNamesMap(
           HTTPConstantsInterface.class, String.class,
           f -> {
             try {
@@ -519,9 +519,9 @@ public class DslHttpSampler extends DslBaseHttpSampler<DslHttpSampler> {
       }
 
       @Override
-      public Set<Class<?>> getImports() {
+      public Set<String> getImports() {
         return findConstant() != null
-            ? Collections.singleton(HTTPConstants.class)
+            ? Collections.singleton(HTTPConstants.class.getName())
             : Collections.emptySet();
       }
 

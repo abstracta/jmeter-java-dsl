@@ -1,14 +1,25 @@
 package us.abstracta.jmeter.javadsl.jdbc;
 
+import java.lang.reflect.Method;
 import java.sql.Connection;
 import java.sql.Driver;
 import java.time.Duration;
+import java.time.temporal.ChronoUnit;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import org.apache.jmeter.protocol.jdbc.config.DataSourceElement;
 import org.apache.jmeter.testbeans.gui.TestBeanGUI;
 import org.apache.jmeter.testelement.TestElement;
+import us.abstracta.jmeter.javadsl.codegeneration.MethodCall;
+import us.abstracta.jmeter.javadsl.codegeneration.MethodCallContext;
+import us.abstracta.jmeter.javadsl.codegeneration.MethodParam;
+import us.abstracta.jmeter.javadsl.codegeneration.SingleTestElementCallBuilder;
+import us.abstracta.jmeter.javadsl.codegeneration.TestElementParamBuilder;
+import us.abstracta.jmeter.javadsl.codegeneration.params.DurationParam;
 import us.abstracta.jmeter.javadsl.core.configs.BaseConfigElement;
 
 /**
@@ -20,6 +31,9 @@ public class DslJdbcConnectionPool extends BaseConfigElement {
 
   private static final Map<Integer, String> TRANSACTION_ISOLATION_TO_PROPERTY_VALUE =
       buildTransactionIsolationToPropertyValueMapping();
+  private static final Duration DEFAULT_MAX_CONNECTION_WAIT = Duration.ofSeconds(10);
+  private static final int DEFAULT_TRANSACTION_ISOLATION = -1;
+  private static final String DEFAULT_PROPERTY_VALUE = "DEFAULT";
 
   protected Class<? extends Driver> driverClass;
   protected String url;
@@ -27,8 +41,8 @@ public class DslJdbcConnectionPool extends BaseConfigElement {
   protected String password;
   protected boolean autoCommit = true;
   protected int maxConnections;
-  protected Duration maxConnectionWait = Duration.ofSeconds(10);
-  protected int transactionIsolation = -1;
+  protected Duration maxConnectionWait = DEFAULT_MAX_CONNECTION_WAIT;
+  protected int transactionIsolation = DEFAULT_TRANSACTION_ISOLATION;
 
   public DslJdbcConnectionPool(String name, Class<? extends Driver> driverClass, String url) {
     super(name, TestBeanGUI.class);
@@ -38,7 +52,7 @@ public class DslJdbcConnectionPool extends BaseConfigElement {
 
   private static Map<Integer, String> buildTransactionIsolationToPropertyValueMapping() {
     HashMap<Integer, String> ret = new HashMap<>();
-    ret.put(-1, "DEFAULT");
+    ret.put(DEFAULT_TRANSACTION_ISOLATION, DEFAULT_PROPERTY_VALUE);
     ret.put(Connection.TRANSACTION_NONE, "TRANSACTION_NONE");
     ret.put(Connection.TRANSACTION_READ_COMMITTED, "TRANSACTION_READ_COMMITTED");
     ret.put(Connection.TRANSACTION_READ_UNCOMMITTED, "TRANSACTION_READ_UNCOMMITTED");
@@ -83,8 +97,8 @@ public class DslJdbcConnectionPool extends BaseConfigElement {
    * transaction.
    *
    * @param enabled specifies whether auto-commit is enabled or disabled by default. The connection
-   *                behavior can be changed at any point in time by {@link
-   *                DslJdbcSampler#autoCommit(boolean)}. By default, this is enabled.
+   *                behavior can be changed at any point in time by
+   *                {@link DslJdbcSampler#autoCommit(boolean)}. By default, this is enabled.
    * @return the config element for further configuration or usage.
    */
   public DslJdbcConnectionPool autoCommit(boolean enabled) {
@@ -137,14 +151,14 @@ public class DslJdbcConnectionPool extends BaseConfigElement {
    * Transaction isolation level are usually required to be tuned either to improve performance or
    * avoid potential conflicts between concurrent queries.
    *
-   * @param transactionIsolation specifies a transaction level which value is -1 or one of {@link
-   *                             Connection#TRANSACTION_NONE},
+   * @param transactionIsolation specifies a transaction level which value is -1 or one of
+   *                             {@link Connection#TRANSACTION_NONE},
    *                             {@link Connection#TRANSACTION_READ_COMMITTED},
-   *                             {@link Connection#TRANSACTION_READ_UNCOMMITTED}, {@link
-   *                             Connection#TRANSACTION_REPEATABLE_READ} or {@link
-   *                             Connection#TRANSACTION_SERIALIZABLE}. By default is set to -1,
-   *                             which means that it will use the default level for the connection
-   *                             string, session or database.
+   *                             {@link Connection#TRANSACTION_READ_UNCOMMITTED},
+   *                             {@link Connection#TRANSACTION_REPEATABLE_READ} or
+   *                             {@link Connection#TRANSACTION_SERIALIZABLE}. By default is set to
+   *                             -1, which means that it will use the default level for the
+   *                             connection string, session or database.
    * @return the config element for further configuration or usage.
    * @see java.sql.Connection
    */
@@ -177,6 +191,77 @@ public class DslJdbcConnectionPool extends BaseConfigElement {
     return Optional.ofNullable(TRANSACTION_ISOLATION_TO_PROPERTY_VALUE.get(val))
         .orElseThrow(() -> new IllegalArgumentException(
             "Unknown transaction level " + val + " for pool " + name));
+  }
+
+  public static class CodeBuilder extends SingleTestElementCallBuilder<DataSourceElement> {
+
+    public CodeBuilder(List<Method> builderMethods) {
+      super(DataSourceElement.class, builderMethods);
+    }
+
+    @Override
+    protected MethodCall buildMethodCall(DataSourceElement testElement, MethodCallContext context) {
+      TestElementParamBuilder paramBuilder = new TestElementParamBuilder(testElement);
+      return buildMethodCall(paramBuilder.stringParam("dataSource"),
+          new ClassParam(testElement.getPropertyAsString("driver")),
+          paramBuilder.stringParam("dbUrl"))
+          .chain("user", paramBuilder.stringParam("username"))
+          .chain("password", paramBuilder.stringParam("password"))
+          .chain("autoCommit", paramBuilder.boolParam("autocommit", true))
+          .chain("maxConnections", paramBuilder.intParam("poolMax", 0))
+          .chain("maxConnectionWait", paramBuilder.buildParam("timeout",
+              (expression, defaultValue) -> new DurationParam(expression, defaultValue,
+                  ChronoUnit.MILLIS),
+              DEFAULT_MAX_CONNECTION_WAIT))
+          .chain("transactionIsolation", new TransactionIsolationParam(
+              testElement.getPropertyAsString("transactionIsolation")));
+    }
+
+  }
+
+  private static class ClassParam extends MethodParam {
+
+    private final String className;
+
+    private ClassParam(String className) {
+      super(Class.class, null);
+      this.className = className;
+    }
+
+    @Override
+    public Set<String> getImports() {
+      return Collections.singleton(className);
+    }
+
+    @Override
+    protected String buildCode(String indent) {
+      return className.substring(className.lastIndexOf(".") + 1) + ".class";
+    }
+
+  }
+
+  private static class TransactionIsolationParam extends MethodParam {
+
+    protected TransactionIsolationParam(String expression) {
+      super(int.class, expression);
+    }
+
+    @Override
+    public boolean isDefault() {
+      return expression == null || DEFAULT_PROPERTY_VALUE.equals(expression);
+    }
+
+    @Override
+    public Set<String> getImports() {
+      return DEFAULT_PROPERTY_VALUE.equals(expression) ? Collections.emptySet()
+          : Collections.singleton(Connection.class.getName());
+    }
+
+    @Override
+    protected String buildCode(String indent) {
+      return DEFAULT_PROPERTY_VALUE.equals(expression) ? "-1" : "Connection." + expression;
+    }
+
   }
 
 }

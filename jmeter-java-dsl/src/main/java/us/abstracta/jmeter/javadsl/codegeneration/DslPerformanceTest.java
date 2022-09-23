@@ -36,12 +36,12 @@ public class DslPerformanceTest {
         "org.assertj:assertj-core:3.23.1"
     ));
     dependencyPaths.addAll(dependencies.entrySet().stream()
-        .filter(e -> testPlanMethodCall.getStaticImports().contains(e.getKey())
-            || testPlanMethodCall.getImports().contains(e.getKey()))
+        .filter(e -> testPlanMethodCall.getStaticImports().contains(e.getKey().getName())
+            || testPlanMethodCall.getImports().contains(e.getKey().getName()))
         .map(Entry::getValue)
         .collect(Collectors.toList()));
-    return dependencyPaths
-        .stream().map(d -> "//DEPS " + d)
+    return dependencyPaths.stream()
+        .map(d -> "//DEPS " + d)
         .collect(Collectors.joining("\n"));
   }
 
@@ -60,7 +60,7 @@ public class DslPerformanceTest {
     TreeSet<String> imports = new TreeSet<>();
     imports.add("org.assertj.core.api.Assertions.assertThat");
     imports.addAll(testPlanMethodCall.getStaticImports().stream()
-        .map(c -> c.getName() + ".*")
+        .map(c -> c + ".*")
         .collect(Collectors.toList()));
     return buildImportsCode(imports, "static ");
   }
@@ -80,11 +80,10 @@ public class DslPerformanceTest {
         "org.junit.platform.launcher.listeners.SummaryGeneratingListener",
         "org.junit.platform.launcher.listeners.TestExecutionSummary"
     ));
-    Set<Class<?>> classes = new HashSet<>(testPlanMethodCall.getImports());
-    classes.addAll(Arrays.asList(IOException.class, PrintWriter.class, TestPlanStats.class));
-    imports.addAll(classes.stream()
-        .map(Class::getName)
-        .collect(Collectors.toList()));
+    Set<String> classes = new HashSet<>(testPlanMethodCall.getImports());
+    classes.addAll(Arrays.asList(IOException.class.getName(), PrintWriter.class.getName(),
+        TestPlanStats.class.getName()));
+    imports.addAll(classes);
     return buildImportsCode(imports, "");
   }
 

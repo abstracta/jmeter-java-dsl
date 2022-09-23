@@ -31,8 +31,8 @@ public class EnumParam<T extends Enum<?> & EnumPropertyValue> extends FixedParam
   }
 
   @Override
-  public Set<Class<?>> getImports() {
-    return Collections.singleton(paramType);
+  public Set<String> getImports() {
+    return Collections.singleton(paramType.getName());
   }
 
   @Override

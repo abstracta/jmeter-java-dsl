@@ -66,14 +66,14 @@ public class ChildrenParam<T> extends MethodParam {
   }
 
   @Override
-  public Set<Class<?>> getStaticImports() {
+  public Set<String> getStaticImports() {
     return children.stream()
         .flatMap(c -> c.getStaticImports().stream())
         .collect(Collectors.toSet());
   }
 
   @Override
-  public Set<Class<?>> getImports() {
+  public Set<String> getImports() {
     return children.stream()
         .flatMap(c -> c.getImports().stream())
         .collect(Collectors.toSet());

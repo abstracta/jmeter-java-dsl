@@ -12,7 +12,7 @@ import us.abstracta.jmeter.javadsl.codegeneration.params.StringParam;
 
 public class ContentTypeParam extends FixedParam<ContentType> {
 
-  private static final Map<ContentType, String> CONSTANT_CONTENT_TYPES = findConstantNames(
+  private static final Map<ContentType, String> CONSTANT_CONTENT_TYPES = findConstantNamesMap(
       ContentType.class, ContentType.class,
       f -> !"DEFAULT_TEXT".equals(f.getName()) && !"DEFAULT_BINARY".equals(f.getName()));
 
@@ -21,8 +21,8 @@ public class ContentTypeParam extends FixedParam<ContentType> {
   }
 
   @Override
-  public Set<Class<?>> getImports() {
-    return Collections.singleton(ContentType.class);
+  public Set<String> getImports() {
+    return Collections.singleton(ContentType.class.getName());
   }
 
   @Override

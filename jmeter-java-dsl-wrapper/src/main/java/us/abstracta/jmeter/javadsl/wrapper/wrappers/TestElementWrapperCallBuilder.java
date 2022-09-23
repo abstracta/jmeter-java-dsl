@@ -107,10 +107,10 @@ public class TestElementWrapperCallBuilder<T extends TestElement> extends
     }
 
     @Override
-    public Set<Class<?>> getImports() {
+    public Set<String> getImports() {
       if (prop instanceof CollectionProperty) {
         return Collections.singleton(
-            ((CollectionProperty) prop).size() == 1 ? Collections.class : Arrays.class);
+            (((CollectionProperty) prop).size() == 1 ? Collections.class : Arrays.class).getName());
       } else {
         return Collections.emptySet();
       }
@@ -152,8 +152,8 @@ public class TestElementWrapperCallBuilder<T extends TestElement> extends
     }
 
     @Override
-    public Set<Class<?>> getImports() {
-      return Collections.singleton(constructorType);
+    public Set<String> getImports() {
+      return Collections.singleton(constructorType.getName());
     }
 
     @Override

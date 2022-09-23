@@ -15,16 +15,17 @@ import us.abstracta.jmeter.javadsl.codegeneration.MethodCall;
 public class EncodingParam extends FixedParam<Charset> {
 
   private static final Map<Charset, String> STANDARD_CHARSETS_NAMES =
-      findConstantNames(StandardCharsets.class, Charset.class, s -> true);
+      findConstantNamesMap(StandardCharsets.class, Charset.class, s -> true);
 
   public EncodingParam(String expression, Charset defaultValue) {
     super(Charset.class, expression, Charset::forName, defaultValue);
   }
 
   @Override
-  public Set<Class<?>> getImports() {
-    return Collections.singleton(
-        STANDARD_CHARSETS_NAMES.get(value) != null ? StandardCharsets.class : Charset.class);
+  public Set<String> getImports() {
+    return Collections.singleton((STANDARD_CHARSETS_NAMES.get(value) != null
+        ? StandardCharsets.class
+        : Charset.class).getName());
   }
 
   public String buildCode(String indent) {

@@ -14,33 +14,48 @@ import us.abstracta.jmeter.javadsl.codegeneration.MethodCall;
  */
 public class DurationParam extends FixedParam<Duration> {
 
-  private final TemporalUnit unit;
-
   public DurationParam(String expression, Duration defaultValue) {
     this(expression, defaultValue, ChronoUnit.SECONDS);
   }
 
   public DurationParam(Duration value) {
     super(Duration.class, value, null);
-    this.unit = ChronoUnit.SECONDS;
   }
 
   public DurationParam(String expression, Duration defaultValue, TemporalUnit unit) {
     super(Duration.class, expression, v -> Duration.of(Long.parseLong(v), unit), defaultValue);
-    this.unit = unit;
   }
 
   @Override
-  public Set<Class<?>> getImports() {
-    return Collections.singleton(Duration.class);
+  public Set<String> getImports() {
+    return Collections.singleton(Duration.class.getName());
   }
 
   @Override
   public String buildCode(String indent) {
-    return value.isZero() ? Duration.class.getSimpleName() + ".ZERO"
-        : MethodCall.forStaticMethod(Duration.class, "of" + unit,
-                new LongParam(unit == ChronoUnit.MILLIS ? value.toMillis() : value.get(unit)))
-            .buildCode();
+    if (value.isZero()) {
+      return Duration.class.getSimpleName() + ".ZERO";
+    }
+    TemporalUnit outputUnit;
+    long outputValue;
+    if (value.getNano() != 0) {
+      outputUnit = ChronoUnit.MILLIS;
+      outputValue = value.toMillis();
+    } else if (value.toMinutes() * 60 != value.getSeconds()) {
+      outputUnit = ChronoUnit.SECONDS;
+      outputValue = value.getSeconds();
+    } else if (value.toHours() * 60 != value.toMinutes()) {
+      outputUnit = ChronoUnit.MINUTES;
+      outputValue = value.toMinutes();
+    } else if (value.toDays() * 24 != value.toHours()) {
+      outputUnit = ChronoUnit.HOURS;
+      outputValue = value.toHours();
+    } else {
+      outputUnit = ChronoUnit.DAYS;
+      outputValue = value.toDays();
+    }
+    return MethodCall.forStaticMethod(Duration.class, "of" + outputUnit, new LongParam(outputValue))
+        .buildCode();
   }
 
 }

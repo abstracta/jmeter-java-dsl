@@ -239,12 +239,12 @@ public class DslWeightedSwitchController extends BaseController<DslWeightedSwitc
     }
 
     @Override
-    public Set<Class<?>> getStaticImports() {
+    public Set<String> getStaticImports() {
       return child.getStaticImports();
     }
 
     @Override
-    public Set<Class<?>> getImports() {
+    public Set<String> getImports() {
       return child.getImports();
     }
 

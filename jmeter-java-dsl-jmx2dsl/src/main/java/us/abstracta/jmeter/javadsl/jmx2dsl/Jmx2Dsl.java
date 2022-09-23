@@ -13,6 +13,7 @@ import us.abstracta.jmeter.javadsl.JmeterDsl;
 import us.abstracta.jmeter.javadsl.codegeneration.DslCodeGenerator;
 import us.abstracta.jmeter.javadsl.elasticsearch.listener.ElasticsearchBackendListener;
 import us.abstracta.jmeter.javadsl.graphql.DslGraphqlSampler;
+import us.abstracta.jmeter.javadsl.jdbc.JdbcJmeterDsl;
 import us.abstracta.jmeter.javadsl.parallel.ParallelController;
 import us.abstracta.jmeter.javadsl.wrapper.WrapperJmeterDsl;
 
@@ -41,6 +42,7 @@ public class Jmx2Dsl implements Callable<Integer> {
   public Integer call() throws Exception {
     DslCodeGenerator codeGenerator = new DslCodeGenerator();
     addBuildersFrom(JmeterDsl.class, "jmeter-java-dsl", codeGenerator);
+    addBuildersFrom(JdbcJmeterDsl.class, "jmeter-java-dsl-jdbc", codeGenerator);
     addBuildersFrom(DslGraphqlSampler.class, "jmeter-java-dsl-graphql", codeGenerator);
     addBuildersFrom(ParallelController.class, "jmeter-java-dsl-parallel", codeGenerator);
     addBuildersFrom(WrapperJmeterDsl.class, "jmeter-java-dsl-wrapper", codeGenerator);

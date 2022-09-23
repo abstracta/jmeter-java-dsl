@@ -5,9 +5,7 @@ import com.blazemeter.jmeter.RandomCSVDataSetConfigGui;
 import java.lang.reflect.Method;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 import org.apache.jmeter.config.CSVDataSet;
 import org.apache.jmeter.testbeans.gui.TestBeanGUI;
 import org.apache.jmeter.testelement.TestElement;
@@ -19,7 +17,7 @@ import us.abstracta.jmeter.javadsl.codegeneration.TestElementParamBuilder;
 import us.abstracta.jmeter.javadsl.codegeneration.params.BoolParam;
 import us.abstracta.jmeter.javadsl.codegeneration.params.EnumParam;
 import us.abstracta.jmeter.javadsl.codegeneration.params.EnumParam.EnumPropertyValue;
-import us.abstracta.jmeter.javadsl.codegeneration.params.FixedParam;
+import us.abstracta.jmeter.javadsl.codegeneration.params.StringArrayParam;
 
 /**
  * Allows using a CSV file as input data for JMeter variables to use in test plan.
@@ -192,7 +190,8 @@ public class DslCsvDataSet extends BaseConfigElement {
    * Specifies to get file lines in random order instead of sequentially iterating over them.
    * <p>
    * When this method is invoked
-   * <a href="https://github.com/Blazemeter/jmeter-bzm-plugins/blob/master/random-csv-data-set/RandomCSVDataSetConfig.md">Random
+   * <a
+   * href="https://github.com/Blazemeter/jmeter-bzm-plugins/blob/master/random-csv-data-set/RandomCSVDataSetConfig.md">Random
    * CSV Data Set plugin</a> is used.
    * <p>
    * <b>Warning:</b> Getting lines in random order has a performance penalty.
@@ -356,21 +355,6 @@ public class DslCsvDataSet extends BaseConfigElement {
         TestElementParamBuilder paramBuilder) {
       return new BoolParam(testElement.getClass() == RandomCSVDataSetConfig.class
           && !paramBuilder.boolParam("randomOrder", false).isDefault(), false);
-    }
-
-  }
-
-  private static class StringArrayParam extends FixedParam<String[]> {
-
-    protected StringArrayParam(String expression) {
-      super(String[].class, expression, e -> e.split(","), null);
-    }
-
-    @Override
-    public String buildCode(String indent) {
-      return Arrays.stream(value)
-          .map(s -> MethodParam.buildStringLiteral(s, indent))
-          .collect(Collectors.joining(", "));
     }
 
   }

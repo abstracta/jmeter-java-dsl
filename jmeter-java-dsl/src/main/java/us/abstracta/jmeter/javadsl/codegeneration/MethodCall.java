@@ -37,7 +37,7 @@ public class MethodCall {
   private ChildrenParam<?> childrenParam;
   private final List<MethodParam> params;
   private final List<MethodCall> chain = new ArrayList<>();
-  private final Set<Class<?>> requiredStaticImports = new HashSet<>();
+  private final Set<String> requiredStaticImports = new HashSet<>();
 
   protected MethodCall(String methodName, Class<?> returnType, MethodParam... params) {
     this.methodName = methodName;
@@ -47,7 +47,7 @@ public class MethodCall {
 
   public static MethodCall fromBuilderMethod(Method method, MethodParam... params) {
     MethodCall ret = from(method, params);
-    ret.requiredStaticImports.add(method.getDeclaringClass());
+    ret.requiredStaticImports.add(method.getDeclaringClass().getName());
     return ret;
   }
 
@@ -140,8 +140,8 @@ public class MethodCall {
 
   }
 
-  public Set<Class<?>> getStaticImports() {
-    Set<Class<?>> ret = new HashSet<>(requiredStaticImports);
+  public Set<String> getStaticImports() {
+    Set<String> ret = new HashSet<>(requiredStaticImports);
     params.stream()
         .filter(p -> !p.isIgnored())
         .forEach(p -> ret.addAll(p.getStaticImports()));
@@ -149,8 +149,8 @@ public class MethodCall {
     return ret;
   }
 
-  public Set<Class<?>> getImports() {
-    Set<Class<?>> ret = new HashSet<>();
+  public Set<String> getImports() {
+    Set<String> ret = new HashSet<>();
     params.stream()
         .filter(p -> !p.isIgnored())
         .forEach(p -> ret.addAll(p.getImports()));
@@ -173,7 +173,7 @@ public class MethodCall {
    * parameters of the call. Otherwise, a children method will be looked into the class retunrned by
    * this method, and if there is, then chained into this call and used to register provided child
    * element.
-   *
+   * <p>
    * <b>Warning:</b> You should only use this method after applying any required chaining.
    *
    * @param child specifies the method call to be added as child call of this call.

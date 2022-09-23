@@ -1,17 +1,34 @@
 package us.abstracta.jmeter.javadsl.jdbc;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.sql.Types;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import org.apache.jmeter.protocol.jdbc.sampler.JDBCSampler;
 import org.apache.jmeter.testbeans.gui.TestBeanGUI;
 import org.apache.jmeter.testelement.TestElement;
+import us.abstracta.jmeter.javadsl.codegeneration.MethodCall;
+import us.abstracta.jmeter.javadsl.codegeneration.MethodCallContext;
+import us.abstracta.jmeter.javadsl.codegeneration.MethodParam;
+import us.abstracta.jmeter.javadsl.codegeneration.SingleTestElementCallBuilder;
+import us.abstracta.jmeter.javadsl.codegeneration.TestElementParamBuilder;
+import us.abstracta.jmeter.javadsl.codegeneration.params.BoolParam;
+import us.abstracta.jmeter.javadsl.codegeneration.params.EnumParam;
+import us.abstracta.jmeter.javadsl.codegeneration.params.EnumParam.EnumPropertyValue;
+import us.abstracta.jmeter.javadsl.codegeneration.params.FixedParam;
+import us.abstracta.jmeter.javadsl.codegeneration.params.StringArrayParam;
 import us.abstracta.jmeter.javadsl.core.samplers.BaseSampler;
 
 /**
@@ -25,6 +42,9 @@ import us.abstracta.jmeter.javadsl.core.samplers.BaseSampler;
  */
 public class DslJdbcSampler extends BaseSampler<DslJdbcSampler> {
 
+  private static final String DEFAULT_NAME = "JDBC Request";
+  private static final String NULL_ARGUMENT = "]NULL[";
+
   protected String poolName;
   protected String query;
   protected final List<QueryParameter> params = new ArrayList<>();
@@ -34,7 +54,7 @@ public class DslJdbcSampler extends BaseSampler<DslJdbcSampler> {
   protected QueryType queryType;
 
   public DslJdbcSampler(String name, String poolName, String query) {
-    super(name != null ? name : "JDBC Request", TestBeanGUI.class);
+    super(name != null ? name : DEFAULT_NAME, TestBeanGUI.class);
     this.poolName = poolName;
     this.query = query;
   }
@@ -83,7 +103,7 @@ public class DslJdbcSampler extends BaseSampler<DslJdbcSampler> {
   /**
    * Specifies the mode to apply to a given query parameter.
    */
-  public enum JdbcParamMode {
+  public enum JdbcParamMode implements EnumPropertyValue {
     /**
      * The parameter is only used by database query to read a value.
      * <p>
@@ -99,7 +119,13 @@ public class DslJdbcSampler extends BaseSampler<DslJdbcSampler> {
      * The parameter value is used to read a value by the query and is altered containing a
      * resulting output.
      */
-    INOUT
+    INOUT;
+
+    @Override
+    public String propertyValue() {
+      return name();
+    }
+
   }
 
   /**
@@ -109,7 +135,7 @@ public class DslJdbcSampler extends BaseSampler<DslJdbcSampler> {
    * the type, then you can manually specify the type through
    * {@link DslJdbcSampler#queryType(QueryType)} method.
    */
-  public enum QueryType {
+  public enum QueryType implements EnumPropertyValue {
     /**
      * Identifies simple select statement with no parameters as placeholders.
      * <p>
@@ -126,24 +152,24 @@ public class DslJdbcSampler extends BaseSampler<DslJdbcSampler> {
      * Identifies callable statement with potential input, output or inout parameters. For example
      * functions, stored procedures, etc.
      * <p>
-     * This type of query usually requires setting parameters through {@link
-     * DslJdbcSampler#param(Object, int)} or {@link DslJdbcSampler#param(Object, int,
-     * JdbcParamMode)} and potentially getting results through
-     * {@link DslJdbcSampler#vars(String...)} and/or {@link DslJdbcSampler#resultsVar}.
+     * This type of query usually requires setting parameters through
+     * {@link DslJdbcSampler#param(Object, int)} or
+     * {@link DslJdbcSampler#param(Object, int, JdbcParamMode)} and potentially getting results
+     * through {@link DslJdbcSampler#vars(String...)} and/or {@link DslJdbcSampler#resultsVar}.
      */
     CALLABLE("Callable Statement"),
     /**
      * Same as {@link QueryType#SELECT} but with parameters set through placeholders ("?" symbol).
      * <p>
-     * This type of query requires setting parameters through {@link DslJdbcSampler#param(Object,
-     * int)}.
+     * This type of query requires setting parameters through
+     * {@link DslJdbcSampler#param(Object, int)}.
      */
     PREPARED_SELECT("Prepared Select Statement"),
     /**
      * Same as {@link QueryType#UPDATE} but with parameters set through placeholders ("?" symbol).
      * <p>
-     * This type of query requires setting parameters through {@link DslJdbcSampler#param(Object,
-     * int)}.
+     * This type of query requires setting parameters through
+     * {@link DslJdbcSampler#param(Object, int)}.
      */
     PREPARED_UPDATE("Prepared Update Statement"),
     /**
@@ -171,6 +197,11 @@ public class DslJdbcSampler extends BaseSampler<DslJdbcSampler> {
       this.propertyValue = propertyValue;
     }
 
+    @Override
+    public String propertyValue() {
+      return propertyValue;
+    }
+
   }
 
   /**
@@ -187,9 +218,9 @@ public class DslJdbcSampler extends BaseSampler<DslJdbcSampler> {
    * strings containing commas and quotes since the DSL abstracts such details.
    *
    * @param value         specifies the actual value to set on the parameter.
-   * @param jdbcParamType sets the type of the parameter, being the value one of {@link
-   *                      java.sql.Types} defined ones, or a specific one for the database that is
-   *                      not included in Types class.
+   * @param jdbcParamType sets the type of the parameter, being the value one of
+   *                      {@link java.sql.Types} defined ones, or a specific one for the database
+   *                      that is not included in Types class.
    * @return the sampler for further configuration or usage.
    * @see java.sql.Types
    */
@@ -206,9 +237,9 @@ public class DslJdbcSampler extends BaseSampler<DslJdbcSampler> {
    * parameter.
    *
    * @param value         specifies the actual value to set on the parameter.
-   * @param jdbcParamType sets the type of the parameter, being the value one of {@link
-   *                      java.sql.Types} defined ones, or a specific one for the database that is
-   *                      not included in Types class.
+   * @param jdbcParamType sets the type of the parameter, being the value one of
+   *                      {@link java.sql.Types} defined ones, or a specific one for the database
+   *                      that is not included in Types class.
    * @param mode          specifies the {@link JdbcParamMode} for the parameter.
    * @return the sampler for further configuration or usage.
    * @see #param(Object, int)
@@ -359,13 +390,21 @@ public class DslJdbcSampler extends BaseSampler<DslJdbcSampler> {
       throw new IllegalStateException(
           "Query can only be null when using commit, rollback or autoCommit");
     }
+    return solveQueryType(query, params.isEmpty());
+  }
+
+  private static QueryType solveQueryType(String query,
+      boolean hasParams) {
     String queryType = query.trim();
+    if (query.isEmpty()) {
+      return null;
+    }
     queryType = queryType.substring(0, queryType.indexOf(" ")).toLowerCase(Locale.US);
     if ("select".equals(queryType)) {
-      return params.isEmpty() ? QueryType.SELECT : QueryType.PREPARED_SELECT;
+      return hasParams ? QueryType.SELECT : QueryType.PREPARED_SELECT;
     } else if ("insert".equals(queryType) || "update".equals(queryType) || "delete".equals(
         queryType)) {
-      return params.isEmpty() ? QueryType.UPDATE : QueryType.PREPARED_UPDATE;
+      return hasParams ? QueryType.UPDATE : QueryType.PREPARED_UPDATE;
     } else {
       return QueryType.CALLABLE;
     }
@@ -373,13 +412,187 @@ public class DslJdbcSampler extends BaseSampler<DslJdbcSampler> {
 
   private String extractParamValue(QueryParameter p) {
     if (p.value == null) {
-      return "]NULL[";
+      return NULL_ARGUMENT;
     }
     String strValue = p.value.toString();
     if (strValue.contains(",") || strValue.contains("\"")) {
       return "\"" + strValue.replace("\"", "\"\"") + "\"";
     }
     return strValue;
+  }
+
+  public static class CodeBuilder extends SingleTestElementCallBuilder<JDBCSampler> {
+
+    public CodeBuilder(List<Method> builderMethods) {
+      super(JDBCSampler.class, builderMethods);
+    }
+
+    @Override
+    protected MethodCall buildMethodCall(JDBCSampler testElement, MethodCallContext context) {
+      TestElementParamBuilder paramBuilder = new TestElementParamBuilder(testElement);
+      FixedParam<QueryType> queryType = (FixedParam<QueryType>) paramBuilder.enumParam("queryType",
+          QueryType.COMMIT);
+      MethodParam query = paramBuilder.stringParam("query");
+      String queryArgumentsTypes = testElement.getPropertyAsString("queryArgumentsTypes");
+      MethodCall ret = buildMethodCall(paramBuilder.nameParam(DEFAULT_NAME),
+          paramBuilder.stringParam("dataSource"), query);
+
+      if (queryType.getValue() == QueryType.COMMIT) {
+        ret.chain("commit");
+      } else if (queryType.getValue() == QueryType.ROLLBACK) {
+        ret.chain("rollback");
+      } else if (queryType.getValue() == QueryType.AUTO_COMMIT_TRUE
+          || queryType.getValue() == QueryType.AUTO_COMMIT_FALSE) {
+        ret.chain("autoCommit",
+            new BoolParam(queryType.getValue() == QueryType.AUTO_COMMIT_TRUE, null));
+      } else if (queryType.getValue() != solveQueryType(query.getExpression(),
+          queryArgumentsTypes == null || queryArgumentsTypes.isEmpty())) {
+        ret.chain("queryType", queryType);
+      } else {
+        chainParams(ret, queryArgumentsTypes, testElement.getPropertyAsString("queryArguments"));
+        ret.chain("vars", new StringArrayParam(testElement.getPropertyAsString("variableNames")))
+            .chain("resultVar", paramBuilder.stringParam("resultVariable"));
+      }
+
+      return ret.chain("timeout",
+          paramBuilder.durationParam("queryTimeout", Duration.ofSeconds(-1)));
+    }
+
+    private void chainParams(MethodCall ret, String queryArgumentsTypes, String queryArguments) {
+      if (queryArgumentsTypes == null || queryArgumentsTypes.isEmpty()) {
+        return;
+      }
+      QueryArgumentsParser argumentParser = new QueryArgumentsParser(queryArguments);
+      for (ParsedArgumentType argumentType : ParsedArgumentType.parseAll(queryArgumentsTypes)) {
+        MethodParam value = argumentParser.parseNext(argumentType);
+        if (argumentType.mode.isDefault()) {
+          ret.chain("param", value, argumentType.paramType);
+        } else {
+          ret.chain("param", value, argumentType.paramType, argumentType.mode);
+        }
+      }
+    }
+
+  }
+
+  private static class QueryArgumentsParser {
+
+    private final String queryArguments;
+    private int pos = 0;
+
+    private QueryArgumentsParser(String queryArguments) {
+      this.queryArguments = queryArguments;
+    }
+
+    private ValueParam parseNext(ParsedArgumentType argumentType) {
+      String ret;
+      int finalPos;
+      if (queryArguments.startsWith(NULL_ARGUMENT, pos)) {
+        ret = null;
+        finalPos = queryArguments.indexOf(pos, ',');
+      } else if (queryArguments.charAt(pos) == '"') {
+        finalPos = findQuotedParamEnd();
+        ret = queryArguments.substring(pos + 1, finalPos).replace("\"\"", "\"");
+        finalPos = queryArguments.indexOf(',', finalPos);
+      } else {
+        finalPos = queryArguments.indexOf(',', pos);
+        ret = queryArguments.substring(pos, finalPos == -1 ? queryArguments.length() : finalPos);
+      }
+      pos = finalPos + 1;
+      return new ValueParam(ret, argumentType);
+    }
+
+    private int findQuotedParamEnd() {
+      int finalPos = pos + 1;
+      while (!(queryArguments.charAt(finalPos) == '"' && (finalPos + 1 >= queryArguments.length()
+          || queryArguments.charAt(finalPos + 1) != '"'))) {
+        if (queryArguments.charAt(finalPos) == '"'
+            && queryArguments.charAt(finalPos + 1) == '"') {
+          finalPos++;
+        }
+        finalPos++;
+      }
+      return finalPos;
+    }
+
+  }
+
+  private static class ParsedArgumentType {
+
+    private final EnumParam<JdbcParamMode> mode;
+    private final ArgumentTypeParam paramType;
+
+    private ParsedArgumentType(EnumParam<JdbcParamMode> mode, ArgumentTypeParam paramType) {
+      this.mode = mode;
+      this.paramType = paramType;
+    }
+
+    private static List<ParsedArgumentType> parseAll(String str) {
+      if (str == null || str.isEmpty()) {
+        return Collections.emptyList();
+      }
+      Pattern paramTypePattern = Pattern.compile("(?:(IN|OUT|INOUT) )?(-?\\w+)");
+      return Arrays.stream(str.split(","))
+          .map(s -> {
+            Matcher paramTypeMatcher = paramTypePattern.matcher(s);
+            paramTypeMatcher.find();
+            return new ParsedArgumentType(
+                new EnumParam<>(JdbcParamMode.class, paramTypeMatcher.group(1), JdbcParamMode.IN),
+                new ArgumentTypeParam(paramTypeMatcher.group(2)));
+          })
+          .collect(Collectors.toList());
+    }
+
+  }
+
+  private static class ArgumentTypeParam extends MethodParam {
+
+    private static final Set<String> PREDEFINED_TYPES = findConstantNames(Types.class, int.class,
+        f -> true);
+
+    private final String type;
+
+    protected ArgumentTypeParam(String expression) {
+      super(int.class, expression);
+      type = expression.toUpperCase();
+    }
+
+    @Override
+    public boolean isDefault() {
+      return expression == null;
+    }
+
+    @Override
+    public Set<String> getImports() {
+      return PREDEFINED_TYPES.contains(type) ? Collections.singleton(Types.class.getName())
+          : Collections.emptySet();
+    }
+
+    @Override
+    protected String buildCode(String indent) {
+      return PREDEFINED_TYPES.contains(type) ? "Types." + type : type;
+    }
+
+  }
+
+  private static class ValueParam extends MethodParam {
+
+    private static final Set<String> STRING_TYPES = new HashSet<>(
+        Arrays.asList("CHAR", "VARCHAR", "LONGVARCHAR", "NCHAR", "NVARCHAR", "LONGNVARCHAR"));
+
+    private final ParsedArgumentType argumentType;
+
+    private ValueParam(String expression, ParsedArgumentType argumentType) {
+      super(Object.class, expression);
+      this.argumentType = argumentType;
+    }
+
+    @Override
+    protected String buildCode(String indent) {
+      return (STRING_TYPES.contains(argumentType.paramType.type)) ? buildStringLiteral(expression,
+          indent) : expression;
+    }
+
   }
 
 }

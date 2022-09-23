@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Generates code for a MethodCall parameter.
@@ -60,9 +61,9 @@ public abstract class MethodParam {
    * Override this method if you implement a custom MethodParam that requires some particular
    * import.
    *
-   * @return the set of required classes that need to be imported by generated code.
+   * @return the set of required classes names that need to be imported by generated code.
    */
-  public Set<Class<?>> getStaticImports() {
+  public Set<String> getStaticImports() {
     return Collections.emptySet();
   }
 
@@ -72,9 +73,10 @@ public abstract class MethodParam {
    * Override this method if you implement a custom MethodParam that requires some particular static
    * import.
    *
-   * @return the set of required classes that need to be statically imported by generated code.
+   * @return the set of required classes names that need to be statically imported by generated
+   * code.
    */
-  public Set<Class<?>> getImports() {
+  public Set<String> getImports() {
     return Collections.emptySet();
   }
 
@@ -92,12 +94,9 @@ public abstract class MethodParam {
         + "\"";
   }
 
-  protected static <T> Map<T, String> findConstantNames(Class<?> constantsHolderClass,
+  protected static <T> Map<T, String> findConstantNamesMap(Class<?> constantsHolderClass,
       Class<T> constantClass, Predicate<Field> filter) {
-    return Arrays.stream(constantsHolderClass.getDeclaredFields())
-        .filter(f -> Modifier.isPublic(f.getModifiers()) && Modifier.isStatic(f.getModifiers())
-            && Modifier.isFinal(f.getModifiers()) && f.getType() == constantClass
-            && filter.test(f))
+    return findConstantNamesFields(constantsHolderClass, constantClass, filter)
         .collect(Collectors.toMap(f -> {
           try {
             return constantClass.cast(f.get(null));
@@ -106,6 +105,21 @@ public abstract class MethodParam {
             throw new RuntimeException(e);
           }
         }, Field::getName));
+  }
+
+  private static Stream<Field> findConstantNamesFields(Class<?> constantsHolderClass,
+      Class<?> constantClass, Predicate<Field> filter) {
+    return Arrays.stream(constantsHolderClass.getDeclaredFields())
+        .filter(f -> Modifier.isPublic(f.getModifiers()) && Modifier.isStatic(f.getModifiers())
+            && Modifier.isFinal(f.getModifiers()) && f.getType() == constantClass
+            && filter.test(f));
+  }
+
+  protected static Set<String> findConstantNames(Class<?> constantsHolderClass,
+      Class<?> constantClass, Predicate<Field> filter) {
+    return findConstantNamesFields(constantsHolderClass, constantClass, filter)
+        .map(Field::getName)
+        .collect(Collectors.toSet());
   }
 
 }
