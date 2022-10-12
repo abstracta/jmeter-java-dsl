@@ -53,7 +53,7 @@
     <wiremock.version>2.33.2</wiremock.version>
     <junit.version>5.9.0</junit.version>
     <!-- same version as JMeter dependency -->
-    <jackson.version>2.13.3</jackson.version>
+    <jackson.version>2.13.4</jackson.version>
   </properties>
 
   <modules>
