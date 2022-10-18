@@ -70,14 +70,23 @@ Check more about the motivation and analysis of alternatives [here](https://abst
 
 ## Articles & Talks
 
-* [Developer’s friendly tools for continuous performance testing](https://abstracta.us/blog/performance-testing/developers-friendly-tools-for-continuous-performance-testing/): Walk-through from Fiddler recording to JMeter DSL test plan. [Here is a Russian version](https://habr.com/ru/company/otus/blog/653823/).
-* [JMeterDSL: Bringing Performance Testing Closer to Developers](https://www.blazemeter.com/blog/jmeterdsl-performance-testing-developers): Intro to JMeter DSL and scaling execution in BlazeMeter.
-* [Performance testing tools trend](https://www.linkedin.com/pulse/performance-testing-tools-trend-roger-abelenda/): A quick review of different alternatives for performance testing in Java and associated trend.
-* [JMeter scripting: la pieza faltante](https://www.youtube.com/watch?v=n-U6YPXAGX0): Spanish demo at QA Minds.
-* [Getting Started with JMeter DSL](https://qainsights.com/getting-started-with-jmeter-dsl): Intro to JMeter DSL and general thoughts. [Here is the video version](https://www.youtube.com/watch?v=JnnmSSYE2ok).
-* [Virtual Threads: JMeter meets Project Loom](https://abstracta.us/blog/performance-testing/virtual-threads-jmeter-meets-project-loom/): Experimenting with Virtual Threads in JMeter using JMeter DSL as a prototyping tool. [Here is the Spanish version](https://medium.com/@abstracta/threads-virtuales-jmeter-y-project-loom-ad2a849af53f)
-* [JMeter Scripts Written in Java??](https://www.youtube.com/watch?v=_drADTk82kg): JMeter DSL demo and discussion at PerfBytes session.
-* [JMeter: test as code solutions](https://octoperf.com/blog/2022/06/13/jmeter-test-as-code/): JMeter DSL & Taurus review.
+* [Developer’s friendly tools for continuous performance testing](https://abstracta.us/blog/performance-testing/developers-friendly-tools-for-continuous-performance-testing/): Walk-through from Fiddler recording to JMeter DSL test plan by Belen Vignolo @ Abstracta. [Russian translation by Ksenia Moseenkova](https://habr.com/ru/company/otus/blog/653823/).
+* [JMeterDSL: Bringing Performance Testing Closer to Developers](https://www.blazemeter.com/blog/jmeterdsl-performance-testing-developers): Intro to JMeter DSL and scaling execution in BlazeMeter by Yaina Machado.
+* [Performance testing tools trend](https://www.linkedin.com/pulse/performance-testing-tools-trend-roger-abelenda/): A quick review of different alternatives for performance testing in Java and associated trend by Roger Abelenda @ Abstracta.
+* [JMeter scripting: la pieza faltante](https://www.youtube.com/watch?v=n-U6YPXAGX0): Spanish demo by Roger Abelenda and hosted by Blanca Moreno @ QA Minds.
+* [Getting Started with JMeter DSL](https://qainsights.com/getting-started-with-jmeter-dsl): Intro to JMeter DSL and general thoughts by Roger Abelenda and hosted by NaveenKumar Namachivayam @ QA Insights. [Here is the video version](https://www.youtube.com/watch?v=JnnmSSYE2ok).
+* [Virtual Threads: JMeter meets Project Loom](https://abstracta.us/blog/performance-testing/virtual-threads-jmeter-meets-project-loom/): Experimenting with Virtual Threads in JMeter using JMeter DSL as a prototyping tool by Roger Abelenda @ Abstracta. [Here is the Spanish version](https://medium.com/@abstracta/threads-virtuales-jmeter-y-project-loom-ad2a849af53f)
+* [JMeter Scripts Written in Java??](https://www.youtube.com/watch?v=_drADTk82kg): JMeter DSL demo and discussion at PerfBytes session by Roger Abelenda and hosted by Mark Tomlinson.
+* [JMeter: test as code solutions](https://octoperf.com/blog/2022/06/13/jmeter-test-as-code/): JMeter DSL & Taurus review by Gérald Pereira @ OctoPerf.
+* [JMeter DSL, an Innovative Tool for Performance Testing](https://abstracta.us/blog/tools/jmeter-dsl-an-innovative-tool-for-performance-testing/): Short article on JMeter DSL motivation by Roger Abelenda @ Abstracta. [Spanish version](https://medium.com/@abstracta/jmeter-dsl-una-innovadora-herramienta-para-testing-de-performance-e808e3e82c3b).
+* [JMeter DSL, the Story of Abstracta’s Latest Innovation in Software Testing](https://abstracta.us/blog/performance-testing/jmeter-dsl-abstractas-latest-innovation-in-software-testing/): Post about JMeter DSL inception story by Natalie Rodgers & Roger Abelenda @ Abstracta. [Spanish Version](https://medium.com/@abstracta/jmeter-dsl-la-historia-de-la-m%C3%A1s-reciente-innovaci%C3%B3n-en-testing-de-software-de-abstracta-743b02e287e2).
+* [Develop JMeter Scripts Using Java with Roger Abelenda](https://testguild.com/podcast/performance/p93-roger/): Short interview by Joe Colantonio from TestGuild to Roger Abelenda about JMeter DSL basics.
+* [PerfOps - faster and cheaper through a service approach](https://habr.com/ru/company/oleg-bunin/blog/682746/): A nice analysis on implementing a performance experts service while using JMeter DSL as basics for creating a framework on top of it by Kirill Yurkov. (In Russian, but you can use Chrome Translation ;))
+* [pymeter announcement](https://www.linkedin.com/feed/update/urn:li:activity:6987704015933304832/): Announcement of a python API, built on top JMeter DSL, which eases JMeter test plan creation and execution for python devs by Eldad Uzman. 
+
+## Ecosystem
+
+* [pymeter](https://github.com/eldaduzman/pymeter): python API based on JMeter DSL that allows python devs to create and run JMeter test plans.
 
 ## Contributing & Requesting features
 
