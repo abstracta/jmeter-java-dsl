@@ -42,7 +42,7 @@ public class HtmlReporter extends BaseListener {
     reportsDirectory.mkdirs();
     reportDirectory = reportsDirectory.toPath()
         .resolve(name != null ? name : new SimpleDateFormat("yyyy-MM-dd hh-mm-ss").format(
-            Instant.now().getEpochSecond()*1000) + " " + UUID.randomUUID())
+            Instant.now().getEpochSecond() * 1000) + " " + UUID.randomUUID())
         .toFile();
   }
 
