@@ -2,8 +2,9 @@ package us.abstracta.jmeter.javadsl.core.listeners;
 
 import java.io.File;
 import java.lang.reflect.Method;
-import java.text.SimpleDateFormat;
 import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -76,10 +77,14 @@ public class JtlWriter extends BaseListener {
     File directory = new File(directoryPath);
     directory.mkdirs();
     this.jtlFile = directory.toPath()
-        .resolve(fileName != null ? fileName
-            : new SimpleDateFormat("yyyy-MM-dd hh-mm-ss").format(Instant.now()) + " "
-                + UUID.randomUUID() + ".jtl")
+        .resolve(fileName != null ? fileName : buildFileName())
         .toString();
+  }
+
+  private static String buildFileName() {
+    DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd hh-mm-ss")
+        .withZone(ZoneId.systemDefault());
+    return timeFormatter.format(Instant.now()) + " " + UUID.randomUUID() + ".jtl";
   }
 
   @Override

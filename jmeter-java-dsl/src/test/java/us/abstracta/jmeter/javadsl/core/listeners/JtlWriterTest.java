@@ -25,6 +25,21 @@ public class JtlWriterTest extends JmeterDslTest {
   private static final String RESULTS_JTL = "results.jtl";
 
   @Test
+  public void shouldWriteResultsToFileWhenJtlWriterWithoutNameAtTestPlan(@TempDir Path tempDir) throws Exception {
+    testPlan(
+        threadGroup(1, TEST_ITERATIONS,
+            httpSampler(wiremockUri)
+        ),
+        jtlWriter(tempDir.toString())
+    ).run();
+    assertResultsFileResultsCount(findJtlFileInDirectory(tempDir), TEST_ITERATIONS);
+  }
+
+  private Path findJtlFileInDirectory(Path tempDir) {
+    return tempDir.resolve(tempDir.toFile().list((dir, name) -> name.endsWith(".jtl"))[0]);
+  }
+
+  @Test
   public void shouldWriteAllThreadGroupsResultsToFileWhenJtlWriterAtTestPlan(@TempDir Path tempDir)
       throws IOException {
     Path resultsFilePath = tempDir.resolve(RESULTS_JTL);

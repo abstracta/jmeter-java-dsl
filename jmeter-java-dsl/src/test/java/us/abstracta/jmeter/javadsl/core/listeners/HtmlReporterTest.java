@@ -17,10 +17,10 @@ import java.nio.file.Path;
 import java.time.Duration;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import us.abstracta.jmeter.javadsl.JmeterDslTest;
-import us.abstracta.jmeter.javadsl.core.TestPlanStats;
 
 public class HtmlReporterTest extends JmeterDslTest {
 
@@ -31,6 +31,10 @@ public class HtmlReporterTest extends JmeterDslTest {
         threadGroup(1, TEST_ITERATIONS,
             httpSampler(wiremockUri)),
         buildHtmlReporter(reportDir)).run();
+    assertDirectoryContainsReportIndex(reportDir);
+  }
+
+  private static void assertDirectoryContainsReportIndex(Path reportDir) {
     assertThat(reportDir.resolve("index.html").toFile().exists()).isTrue();
   }
 
@@ -39,14 +43,16 @@ public class HtmlReporterTest extends JmeterDslTest {
   }
 
   @Test
-  public void shouldBeAllowedToCreateHtmlReporterWithoutName(@TempDir Path reportDir) throws Exception {
-
+  public void shouldWriteHtmlReportWhenHtmlReporterWithoutName(@TempDir Path reportDir) throws Exception {
     testPlan(
         threadGroup(1, 1,
-
             httpSampler(wiremockUri)),
         htmlReporter(reportDir.toString())).run();
-    assertThat(reportDir.resolve(reportDir.toFile().list()[0]).resolve("index.html").toFile().exists()).isTrue();
+    assertDirectoryContainsReportIndex(findFirstSubDirectory(reportDir));
+  }
+
+  private static Path findFirstSubDirectory(Path reportDir) {
+    return reportDir.resolve(reportDir.toFile().list()[0]);
   }
 
   @Test

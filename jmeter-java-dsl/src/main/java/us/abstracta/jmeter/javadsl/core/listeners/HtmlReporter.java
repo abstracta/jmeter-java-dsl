@@ -5,9 +5,10 @@ import java.io.IOException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -36,14 +37,18 @@ public class HtmlReporter extends BaseListener {
   protected final ApdexThresholds apdexThresholds = new ApdexThresholds();
   protected final Map<String, ApdexThresholds> labelApdexThresholds = new HashMap<>();
 
-  public HtmlReporter(String reportsDirectoryPath, String name) throws IOException {
+  public HtmlReporter(String reportsDirectoryPath, String name) {
     super("Simple Data Writer", SimpleDataWriter.class);
     File reportsDirectory = new File(reportsDirectoryPath);
     reportsDirectory.mkdirs();
-    reportDirectory = reportsDirectory.toPath()
-        .resolve(name != null ? name : new SimpleDateFormat("yyyy-MM-dd hh-mm-ss").format(
-            Instant.now().getEpochSecond() * 1000) + " " + UUID.randomUUID())
+    reportDirectory = reportsDirectory.toPath().resolve(name != null ? name : buildReportName())
         .toFile();
+  }
+
+  private static String buildReportName() {
+    DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd hh-mm-ss")
+        .withZone(ZoneId.systemDefault());
+    return timeFormatter.format(Instant.now()) + " " + UUID.randomUUID();
   }
 
   private boolean isEmptyDirectory(File reportDirectory) throws IOException {
