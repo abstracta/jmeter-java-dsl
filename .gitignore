@@ -296,3 +296,5 @@ buildNumber.properties
 
 .nvmrc
 .sdkmanrc
+*.jks
+.vscode/

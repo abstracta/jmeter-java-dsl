@@ -20,6 +20,7 @@ import java.util.regex.Pattern;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import us.abstracta.jmeter.javadsl.JmeterDslTest;
+import us.abstracta.jmeter.javadsl.core.TestPlanStats;
 
 public class HtmlReporterTest extends JmeterDslTest {
 
@@ -28,15 +29,24 @@ public class HtmlReporterTest extends JmeterDslTest {
       throws IOException {
     testPlan(
         threadGroup(1, TEST_ITERATIONS,
-            httpSampler(wiremockUri)
-        ),
-        buildHtmlReporter(reportDir)
-    ).run();
+            httpSampler(wiremockUri)),
+        buildHtmlReporter(reportDir)).run();
     assertThat(reportDir.resolve("index.html").toFile().exists()).isTrue();
   }
 
   private static HtmlReporter buildHtmlReporter(Path reportDir) throws IOException {
     return htmlReporter(reportDir.getParent().toString(), reportDir.getFileName().toString());
+  }
+
+  @Test
+  public void shouldBeAllowedToCreateHtmlReporterWithoutName(@TempDir Path reportDir) throws Exception {
+
+    testPlan(
+        threadGroup(1, 1,
+
+            httpSampler(wiremockUri)),
+        htmlReporter(reportDir.toString())).run();
+    assertThat(reportDir.resolve(reportDir.toFile().list()[0]).resolve("index.html").toFile().exists()).isTrue();
   }
 
   @Test
@@ -47,11 +57,10 @@ public class HtmlReporterTest extends JmeterDslTest {
         .willReturn(aResponse().withFixedDelay((int) threshold.multipliedBy(2).toMillis())));
     testPlan(
         threadGroup(1, TEST_ITERATIONS,
-            httpSampler(wiremockUri)
-        ),
+            httpSampler(wiremockUri)),
         buildHtmlReporter(reportDir)
-            .apdexThresholds(threshold, threshold)
-    ).run();
+            .apdexThresholds(threshold, threshold))
+        .run();
     assertThat(extractApdex(reportDir, "overall")).isEqualTo(0.0);
   }
 
@@ -80,11 +89,10 @@ public class HtmlReporterTest extends JmeterDslTest {
         .willReturn(aResponse().withFixedDelay((int) threshold.multipliedBy(2).toMillis())));
     testPlan(
         threadGroup(1, TEST_ITERATIONS,
-            httpSampler(SAMPLE_1_LABEL, wiremockUri)
-        ),
+            httpSampler(SAMPLE_1_LABEL, wiremockUri)),
         buildHtmlReporter(reportDir)
-            .transactionApdexThresholds(SAMPLE_1_LABEL, threshold, threshold)
-    ).run();
+            .transactionApdexThresholds(SAMPLE_1_LABEL, threshold, threshold))
+        .run();
     assertThat(extractApdex(reportDir, "items")).isEqualTo(0.0);
   }
 
