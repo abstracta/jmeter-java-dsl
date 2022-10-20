@@ -9,7 +9,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
-import us.abstracta.jmeter.javadsl.core.StringTemplate;
+import us.abstracta.jmeter.javadsl.core.util.StringTemplate;
 import us.abstracta.jmeter.javadsl.util.TestResource;
 
 public class DslCodeGeneratorTest {

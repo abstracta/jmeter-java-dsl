@@ -18,7 +18,7 @@ import org.junit.jupiter.api.io.TempDir;
 import us.abstracta.jmeter.javadsl.JmeterDslTest;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodCallBuilderTest;
 import us.abstracta.jmeter.javadsl.core.DslTestPlan;
-import us.abstracta.jmeter.javadsl.core.StringTemplate.StringTemplateAssert;
+import us.abstracta.jmeter.javadsl.core.StringTemplateAssert;
 
 public class JtlWriterTest extends JmeterDslTest {
 

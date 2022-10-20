@@ -1,10 +1,7 @@
 package us.abstracta.jmeter.javadsl.codegeneration;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Map;
@@ -13,6 +10,8 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 import us.abstracta.jmeter.javadsl.core.TestPlanStats;
+import us.abstracta.jmeter.javadsl.core.util.StringTemplate;
+import us.abstracta.jmeter.javadsl.util.TestResource;
 
 public class DslPerformanceTest {
 
@@ -25,8 +24,18 @@ public class DslPerformanceTest {
   }
 
   public String buildCode() {
-    return String.format(findTestClassTemplate(), buildDependencies(), buildStaticImports(),
-        buildImports(), buildMethodDefinitions(), buildTestMethodCall());
+    try {
+      return new StringTemplate(new TestResource("TestClass.template.java").contents())
+          .bind("dependencies", buildDependencies())
+          .bind("staticImports", buildStaticImports())
+          .bind("imports", buildImports())
+          .bind("methodDefinitions", buildMethodDefinitions())
+          .bind("testMethodBody", buildTestMethodBody())
+          .solve();
+    } catch (IOException e) {
+      // Only would happen if can't access resource that should be included in jar
+      throw new RuntimeException(e);
+    }
   }
 
   private String buildDependencies() {
@@ -43,17 +52,6 @@ public class DslPerformanceTest {
     return dependencyPaths.stream()
         .map(d -> "//DEPS " + d)
         .collect(Collectors.joining("\n"));
-  }
-
-  private String findTestClassTemplate() {
-    try (BufferedReader reader = new BufferedReader(
-        new InputStreamReader(getClass().getResourceAsStream("/TestClass.template.java"),
-            StandardCharsets.UTF_8))) {
-      return reader.lines()
-          .collect(Collectors.joining("\n"));
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    }
   }
 
   private String buildStaticImports() {
@@ -98,7 +96,7 @@ public class DslPerformanceTest {
             .collect(Collectors.joining("\n"));
   }
 
-  private String buildTestMethodCall() {
+  private String buildTestMethodBody() {
     String indent = "      ";
     String testPlanCode = testPlanMethodCall.buildCode(indent);
     return testPlanCode.matches("\\s+\\)$") ? testPlanCode : testPlanCode + "\n" + indent;

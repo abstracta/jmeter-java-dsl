@@ -3,17 +3,17 @@
 These commented lines make the class executable if you have jbang installed by making the file
 executable (eg: chmod +x ./PerformanceTest.java) and just executing it with ./PerformanceTest.java
 */
-%s
+{{dependencies}}
 
-%s
+{{staticImports}}
 
-%s
+{{imports}}
 
 public class PerformanceTest {
-%s
+{{methodDefinitions}}
   @Test
   public void test() throws IOException {
-    TestPlanStats stats = %s.run();
+    TestPlanStats stats = {{testMethodBody}}.run();
     assertThat(stats.overall().errorsCount()).isEqualTo(0);
   }
 

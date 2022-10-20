@@ -1,31 +1,46 @@
-package us.abstracta.jmeter.javadsl.core;
+package us.abstracta.jmeter.javadsl.core.util;
 
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-import org.assertj.core.api.AbstractAssert;
-import org.assertj.core.error.ShouldHaveContent;
-import org.assertj.core.internal.Diff;
-import org.assertj.core.internal.Failures;
-import org.assertj.core.util.diff.Chunk;
-import org.assertj.core.util.diff.Delta;
-import us.abstracta.jmeter.javadsl.util.TestResource;
 
+/**
+ * String template engine allowing easy string regex matching and usual template engine resolution.
+ * <p>
+ * This engine uses a syntax inspired in mustache using {@code {{}}} as basic indicator of special
+ * treatment/replacement.
+ * <p>
+ * To check fo string regex matching you can have a template like
+ * <pre>&lt;root version="1.2"&gt;{{\d+}}&lt;/root&gt;</pre>
+ * and use {@link #matches(String)}. No need to escape regex special characters outside of
+ * {@code {{}} }.
+ * <p>
+ * To use regular string template resolution you can use templates like
+ * <pre>&lt;root version="1.2"&gt;{{value}}&lt;/root&gt;</pre>
+ * and use {@link #bind(String, Object)} and {@link #solve()} to get the resulting string of
+ * replacing each occurrence of {@code {{}} } with the bound value. Additionally, you can define
+ * default values for each replacement expression. In this example
+ * <pre>&lt;root version="1.2"&gt;{{value:3}}&lt;/root&gt;</pre>
+ * it will solve "value" to string "3" if no value is bound to "value" or if bound value is null. If
+ * a replacement has no binding value different from null and no default value is specified, then an
+ * exception will be generated. You can always specify an empty default value (like
+ * {@code {{value:}}}) which avoids the exception and generates an empty string instead.
+ * <p>
+ * You can even use one template for both regex matching or string template solving. Eg:
+ * <pre>&lt;root version="1.2"&gt;{{value:3~\d+}}&lt;/root&gt;</pre>
+ * can be used with {@link #matches(String)} or with {@link #bind(String, Object)} and
+ * {@link #solve()}.
+ */
 public class StringTemplate {
 
   public static final String EXPRESSION_START_MARKER = "{{";
   public static final String EXPRESSION_END_MARKER = "}}";
   private static final Pattern EXPRESSION_PATTERN = Pattern.compile(
       Pattern.quote(EXPRESSION_START_MARKER) + "(.*?)" + Pattern.quote(EXPRESSION_END_MARKER));
-  private static final Pattern EXPRESSION_WITH_VAR_NAME_PATTERN = Pattern.compile("^(\\w+)?(:[^~]*)?(~.*)?$");
+  private static final Pattern EXPRESSION_WITH_VAR_NAME_PATTERN = Pattern.compile(
+      "^(\\w+)?(:[^~]*)?(~.*)?$");
   private final String template;
   private final Map<String, Object> bindings = new HashMap<>();
 
@@ -34,16 +49,20 @@ public class StringTemplate {
   }
 
   public boolean matches(String string) {
-    Pattern templatePattern = Pattern.compile(processTemplate(Pattern::quote, this::getExpressionPattern));
+    Pattern templatePattern = Pattern.compile(
+        processTemplate(Pattern::quote, this::getExpressionPattern));
     return templatePattern.matcher(string).matches();
   }
-  private String processTemplate(Function<String, String> literalProcessor, Function<String, String> expressionProcessor) {
+
+  private String processTemplate(Function<String, String> literalProcessor,
+      Function<String, String> expressionProcessor) {
     StringBuilder ret = new StringBuilder();
     int currentIndex = 0;
     Matcher matcher = EXPRESSION_PATTERN.matcher(template);
     while (matcher.find()) {
       ret.append(literalProcessor.apply(template.substring(currentIndex, matcher.start())));
-      String expression = template.substring(matcher.start() + EXPRESSION_START_MARKER.length(), matcher.end() - EXPRESSION_END_MARKER.length());
+      String expression = template.substring(matcher.start() + EXPRESSION_START_MARKER.length(),
+          matcher.end() - EXPRESSION_END_MARKER.length());
       ret.append(expressionProcessor.apply(expression));
       currentIndex = matcher.end();
     }
@@ -99,50 +118,6 @@ public class StringTemplate {
 
   private IllegalStateException buildNoBindingException(String expression) {
     return new IllegalStateException("No binding was found for: " + expression);
-  }
-
-  public static class StringTemplateAssert extends AbstractAssert<StringTemplateAssert, Path> {
-
-    private final Diff diff;
-    private final Failures failures;
-
-    private StringTemplateAssert(Path actual) {
-      super(actual, StringTemplateAssert.class);
-      diff = new Diff();
-      failures = Failures.instance();
-    }
-
-    public static StringTemplateAssert assertThat(Path actual) {
-      return new StringTemplateAssert(actual);
-    }
-
-    public StringTemplateAssert matches(TestResource template) throws IOException {
-      String actualContent = getFileContents(actual);
-      String templateContents = template.contents();
-      if (!new StringTemplate(templateContents).matches(actualContent)) {
-        List<Delta<String>> diffs = diff
-            .diff(actual, templateContents, StandardCharsets.UTF_8).stream()
-            .filter(d -> !isDiffMatching(d))
-            .collect(Collectors.toList());
-        throw failures.failure(this.info,
-            ShouldHaveContent.shouldHaveContent(actual, StandardCharsets.UTF_8, diffs));
-      }
-      return this;
-    }
-
-    protected String getFileContents(Path filePath) throws IOException {
-      return String.join("\n", Files.readAllLines(filePath, StandardCharsets.UTF_8));
-    }
-
-    private boolean isDiffMatching(Delta<String> d) {
-      return new StringTemplate(buildChunkString(d.getOriginal())).matches(
-          buildChunkString(d.getRevised()));
-    }
-
-    private String buildChunkString(Chunk<String> original) {
-      return String.join("\n", original.getLines());
-    }
-
   }
 
 }
