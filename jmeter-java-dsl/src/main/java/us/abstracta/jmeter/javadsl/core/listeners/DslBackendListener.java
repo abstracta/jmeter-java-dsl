@@ -94,8 +94,8 @@ public abstract class DslBackendListener<T extends DslBackendListener<T>> extend
     @Override
     public boolean matches(MethodCallContext context) {
       TestElement testElement = context.getTestElement();
-      return testElement instanceof BackendListener && backendListenerClass.getName()
-          .equals(((BackendListener) testElement).getClassname());
+      return testElement instanceof BackendListener
+          && backendListenerClass.getName().equals(((BackendListener) testElement).getClassname());
     }
 
     @Override

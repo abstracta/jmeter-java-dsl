@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.stream.Collectors;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodCall;
@@ -77,6 +79,12 @@ public class ChildrenParam<T> extends MethodParam {
     return children.stream()
         .flatMap(c -> c.getImports().stream())
         .collect(Collectors.toSet());
+  }
+
+  public Map<String, MethodCall> getMethodDefinitions() {
+    return children.stream()
+        .flatMap(c -> c.getMethodDefinitions().entrySet().stream())
+        .collect(Collectors.toMap(Entry::getKey, Entry::getValue));
   }
 
   @Override

@@ -26,7 +26,7 @@ public class DslPerformanceTest {
 
   public String buildCode() {
     return String.format(findTestClassTemplate(), buildDependencies(), buildStaticImports(),
-        buildImports(), buildTestMethodCall());
+        buildImports(), buildMethodDefinitions(), buildTestMethodCall());
   }
 
   private String buildDependencies() {
@@ -85,6 +85,17 @@ public class DslPerformanceTest {
         TestPlanStats.class.getName()));
     imports.addAll(classes);
     return buildImportsCode(imports, "");
+  }
+
+  private String buildMethodDefinitions() {
+    Map<String, MethodCall> methodDefinitions = testPlanMethodCall.getMethodDefinitions();
+    return methodDefinitions.isEmpty() ? ""
+        : "\n " + testPlanMethodCall.getMethodDefinitions().entrySet().stream()
+            .map(e -> String.format("  private %s %s() {\n"
+                    + "    return %s;\n"
+                    + "  }\n", e.getValue().getReturnType().getSimpleName(), e.getKey(),
+                e.getValue().buildCode("      ")))
+            .collect(Collectors.joining("\n"));
   }
 
   private String buildTestMethodCall() {

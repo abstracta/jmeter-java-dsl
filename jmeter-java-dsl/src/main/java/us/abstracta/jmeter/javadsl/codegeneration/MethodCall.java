@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -156,6 +158,13 @@ public class MethodCall {
         .forEach(p -> ret.addAll(p.getImports()));
     chain.forEach(c -> ret.addAll(c.getImports()));
     return ret;
+  }
+
+  public Map<String, MethodCall> getMethodDefinitions() {
+    return params.stream()
+        .filter(p -> !p.isIgnored())
+        .flatMap(p -> p.getMethodDefinitions().entrySet().stream())
+        .collect(Collectors.toMap(Entry::getKey, Entry::getValue));
   }
 
   public Class<?> getReturnType() {

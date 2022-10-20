@@ -10,7 +10,7 @@ executable (eg: chmod +x ./PerformanceTest.java) and just executing it with ./Pe
 %s
 
 public class PerformanceTest {
-
+%s
   @Test
   public void test() throws IOException {
     TestPlanStats stats = %s.run();
