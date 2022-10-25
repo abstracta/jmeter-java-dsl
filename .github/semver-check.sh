@@ -5,7 +5,7 @@ set -eo pipefail
 
 git fetch --tags --quiet
 VERSION="$1"
-PREV_VERSION=$(git describe --abbrev=0 --tags `git rev-list --tags --skip=1  --max-count=1`)
+PREV_VERSION=$(git tag --sort=-committerdate | head -1)
 PREV_VERSION=${PREV_VERSION#v}
 PREV_MAJOR="${PREV_VERSION%%.*}"
 PREV_VERSION="${PREV_VERSION#*.}"

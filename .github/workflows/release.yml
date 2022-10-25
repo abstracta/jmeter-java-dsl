@@ -1,8 +1,10 @@
 name: publish release
 on:
-  release:
-    types: [ published ]
   workflow_dispatch:
+    inputs:
+      version:
+        required: true
+        type: string
 jobs:
   release:
     runs-on: ubuntu-latest
@@ -16,53 +18,29 @@ jobs:
       - uses: actions/setup-node@v2
         with:
           node-version: '14'
-      - name: Get version
-        id: version
-        run: echo "dsl_version=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
-      - name: Check version
-        run: .github/semver-check.sh ${{ env.dsl_version }}
+      - name: check version
+        run: .github/semver-check.sh ${{ inputs.version }}
+      - name: create release draft
+        uses: ncipollo/release-action@v1
+        with:
+          tag: v${{ inputs.version }}
+          name: ${{ inputs.version }}
+          draft: true
       - name: set maven project version
-        run: mvn --batch-mode --no-transfer-progress versions:set -DnewVersion=${{ env.dsl_version }} --settings .github/settings.xml
+        run: mvn --batch-mode --no-transfer-progress versions:set -DnewVersion=${{ inputs.version }} --settings .github/settings.xml
+      - name: update docs version
+        run: .github/fix-docs-version.sh ${{ inputs.version }}
+      - name: commit release version
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: '[skip ci] Set release version'
+          branch: master
+          file_pattern: 'pom.xml */pom.xml docs/README.md docs/index.md docs/guide/README.md'
       - name: package release
         run: mvn --batch-mode --no-transfer-progress clean install --settings .github/settings.xml
         env:
           BZ_TOKEN: ${{ secrets.BZ_TOKEN }}
           OCTOPERF_API_KEY: ${{ secrets.OCTOPERF_API_KEY }}
-      - name: Upload jmeter-java-dsl.jar to release
-        uses: svenstaro/upload-release-action@v2
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: ./jmeter-java-dsl/target/jmeter-java-dsl-${{ env.dsl_version }}.jar
-          file_glob: true
-          tag: ${{ github.ref }}
-      - name: Upload jmeter-java-dsl-blazemeter.jar to release
-        uses: svenstaro/upload-release-action@v2
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: ./jmeter-java-dsl-blazemeter/target/jmeter-java-dsl-blazemeter-${{ env.dsl_version }}.jar
-          file_glob: true
-          tag: ${{ github.ref }}
-      - name: Upload jmeter-java-dsl-elasticsearch-listener.jar to release
-        uses: svenstaro/upload-release-action@v2
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: ./jmeter-java-dsl-elasticsearch-listener/target/jmeter-java-dsl-elasticsearch-listener-${{ env.dsl_version }}.jar
-          file_glob: true
-          tag: ${{ github.ref }}
-      - name: Upload jmeter-java-dsl-dashboard.jar to release
-        uses: svenstaro/upload-release-action@v2
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: ./jmeter-java-dsl-dashboard/target/jmeter-java-dsl-dashboard-${{ env.dsl_version }}.jar
-          file_glob: true
-          tag: ${{ github.ref }}
-      - name: Upload jmx2dsl to release
-        uses: svenstaro/upload-release-action@v2
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: ./jmeter-java-dsl-jmx2dsl/target/jmx2dsl.jar
-          file_glob: true
-          tag: ${{ github.ref }}
       - name: publish to Nexus
         run: .github/maven-central-deploy.sh
         env:
@@ -72,9 +50,31 @@ jobs:
           GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
           SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
           SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
-      - name: update docs version
-        run: .github/fix-docs-version.sh ${{ env.dsl_version }}
-      - name: Deploy github pages
+      - name: collect release artifacts
+        run: echo "RELEASE_ARTIFACTS=$(.github/collect-release-artifacts.sh)" >> $GITHUB_ENV
+      - name: publish GH release
+        uses: ncipollo/release-action@v1
+        with:
+          tag: v${{ inputs.version }}
+          allowUpdates: true
+          omitNameDuringUpdate: true
+          omitBodyDuringUpdate: true
+          updateOnlyUnreleased: true
+          draft: false
+          artifacts: "${{ env.RELEASE_ARTIFACTS }}"
+      - name: get next SNAPSHOT version
+        run: echo "SNAPSHOT_VERSION=$(.github/next-minor-snapshot.sh ${{ inputs.version }})" >> $GITHUB_ENV
+      - name: update to next SNAPSHOT version
+        run: mvn --batch-mode --no-transfer-progress versions:set -DnewVersion=${{ env.SNAPSHOT_VERSION }}
+      - name: update docs SNAPSHOT version
+        run: .github/fix-docs-version.sh ${{ env.SNAPSHOT_VERSION }}
+      - name: commit SNAPSHOT version
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: '[skip ci] Set SNAPSHOT version'
+          branch: master
+          file_pattern: 'pom.xml */pom.xml docs/README.md docs/index.md docs/guide/README.md'
+      - name: deploy github pages
         run: .github/vuepress-deploy.sh
         env:
           ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -84,10 +84,10 @@ jobs:
           path: jmeter-java-dsl-sample
           token: ${{ secrets.ACTIONS_TOKEN }}
       - name: update version in sample project
-        run: .github/update-sample-version.sh ${{ env.dsl_version }}
+        run: .github/update-sample-version.sh ${{ inputs.version }}
       - name: Discord notification
         env:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
         uses: Ilshidur/action-discord@master
         with:
-          args: 'A new release is out! Check it at {{ EVENT_PAYLOAD.release.html_url }}.'
+          args: 'A new release is out! Check it at ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/releases/tag/v${{ inputs.version }}.'

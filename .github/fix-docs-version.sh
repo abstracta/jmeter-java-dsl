@@ -17,9 +17,3 @@ update_file_versions ${VERSION} README.md
 update_file_versions ${VERSION} docs/index.md
 update_file_versions ${VERSION} docs/guide/README.md
 update_file_versions ${VERSION} docs/guide/distributed/test/pom.xml
-
-git add README.md docs/index.md docs/guide/README.md
-git config --local user.email "$(git log --format='%ae' HEAD^!)"
-git config --local user.name "$(git log --format='%an' HEAD^!)"
-git commit -m "[skip ci] Updated docs artifacts versions"
-git push origin HEAD:master
