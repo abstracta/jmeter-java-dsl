@@ -25,7 +25,8 @@ import us.abstracta.jmeter.javadsl.util.TestResource;
 
 public class CsvDataSetTest extends JmeterDslTest {
 
-  public static final TestResource DEFAULT_CSV_FILE = testResource("dataset-with-headers.csv");
+  public static final TestResource DEFAULT_CSV_FILE = testResource(
+      "datasets/dataset-with-headers.csv");
 
   @Test
   public void shouldGetVariableValuesFromCsvWhenCsvDataSetWithDefaultSettings()
@@ -60,7 +61,7 @@ public class CsvDataSetTest extends JmeterDslTest {
   public void shouldGetVariableValuesFromCsvWhenCsvWithAlternateFormat()
       throws Exception {
     testPlan(
-        csvDataSet(testResource("dataset-with-alt-format.csv"))
+        csvDataSet(testResource("datasets/dataset-with-alt-format.csv"))
             .delimiter("\\t")
             .encoding(StandardCharsets.UTF_8.name())
             .variableNames("VAR1", "VAR2"),
@@ -110,7 +111,7 @@ public class CsvDataSetTest extends JmeterDslTest {
   }
 
   @Test
-  public void shouldShareDataBetweenThredGroupsWhenCsvWithDefaultSettings() throws Exception {
+  public void shouldShareDataBetweenThreadGroupsWhenCsvWithDefaultSettings() throws Exception {
     testPlan(
         csvDataSet(DEFAULT_CSV_FILE),
         threadGroup(1, 1,
@@ -157,7 +158,7 @@ public class CsvDataSetTest extends JmeterDslTest {
       throws Exception {
     List<String> vals = new ArrayList<>();
     testPlan(
-        csvDataSet(testResource("dataset-long.csv").file().getPath())
+        csvDataSet(testResource("datasets/dataset-long.csv").file().getPath())
             .randomOrder(),
         threadGroup(1, 10,
             jsr223Sampler(s -> vals.add(s.vars.get("VAR")))

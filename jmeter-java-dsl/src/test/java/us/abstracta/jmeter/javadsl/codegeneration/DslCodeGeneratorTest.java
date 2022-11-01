@@ -20,7 +20,7 @@ public class DslCodeGeneratorTest {
     File solvedTemplate = solveTemplateResource("test-plan.template.jmx", tempDir);
     assertThat(new DslCodeGenerator()
         .generateCodeFromJmx(solvedTemplate))
-        .isEqualTo(new TestResource("SimpleTest.java").contents());
+        .isEqualTo(new TestResource("codegeneration/SimpleTest.java").contents());
   }
 
   private File solveTemplateResource(String resourcePath, Path tempDir) throws IOException {
@@ -34,8 +34,8 @@ public class DslCodeGeneratorTest {
   @Test
   public void shouldGenerateExpectedCodeWhenRecordedJmxIsProvided() throws Exception {
     assertThat(new DslCodeGenerator()
-        .generateCodeFromJmx(new TestResource("recorded.jmx").file()))
-        .isEqualTo(new TestResource("RecordedTest.java").contents());
+        .generateCodeFromJmx(new TestResource("codegeneration/recorded.jmx").file()))
+        .isEqualTo(new TestResource("codegeneration/RecordedTest.java").contents());
   }
 
 }

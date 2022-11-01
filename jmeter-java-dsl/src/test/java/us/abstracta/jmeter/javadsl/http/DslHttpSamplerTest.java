@@ -422,7 +422,7 @@ public class DslHttpSamplerTest extends JmeterDslTest {
     String part1Value = "value1";
     ContentType part1Encoding = ContentType.TEXT_PLAIN.withCharset(StandardCharsets.US_ASCII);
     String part2Name = "part2";
-    TestResource part2Resource = testResource("custom-sample-jtl.xml");
+    TestResource part2Resource = testResource("jtls/custom-sample-jtl.xml");
     ContentType part2Encoding = ContentType.TEXT_XML;
 
     testPlan(

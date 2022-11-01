@@ -46,7 +46,7 @@ public class DslJsr223SamplerTest {
 
   private void assertThatJtlContentIsExpectedForCustomSample(Path resultsFilePath) {
     assertThat(resultsFilePath.toFile())
-        .hasSameTextualContentAs(testResource("custom-sample-jtl.xml").file());
+        .hasSameTextualContentAs(testResource("jtls/custom-sample-jtl.xml").file());
   }
 
   @Test
