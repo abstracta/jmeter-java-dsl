@@ -21,6 +21,7 @@ import org.apache.jmeter.util.JMeterUtils;
 import org.apache.jorphan.collections.HashTree;
 import org.apache.jorphan.gui.ComponentUtil;
 import org.apache.jorphan.gui.JMeterUIDefaults;
+import org.apache.jorphan.gui.ui.KerningOptimizer;
 
 /**
  * Displays JMeter GUI in current JVM.
@@ -40,12 +41,14 @@ public class JmeterGui {
   private final CountDownLatch closeLatch = new CountDownLatch(1);
 
   public JmeterGui() throws IOException {
-    initLookAndFeel();
     loadUiResources();
+    initLookAndFeel();
     openFrame();
   }
 
   private void initLookAndFeel() {
+    KerningOptimizer.INSTANCE.setMaxTextLengthWithKerning(
+        JMeterUtils.getPropDefault("text.kerning.max_document_size", 10000));
     JMeterUIDefaults.INSTANCE.install();
     String jMeterLaf = LookAndFeelCommand.getPreferredLafCommand();
     LookAndFeelCommand.activateLookAndFeel(jMeterLaf);

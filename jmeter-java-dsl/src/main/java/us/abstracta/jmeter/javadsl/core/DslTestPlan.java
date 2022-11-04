@@ -3,10 +3,14 @@ package us.abstracta.jmeter.javadsl.core;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
+import javax.swing.SwingUtilities;
 import org.apache.jmeter.config.Arguments;
 import org.apache.jmeter.control.gui.TestPlanGui;
 import org.apache.jmeter.exceptions.IllegalUserActionException;
@@ -139,13 +143,26 @@ public class DslTestPlan extends TestElementContainer<DslTestPlan, TestPlanChild
     try {
       JmeterEnvironment env = new JmeterEnvironment();
       env.initLocale();
-      HashTree tree = new ListedHashTree();
-      new BuildTreeContext().buildTreeFor(this, tree);
-      env.updateSearchPath(tree);
-      JmeterGui gui = new JmeterGui();
-      gui.load(tree);
-      gui.awaitClose();
-    } catch (IOException | IllegalUserActionException e) {
+      CompletableFuture<JmeterGui> guiFuture = new CompletableFuture<>();
+      /*
+       Need to invoke this logic in swing event queue for proper order of execution of events
+       and avoid NPE while updating RSyntaxTextArea in test plan load (e.g.: when test plan contains
+       an ifController).
+       */
+      SwingUtilities.invokeAndWait(() -> {
+        try {
+          JmeterGui gui = new JmeterGui();
+          guiFuture.complete(gui);
+          HashTree tree = new ListedHashTree();
+          new BuildTreeContext().buildTreeFor(this, tree);
+          env.updateSearchPath(tree);
+          gui.load(tree);
+        } catch (IllegalUserActionException | IOException e) {
+          throw new RuntimeException(e);
+        }
+      });
+      guiFuture.get().awaitClose();
+    } catch (IOException | ExecutionException | InvocationTargetException e) {
       throw new RuntimeException(e);
     } catch (InterruptedException e) {
       Thread.currentThread().interrupt();
