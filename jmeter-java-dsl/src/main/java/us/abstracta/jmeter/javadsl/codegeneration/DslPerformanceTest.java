@@ -97,19 +97,12 @@ public class DslPerformanceTest {
     return String.format("%1sprivate %s %s() {\n"
             + "%1$s%1$sreturn %s;\n"
             + "%1$s}\n", MethodCall.INDENT, methodCall.getReturnType().getSimpleName(), methodName,
-        MethodCall.decreaseLastParenthesisIndentation(methodCall.buildCode(indentLevel(3))));
-  }
-
-  private static String indentLevel(int level) {
-    StringBuilder ret = new StringBuilder();
-    for (int i = 0; i < level; i++) {
-      ret.append(MethodCall.INDENT);
-    }
-    return ret.toString();
+        MethodCall.decreaseLastParenthesisIndentation(
+            methodCall.buildCode(MethodCall.indentLevel(3))));
   }
 
   private String buildTestPlanCode() {
-    String indent = indentLevel(3);
+    String indent = MethodCall.indentLevel(3);
     String testPlanCode = MethodCall.decreaseLastParenthesisIndentation(
         testPlanMethodCall.buildCode(indent));
     return testPlanCode.endsWith(MethodCall.INDENT + ")") ? testPlanCode

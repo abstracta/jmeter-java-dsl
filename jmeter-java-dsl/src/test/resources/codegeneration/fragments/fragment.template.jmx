@@ -1,0 +1,4 @@
+<TestFragmentController guiclass="TestFragmentControllerGui" testclass="TestFragmentController" testname="{{name}}" enabled="true"/>
+<hashTree>
+  {{children}}
+</hashTree>

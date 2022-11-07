@@ -392,6 +392,14 @@ public class MethodCall {
     return ret.toString();
   }
 
+  public static String indentLevel(int level) {
+    StringBuilder ret = new StringBuilder();
+    for (int i = 0; i < level; i++) {
+      ret.append(MethodCall.INDENT);
+    }
+    return ret.toString();
+  }
+
   public static String decreaseLastParenthesisIndentation(String paramsCode) {
     String indentedParenthesis = INDENT + ")";
     return paramsCode.endsWith(indentedParenthesis)
