@@ -70,8 +70,7 @@ public class PerformanceTest {
             )
           ),
           resultsTreeVisualizer()
-        )
-      .run();
+      ).run();
     assertThat(stats.overall().errorsCount()).isEqualTo(0);
   }
 

@@ -95,8 +95,6 @@ public class DslTestFragmentController extends BaseController<DslTestFragmentCon
     private static class FragmentMethodCall extends MethodCall {
 
       private final MethodCall delegate;
-      private int childCount = 0;
-      private MethodCall lastChild = null;
 
       protected FragmentMethodCall(String methodName, MethodCall delegate) {
         super(methodName, DslTestFragmentController.class);
@@ -105,14 +103,12 @@ public class DslTestFragmentController extends BaseController<DslTestFragmentCon
 
       @Override
       public MethodCall child(MethodCall child) {
-        childCount++;
-        lastChild = child;
         return delegate.child(child);
       }
 
       @Override
       public Map<String, MethodCall> getMethodDefinitions() {
-        return Collections.singletonMap(methodName, childCount == 1 ? lastChild : delegate);
+        return Collections.singletonMap(methodName, delegate);
       }
 
       @Override

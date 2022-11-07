@@ -148,6 +148,8 @@ public class MethodCall {
         .filter(p -> !p.isIgnored())
         .forEach(p -> ret.addAll(p.getStaticImports()));
     chain.forEach(c -> ret.addAll(c.getStaticImports()));
+    getMethodDefinitions().values()
+        .forEach(m -> ret.addAll(m.getStaticImports()));
     return ret;
   }
 
@@ -157,6 +159,11 @@ public class MethodCall {
         .filter(p -> !p.isIgnored())
         .forEach(p -> ret.addAll(p.getImports()));
     chain.forEach(c -> ret.addAll(c.getImports()));
+    getMethodDefinitions().values()
+        .forEach(m -> {
+          ret.add(m.getReturnType().getName());
+          ret.addAll(m.getImports());
+        });
     return ret;
   }
 
@@ -367,7 +374,7 @@ public class MethodCall {
         .append("(");
     String childIndent = indent + INDENT;
     String paramsCode = buildParamsCode(childIndent);
-    ret.append(reIndentParenthesis(paramsCode));
+    ret.append(decreaseLastParenthesisIndentation(paramsCode));
     boolean hasChildren = paramsCode.endsWith("\n");
     if (hasChildren) {
       ret.append(indent);
@@ -385,7 +392,7 @@ public class MethodCall {
     return ret.toString();
   }
 
-  private String reIndentParenthesis(String paramsCode) {
+  public static String decreaseLastParenthesisIndentation(String paramsCode) {
     String indentedParenthesis = INDENT + ")";
     return paramsCode.endsWith(indentedParenthesis)
         ? paramsCode.substring(0, paramsCode.length() - indentedParenthesis.length()) + ")"

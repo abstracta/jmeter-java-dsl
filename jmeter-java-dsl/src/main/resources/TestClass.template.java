@@ -13,7 +13,7 @@ public class PerformanceTest {
 {{methodDefinitions}}
   @Test
   public void test() throws IOException {
-    TestPlanStats stats = {{testMethodBody}}.run();
+    TestPlanStats stats = {{testPlan}}.run();
     assertThat(stats.overall().errorsCount()).isEqualTo(0);
   }
 

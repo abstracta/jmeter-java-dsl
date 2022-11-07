@@ -33,8 +33,7 @@ public class PerformanceTest {
           httpSampler("http://localhost")
         ),
         jtlWriter("", "results.jtl")
-      )
-      .run();
+    ).run();
     assertThat(stats.overall().errorsCount()).isEqualTo(0);
   }
 

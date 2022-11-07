@@ -30,7 +30,7 @@ public class DslPerformanceTest {
           .bind("staticImports", buildStaticImports())
           .bind("imports", buildImports())
           .bind("methodDefinitions", buildMethodDefinitions())
-          .bind("testMethodBody", buildTestMethodBody())
+          .bind("testPlan", buildTestPlanCode())
           .solve();
     } catch (IOException e) {
       // Only would happen if can't access resource that should be included in jar
@@ -88,18 +88,32 @@ public class DslPerformanceTest {
   private String buildMethodDefinitions() {
     Map<String, MethodCall> methodDefinitions = testPlanMethodCall.getMethodDefinitions();
     return methodDefinitions.isEmpty() ? ""
-        : "\n " + testPlanMethodCall.getMethodDefinitions().entrySet().stream()
-            .map(e -> String.format("  private %s %s() {\n"
-                    + "    return %s;\n"
-                    + "  }\n", e.getValue().getReturnType().getSimpleName(), e.getKey(),
-                e.getValue().buildCode("      ")))
+        : "\n" + testPlanMethodCall.getMethodDefinitions().entrySet().stream()
+            .map(e -> buildMethodDefinitionCode(e.getKey(), e.getValue()))
             .collect(Collectors.joining("\n"));
   }
 
-  private String buildTestMethodBody() {
-    String indent = "      ";
-    String testPlanCode = testPlanMethodCall.buildCode(indent);
-    return testPlanCode.matches("\\s+\\)$") ? testPlanCode : testPlanCode + "\n" + indent;
+  private static String buildMethodDefinitionCode(String methodName, MethodCall methodCall) {
+    return String.format("%1sprivate %s %s() {\n"
+            + "%1$s%1$sreturn %s;\n"
+            + "%1$s}\n", MethodCall.INDENT, methodCall.getReturnType().getSimpleName(), methodName,
+        MethodCall.decreaseLastParenthesisIndentation(methodCall.buildCode(indentLevel(3))));
+  }
+
+  private static String indentLevel(int level) {
+    StringBuilder ret = new StringBuilder();
+    for (int i = 0; i < level; i++) {
+      ret.append(MethodCall.INDENT);
+    }
+    return ret.toString();
+  }
+
+  private String buildTestPlanCode() {
+    String indent = indentLevel(3);
+    String testPlanCode = MethodCall.decreaseLastParenthesisIndentation(
+        testPlanMethodCall.buildCode(indent));
+    return testPlanCode.endsWith(MethodCall.INDENT + ")") ? testPlanCode
+        : testPlanCode + "\n" + indent;
   }
 
 }
