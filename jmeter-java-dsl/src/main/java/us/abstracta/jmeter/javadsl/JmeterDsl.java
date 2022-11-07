@@ -19,6 +19,7 @@ import us.abstracta.jmeter.javadsl.core.controllers.DslWeightedSwitchController;
 import us.abstracta.jmeter.javadsl.core.controllers.DslWhileController;
 import us.abstracta.jmeter.javadsl.core.controllers.ForLoopController;
 import us.abstracta.jmeter.javadsl.core.controllers.PercentController;
+import us.abstracta.jmeter.javadsl.core.controllers.DslRuntimeController;
 import us.abstracta.jmeter.javadsl.core.listeners.DslViewResultsTree;
 import us.abstracta.jmeter.javadsl.core.listeners.HtmlReporter;
 import us.abstracta.jmeter.javadsl.core.listeners.InfluxDbBackendListener;
@@ -621,6 +622,21 @@ public class JmeterDsl {
    */
   public static DslOnceOnlyController onceOnlyController(ThreadGroupChild... children) {
     return new DslOnceOnlyController(Arrays.asList(children));
+  }
+  /**
+   * Builds a Runtime Controller that allows running a part of a test plan for a specified
+   * number of seconds on each iteration of a thread group.
+   *
+   *@param seconds defines the number of seconds the runtime controller should be executed on
+   *               each iteration.
+   * @param children contains the test plan elements to execute only one time on first iteration of
+   *                 each thread group.
+   * @return the controller instance for further configuration and usage.
+   * @see DslOnceOnlyController
+   */
+
+  public static DslRuntimeController runtimeController(String seconds, ThreadGroupChild... children) {
+    return new DslRuntimeController(seconds, Arrays.asList(children));
   }
 
   /**
