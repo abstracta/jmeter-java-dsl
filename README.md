@@ -1,4 +1,5 @@
 ![logo](/docs/.vuepress/public/logo.svg)
+
 [![Maven Central](https://img.shields.io/maven-central/v/us.abstracta.jmeter/jmeter-java-dsl.svg?label=Maven%20Central)](https://search.maven.org/artifact/us.abstracta.jmeter/jmeter-java-dsl)
 [![Reproducible Builds](https://img.shields.io/badge/Reproducible_Builds-ok-green?labelColor=1e5b96)](https://github.com/jvm-repo-rebuild/reproducible-central/blob/master/content/us/abstracta/jmeter/jmeter-java-dsl/README.md)
 
