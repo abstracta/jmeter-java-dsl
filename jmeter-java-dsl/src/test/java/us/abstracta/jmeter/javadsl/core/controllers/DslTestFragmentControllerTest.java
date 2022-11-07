@@ -7,17 +7,16 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import us.abstracta.jmeter.javadsl.codegeneration.DslCodeGenerator;
-import us.abstracta.jmeter.javadsl.codegeneration.MethodCall;
+import us.abstracta.jmeter.javadsl.codegeneration.Indentation;
+import us.abstracta.jmeter.javadsl.codegeneration.TestClassTemplate;
 import us.abstracta.jmeter.javadsl.core.util.StringTemplate;
 
 public class DslTestFragmentControllerTest {
@@ -29,8 +28,7 @@ public class DslTestFragmentControllerTest {
 
     @Test
     public void shouldGenerateDslWithFragmentMethodWhenConvertTestPlanWithFragment(
-        @TempDir Path tmp)
-        throws IOException {
+        @TempDir Path tmp) throws IOException {
       String testPlanJmx = buildTestPlanJmx(
           buildFragmentJmx(DEFAULT_FRAGMENT_NAME, buildHttpSamplerJmx()));
       String methodName = "testFragment";
@@ -40,25 +38,29 @@ public class DslTestFragmentControllerTest {
               methodName + "()"));
     }
 
-    private String buildTestPlanJmx(String... childrenJmx) throws IOException {
+    private String buildTestPlanJmx(String... childrenJmx) {
       return new StringTemplate(testResourceContents("base-test-plan.template.jmx"))
           .bind("children", String.join("\n", childrenJmx))
           .solve();
     }
 
-    private String testResourceContents(String resourceName) throws IOException {
-      return testResource(resourceName.startsWith("/") ? resourceName.substring(1)
-          : "codegeneration/fragments/" + resourceName).contents();
+    private String testResourceContents(String resourceName) {
+      try {
+        return testResource(resourceName.startsWith("/") ? resourceName.substring(1)
+            : "codegeneration/fragments/" + resourceName).contents();
+      } catch (IOException e) {
+        throw new RuntimeException(e);
+      }
     }
 
-    private String buildFragmentJmx(String name, String... childrenJmx) throws IOException {
+    private String buildFragmentJmx(String name, String... childrenJmx) {
       return new StringTemplate(testResourceContents("fragment.template.jmx"))
           .bind("name", name)
           .bind("children", String.join("\n", childrenJmx))
           .solve();
     }
 
-    private String buildHttpSamplerJmx() throws IOException {
+    private String buildHttpSamplerJmx() {
       return testResourceContents("http-sampler.jmx");
     }
 
@@ -68,74 +70,30 @@ public class DslTestFragmentControllerTest {
       return new DslCodeGenerator().generateCodeFromJmx(testPlanPath.toFile());
     }
 
-    private String buildTestPlanDsl(String method, String child) throws IOException {
+    private String buildTestPlanDsl(String method, String child) {
       return buildTestPlanDsl(Collections.singletonList(method), Collections.singletonList(child));
     }
 
-    private String buildTestPlanDsl(List<String> methods, List<String> children)
-        throws IOException {
-      Map<Boolean, List<String>> imports = Arrays.stream(
-              testResourceContents("/default-imports.txt")
-                  .split("\n"))
-          .filter(s -> !s.isEmpty())
-          .collect(Collectors.partitioningBy(s -> s.startsWith("static ")));
-      return new StringTemplate(testResourceContents("/TestClass.template.java"))
-          .bind("dependencies", buildDependencies())
-          .bind("staticImports", buildStaticImports(imports.get(true)))
-          .bind("imports", buildImports(imports.get(false)))
-          .bind("methodDefinitions", buildMethodDefinitions(methods))
-          .bind("testPlan", buildTestPlanCode(children))
+    private String buildTestPlanDsl(List<String> methods, List<String> children) {
+      return new TestClassTemplate()
+          .dependencies(Collections.singleton("us.abstracta.jmeter:jmeter-java-dsl"))
+          .staticImports(Collections.singleton(DslTestFragmentController.class.getName()))
+          .imports(Collections.singleton(DslTestFragmentController.class.getName()))
+          .methodDefinitions(methods)
+          .testPlan(buildTestPlanCode(children))
           .solve();
     }
 
-    private String buildDependencies() throws IOException {
-      return Arrays.stream(testResourceContents("/default-dependencies.txt")
-              .split("\n"))
-          .map(d -> "//DEPS " + d)
-          .collect(Collectors.joining("\n"));
-    }
-
-    private String buildStaticImports(List<String> defaultImports) {
-      List<String> additionalImports = Collections.singletonList(
-          String.format("static %s.*", DslTestFragmentController.class.getName()));
-      return buildImports(defaultImports, additionalImports);
-    }
-
-    private String buildImports(List<String> defaultImports) {
-      List<String> additionalImports = Collections.singletonList(
-          DslTestFragmentController.class.getName());
-      return buildImports(defaultImports, additionalImports);
-    }
-
-    private String buildImports(List<String> defaultImports, List<String> imports) {
-      List<String> ret = new ArrayList<>(defaultImports);
-      ret.addAll(imports);
-      return ret.stream()
-          .sorted()
-          .map(i -> String.format("import %s;", i))
-          .collect(Collectors.joining("\n"));
-    }
-
-    private String buildMethodDefinitions(List<String> methods) {
-      return methods.stream()
-          .map(m -> String.format("\n%s\n", indent(m, MethodCall.INDENT)))
-          .collect(Collectors.joining());
-    }
-
-    private String indent(String str, String indentation) {
-      return indentation + str.replace("\n", "\n" + indentation);
-    }
-
     private String buildTestPlanCode(List<String> children) {
-      String parentIndentation = MethodCall.indentLevel(2);
-      String childIndentation = MethodCall.indentLevel(4);
+      String parentIndentation = Indentation.indentLevel(2);
+      String childIndentation = Indentation.indentLevel(4);
       return String.format("testPlan(\n%s\n%s)", children.stream()
-          .map(c -> indent(c, childIndentation))
+          .map(c -> Indentation.indent(c, childIndentation))
           .collect(Collectors.joining(",\n")), parentIndentation);
     }
 
-    private String testFragmentMethodDsl(String methodName, String fragmentName, String... children)
-        throws IOException {
+    private String testFragmentMethodDsl(String methodName, String fragmentName,
+        String... children) {
       return new StringTemplate(testResourceContents("TestFragmentMethodDsl.template.java"))
           .bind("methodName", methodName)
           .bind("fragmentName", DEFAULT_FRAGMENT_NAME.equals(fragmentName) ? ""
@@ -144,7 +102,7 @@ public class DslTestFragmentControllerTest {
           .solve();
     }
 
-    private String buildHttpSamplerDsl() throws IOException {
+    private String buildHttpSamplerDsl() {
       return testResourceContents("HttpSamplerDsl.java");
     }
 

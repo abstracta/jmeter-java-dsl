@@ -30,7 +30,11 @@ import us.abstracta.jmeter.javadsl.core.testelements.MultiLevelTestElement;
  */
 public class MethodCall {
 
-  public static final String INDENT = "  ";
+  /**
+   * As of 1.2 use {@link Indentation#INDENT} instead.
+   */
+  @Deprecated
+  public static final String INDENT = Indentation.INDENT;
   private static final MethodCall EMPTY_METHOD_CALL = new EmptyMethodCall();
 
   protected final String methodName;
@@ -388,14 +392,6 @@ public class MethodCall {
       }
       ret.append(".");
       ret.append(chainedCode);
-    }
-    return ret.toString();
-  }
-
-  public static String indentLevel(int level) {
-    StringBuilder ret = new StringBuilder();
-    for (int i = 0; i < level; i++) {
-      ret.append(MethodCall.INDENT);
     }
     return ret.toString();
   }

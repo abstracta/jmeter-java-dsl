@@ -147,8 +147,8 @@ public class DslCodeGenerator implements MethodCallBuilderRegistry {
    * @throws IOException when there is some problem reading the file.
    */
   public String generateCodeFromJmx(File file) throws IOException {
-    return new DslPerformanceTest(buildMethodCallFromJmxFile(file), dependencies)
-        .buildCode();
+    return TestClassTemplate.fromTestPlanMethodCall(buildMethodCallFromJmxFile(file), dependencies)
+        .solve();
   }
 
   public MethodCall buildMethodCallFromJmxFile(File file) throws IOException {
