@@ -14,7 +14,7 @@ public class DslRuntimeControllerTest extends JmeterDslTest {
   public void shouldExecuteMultipleTimesWhenRuntimeControllerInPlan() throws Exception {
     TestPlanStats stats = testPlan(
         threadGroup(1, 1,
-            Runtime("1",
+            runtimeController ("1",
                 httpSampler(wiremockUri)
             )
         )
@@ -28,7 +28,7 @@ public class DslRuntimeControllerTest extends JmeterDslTest {
     public DslTestPlan testPlanWithRuntimeController() {
       return testPlan(
           threadGroup(1, 1,
-              Runtime("5",
+                  runtimeController("5",
                   httpSampler("http://localhost")
               )
           )

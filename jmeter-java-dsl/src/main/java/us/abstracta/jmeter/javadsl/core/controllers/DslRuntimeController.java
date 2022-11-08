@@ -8,6 +8,7 @@ import org.apache.jmeter.testelement.TestElement;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodCall;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodCallContext;
 import us.abstracta.jmeter.javadsl.codegeneration.SingleTestElementCallBuilder;
+import us.abstracta.jmeter.javadsl.codegeneration.TestElementParamBuilder;
 import us.abstracta.jmeter.javadsl.codegeneration.params.ChildrenParam;
 import us.abstracta.jmeter.javadsl.core.threadgroups.BaseThreadGroup;
 import us.abstracta.jmeter.javadsl.core.threadgroups.BaseThreadGroup.ThreadGroupChild;
@@ -43,8 +44,11 @@ public class DslRuntimeController extends BaseController<DslRuntimeController> {
 
     @Override
     protected MethodCall buildMethodCall(RunTime testElement,
-        MethodCallContext context) {
-      return buildMethodCall(new ChildrenParam<>(ThreadGroupChild[].class));
+                                         MethodCallContext context) {
+      TestElementParamBuilder paramBuilder = new TestElementParamBuilder(testElement,
+              "RuntimeController");
+      return buildMethodCall(paramBuilder.stringParam("seconds"),
+              new ChildrenParam<>(ThreadGroupChild[].class));
     }
   }
 }

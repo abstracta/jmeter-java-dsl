@@ -14,12 +14,12 @@ import us.abstracta.jmeter.javadsl.core.configs.DslVariables;
 import us.abstracta.jmeter.javadsl.core.controllers.DslForEachController;
 import us.abstracta.jmeter.javadsl.core.controllers.DslIfController;
 import us.abstracta.jmeter.javadsl.core.controllers.DslOnceOnlyController;
+import us.abstracta.jmeter.javadsl.core.controllers.DslRuntimeController;
 import us.abstracta.jmeter.javadsl.core.controllers.DslTransactionController;
 import us.abstracta.jmeter.javadsl.core.controllers.DslWeightedSwitchController;
 import us.abstracta.jmeter.javadsl.core.controllers.DslWhileController;
 import us.abstracta.jmeter.javadsl.core.controllers.ForLoopController;
 import us.abstracta.jmeter.javadsl.core.controllers.PercentController;
-import us.abstracta.jmeter.javadsl.core.controllers.DslRuntimeController;
 import us.abstracta.jmeter.javadsl.core.listeners.DslViewResultsTree;
 import us.abstracta.jmeter.javadsl.core.listeners.HtmlReporter;
 import us.abstracta.jmeter.javadsl.core.listeners.InfluxDbBackendListener;
@@ -635,7 +635,8 @@ public class JmeterDsl {
    * @see DslOnceOnlyController
    */
 
-  public static DslRuntimeController runtimeController(String seconds, ThreadGroupChild... children) {
+  public static DslRuntimeController runtimeController(String seconds,
+      ThreadGroupChild... children) {
     return new DslRuntimeController(seconds, Arrays.asList(children));
   }
 
