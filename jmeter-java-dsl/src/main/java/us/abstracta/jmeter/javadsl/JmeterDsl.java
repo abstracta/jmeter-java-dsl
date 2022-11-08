@@ -624,15 +624,18 @@ public class JmeterDsl {
     return new DslOnceOnlyController(Arrays.asList(children));
   }
   /**
-   * Builds a Runtime Controller that allows running a part of a test plan for a specified
-   * number of seconds on each iteration of a thread group.
-   *
+   * Builds a Runtime Controller that allows it's child elements to be executed for a defined amount of time (seconds)
+   * per thread group iteration.
+   * This can be very useful in tailoring a test plan to more accurately  the actual behavior of users in a system or
+   * perhaps control the execution of a set of samplers for a period of time followed by a request to refresh an auth token.
+   * When the defined execution time of the controller is reached, the runtime controller will stop execution and the next part of the
+   * test plan will be executed
    *@param seconds defines the number of seconds the runtime controller should be executed on
-   *               each iteration.
+   *               each iteration. Can be a variable expression or a fixed value.
    * @param children contains the test plan elements to execute only one time on first iteration of
    *                 each thread group.
    * @return the controller instance for further configuration and usage.
-   * @see DslOnceOnlyController
+   * @see DslRuntimeController
    */
 
   public static DslRuntimeController runtimeController(String seconds,
