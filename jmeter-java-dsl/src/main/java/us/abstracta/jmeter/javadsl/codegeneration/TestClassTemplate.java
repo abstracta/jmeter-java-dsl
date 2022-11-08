@@ -1,8 +1,9 @@
 package us.abstracta.jmeter.javadsl.codegeneration;
 
-import static us.abstracta.jmeter.javadsl.JmeterDsl.testResource;
-
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -50,15 +51,13 @@ public class TestClassTemplate {
     return String.format("private %s %s() {\n"
             + "%sreturn %s;\n"
             + "}", methodCall.getReturnType().getSimpleName(), methodName, Indentation.INDENT,
-        MethodCall.decreaseLastParenthesisIndentation(
-            methodCall.buildCode(Indentation.indentLevel(2))));
+        methodCall.buildAssignmentCode(Indentation.indentLevel(2)));
   }
 
   private static String testPlanCode(MethodCall testPlan) {
     String indent = Indentation.indentLevel(3);
-    String testPlanCode = MethodCall.decreaseLastParenthesisIndentation(testPlan.buildCode(indent));
-    return testPlanCode.endsWith(Indentation.INDENT + ")") ? testPlanCode
-        : testPlanCode + "\n" + indent;
+    String ret = testPlan.buildAssignmentCode(indent);
+    return ret.endsWith(Indentation.INDENT + ")") ? ret : ret + "\n" + indent;
   }
 
   public TestClassTemplate dependencies(Set<String> dependencies) {
@@ -89,11 +88,11 @@ public class TestClassTemplate {
   public String solve() {
     try {
       Map<Boolean, List<String>> defaultImports = Arrays.stream(
-              testResource("default-imports.txt").contents()
+              resourceContents("/default-imports.txt")
                   .split("\n"))
           .filter(s -> !s.isEmpty())
           .collect(Collectors.partitioningBy(s -> s.startsWith("static ")));
-      return new StringTemplate(testResource("TestClass.template.java").contents())
+      return new StringTemplate(resourceContents("/TestClass.template.java"))
           .bind("dependencies", buildDependencies())
           .bind("staticImports", buildStaticImports(defaultImports.get(true)))
           .bind("imports", buildImports(defaultImports.get(false), imports))
@@ -106,9 +105,19 @@ public class TestClassTemplate {
     }
   }
 
+  private String resourceContents(String resource) {
+    try (BufferedReader reader = new BufferedReader(
+        new InputStreamReader(getClass().getResourceAsStream(resource), StandardCharsets.UTF_8))) {
+      return reader.lines()
+          .collect(Collectors.joining("\n"));
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
   private String buildDependencies() throws IOException {
     TreeSet<String> ret = new TreeSet<>();
-    ret.addAll(Arrays.asList(testResource("default-dependencies.txt").contents()
+    ret.addAll(Arrays.asList(resourceContents("/default-dependencies.txt")
         .split("\n")));
     ret.addAll(dependencies);
     return ret.stream()

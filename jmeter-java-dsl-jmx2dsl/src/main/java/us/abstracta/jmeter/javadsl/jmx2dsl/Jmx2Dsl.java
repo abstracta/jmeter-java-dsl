@@ -9,6 +9,7 @@ import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.IVersionProvider;
 import picocli.CommandLine.Parameters;
+import us.abstracta.jmeter.javadsl.JmeterDsl;
 import us.abstracta.jmeter.javadsl.codegeneration.DslCodeGenerator;
 import us.abstracta.jmeter.javadsl.elasticsearch.listener.ElasticsearchBackendListener;
 import us.abstracta.jmeter.javadsl.graphql.DslGraphqlSampler;
@@ -40,6 +41,11 @@ public class Jmx2Dsl implements Callable<Integer> {
   @Override
   public Integer call() throws Exception {
     DslCodeGenerator codeGenerator = new DslCodeGenerator();
+    /*
+    even though code generator already includes this dependency, is necessary to re add it to
+    properly solve the dependency version.
+     */
+    addBuildersFrom(JmeterDsl.class, "jmeter-java-dsl", codeGenerator);
     addBuildersFrom(JdbcJmeterDsl.class, "jmeter-java-dsl-jdbc", codeGenerator);
     addBuildersFrom(DslGraphqlSampler.class, "jmeter-java-dsl-graphql", codeGenerator);
     addBuildersFrom(ParallelController.class, "jmeter-java-dsl-parallel", codeGenerator);

@@ -85,11 +85,10 @@ public class DslTestFragmentControllerTest {
     }
 
     private String buildTestPlanCode(List<String> children) {
-      String parentIndentation = Indentation.indentLevel(2);
-      String childIndentation = Indentation.indentLevel(4);
+      String childIndent = Indentation.indentLevel(4);
       return String.format("testPlan(\n%s\n%s)", children.stream()
-          .map(c -> Indentation.indent(c, childIndentation))
-          .collect(Collectors.joining(",\n")), parentIndentation);
+          .map(c -> Indentation.indent(c, childIndent))
+          .collect(Collectors.joining(",\n")), Indentation.indentLevel(2));
     }
 
     private String testFragmentMethodDsl(String methodName, String fragmentName,

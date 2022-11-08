@@ -201,7 +201,7 @@ public class MethodCall {
    */
   public MethodCall child(MethodCall child) {
     if (childrenMethod == null) {
-      MethodParam lastParam =  params.isEmpty() ? null : params.get(params.size() - 1);
+      MethodParam lastParam = params.isEmpty() ? null : params.get(params.size() - 1);
       if (lastParam instanceof ChildrenParam && chain.isEmpty()) {
         childrenMethod = this;
         childrenParam = (ChildrenParam<?>) lastParam;
@@ -378,7 +378,7 @@ public class MethodCall {
         .append("(");
     String childIndent = indent + INDENT;
     String paramsCode = buildParamsCode(childIndent);
-    ret.append(decreaseLastParenthesisIndentation(paramsCode));
+    ret.append(paramsCode);
     boolean hasChildren = paramsCode.endsWith("\n");
     if (hasChildren) {
       ret.append(indent);
@@ -396,11 +396,12 @@ public class MethodCall {
     return ret.toString();
   }
 
-  public static String decreaseLastParenthesisIndentation(String paramsCode) {
+  public String buildAssignmentCode(String indent) {
+    String ret = buildCode(indent);
     String indentedParenthesis = INDENT + ")";
-    return paramsCode.endsWith(indentedParenthesis)
-        ? paramsCode.substring(0, paramsCode.length() - indentedParenthesis.length()) + ")"
-        : paramsCode;
+    return chain.isEmpty() && ret.endsWith(indentedParenthesis)
+        ? ret.substring(0, ret.length() - indentedParenthesis.length()) + ")"
+        : ret;
   }
 
   protected String buildParamsCode(String indent) {
