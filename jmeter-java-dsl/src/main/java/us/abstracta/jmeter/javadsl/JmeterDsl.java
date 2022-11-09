@@ -1,6 +1,5 @@
 package us.abstracta.jmeter.javadsl;
 
-import java.io.IOException;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.Collections;
@@ -1296,7 +1295,7 @@ public class JmeterDsl {
    * @see HtmlReporter
    * @since 0.6
    */
-  public static HtmlReporter htmlReporter(String reportsDirectory) throws IOException {
+  public static HtmlReporter htmlReporter(String reportsDirectory) {
     return new HtmlReporter(reportsDirectory, null);
   }
 
@@ -1315,7 +1314,7 @@ public class JmeterDsl {
    * @see HtmlReporter
    * @since 1.0
    */
-  public static HtmlReporter htmlReporter(String reportsDirectory, String name) throws IOException {
+  public static HtmlReporter htmlReporter(String reportsDirectory, String name) {
     return new HtmlReporter(reportsDirectory, name);
   }
 
