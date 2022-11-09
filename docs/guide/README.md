@@ -29,7 +29,7 @@ To use the DSL just include it in your project:
 <dependency>
   <groupId>us.abstracta.jmeter</groupId>
   <artifactId>jmeter-java-dsl</artifactId>
-  <version>1.1-SNAPSHOT</version>
+  <version>1.1</version>
   <scope>test</scope>
 </dependency>
 ```
@@ -224,7 +224,7 @@ By including the following module as a dependency:
 <dependency>
   <groupId>us.abstracta.jmeter</groupId>
   <artifactId>jmeter-java-dsl-blazemeter</artifactId>
-  <version>1.1-SNAPSHOT</version>
+  <version>1.1</version>
   <scope>test</scope>
 </dependency>
 ```
@@ -299,7 +299,7 @@ In the same fashion as with BlazeMeter, just by including the following module a
 <dependency>
   <groupId>us.abstracta.jmeter</groupId>
   <artifactId>jmeter-java-dsl-octoperf</artifactId>
-  <version>1.1-SNAPSHOT</version>
+  <version>1.1</version>
   <scope>test</scope>
 </dependency>
 ```
@@ -992,7 +992,7 @@ To use the module, you will need to include the following dependency in your pro
 <dependency>
   <groupId>us.abstracta.jmeter</groupId>
   <artifactId>jmeter-java-dsl-elasticsearch-listener</artifactId>
-  <version>1.1-SNAPSHOT</version>
+  <version>1.1</version>
   <scope>test</scope>
 </dependency>
 ```
@@ -1109,7 +1109,7 @@ To use it, you need to add the following dependency:
 <dependency>
   <groupId>us.abstracta.jmeter</groupId>
   <artifactId>jmeter-java-dsl-dashboard</artifactId>
-  <version>1.1-SNAPSHOT</version>
+  <version>1.1</version>
   <scope>test</scope>
 </dependency>
 ```
@@ -1972,7 +1972,7 @@ To use it, add the following dependency to your project:
 <dependency>
   <groupId>us.abstracta.jmeter</groupId>
   <artifactId>jmeter-java-dsl-parallel</artifactId>
-  <version>1.1-SNAPSHOT</version>
+  <version>1.1</version>
   <scope>test</scope>
 </dependency>
 ```
@@ -2590,7 +2590,7 @@ When you want to test a GraphQL service, having properly set each field in an HT
 <dependency>
   <groupId>us.abstracta.jmeter</groupId>
   <artifactId>jmeter-java-dsl-graphql</artifactId>
-  <version>1.1-SNAPSHOT</version>
+  <version>1.1</version>
   <scope>test</scope>
 </dependency>
 ```
@@ -2683,7 +2683,7 @@ Including the following dependency in your project:
 <dependency>
   <groupId>us.abstracta.jmeter</groupId>
   <artifactId>jmeter-java-dsl-jdbc</artifactId>
-  <version>1.1-SNAPSHOT</version>
+  <version>1.1</version>
   <scope>test</scope>
 </dependency>
 ```
@@ -2931,7 +2931,7 @@ Include the module on your project:
 <dependency>
   <groupId>us.abstracta.jmeter</groupId>
   <artifactId>jmeter-java-dsl-wrapper</artifactId>
-  <version>1.1-SNAPSHOT</version>
+  <version>1.1</version>
   <scope>test</scope>
 </dependency>
 ```
