@@ -29,7 +29,7 @@ To use the DSL just include it in your project:
 <dependency>
   <groupId>us.abstracta.jmeter</groupId>
   <artifactId>jmeter-java-dsl</artifactId>
-  <version>1.1</version>
+  <version>1.2-SNAPSHOT</version>
   <scope>test</scope>
 </dependency>
 ```
@@ -50,7 +50,7 @@ class JmeterRule implements ComponentMetadataRule {
 
 dependencies {
     ...
-    testImplementation 'us.abstracta.jmeter:jmeter-java-dsl:1.1-SNAPSHOT'
+    testImplementation 'us.abstracta.jmeter:jmeter-java-dsl:1.2-SNAPSHOT-SNAPSHOT'
     components {
         withModule("org.apache.jmeter:ApacheJMeter_core", JmeterRule)
         withModule("org.apache.jmeter:ApacheJMeter_java", JmeterRule)
@@ -133,7 +133,7 @@ java -jar jmx2dsl.jar test-plan.jmx
 :::
 ::: tab Jbang
 ```bash
-jbang us.abstracta.jmeter:jmeter-java-dsl-jmx2dsl:1.1-SNAPSHOT test-plan.jmx
+jbang us.abstracta.jmeter:jmeter-java-dsl-jmx2dsl:1.2-SNAPSHOT-SNAPSHOT test-plan.jmx
 ```
 :::
 ::::
@@ -149,7 +149,7 @@ executable (eg: chmod +x ./PerformanceTest.java) and just executing it with ./Pe
 //DEPS org.assertj:assertj-core:3.23.1
 //DEPS org.junit.jupiter:junit-jupiter-engine:5.9.0
 //DEPS org.junit.platform:junit-platform-launcher:1.9.0
-//DEPS us.abstracta.jmeter:jmeter-java-dsl:1.1-SNAPSHOT
+//DEPS us.abstracta.jmeter:jmeter-java-dsl:1.2-SNAPSHOT-SNAPSHOT
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.*;
@@ -224,14 +224,14 @@ By including the following module as a dependency:
 <dependency>
   <groupId>us.abstracta.jmeter</groupId>
   <artifactId>jmeter-java-dsl-blazemeter</artifactId>
-  <version>1.1</version>
+  <version>1.2-SNAPSHOT</version>
   <scope>test</scope>
 </dependency>
 ```
 :::
 ::: tab Gradle
 ```groovy
-testImplementation 'us.abstracta.jmeter:jmeter-java-dsl-blazemeter:1.1-SNAPSHOT'
+testImplementation 'us.abstracta.jmeter:jmeter-java-dsl-blazemeter:1.2-SNAPSHOT-SNAPSHOT'
 ```
 :::
 ::::
@@ -299,14 +299,14 @@ In the same fashion as with BlazeMeter, just by including the following module a
 <dependency>
   <groupId>us.abstracta.jmeter</groupId>
   <artifactId>jmeter-java-dsl-octoperf</artifactId>
-  <version>1.1</version>
+  <version>1.2-SNAPSHOT</version>
   <scope>test</scope>
 </dependency>
 ```
 :::
 ::: tab Gradle
 ```groovy
-testImplementation 'us.abstracta.jmeter:jmeter-java-dsl-octoperf:1.1-SNAPSHOT'
+testImplementation 'us.abstracta.jmeter:jmeter-java-dsl-octoperf:1.2-SNAPSHOT-SNAPSHOT'
 ```
 :::
 ::::
@@ -992,7 +992,7 @@ To use the module, you will need to include the following dependency in your pro
 <dependency>
   <groupId>us.abstracta.jmeter</groupId>
   <artifactId>jmeter-java-dsl-elasticsearch-listener</artifactId>
-  <version>1.1</version>
+  <version>1.2-SNAPSHOT</version>
   <scope>test</scope>
 </dependency>
 ```
@@ -1005,7 +1005,7 @@ maven { url 'https://jitpack.io' }
 
 And the dependency:
 ```groovy
-testImplementation 'us.abstracta.jmeter:jmeter-java-dsl-elasticsearch-listener:1.1-SNAPSHOT'
+testImplementation 'us.abstracta.jmeter:jmeter-java-dsl-elasticsearch-listener:1.2-SNAPSHOT-SNAPSHOT'
 ```
 
 :::
@@ -1109,14 +1109,14 @@ To use it, you need to add the following dependency:
 <dependency>
   <groupId>us.abstracta.jmeter</groupId>
   <artifactId>jmeter-java-dsl-dashboard</artifactId>
-  <version>1.1</version>
+  <version>1.2-SNAPSHOT</version>
   <scope>test</scope>
 </dependency>
 ```
 :::
 ::: tab Gradle
 ```groovy
-testImplementation 'us.abstracta.jmeter:jmeter-java-dsl-dashboard:1.1-SNAPSHOT'
+testImplementation 'us.abstracta.jmeter:jmeter-java-dsl-dashboard:1.2-SNAPSHOT-SNAPSHOT'
 ```
 :::
 ::::
@@ -1972,14 +1972,14 @@ To use it, add the following dependency to your project:
 <dependency>
   <groupId>us.abstracta.jmeter</groupId>
   <artifactId>jmeter-java-dsl-parallel</artifactId>
-  <version>1.1</version>
+  <version>1.2-SNAPSHOT</version>
   <scope>test</scope>
 </dependency>
 ```
 :::
 ::: tab Gradle
 ```groovy
-testImplementation 'us.abstracta.jmeter:jmeter-java-dsl-dashboard:1.1-SNAPSHOT'
+testImplementation 'us.abstracta.jmeter:jmeter-java-dsl-dashboard:1.2-SNAPSHOT-SNAPSHOT'
 ```
 :::
 ::::
@@ -2590,14 +2590,14 @@ When you want to test a GraphQL service, having properly set each field in an HT
 <dependency>
   <groupId>us.abstracta.jmeter</groupId>
   <artifactId>jmeter-java-dsl-graphql</artifactId>
-  <version>1.1</version>
+  <version>1.2-SNAPSHOT</version>
   <scope>test</scope>
 </dependency>
 ```
 :::
 ::: tab Gradle
 ```groovy
-testImplementation 'us.abstracta.jmeter:jmeter-java-dsl-graphql:1.1-SNAPSHOT'
+testImplementation 'us.abstracta.jmeter:jmeter-java-dsl-graphql:1.2-SNAPSHOT-SNAPSHOT'
 ```
 :::
 ::::
@@ -2683,14 +2683,14 @@ Including the following dependency in your project:
 <dependency>
   <groupId>us.abstracta.jmeter</groupId>
   <artifactId>jmeter-java-dsl-jdbc</artifactId>
-  <version>1.1</version>
+  <version>1.2-SNAPSHOT</version>
   <scope>test</scope>
 </dependency>
 ```
 :::
 ::: tab Gradle
 ```groovy
-testImplementation 'us.abstracta.jmeter:jmeter-java-dsl-jdbc:1.1-SNAPSHOT'
+testImplementation 'us.abstracta.jmeter:jmeter-java-dsl-jdbc:1.2-SNAPSHOT-SNAPSHOT'
 ```
 :::
 ::::
@@ -2931,14 +2931,14 @@ Include the module on your project:
 <dependency>
   <groupId>us.abstracta.jmeter</groupId>
   <artifactId>jmeter-java-dsl-wrapper</artifactId>
-  <version>1.1</version>
+  <version>1.2-SNAPSHOT</version>
   <scope>test</scope>
 </dependency>
 ```
 :::
 ::: tab Gradle
 ```groovy
-testImplementation 'us.abstracta.jmeter:jmeter-java-dsl-wrapper:1.1-SNAPSHOT'
+testImplementation 'us.abstracta.jmeter:jmeter-java-dsl-wrapper:1.2-SNAPSHOT-SNAPSHOT'
 ```
 :::
 ::::
