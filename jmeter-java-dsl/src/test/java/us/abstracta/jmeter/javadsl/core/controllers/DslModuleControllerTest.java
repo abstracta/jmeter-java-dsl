@@ -3,26 +3,30 @@ package us.abstracta.jmeter.javadsl.core.controllers;
 import static org.assertj.core.api.Assertions.assertThat;
 import static us.abstracta.jmeter.javadsl.codegeneration.MethodCallBuilderTest.buildHttpSamplerDsl;
 import static us.abstracta.jmeter.javadsl.codegeneration.MethodCallBuilderTest.buildHttpSamplerJmx;
-import static us.abstracta.jmeter.javadsl.codegeneration.MethodCallBuilderTest.buildTestPlanDsl;
-import static us.abstracta.jmeter.javadsl.codegeneration.MethodCallBuilderTest.buildTestPlanJmx;
+import static us.abstracta.jmeter.javadsl.codegeneration.MethodCallBuilderTest.buildTestPlanDslTemplate;
 import static us.abstracta.jmeter.javadsl.codegeneration.MethodCallBuilderTest.jmx2dsl;
 import static us.abstracta.jmeter.javadsl.codegeneration.MethodCallBuilderTest.testResourceContents;
+import static us.abstracta.jmeter.javadsl.core.controllers.DslTestFragmentControllerTest.DEFAULT_FRAGMENT_NAME;
 import static us.abstracta.jmeter.javadsl.core.controllers.DslTestFragmentControllerTest.buildFragmentDisabledJmx;
 import static us.abstracta.jmeter.javadsl.core.controllers.DslTestFragmentControllerTest.buildFragmentJmx;
 import static us.abstracta.jmeter.javadsl.core.controllers.DslTestFragmentControllerTest.buildFragmentMethod;
-import static us.abstracta.jmeter.javadsl.core.controllers.DslTestFragmentControllerTest.DEFAULT_FRAGMENT_NAME;
 
+import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Collections;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import us.abstracta.jmeter.javadsl.codegeneration.Indentation;
+import us.abstracta.jmeter.javadsl.codegeneration.MethodCallBuilderTest;
 import us.abstracta.jmeter.javadsl.core.util.StringTemplate;
 
 public class DslModuleControllerTest {
 
   private static final String FRAGMENT_METHOD_NAME = "testFragment";
   private static final String FRAGMENT_METHOD_CALL = FRAGMENT_METHOD_NAME + "()";
+  private static final String IF_CONTROLLER_METHOD_CALL = "ifController()";
+  private static final String IF_CONTROLLER_DEFAULT_NAME = "If Controller";
 
   @Nested
   public class CodeBuilderTest {
@@ -31,16 +35,24 @@ public class DslModuleControllerTest {
     public void shouldReuseFragmentMethodWhenModuleUsesPreviousEnabledFragment(@TempDir Path tmp)
         throws Exception {
       String jmx = buildTestPlanJmx(
-          buildThreadGroupJmx(
-              buildFragmentJmx(DEFAULT_FRAGMENT_NAME, buildHttpSamplerJmx()),
-              buildModuleJmx()
-          ));
+          buildFragmentJmx(DEFAULT_FRAGMENT_NAME, buildHttpSamplerJmx()),
+          buildModuleJmx(DEFAULT_FRAGMENT_NAME));
       assertThat(jmx2dsl(jmx, tmp))
-          .isEqualTo(buildTestPlanDsl(
+          .isEqualTo(buildFragmentPlanDsl(FRAGMENT_METHOD_CALL, FRAGMENT_METHOD_CALL));
+    }
+
+    private String buildTestPlanJmx(String... children) throws IOException {
+      return MethodCallBuilderTest.buildTestPlanJmx(buildThreadGroupJmx(children));
+    }
+
+    public String buildFragmentPlanDsl(String... children) {
+      return buildTestPlanDslTemplate(Collections.singletonList(buildThreadGroupDsl(children)))
+          .staticImports(Collections.singleton(DslTestFragmentController.class.getName()))
+          .imports(Collections.singleton(DslTestFragmentController.class.getName()))
+          .methodDefinitions(Collections.singletonList(
               buildFragmentMethod(FRAGMENT_METHOD_NAME, DEFAULT_FRAGMENT_NAME,
-                  buildHttpSamplerDsl()),
-              buildThreadGroupDsl(FRAGMENT_METHOD_CALL, FRAGMENT_METHOD_CALL)
-          ));
+                  buildHttpSamplerDsl())))
+          .solve();
     }
 
     private String buildThreadGroupJmx(String... childrenJmx) {
@@ -49,8 +61,10 @@ public class DslModuleControllerTest {
           .solve();
     }
 
-    private String buildModuleJmx() {
-      return testResourceContents("fragments/module.jmx");
+    private String buildModuleJmx(String controllerName) {
+      return new StringTemplate(testResourceContents("fragments/module.jmx"))
+          .bind("controllerName", controllerName)
+          .solve();
     }
 
     private String buildThreadGroupDsl(String... children) {
@@ -62,32 +76,56 @@ public class DslModuleControllerTest {
     public void shouldDefineAndUseFragmentMethodWhenModuleUsesLaterEnabledFragment(
         @TempDir Path tmp) throws Exception {
       String jmx = buildTestPlanJmx(
-          buildThreadGroupJmx(
-              buildModuleJmx(),
-              buildFragmentJmx(DEFAULT_FRAGMENT_NAME, buildHttpSamplerJmx())
-          ));
+          buildModuleJmx(DEFAULT_FRAGMENT_NAME),
+          buildFragmentJmx(DEFAULT_FRAGMENT_NAME, buildHttpSamplerJmx()));
       assertThat(jmx2dsl(jmx, tmp))
-          .isEqualTo(buildTestPlanDsl(
-              buildFragmentMethod(FRAGMENT_METHOD_NAME, DEFAULT_FRAGMENT_NAME,
-                  buildHttpSamplerDsl()),
-              buildThreadGroupDsl(FRAGMENT_METHOD_CALL, FRAGMENT_METHOD_CALL)
-          ));
+          .isEqualTo(buildFragmentPlanDsl(FRAGMENT_METHOD_CALL, FRAGMENT_METHOD_CALL));
     }
 
     @Test
     public void shouldUseFragmentMethodWhenModuleUsesDisabledFragment(@TempDir Path tmp)
         throws Exception {
       String jmx = buildTestPlanJmx(
-          buildThreadGroupJmx(
-              buildFragmentDisabledJmx(DEFAULT_FRAGMENT_NAME, buildHttpSamplerJmx()),
-              buildModuleJmx()
-          ));
+          buildFragmentDisabledJmx(DEFAULT_FRAGMENT_NAME, buildHttpSamplerJmx()),
+          buildModuleJmx(DEFAULT_FRAGMENT_NAME)
+      );
       assertThat(jmx2dsl(jmx, tmp))
-          .isEqualTo(buildTestPlanDsl(
-              buildFragmentMethod(FRAGMENT_METHOD_NAME, DEFAULT_FRAGMENT_NAME,
-                  buildHttpSamplerDsl()),
-              buildThreadGroupDsl("//" + FRAGMENT_METHOD_CALL, FRAGMENT_METHOD_CALL)
-          ));
+          .isEqualTo(buildFragmentPlanDsl("//" + FRAGMENT_METHOD_CALL, FRAGMENT_METHOD_CALL));
+    }
+
+    @Test
+    public void shouldDefineAndUseMethodWhenModuleUsesPreviouslyDefinedController(@TempDir Path tmp)
+        throws Exception {
+      String jmx = buildTestPlanJmx(
+          buildIfControllerJmx(),
+          buildModuleJmx(IF_CONTROLLER_DEFAULT_NAME));
+      assertThat(jmx2dsl(jmx, tmp))
+          .isEqualTo(
+              buildIfControllerPlanDsl(IF_CONTROLLER_METHOD_CALL, IF_CONTROLLER_METHOD_CALL));
+    }
+
+    private String buildIfControllerJmx() {
+      return testResourceContents("fragments/if-controller.jmx");
+    }
+
+    public String buildIfControllerPlanDsl(String... children) {
+      return buildTestPlanDslTemplate(Collections.singletonList(buildThreadGroupDsl(children)))
+          .imports(Collections.singleton(DslIfController.class.getName()))
+          .methodDefinitions(Collections.singletonList(
+              testResourceContents("fragments/IfControllerDsl.java")))
+          .solve();
+    }
+
+    @Test
+    public void shouldDefineAndUseMethodWhenModuleUsesLaterDefinedController(@TempDir Path tmp)
+        throws Exception {
+      String jmx = buildTestPlanJmx(
+          buildModuleJmx(IF_CONTROLLER_DEFAULT_NAME),
+          buildIfControllerJmx()
+      );
+      assertThat(jmx2dsl(jmx, tmp))
+          .isEqualTo(
+              buildIfControllerPlanDsl(IF_CONTROLLER_METHOD_CALL, IF_CONTROLLER_METHOD_CALL));
     }
 
   }

@@ -3,11 +3,12 @@ package us.abstracta.jmeter.javadsl.codegeneration;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 import org.apache.jmeter.config.ConfigElement;
 import org.apache.jmeter.testelement.TestElement;
 import org.apache.jorphan.collections.HashTree;
@@ -33,10 +34,14 @@ public class MethodCallContext {
 
   private final TestElement testElement;
   private final HashTree childrenTree;
+  private final MethodCallContext root;
   private final MethodCallContext parent;
   private final MethodCallBuilderRegistry builderRegistry;
   private final Map<Object, Object> entries = new HashMap<>();
   private final List<MethodCallContextEndListener> endListeners = new ArrayList<>();
+  private MethodCall methodCall;
+  private final Map<TestElement, String> definedMethods = new HashMap<>();
+  private final Map<TestElement, MethodCallContext> contextRegistry = new HashMap<>();
 
   public MethodCallContext(TestElement testElement, HashTree childrenTree,
       MethodCallContext parent, MethodCallBuilderRegistry builderRegistry) {
@@ -44,6 +49,7 @@ public class MethodCallContext {
     // sorting simplifies code builder
     this.childrenTree = childrenTree == null ? new ListedHashTree() : sortTree(childrenTree);
     this.parent = parent;
+    this.root = parent == null ? this : parent.root;
     this.builderRegistry = builderRegistry;
   }
 
@@ -85,7 +91,7 @@ public class MethodCallContext {
    * @return the parent context. Null is returned if the current context is the root context.
    */
   public MethodCallContext getRoot() {
-    return parent == null ? this : parent.getRoot();
+    return root;
   }
 
   /**
@@ -157,17 +163,22 @@ public class MethodCallContext {
    */
   public MethodCall buildMethodCall() {
     try {
-      MethodCall ret = builderRegistry.findBuilderMatchingContext(this)
+      methodCall = builderRegistry.findBuilderMatchingContext(this)
           .map(b -> b.buildMethodCall(this))
           .orElseGet(() -> {
             LOG.warn("No builder found for {}({}). " + UNSUPPORTED_USAGE_WARNING,
                 testElement.getClass(), testElement.getName());
             return MethodCall.buildUnsupported();
           });
-      ret.setCommented(!testElement.isEnabled());
-      addChildrenTo(ret);
-      endListeners.forEach(l -> l.execute(this, ret));
-      return ret;
+      root.contextRegistry.put(testElement, this);
+      String definedMethodName = root.definedMethods.get(testElement);
+      if (definedMethodName != null && !(methodCall instanceof FragmentMethodCall)) {
+        methodCall = new FragmentMethodCall(definedMethodName, methodCall);
+      }
+      methodCall.setCommented(!testElement.isEnabled());
+      addChildrenTo(methodCall);
+      executeEndListeners(methodCall);
+      return methodCall;
     } catch (RuntimeException e) {
       LOG.warn("Could not build code for {}({}). " + UNSUPPORTED_USAGE_WARNING,
           testElement.getClass(), testElement.getName(), e);
@@ -175,20 +186,16 @@ public class MethodCallContext {
     }
   }
 
-  private void addChildrenTo(MethodCall call) {
-    List<MethodCall> children = buildChildrenMethodCalls();
-    if (children.isEmpty()) {
-      return;
-    }
-    children.forEach(call::child);
+  private void executeEndListeners(MethodCall ret) {
+    endListeners.forEach(l -> l.execute(this, ret));
   }
 
-  private List<MethodCall> buildChildrenMethodCalls() {
-    return childrenTree.list().stream()
+  private void addChildrenTo(MethodCall call) {
+    childrenTree.list().stream()
         .map(e -> new MethodCallContext((TestElement) e, childrenTree.getTree(e), this,
             builderRegistry)
             .buildMethodCall())
-        .collect(Collectors.toList());
+        .forEach(call::child);
   }
 
   /**
@@ -223,6 +230,39 @@ public class MethodCallContext {
    */
   public <T extends MethodCallBuilder> T findBuilder(Class<T> builderClass) {
     return builderRegistry.findBuilderByClass(builderClass);
+  }
+
+  public String solveMethodName(TestElement element) {
+    MethodCallContext elementContext = root.contextRegistry.get(element);
+    String ret = root.definedMethods.computeIfAbsent(element,
+        e -> buildUniqueName(e.getName(), new HashSet<>(root.definedMethods.values())));
+    if (elementContext != null) {
+      MethodCall elementMethodCall = elementContext.methodCall;
+       if (!(elementMethodCall instanceof FragmentMethodCall)) {
+         FragmentMethodCall fragment = new FragmentMethodCall(ret, elementMethodCall);
+         fragment.setCommented(elementMethodCall.isCommented());
+         elementMethodCall.setCommented(false);
+         elementContext.parent.methodCall.replaceChild(elementMethodCall, fragment);
+       }
+    }
+    return ret;
+  }
+
+  private static String buildUniqueName(String elementName, Set<String> existingNames) {
+    // removing any character that may not be allowed in method name
+    String ret = elementName.replaceAll("\\W", "");
+    // avoid method names starting with digits which are not supported by java
+    ret = (Character.isDigit(ret.charAt(0)) ? "fragment" : "") + ret;
+    // lower first char to follow java method naming convention
+    ret = Character.toLowerCase(ret.charAt(0)) + ret.substring(1);
+    if (!existingNames.contains(ret)) {
+      return ret;
+    }
+    int index = 2;
+    while (existingNames.contains(ret + index)) {
+      index++;
+    }
+    return ret + index;
   }
 
   public interface MethodCallContextEndListener {

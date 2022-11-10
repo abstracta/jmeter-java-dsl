@@ -12,11 +12,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.apache.http.entity.ContentType;
-import org.apache.jorphan.collections.HashTree;
 import us.abstracta.jmeter.javadsl.codegeneration.params.BoolParam;
 import us.abstracta.jmeter.javadsl.codegeneration.params.ChildrenParam;
-import us.abstracta.jmeter.javadsl.core.BuildTreeContext;
-import us.abstracta.jmeter.javadsl.core.DslTestElement;
 import us.abstracta.jmeter.javadsl.core.DslTestPlan;
 import us.abstracta.jmeter.javadsl.core.testelements.MultiLevelTestElement;
 
@@ -103,27 +100,15 @@ public class MethodCall {
   }
 
   public static MethodCall buildUnsupported() {
-    return new MethodCall("unsupported", UnsupportedTestElement.class);
+    return new MethodCall("unsupported", MultiLevelTestElement.class);
   }
 
   public void setCommented(boolean commented) {
     this.commented = commented;
   }
 
-  private static class UnsupportedTestElement implements MultiLevelTestElement {
-
-    public void children(DslTestElement... child) {
-    }
-
-    @Override
-    public HashTree buildTreeUnder(HashTree parent, BuildTreeContext context) {
-      return null;
-    }
-
-    @Override
-    public void showInGui() {
-    }
-
+  public boolean isCommented() {
+    return commented;
   }
 
   /**
@@ -211,6 +196,11 @@ public class MethodCall {
    * @return the current call instance for further configuration.
    */
   public MethodCall child(MethodCall child) {
+    solveChildrenParam().addChild(child);
+    return this;
+  }
+
+  private ChildrenParam<?> solveChildrenParam() {
     if (childrenMethod == null) {
       MethodParam lastParam = params.isEmpty() ? null : params.get(params.size() - 1);
       if (lastParam instanceof ChildrenParam && chain.isEmpty()) {
@@ -222,8 +212,7 @@ public class MethodCall {
         childrenParam = (ChildrenParam<?>) childrenMethod.params.get(0);
       }
     }
-    childrenParam.addChild(child);
-    return this;
+    return childrenParam;
   }
 
   private MethodCall findChildrenMethod() {
@@ -258,6 +247,10 @@ public class MethodCall {
       return paramsCode.isEmpty() ? "" : methodName + "(" + paramsCode + indent + ")";
     }
 
+  }
+
+  public void replaceChild(MethodCall original, MethodCall replacement) {
+    solveChildrenParam().replaceChild(original, replacement);
   }
 
   /**

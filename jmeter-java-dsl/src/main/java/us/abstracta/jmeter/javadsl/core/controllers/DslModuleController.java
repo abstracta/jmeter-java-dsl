@@ -6,6 +6,7 @@ import org.apache.jmeter.testelement.TestElement;
 import org.apache.jmeter.testelement.property.CollectionProperty;
 import org.apache.jmeter.testelement.property.PropertyIterator;
 import org.apache.jorphan.collections.HashTree;
+import us.abstracta.jmeter.javadsl.codegeneration.FragmentMethodCall;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodCall;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodCallContext;
 import us.abstracta.jmeter.javadsl.codegeneration.SingleTestElementCallBuilder;
@@ -28,8 +29,7 @@ public class DslModuleController {
       CollectionProperty nodePath = (CollectionProperty) testElement.getProperty(
           "ModuleController.node_path");
       TestElement element = findElementInPath(nodePath, context);
-      //TODO this should replace original method call by the fragment method call
-      return new FragmentMethodCall(null, element, context);
+      return new FragmentMethodCall(context.solveMethodName(element), null);
     }
 
     private TestElement findElementInPath(CollectionProperty nodePath, MethodCallContext context) {

@@ -124,4 +124,8 @@ public class ChildrenParam<T> extends MethodParam {
     children.add(child);
   }
 
+  public void replaceChild(MethodCall original, MethodCall replacement) {
+    children.replaceAll(c -> c == original ? replacement : c);
+  }
+
 }

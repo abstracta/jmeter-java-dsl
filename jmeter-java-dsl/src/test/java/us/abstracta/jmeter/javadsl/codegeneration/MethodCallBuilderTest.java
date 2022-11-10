@@ -28,7 +28,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import us.abstracta.jmeter.javadsl.core.DslTestPlan;
-import us.abstracta.jmeter.javadsl.core.controllers.DslTestFragmentController;
 import us.abstracta.jmeter.javadsl.core.util.StringTemplate;
 
 @TestInstance(Lifecycle.PER_CLASS)
@@ -123,18 +122,10 @@ public abstract class MethodCallBuilderTest {
     return testResourceContents("fragments/http-sampler.jmx");
   }
 
-  public static String buildTestPlanDsl(String method, String child) {
-    return buildTestPlanDsl(Collections.singletonList(method), Collections.singletonList(child));
-  }
-
-  public static String buildTestPlanDsl(List<String> methods, List<String> children) {
+  public static TestClassTemplate buildTestPlanDslTemplate(List<String> children) {
     return new TestClassTemplate()
         .dependencies(Collections.singleton("us.abstracta.jmeter:jmeter-java-dsl"))
-        .staticImports(Collections.singleton(DslTestFragmentController.class.getName()))
-        .imports(Collections.singleton(DslTestFragmentController.class.getName()))
-        .methodDefinitions(methods)
-        .testPlan(buildTestPlanMethodCode(children))
-        .solve();
+        .testPlan(buildTestPlanMethodCode(children));
   }
 
   private static String buildTestPlanMethodCode(List<String> children) {

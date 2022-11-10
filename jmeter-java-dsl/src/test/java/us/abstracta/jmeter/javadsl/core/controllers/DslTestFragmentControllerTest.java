@@ -3,7 +3,7 @@ package us.abstracta.jmeter.javadsl.core.controllers;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static us.abstracta.jmeter.javadsl.codegeneration.MethodCallBuilderTest.buildHttpSamplerDsl;
 import static us.abstracta.jmeter.javadsl.codegeneration.MethodCallBuilderTest.buildHttpSamplerJmx;
-import static us.abstracta.jmeter.javadsl.codegeneration.MethodCallBuilderTest.buildTestPlanDsl;
+import static us.abstracta.jmeter.javadsl.codegeneration.MethodCallBuilderTest.buildTestPlanDslTemplate;
 import static us.abstracta.jmeter.javadsl.codegeneration.MethodCallBuilderTest.buildTestPlanJmx;
 import static us.abstracta.jmeter.javadsl.codegeneration.MethodCallBuilderTest.jmx2dsl;
 import static us.abstracta.jmeter.javadsl.codegeneration.MethodCallBuilderTest.testResourceContents;
@@ -11,6 +11,8 @@ import static us.abstracta.jmeter.javadsl.codegeneration.MethodCallBuilderTest.t
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -59,6 +61,18 @@ public class DslTestFragmentControllerTest {
           .isEqualTo(buildTestPlanDsl(
               buildFragmentMethod(methodName, DEFAULT_FRAGMENT_NAME, buildHttpSamplerDsl()),
               methodName + "()"));
+    }
+
+    private String buildTestPlanDsl(String method, String child) {
+      return buildTestPlanDsl(Collections.singletonList(method), Collections.singletonList(child));
+    }
+
+    public String buildTestPlanDsl(List<String> methods, List<String> children) {
+      return buildTestPlanDslTemplate(children)
+          .staticImports(Collections.singleton(DslTestFragmentController.class.getName()))
+          .imports(Collections.singleton(DslTestFragmentController.class.getName()))
+          .methodDefinitions(methods)
+          .solve();
     }
 
     @Test
