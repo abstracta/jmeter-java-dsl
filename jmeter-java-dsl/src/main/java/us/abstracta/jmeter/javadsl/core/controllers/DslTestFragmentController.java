@@ -53,10 +53,11 @@ public class DslTestFragmentController extends BaseController<DslTestFragmentCon
 
     @Override
     protected MethodCall buildMethodCall(MethodCallContext context) {
-      TestElementParamBuilder paramBuilder = new TestElementParamBuilder(context.getTestElement());
-      return new FragmentMethodCall(buildMethodCall(paramBuilder.nameParam(DEFAULT_NAME),
-          new ChildrenParam<>(ThreadGroupChild[].class)), context.getTestElement(), context
-      );
+      TestElement element = context.getTestElement();
+      MethodCall methodDefinitionBody = buildMethodCall(
+          new TestElementParamBuilder(element).nameParam(DEFAULT_NAME),
+          new ChildrenParam<>(ThreadGroupChild[].class));
+      return new FragmentMethodCall(methodDefinitionBody, element, context);
     }
 
   }

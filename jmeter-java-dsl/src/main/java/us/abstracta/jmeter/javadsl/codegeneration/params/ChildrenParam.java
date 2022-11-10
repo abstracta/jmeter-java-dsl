@@ -97,7 +97,12 @@ public class ChildrenParam<T> extends MethodParam {
         .map(c -> c.buildCode(indent))
         .filter(s -> !s.isEmpty())
         .collect(Collectors.joining(",\n" + indent));
+    ret = commentLastUncommentedComma(ret);
     return ret.isEmpty() ? ret : "\n" + indent + ret + "\n";
+  }
+
+  private String commentLastUncommentedComma(String ret) {
+    return ret.replaceAll("(?s),((?:\n\\s*//[^\n]+)+)$", "//,$1");
   }
 
   private static int findExecutionOrder(Class<?> returnType) {

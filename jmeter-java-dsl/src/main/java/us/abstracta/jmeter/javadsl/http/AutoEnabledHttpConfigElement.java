@@ -130,7 +130,7 @@ public abstract class AutoEnabledHttpConfigElement extends BaseConfigElement {
     private boolean findConfigElementInSamplerScope(MethodCallContext samplerContext) {
       MethodCallContext parent = samplerContext.getParent();
       return samplerContext.getChildrenTree().list().stream()
-          .anyMatch(testElementClass::isInstance)
+          .anyMatch(e -> testElementClass.isInstance(e) && ((TestElement) e).isEnabled())
           || parent != null && findConfigElementInSamplerScope(parent);
     }
 
@@ -170,6 +170,9 @@ public abstract class AutoEnabledHttpConfigElement extends BaseConfigElement {
 
     @Override
     protected MethodCall buildMethodCall(T testElement, MethodCallContext context) {
+      if (!testElement.isEnabled()) {
+        return MethodCall.emptyCall();
+      }
       if (findSamplerInConfigScope(context)) {
         MethodCallContext parent = context.getParent();
         while (parent != null) {

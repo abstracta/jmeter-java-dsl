@@ -164,6 +164,7 @@ public class MethodCallContext {
                 testElement.getClass(), testElement.getName());
             return MethodCall.buildUnsupported();
           });
+      ret.setCommented(!testElement.isEnabled());
       addChildrenTo(ret);
       endListeners.forEach(l -> l.execute(this, ret));
       return ret;
@@ -184,10 +185,9 @@ public class MethodCallContext {
 
   private List<MethodCall> buildChildrenMethodCalls() {
     return childrenTree.list().stream()
-        .map(c -> (TestElement) c)
-        .filter(TestElement::isEnabled)
-        .map(c -> new MethodCallContext(c, childrenTree.getTree(c), this,
-            builderRegistry).buildMethodCall())
+        .map(e -> new MethodCallContext((TestElement) e, childrenTree.getTree(e), this,
+            builderRegistry)
+            .buildMethodCall())
         .collect(Collectors.toList());
   }
 

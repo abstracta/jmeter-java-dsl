@@ -44,6 +44,7 @@ public class MethodCall {
   private final List<MethodParam> params;
   private final List<MethodCall> chain = new ArrayList<>();
   private final Set<String> requiredStaticImports = new HashSet<>();
+  private boolean commented;
 
   protected MethodCall(String methodName, Class<?> returnType, MethodParam... params) {
     this.methodName = methodName;
@@ -105,6 +106,10 @@ public class MethodCall {
     return new MethodCall("unsupported", UnsupportedTestElement.class);
   }
 
+  public void setCommented(boolean commented) {
+    this.commented = commented;
+  }
+
   private static class UnsupportedTestElement implements MultiLevelTestElement {
 
     public void children(DslTestElement... child) {
@@ -137,6 +142,12 @@ public class MethodCall {
 
     protected EmptyMethodCall() {
       super(null, MultiLevelTestElement.class);
+    }
+
+    @Override
+    public MethodCall child(MethodCall child) {
+      // Just ignoring children
+      return this;
     }
 
     @Override
@@ -393,7 +404,11 @@ public class MethodCall {
       ret.append(".");
       ret.append(chainedCode);
     }
-    return ret.toString();
+    return commented ? commented(ret.toString(), indent) : ret.toString();
+  }
+
+  private String commented(String str, String indent) {
+    return "//" + str.replace("\n" + indent, "\n" + indent + "//");
   }
 
   public String buildAssignmentCode(String indent) {

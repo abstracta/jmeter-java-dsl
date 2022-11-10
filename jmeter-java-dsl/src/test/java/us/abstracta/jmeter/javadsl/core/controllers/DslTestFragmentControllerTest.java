@@ -21,15 +21,24 @@ public class DslTestFragmentControllerTest {
   public static final String DEFAULT_FRAGMENT_NAME = "Test Fragment";
 
   public static String buildFragmentJmx(String name, String... childrenJmx) {
-    return new StringTemplate(testResourceContents("fragment.template.jmx"))
+    return buildFragmentJmx(name, true, childrenJmx);
+  }
+
+  private static String buildFragmentJmx(String name, boolean enabled, String... childrenJmx) {
+    return new StringTemplate(testResourceContents("fragments/fragment.template.jmx"))
         .bind("name", name)
+        .bind("enabled", enabled)
         .bind("children", String.join("\n", childrenJmx))
         .solve();
   }
 
+  public static String buildFragmentDisabledJmx(String... childrenJmx) {
+    return buildFragmentJmx(DEFAULT_FRAGMENT_NAME, false, childrenJmx);
+  }
+
   public static String buildFragmentMethod(String methodName, String fragmentName,
       String... children) {
-    return new StringTemplate(testResourceContents("TestFragmentMethodDsl.template.java"))
+    return new StringTemplate(testResourceContents("fragments/TestFragmentMethodDsl.template.java"))
         .bind("methodName", methodName)
         .bind("fragmentName", DEFAULT_FRAGMENT_NAME.equals(fragmentName) ? ""
             : String.format("\"%s\",", fragmentName))
@@ -106,6 +115,18 @@ public class DslTestFragmentControllerTest {
                   buildFragmentMethod(methodName2, DEFAULT_FRAGMENT_NAME, buildHttpSamplerDsl())),
               Arrays.asList(methodName1 + "()", methodName2 + "()")
           ));
+    }
+
+    @Test
+    public void shouldGenerateDslWithCommentedFragmentCallWhenConvertDisabledFragment(
+        @TempDir Path tmp) throws IOException {
+      String testPlanJmx = buildTestPlanJmx(
+          buildFragmentDisabledJmx(DEFAULT_FRAGMENT_NAME, buildHttpSamplerJmx()));
+      String methodName = "testFragment";
+      assertThat(jmx2dsl(testPlanJmx, tmp))
+          .isEqualTo(buildTestPlanDsl(
+              buildFragmentMethod(methodName, DEFAULT_FRAGMENT_NAME, buildHttpSamplerDsl()),
+              "//" + methodName + "()"));
     }
 
   }

@@ -120,7 +120,7 @@ public abstract class MethodCallBuilderTest {
   }
 
   public static String buildHttpSamplerJmx() {
-    return testResourceContents("http-sampler.jmx");
+    return testResourceContents("fragments/http-sampler.jmx");
   }
 
   public static String buildTestPlanDsl(String method, String child) {
@@ -145,7 +145,7 @@ public abstract class MethodCallBuilderTest {
   }
 
   public static String buildHttpSamplerDsl() {
-    return testResourceContents("HttpSamplerDsl.java");
+    return testResourceContents("fragments/HttpSamplerDsl.java");
   }
 
 }

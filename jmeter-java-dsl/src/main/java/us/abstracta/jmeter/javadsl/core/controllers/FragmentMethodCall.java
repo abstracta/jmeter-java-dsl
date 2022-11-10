@@ -12,7 +12,8 @@ public class FragmentMethodCall extends MethodCall {
 
   private final MethodCall methodDefinitionBody;
 
-  protected FragmentMethodCall(MethodCall methodDefinitionBody, TestElement element, MethodCallContext context) {
+  protected FragmentMethodCall(MethodCall methodDefinitionBody, TestElement element,
+      MethodCallContext context) {
     super(solveMethodName(element, context), DslTestFragmentController.class);
     this.methodDefinitionBody = methodDefinitionBody;
   }
@@ -60,11 +61,6 @@ public class FragmentMethodCall extends MethodCall {
   public Map<String, MethodCall> getMethodDefinitions() {
     return methodDefinitionBody != null ? Collections.singletonMap(methodName, methodDefinitionBody)
         : Collections.emptyMap();
-  }
-
-  @Override
-  public String buildCode(String indent) {
-    return methodName + "()";
   }
 
 }

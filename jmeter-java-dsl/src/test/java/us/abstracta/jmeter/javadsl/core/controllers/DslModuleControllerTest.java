@@ -7,6 +7,7 @@ import static us.abstracta.jmeter.javadsl.codegeneration.MethodCallBuilderTest.b
 import static us.abstracta.jmeter.javadsl.codegeneration.MethodCallBuilderTest.buildTestPlanJmx;
 import static us.abstracta.jmeter.javadsl.codegeneration.MethodCallBuilderTest.jmx2dsl;
 import static us.abstracta.jmeter.javadsl.codegeneration.MethodCallBuilderTest.testResourceContents;
+import static us.abstracta.jmeter.javadsl.core.controllers.DslTestFragmentControllerTest.buildFragmentDisabledJmx;
 import static us.abstracta.jmeter.javadsl.core.controllers.DslTestFragmentControllerTest.buildFragmentJmx;
 import static us.abstracta.jmeter.javadsl.core.controllers.DslTestFragmentControllerTest.buildFragmentMethod;
 import static us.abstracta.jmeter.javadsl.core.controllers.DslTestFragmentControllerTest.DEFAULT_FRAGMENT_NAME;
@@ -43,13 +44,13 @@ public class DslModuleControllerTest {
     }
 
     private String buildThreadGroupJmx(String... childrenJmx) {
-      return new StringTemplate(testResourceContents("thread-group.template.jmx"))
+      return new StringTemplate(testResourceContents("fragments/thread-group.template.jmx"))
           .bind("children", String.join("\n", childrenJmx))
           .solve();
     }
 
     private String buildModuleJmx() {
-      return testResourceContents("module.jmx");
+      return testResourceContents("fragments/module.jmx");
     }
 
     private String buildThreadGroupDsl(String... children) {
@@ -70,6 +71,22 @@ public class DslModuleControllerTest {
               buildFragmentMethod(FRAGMENT_METHOD_NAME, DEFAULT_FRAGMENT_NAME,
                   buildHttpSamplerDsl()),
               buildThreadGroupDsl(FRAGMENT_METHOD_CALL, FRAGMENT_METHOD_CALL)
+          ));
+    }
+
+    @Test
+    public void shouldUseFragmentMethodWhenModuleUsesDisabledFragment(@TempDir Path tmp)
+        throws Exception {
+      String jmx = buildTestPlanJmx(
+          buildThreadGroupJmx(
+              buildFragmentDisabledJmx(DEFAULT_FRAGMENT_NAME, buildHttpSamplerJmx()),
+              buildModuleJmx()
+          ));
+      assertThat(jmx2dsl(jmx, tmp))
+          .isEqualTo(buildTestPlanDsl(
+              buildFragmentMethod(FRAGMENT_METHOD_NAME, DEFAULT_FRAGMENT_NAME,
+                  buildHttpSamplerDsl()),
+              buildThreadGroupDsl("//" + FRAGMENT_METHOD_CALL, FRAGMENT_METHOD_CALL)
           ));
     }
 

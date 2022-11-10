@@ -2,7 +2,6 @@ package us.abstracta.jmeter.javadsl.core.controllers;
 
 import java.util.Collections;
 import org.apache.jmeter.control.ModuleController;
-import org.apache.jmeter.control.gui.ModuleControllerGui;
 import org.apache.jmeter.testelement.TestElement;
 import org.apache.jmeter.testelement.property.CollectionProperty;
 import org.apache.jmeter.testelement.property.PropertyIterator;
@@ -11,16 +10,12 @@ import us.abstracta.jmeter.javadsl.codegeneration.MethodCall;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodCallContext;
 import us.abstracta.jmeter.javadsl.codegeneration.SingleTestElementCallBuilder;
 
-public class DslModuleController extends BaseController<DslTestFragmentController> {
-
-  protected DslModuleController() {
-    super("Module Controller", ModuleControllerGui.class, Collections.emptyList());
-  }
-
-  @Override
-  protected TestElement buildTestElement() {
-    throw new UnsupportedOperationException();
-  }
+/*
+ Since module controller will not be provided in dsl nor be included in saved or executed test plan
+ there is no need to extend from BaseTestElement, and only CodeBuilder is provided for proper jmx
+ conversion.
+ */
+public class DslModuleController {
 
   public static class CodeBuilder extends SingleTestElementCallBuilder<ModuleController> {
 
