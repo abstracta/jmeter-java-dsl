@@ -90,4 +90,4 @@ jobs:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
         uses: Ilshidur/action-discord@master
         with:
-          args: 'A new release is out! Check it at ${{ env.GITHUB_SERVER_URL }}/${{ env.GITHUB_REPOSITORY }}/releases/tag/v${{ inputs.version }}'
+          args: 'A new release is out! Check it at https://github.com/abstracta/jmeter-java-dsl/releases/tag/v${{ inputs.version }}'
