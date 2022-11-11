@@ -138,12 +138,10 @@ public class DslVariables extends BaseConfigElement {
     private void mergeVariablesIntoRootContextVariables(Arguments testElement,
         MethodCallContext context) {
       MethodCallContext rootContext = context.getRoot();
-      CallContextEntry entry = (CallContextEntry) rootContext.getEntry(getClass());
-      if (entry == null) {
-        entry = new CallContextEntry();
-        rootContext.setEntry(getClass(), entry);
+      CallContextEntry entry = rootContext.computeEntryIfAbsent(getClass(), () -> {
         rootContext.addEndListener(buildContextEndListener());
-      }
+        return new CallContextEntry();
+      });
       entry.vars.putAll(testElement.getArgumentsAsMap());
     }
 

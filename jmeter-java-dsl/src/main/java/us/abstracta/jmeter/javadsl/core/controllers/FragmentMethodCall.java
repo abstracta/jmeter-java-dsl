@@ -41,13 +41,7 @@ public class FragmentMethodCall extends MethodCall {
   }
 
   private static Map<TestElement, String> getDefinedMethods(MethodCallContext context) {
-    Object entryKey = FragmentMethodCall.class;
-    Map<TestElement, String> ret = (Map<TestElement, String>) context.getRoot().getEntry(entryKey);
-    if (ret == null) {
-      ret = new HashMap<>();
-      context.getRoot().setEntry(entryKey, ret);
-    }
-    return ret;
+    return context.getRoot().computeEntryIfAbsent(FragmentMethodCall.class, HashMap::new);
   }
 
   private static String buildUniqueName(String elementName, Set<String> existingNames) {

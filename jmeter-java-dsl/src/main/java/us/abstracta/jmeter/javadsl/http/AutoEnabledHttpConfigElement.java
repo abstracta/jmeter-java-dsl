@@ -140,7 +140,7 @@ public abstract class AutoEnabledHttpConfigElement extends BaseConfigElement {
         addDisabledChild(call);
         return;
       }
-      CallContextEntry parentEntry = getOrCreateContextEntry(parentContext);
+      CallContextEntry parentEntry = solveContextEntry(parentContext);
       parentEntry.pendingDisableConfigs.add(call);
       if (parentEntry.endListenerRegistered) {
         return;
@@ -159,13 +159,8 @@ public abstract class AutoEnabledHttpConfigElement extends BaseConfigElement {
       call.child(buildMethodCall().chain("disable"));
     }
 
-    private CallContextEntry getOrCreateContextEntry(MethodCallContext context) {
-      CallContextEntry ctx = (CallContextEntry) context.getEntry(getClass());
-      if (ctx == null) {
-        ctx = new CallContextEntry();
-        context.setEntry(getClass(), ctx);
-      }
-      return ctx;
+    private CallContextEntry solveContextEntry(MethodCallContext context) {
+      return context.computeEntryIfAbsent(getClass(), CallContextEntry::new);
     }
 
     @Override
@@ -176,7 +171,7 @@ public abstract class AutoEnabledHttpConfigElement extends BaseConfigElement {
       if (findSamplerInConfigScope(context)) {
         MethodCallContext parent = context.getParent();
         while (parent != null) {
-          getOrCreateContextEntry(parent).hasChildWithConfig = true;
+          solveContextEntry(parent).hasChildWithConfig = true;
           parent = parent.getParent();
         }
         return MethodCall.emptyCall();

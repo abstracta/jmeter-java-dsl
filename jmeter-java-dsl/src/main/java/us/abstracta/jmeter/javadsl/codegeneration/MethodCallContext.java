@@ -6,7 +6,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 import org.apache.jmeter.config.ConfigElement;
 import org.apache.jmeter.testelement.TestElement;
@@ -135,6 +137,17 @@ public class MethodCallContext {
    */
   public void setEntry(Object key, Object value) {
     entries.put(key, value);
+  }
+
+  /**
+   * Gets existing entry or creates a new one using provided computation function.
+   *
+   * @param key         identifies the entry in context to later on be able to retrieve it.
+   * @param computation function used to build the new entry for the given key, if none exists.
+   * @see #getEntry(Object) for more details
+   */
+  public <V> V computeEntryIfAbsent(Object key, Supplier<V> computation) {
+    return (V) entries.computeIfAbsent(key, k -> computation.get());
   }
 
   /**
