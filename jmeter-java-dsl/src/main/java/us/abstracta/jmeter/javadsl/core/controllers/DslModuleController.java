@@ -6,7 +6,6 @@ import org.apache.jmeter.testelement.TestElement;
 import org.apache.jmeter.testelement.property.CollectionProperty;
 import org.apache.jmeter.testelement.property.PropertyIterator;
 import org.apache.jorphan.collections.HashTree;
-import us.abstracta.jmeter.javadsl.codegeneration.FragmentMethodCall;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodCall;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodCallContext;
 import us.abstracta.jmeter.javadsl.codegeneration.SingleTestElementCallBuilder;
@@ -29,7 +28,7 @@ public class DslModuleController {
       CollectionProperty nodePath = (CollectionProperty) testElement.getProperty(
           "ModuleController.node_path");
       TestElement element = findElementInPath(nodePath, context);
-      return new FragmentMethodCall(context.solveMethodName(element), null);
+      return new FragmentMethodCall(element, null, context);
     }
 
     private TestElement findElementInPath(CollectionProperty nodePath, MethodCallContext context) {

@@ -3,12 +3,11 @@ package us.abstracta.jmeter.javadsl.codegeneration;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.function.Predicate;
+import java.util.function.UnaryOperator;
 import org.apache.jmeter.config.ConfigElement;
 import org.apache.jmeter.testelement.TestElement;
 import org.apache.jorphan.collections.HashTree;
@@ -34,14 +33,14 @@ public class MethodCallContext {
 
   private final TestElement testElement;
   private final HashTree childrenTree;
-  private final MethodCallContext root;
   private final MethodCallContext parent;
+  private final MethodCallContext root;
   private final MethodCallBuilderRegistry builderRegistry;
   private final Map<Object, Object> entries = new HashMap<>();
   private final List<MethodCallContextEndListener> endListeners = new ArrayList<>();
   private MethodCall methodCall;
-  private final Map<TestElement, String> definedMethods = new HashMap<>();
   private final Map<TestElement, MethodCallContext> contextRegistry = new HashMap<>();
+  private final Map<TestElement, UnaryOperator<MethodCall>> pendingReplacements = new HashMap<>();
 
   public MethodCallContext(TestElement testElement, HashTree childrenTree,
       MethodCallContext parent, MethodCallBuilderRegistry builderRegistry) {
@@ -171,13 +170,13 @@ public class MethodCallContext {
             return MethodCall.buildUnsupported();
           });
       root.contextRegistry.put(testElement, this);
-      String definedMethodName = root.definedMethods.get(testElement);
-      if (definedMethodName != null && !(methodCall instanceof FragmentMethodCall)) {
-        methodCall = new FragmentMethodCall(definedMethodName, methodCall);
-      }
       methodCall.setCommented(!testElement.isEnabled());
       addChildrenTo(methodCall);
       executeEndListeners(methodCall);
+      UnaryOperator<MethodCall> replacement = root.pendingReplacements.remove(testElement);
+      if (replacement != null) {
+        methodCall = replacement.apply(methodCall);
+      }
       return methodCall;
     } catch (RuntimeException e) {
       LOG.warn("Could not build code for {}({}). " + UNSUPPORTED_USAGE_WARNING,
@@ -232,37 +231,17 @@ public class MethodCallContext {
     return builderRegistry.findBuilderByClass(builderClass);
   }
 
-  public String solveMethodName(TestElement element) {
+  public void replaceMethodCall(TestElement element, UnaryOperator<MethodCall> operator) {
     MethodCallContext elementContext = root.contextRegistry.get(element);
-    String ret = root.definedMethods.computeIfAbsent(element,
-        e -> buildUniqueName(e.getName(), new HashSet<>(root.definedMethods.values())));
     if (elementContext != null) {
-      MethodCall elementMethodCall = elementContext.methodCall;
-       if (!(elementMethodCall instanceof FragmentMethodCall)) {
-         FragmentMethodCall fragment = new FragmentMethodCall(ret, elementMethodCall);
-         fragment.setCommented(elementMethodCall.isCommented());
-         elementMethodCall.setCommented(false);
-         elementContext.parent.methodCall.replaceChild(elementMethodCall, fragment);
-       }
+      MethodCall original = elementContext.methodCall;
+      MethodCall replacement = operator.apply(original);
+      if (replacement != original) {
+        elementContext.parent.methodCall.replaceChild(original, replacement);
+      }
+    } else {
+      root.pendingReplacements.put(element, operator);
     }
-    return ret;
-  }
-
-  private static String buildUniqueName(String elementName, Set<String> existingNames) {
-    // removing any character that may not be allowed in method name
-    String ret = elementName.replaceAll("\\W", "");
-    // avoid method names starting with digits which are not supported by java
-    ret = (Character.isDigit(ret.charAt(0)) ? "fragment" : "") + ret;
-    // lower first char to follow java method naming convention
-    ret = Character.toLowerCase(ret.charAt(0)) + ret.substring(1);
-    if (!existingNames.contains(ret)) {
-      return ret;
-    }
-    int index = 2;
-    while (existingNames.contains(ret + index)) {
-      index++;
-    }
-    return ret + index;
   }
 
   public interface MethodCallContextEndListener {

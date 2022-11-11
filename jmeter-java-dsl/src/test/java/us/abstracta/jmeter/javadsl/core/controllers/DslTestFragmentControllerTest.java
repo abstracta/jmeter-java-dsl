@@ -1,12 +1,6 @@
 package us.abstracta.jmeter.javadsl.core.controllers;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static us.abstracta.jmeter.javadsl.codegeneration.MethodCallBuilderTest.buildHttpSamplerDsl;
-import static us.abstracta.jmeter.javadsl.codegeneration.MethodCallBuilderTest.buildHttpSamplerJmx;
-import static us.abstracta.jmeter.javadsl.codegeneration.MethodCallBuilderTest.buildTestPlanDslTemplate;
-import static us.abstracta.jmeter.javadsl.codegeneration.MethodCallBuilderTest.buildTestPlanJmx;
-import static us.abstracta.jmeter.javadsl.codegeneration.MethodCallBuilderTest.jmx2dsl;
-import static us.abstracta.jmeter.javadsl.codegeneration.MethodCallBuilderTest.testResourceContents;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -18,7 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import us.abstracta.jmeter.javadsl.core.util.StringTemplate;
 
-public class DslTestFragmentControllerTest {
+public class DslTestFragmentControllerTest extends MethodCallFragmentBuilderTest {
 
   public static final String DEFAULT_FRAGMENT_NAME = "Test Fragment";
 

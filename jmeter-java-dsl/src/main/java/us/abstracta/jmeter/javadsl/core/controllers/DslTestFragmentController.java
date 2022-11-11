@@ -6,7 +6,6 @@ import java.util.List;
 import org.apache.jmeter.control.TestFragmentController;
 import org.apache.jmeter.control.gui.TestFragmentControllerGui;
 import org.apache.jmeter.testelement.TestElement;
-import us.abstracta.jmeter.javadsl.codegeneration.FragmentMethodCall;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodCall;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodCallBuilder;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodCallContext;
@@ -58,7 +57,7 @@ public class DslTestFragmentController extends BaseController<DslTestFragmentCon
       MethodCall methodDefinitionBody = buildMethodCall(
           new TestElementParamBuilder(element).nameParam(DEFAULT_NAME),
           new ChildrenParam<>(ThreadGroupChild[].class));
-      return new FragmentMethodCall(context.solveMethodName(element), methodDefinitionBody);
+      return new FragmentMethodCall(element, methodDefinitionBody, context);
     }
 
   }
