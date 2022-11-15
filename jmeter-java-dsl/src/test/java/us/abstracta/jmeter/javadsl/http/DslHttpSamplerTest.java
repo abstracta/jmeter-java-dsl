@@ -358,6 +358,23 @@ public class DslHttpSamplerTest extends JmeterDslTest {
   }
 
   @Test
+  public void shouldDownloadOnlyMatchingEmbeddedResourceWhenEnabled() throws Exception {
+    String primaryUrl = "/primary";
+    String resource1Url = "/resource1";
+    String resource2Url = "/resource2";
+    stubFor(get(primaryUrl)
+        .willReturn(HttpResponseBuilder.buildEmbeddedResourcesResponse(resource1Url, resource2Url)));
+    testPlan(
+        threadGroup(1, 1,
+            httpSampler(wiremockUri + primaryUrl)
+                .downloadEmbeddedResourcesMatching(".*/resource1.*")
+        )
+    ).run();
+    verify(exactly(0), getRequestedFor(urlPathEqualTo(resource2Url)));
+    verify(getRequestedFor(urlPathEqualTo(resource1Url)));
+  }
+
+  @Test
   public void shouldSendQueryParametersWhenGetRequestWithParameters() throws Exception {
     testPlan(
         threadGroup(1, 1,

@@ -2420,7 +2420,7 @@ This will make JMeter automatically parse the HTTP response for embedded resourc
 Check [JMeter documentation](https://jmeter.apache.org/usermanual/component_reference.html#HTTP_Request) for additional details on downloaded embedded resources.
 
 ::: tip
-You can use `downloadEmbeddedResourcesNotMatching(urlRegex)` method if you need to ignore some embedded resources requests. For example, when such requests are to the system under test. 
+You can use `downloadEmbeddedResourcesNotMatching(urlRegex)` and `downloadEmbeddedResourcesMatching(urlRegex)` methods if you need to ignore, or only download, some embedded resources requests. For example, when some requests are not related to the system under test. 
 :::
 
 ::: warning

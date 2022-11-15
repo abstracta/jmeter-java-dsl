@@ -51,6 +51,7 @@ public class DslHttpSampler extends DslBaseHttpSampler<DslHttpSampler> {
   protected Charset encoding;
   protected boolean followRedirects = true;
   protected boolean downloadEmbeddedResources;
+  protected String embeddedResourcesMatchRegex;
   protected String embeddedResourcesNotMatchRegex;
   protected HttpClientImpl clientImpl;
 
@@ -303,16 +304,45 @@ public class DslHttpSampler extends DslBaseHttpSampler<DslHttpSampler> {
   }
 
   /**
-   * Same as {@link #downloadEmbeddedResources()} but allowing to ignore embedded resources with URL
-   * matching a given regular expression.
+   * Same as {@link #downloadEmbeddedResources()} but allowing to specify which embedded resources
+   * to actually download.
    * <p>
-   * This is helpful when some particular requests (for example to other external services) don't
-   * want to be included in the test execution.
+   * This is helpful when only some particular requests need to be downloaded and the rest should be
+   * ignored. Eg: to only make requests to the site under test, and no other external services.
+   * <p>
+   * An alternative is using {@link #downloadEmbeddedResourcesNotMatching(String)}. If a resources
+   * matches this regex and also one specified in
+   * {@link #downloadEmbeddedResourcesNotMatching(String)}, then it will be ignored.
    *
    * @param urlRegex specifies the regular expression which will be used to ignore embedded
    *                 resources that have a URL matching with it.
    * @return the sampler for further configuration or usage.
    * @see #downloadEmbeddedResources()
+   * @see #downloadEmbeddedResourcesNotMatching(String)
+   * @since 1.2
+   */
+  public DslHttpSampler downloadEmbeddedResourcesMatching(String urlRegex) {
+    this.downloadEmbeddedResources = true;
+    this.embeddedResourcesMatchRegex = urlRegex;
+    return this;
+  }
+
+  /**
+   * Same as {@link #downloadEmbeddedResources()} but allowing to ignore embedded resources with URL
+   * matching a given regular expression.
+   * <p>
+   * This is helpful when some particular requests (for example to other external services) don't
+   * want to be included in the test execution.
+   * <p>
+   * An alternative is using {@link #downloadEmbeddedResourcesMatching(String)}. If a resources
+   * matches this regex and also one specified in
+   * {@link #downloadEmbeddedResourcesMatching(String)}, then it will be ignored.
+   *
+   * @param urlRegex specifies the regular expression which will be used to ignore embedded
+   *                 resources that have a URL matching with it.
+   * @return the sampler for further configuration or usage.
+   * @see #downloadEmbeddedResources()
+   * @see #downloadEmbeddedResourcesMatching(String)
    * @since 1.2
    */
   public DslHttpSampler downloadEmbeddedResourcesNotMatching(String urlRegex) {
@@ -362,6 +392,9 @@ public class DslHttpSampler extends DslBaseHttpSampler<DslHttpSampler> {
     if (downloadEmbeddedResources) {
       elem.setImageParser(true);
       elem.setConcurrentDwn(true);
+      if (embeddedResourcesMatchRegex != null) {
+        elem.setEmbeddedUrlRE(embeddedResourcesMatchRegex);
+      }
       if (embeddedResourcesNotMatchRegex != null) {
         elem.setEmbeddedUrlExcludeRE(embeddedResourcesNotMatchRegex);
       }
