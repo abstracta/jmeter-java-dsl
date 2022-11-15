@@ -4,6 +4,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.anyUrl;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalToJson;
+import static com.github.tomakehurst.wiremock.client.WireMock.exactly;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.getRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.matching;
@@ -337,6 +338,23 @@ public class DslHttpSamplerTest extends JmeterDslTest {
     ).run();
     assertThat(stats.byLabel(transactionLabel).sampleTime().max()).isLessThan(
         Duration.ofMillis(responsesDelayMillis * 3));
+  }
+
+  @Test
+  public void shouldNotDownloadExcludedEmbeddedResourceWhenEnabled() throws Exception {
+    String primaryUrl = "/primary";
+    String resource1Url = "/resource1";
+    String resource2Url = "/resource2";
+    stubFor(get(primaryUrl)
+        .willReturn(HttpResponseBuilder.buildEmbeddedResourcesResponse(resource1Url, resource2Url)));
+    testPlan(
+        threadGroup(1, 1,
+            httpSampler(wiremockUri + primaryUrl)
+                .downloadEmbeddedResourcesNotMatching(".*/resource2.*")
+        )
+    ).run();
+    verify(exactly(0), getRequestedFor(urlPathEqualTo(resource2Url)));
+    verify(getRequestedFor(urlPathEqualTo(resource1Url)));
   }
 
   @Test

@@ -2017,7 +2017,7 @@ By default, the controller has no limit on the number of parallel requests per J
 :::
 
 ::: tip
-When requesting embedded resources of an HTML response, prefer using `downloadEmbeddedResources(boolean)` method in `httpSampler` instead. Likewise, when you just need independent parts of a test plan to execute in parallel, prefer using different thread groups for each part.
+When requesting embedded resources of an HTML response, prefer using `downloadEmbeddedResources()` method in `httpSampler` instead. Likewise, when you just need independent parts of a test plan to execute in parallel, prefer using different thread groups for each part.
 :::
 
 Check [ParallelController](../../jmeter-java-dsl-parallel/src/main/java/us/abstracta/jmeter/javadsl/parallel/ParallelController.java) for additional info.
@@ -2418,6 +2418,10 @@ public class PerformanceTest {
 This will make JMeter automatically parse the HTTP response for embedded resources, download them and register embedded resources downloads as sub-samples of the main sample.
 
 Check [JMeter documentation](https://jmeter.apache.org/usermanual/component_reference.html#HTTP_Request) for additional details on downloaded embedded resources.
+
+::: tip
+You can use `downloadEmbeddedResourcesNotMatching(urlRegex)` method if you need to ignore some embedded resources requests. For example, when such requests are to the system under test. 
+:::
 
 ::: warning
 The DSL, unlike JMeter, uses by default concurrent download of embedded resources (with up to 6 parallel downloads), which is the most used scenario to emulate browser behavior.

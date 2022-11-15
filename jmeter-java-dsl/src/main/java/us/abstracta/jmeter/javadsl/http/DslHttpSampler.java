@@ -51,6 +51,7 @@ public class DslHttpSampler extends DslBaseHttpSampler<DslHttpSampler> {
   protected Charset encoding;
   protected boolean followRedirects = true;
   protected boolean downloadEmbeddedResources;
+  protected String embeddedResourcesNotMatchRegex;
   protected HttpClientImpl clientImpl;
 
   public DslHttpSampler(String name, String url) {
@@ -302,6 +303,25 @@ public class DslHttpSampler extends DslBaseHttpSampler<DslHttpSampler> {
   }
 
   /**
+   * Same as {@link #downloadEmbeddedResources()} but allowing to ignore embedded resources with URL
+   * matching a given regular expression.
+   * <p>
+   * This is helpful when some particular requests (for example to other external services) don't
+   * want to be included in the test execution.
+   *
+   * @param urlRegex specifies the regular expression which will be used to ignore embedded
+   *                 resources that have a URL matching with it.
+   * @return the sampler for further configuration or usage.
+   * @see #downloadEmbeddedResources()
+   * @since 1.2
+   */
+  public DslHttpSampler downloadEmbeddedResourcesNotMatching(String urlRegex) {
+    this.downloadEmbeddedResources = true;
+    this.embeddedResourcesNotMatchRegex = urlRegex;
+    return this;
+  }
+
+  /**
    * Allows specifying the HTTP client implementation to use for this particular sampler.
    * <p>
    * Changing the default implementation ({@link DslHttpSampler.HttpClientImpl#HTTP_CLIENT}) to
@@ -342,6 +362,9 @@ public class DslHttpSampler extends DslBaseHttpSampler<DslHttpSampler> {
     if (downloadEmbeddedResources) {
       elem.setImageParser(true);
       elem.setConcurrentDwn(true);
+      if (embeddedResourcesNotMatchRegex != null) {
+        elem.setEmbeddedUrlExcludeRE(embeddedResourcesNotMatchRegex);
+      }
     }
     if (clientImpl != null) {
       elem.setImplementation(clientImpl.propertyValue);
