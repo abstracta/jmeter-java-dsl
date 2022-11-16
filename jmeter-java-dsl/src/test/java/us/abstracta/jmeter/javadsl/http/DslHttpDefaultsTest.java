@@ -1,5 +1,6 @@
 package us.abstracta.jmeter.javadsl.http;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.exactly;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.getRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
@@ -26,19 +27,15 @@ public class DslHttpDefaultsTest extends JmeterDslTest {
 
   @Test
   public void shouldUseDefaultSettingsWhenHttpDefaultAndNoOverwrites() throws Exception {
-    String primaryUrl = "/primary";
-    String resourceUrl = "/resource";
-    stubFor(get(primaryUrl)
-        .willReturn(HttpResponseBuilder.buildEmbeddedResourcesResponse(resourceUrl)));
+    String path = "/users";
     testPlan(
         httpDefaults()
-            .url(wiremockUri + primaryUrl)
-            .downloadEmbeddedResources(),
+            .url(wiremockUri + path),
         threadGroup(1, 1,
             httpSampler((String) null)
         )
     ).run();
-    verify(getRequestedFor(urlPathEqualTo(resourceUrl)));
+    verify(getRequestedFor(urlPathEqualTo(path)));
   }
 
   @Test
@@ -121,6 +118,62 @@ public class DslHttpDefaultsTest extends JmeterDslTest {
     } finally {
       proxy.stop();
     }
+  }
+
+  @Test
+  public void shouldDownloadEmbeddedResourcesWhenHttpDefaultWithSuchSetting() throws Exception {
+    String primaryUrl = "/primary";
+    String resourceUrl = "/resource";
+    stubFor(get(primaryUrl)
+        .willReturn(HttpResponseBuilder.buildEmbeddedResourcesResponse(resourceUrl)));
+    testPlan(
+        httpDefaults()
+            .downloadEmbeddedResources(),
+        threadGroup(1, 1,
+            httpSampler(wiremockUri + primaryUrl)
+        )
+    ).run();
+    verify(getRequestedFor(urlPathEqualTo(resourceUrl)));
+  }
+
+  @Test
+  public void shouldNotDownloadExcludedEmbeddedResourceWhenHttpDefaultWithSuchSetting()
+      throws Exception {
+    String primaryUrl = "/primary";
+    String resource1Url = "/resource1";
+    String resource2Url = "/resource2";
+    stubFor(get(primaryUrl)
+        .willReturn(
+            HttpResponseBuilder.buildEmbeddedResourcesResponse(resource1Url, resource2Url)));
+    testPlan(
+        httpDefaults()
+            .downloadEmbeddedResourcesNotMatching(".*/resource2.*"),
+        threadGroup(1, 1,
+            httpSampler(wiremockUri + primaryUrl)
+        )
+    ).run();
+    verify(exactly(0), getRequestedFor(urlPathEqualTo(resource2Url)));
+    verify(getRequestedFor(urlPathEqualTo(resource1Url)));
+  }
+
+  @Test
+  public void shouldDownloadOnlyMatchingEmbeddedResourcesWhenHttpDefaultWithSuchSetting()
+      throws Exception {
+    String primaryUrl = "/primary";
+    String resource1Url = "/resource1";
+    String resource2Url = "/resource2";
+    stubFor(get(primaryUrl)
+        .willReturn(
+            HttpResponseBuilder.buildEmbeddedResourcesResponse(resource1Url, resource2Url)));
+    testPlan(
+        httpDefaults()
+            .downloadEmbeddedResourcesMatching(".*/resource1.*"),
+        threadGroup(1, 1,
+            httpSampler(wiremockUri + primaryUrl)
+        )
+    ).run();
+    verify(exactly(0), getRequestedFor(urlPathEqualTo(resource2Url)));
+    verify(getRequestedFor(urlPathEqualTo(resource1Url)));
   }
 
   @Test
