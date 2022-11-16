@@ -9,6 +9,14 @@ import org.apache.jmeter.testelement.TestElement;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodCall;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodCallContext;
 
+/**
+ * Defines a call to a test plan fragment method definition will be used.
+ * <p>
+ * Fragments method definitions might be the explicitly defined from a test fragment controller or
+ * implicitly from module controller target controller.
+ *
+ * @since 1.2
+ */
 public class FragmentMethodCall extends MethodCall {
 
   private final MethodCall methodDefinitionBody;
@@ -28,15 +36,17 @@ public class FragmentMethodCall extends MethodCall {
     Map<TestElement, String> definedMethods = getDefinedMethods(context);
     String ret = definedMethods.computeIfAbsent(element,
         e -> buildUniqueName(e.getName(), new HashSet<>(definedMethods.values())));
-    context.replaceMethodCall(element, c -> {
-      if (c instanceof FragmentMethodCall) {
-        return c;
-      }
-      FragmentMethodCall fragment = new FragmentMethodCall(ret, c);
-      fragment.setCommented(c.isCommented());
-      c.setCommented(false);
-      return fragment;
-    });
+    if (element != context.getTestElement()) {
+      context.replaceMethodCall(element, c -> {
+        if (c instanceof FragmentMethodCall) {
+          return c;
+        }
+        FragmentMethodCall fragment = new FragmentMethodCall(ret, c);
+        fragment.setCommented(c.isCommented());
+        c.setCommented(false);
+        return fragment;
+      });
+    }
     return ret;
   }
 

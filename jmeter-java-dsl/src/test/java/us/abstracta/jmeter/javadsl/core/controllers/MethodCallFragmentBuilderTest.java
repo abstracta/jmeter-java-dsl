@@ -61,12 +61,4 @@ public abstract class MethodCallFragmentBuilderTest {
         Indentation.indent(String.join(",\n", children), Indentation.INDENT));
   }
 
-  protected String buildHttpSamplerJmx() {
-    return testResourceContents("fragments/http-sampler.jmx");
-  }
-
-  protected String buildHttpSamplerDsl() {
-    return testResourceContents("fragments/HttpSamplerDsl.java");
-  }
-
 }

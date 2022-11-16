@@ -7,6 +7,7 @@ import static us.abstracta.jmeter.javadsl.core.controllers.DslTestFragmentContro
 import static us.abstracta.jmeter.javadsl.core.controllers.DslTestFragmentControllerTest.buildFragmentMethod;
 
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.Collections;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -27,10 +28,11 @@ public class DslModuleControllerTest {
     public void shouldReuseFragmentMethodWhenModuleUsesPreviousEnabledFragment(@TempDir Path tmp)
         throws Exception {
       String jmx = buildModuleTestPlanJmx(
-          buildFragmentJmx(DEFAULT_FRAGMENT_NAME, buildHttpSamplerJmx()),
+          buildFragmentJmx(),
           buildModuleJmx(DEFAULT_FRAGMENT_NAME));
       assertThat(jmx2dsl(jmx, tmp))
-          .isEqualTo(buildFragmentPlanDsl(FRAGMENT_METHOD_CALL, FRAGMENT_METHOD_CALL));
+          .isEqualTo(buildFragmentPlanDsl(
+              buildThreadGroupDsl(FRAGMENT_METHOD_CALL, FRAGMENT_METHOD_CALL)));
     }
 
     private String buildModuleTestPlanJmx(String... children) {
@@ -38,12 +40,10 @@ public class DslModuleControllerTest {
     }
 
     public String buildFragmentPlanDsl(String... children) {
-      return buildTestPlanDslTemplate(Collections.singletonList(buildThreadGroupDsl(children)))
+      return buildTestPlanDslTemplate(Arrays.asList(children))
           .staticImports(Collections.singleton(DslTestFragmentController.class.getName()))
           .imports(Collections.singleton(DslTestFragmentController.class.getName()))
-          .methodDefinitions(Collections.singletonList(
-              buildFragmentMethod(FRAGMENT_METHOD_NAME, DEFAULT_FRAGMENT_NAME,
-                  buildHttpSamplerDsl())))
+          .methodDefinitions(Collections.singletonList(buildFragmentMethod()))
           .solve();
     }
 
@@ -58,20 +58,24 @@ public class DslModuleControllerTest {
         @TempDir Path tmp) throws Exception {
       String jmx = buildModuleTestPlanJmx(
           buildModuleJmx(DEFAULT_FRAGMENT_NAME),
-          buildFragmentJmx(DEFAULT_FRAGMENT_NAME, buildHttpSamplerJmx()));
+          buildFragmentJmx());
       assertThat(jmx2dsl(jmx, tmp))
-          .isEqualTo(buildFragmentPlanDsl(FRAGMENT_METHOD_CALL, FRAGMENT_METHOD_CALL));
+          .isEqualTo(buildFragmentPlanDsl(
+              buildThreadGroupDsl(FRAGMENT_METHOD_CALL, FRAGMENT_METHOD_CALL)));
     }
 
     @Test
     public void shouldUseFragmentMethodWhenModuleUsesDisabledFragment(@TempDir Path tmp)
         throws Exception {
       String jmx = buildModuleTestPlanJmx(
-          buildFragmentDisabledJmx(DEFAULT_FRAGMENT_NAME, buildHttpSamplerJmx()),
+          buildFragmentDisabledJmx(),
           buildModuleJmx(DEFAULT_FRAGMENT_NAME)
       );
       assertThat(jmx2dsl(jmx, tmp))
-          .isEqualTo(buildFragmentPlanDsl("//" + FRAGMENT_METHOD_CALL, FRAGMENT_METHOD_CALL));
+          .isEqualTo(buildFragmentPlanDsl(
+              "httpCookies()",
+              "httpCache()",
+              buildThreadGroupDsl("//" + FRAGMENT_METHOD_CALL, FRAGMENT_METHOD_CALL)));
     }
 
     @Test

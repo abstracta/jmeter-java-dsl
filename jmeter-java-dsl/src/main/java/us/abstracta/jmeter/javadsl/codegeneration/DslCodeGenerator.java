@@ -20,6 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import us.abstracta.jmeter.javadsl.JmeterDsl;
 import us.abstracta.jmeter.javadsl.core.DslTestElement;
+import us.abstracta.jmeter.javadsl.core.controllers.DslIncludeController;
 import us.abstracta.jmeter.javadsl.core.controllers.DslModuleController;
 import us.abstracta.jmeter.javadsl.core.controllers.DslProxyControl;
 import us.abstracta.jmeter.javadsl.core.controllers.DslRecordingController;
@@ -52,6 +53,7 @@ public class DslCodeGenerator implements MethodCallBuilderRegistry {
     builders.add(new DslRecordingController.CodeBuilder());
     builders.add(new DslProxyControl.CodeBuilder());
     builders.add(new DslModuleController.CodeBuilder());
+    builders.add(new DslIncludeController.CodeBuilder());
     builders.addAll(findCallBuilders(DslTestFragmentController.class));
     sortBuilders();
   }

@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
@@ -204,10 +203,13 @@ public class MethodCallContext {
 
   private void addChildrenTo(MethodCall call) {
     childrenTree.list().stream()
-        .map(e -> new MethodCallContext((TestElement) e, childrenTree.getTree(e), this,
-            builderRegistry)
+        .map(e -> child((TestElement) e, childrenTree.getTree(e))
             .buildMethodCall())
         .forEach(call::child);
+  }
+
+  public MethodCallContext child(TestElement element, HashTree childrenTree) {
+    return new MethodCallContext(element, childrenTree, this, builderRegistry);
   }
 
   /**
@@ -226,8 +228,7 @@ public class MethodCallContext {
         .findAny();
     child.ifPresent(childrenTree::remove);
     return child
-        .map(c -> new MethodCallContext((TestElement) c, childrenTree.getTree(c), this,
-            builderRegistry))
+        .map(c -> child((TestElement) c, childrenTree.getTree(c)))
         .orElse(null);
   }
 

@@ -15,30 +15,37 @@ import us.abstracta.jmeter.javadsl.core.util.StringTemplate;
 public class DslTestFragmentControllerTest extends MethodCallFragmentBuilderTest {
 
   public static final String DEFAULT_FRAGMENT_NAME = "Test Fragment";
+  private static final String DEFAULT_FRAGMENT_METHOD_NAME = "testFragment";
+  private static final String DEFAULT_FRAGMENT_METHOD_CALL = DEFAULT_FRAGMENT_METHOD_NAME + "()";
 
-  public static String buildFragmentJmx(String name, String... childrenJmx) {
-    return buildFragmentJmx(name, true, childrenJmx);
+  public static String buildFragmentJmx() {
+    return buildFragmentJmx(DEFAULT_FRAGMENT_NAME);
   }
 
-  private static String buildFragmentJmx(String name, boolean enabled, String... childrenJmx) {
+  private static String buildFragmentJmx(String name) {
+    return buildFragmentJmx(name, true);
+  }
+
+  private static String buildFragmentJmx(String name, boolean enabled) {
     return new StringTemplate(testResourceContents("fragments/fragment.template.jmx"))
         .bind("name", name)
         .bind("enabled", enabled)
-        .bind("children", String.join("\n", childrenJmx))
         .solve();
   }
 
-  public static String buildFragmentDisabledJmx(String... childrenJmx) {
-    return buildFragmentJmx(DEFAULT_FRAGMENT_NAME, false, childrenJmx);
+  public static String buildFragmentDisabledJmx() {
+    return buildFragmentJmx(DEFAULT_FRAGMENT_NAME, false);
   }
 
-  public static String buildFragmentMethod(String methodName, String fragmentName,
-      String... children) {
+  public static String buildFragmentMethod() {
+    return buildFragmentMethod(DEFAULT_FRAGMENT_METHOD_NAME, DEFAULT_FRAGMENT_NAME);
+  }
+
+  public static String buildFragmentMethod(String methodName, String fragmentName) {
     return new StringTemplate(testResourceContents("fragments/TestFragmentMethodDsl.template.java"))
         .bind("methodName", methodName)
         .bind("fragmentName", DEFAULT_FRAGMENT_NAME.equals(fragmentName) ? ""
             : String.format("\"%s\",", fragmentName))
-        .bind("children", String.join("\n,", children))
         .solve();
   }
 
@@ -48,13 +55,9 @@ public class DslTestFragmentControllerTest extends MethodCallFragmentBuilderTest
     @Test
     public void shouldGenerateDslWithFragmentMethodWhenConvertTestPlanWithFragment(
         @TempDir Path tmp) throws IOException {
-      String testPlanJmx = buildTestPlanJmx(
-          buildFragmentJmx(DEFAULT_FRAGMENT_NAME, buildHttpSamplerJmx()));
-      String methodName = "testFragment";
+      String testPlanJmx = buildTestPlanJmx(buildFragmentJmx());
       assertThat(jmx2dsl(testPlanJmx, tmp))
-          .isEqualTo(buildTestPlanDsl(
-              buildFragmentMethod(methodName, DEFAULT_FRAGMENT_NAME, buildHttpSamplerDsl()),
-              methodName + "()"));
+          .isEqualTo(buildTestPlanDsl(buildFragmentMethod(), DEFAULT_FRAGMENT_METHOD_CALL));
     }
 
     private String buildTestPlanDsl(String method, String child) {
@@ -73,12 +76,11 @@ public class DslTestFragmentControllerTest extends MethodCallFragmentBuilderTest
     public void shouldGenerateDslWithFragmentNameWhenConvertFragmentNonDefaultName(
         @TempDir Path tmp) throws IOException {
       String fragmentName = "My Fragment";
-      String testPlanJmx = buildTestPlanJmx(
-          buildFragmentJmx(fragmentName, buildHttpSamplerJmx()));
+      String testPlanJmx = buildTestPlanJmx(buildFragmentJmx(fragmentName));
       String methodName = "myFragment";
       assertThat(jmx2dsl(testPlanJmx, tmp))
           .isEqualTo(buildTestPlanDsl(
-              buildFragmentMethod(methodName, fragmentName, buildHttpSamplerDsl()),
+              buildFragmentMethod(methodName, fragmentName),
               methodName + "()"));
     }
 
@@ -86,12 +88,11 @@ public class DslTestFragmentControllerTest extends MethodCallFragmentBuilderTest
     public void shouldGenerateDslWithFragmentNameWhenConvertFragmentWithNameStartingWithDigit(
         @TempDir Path tmp) throws IOException {
       String fragmentName = "2Fragment";
-      String testPlanJmx = buildTestPlanJmx(
-          buildFragmentJmx(fragmentName, buildHttpSamplerJmx()));
+      String testPlanJmx = buildTestPlanJmx(buildFragmentJmx(fragmentName));
       String methodName = "fragment" + fragmentName;
       assertThat(jmx2dsl(testPlanJmx, tmp))
           .isEqualTo(buildTestPlanDsl(
-              buildFragmentMethod(methodName, fragmentName, buildHttpSamplerDsl()),
+              buildFragmentMethod(methodName, fragmentName),
               methodName + "()"));
     }
 
@@ -99,12 +100,11 @@ public class DslTestFragmentControllerTest extends MethodCallFragmentBuilderTest
     public void shouldGenerateDslWithFragmentNameWhenConvertFragmentWithNameWithSpecialChars(
         @TempDir Path tmp) throws IOException {
       String fragmentName = "My(){Fragment}";
-      String testPlanJmx = buildTestPlanJmx(
-          buildFragmentJmx(fragmentName, buildHttpSamplerJmx()));
+      String testPlanJmx = buildTestPlanJmx(buildFragmentJmx(fragmentName));
       String methodName = "myFragment";
       assertThat(jmx2dsl(testPlanJmx, tmp))
           .isEqualTo(buildTestPlanDsl(
-              buildFragmentMethod(methodName, fragmentName, buildHttpSamplerDsl()),
+              buildFragmentMethod(methodName, fragmentName),
               methodName + "()"));
     }
 
@@ -112,29 +112,27 @@ public class DslTestFragmentControllerTest extends MethodCallFragmentBuilderTest
     public void shouldGenerateDslWithFragmentsWhenConvertFragmentsWithCollidingNames(
         @TempDir Path tmp) throws IOException {
       String testPlanJmx = buildTestPlanJmx(
-          buildFragmentJmx(DEFAULT_FRAGMENT_NAME, buildHttpSamplerJmx()),
-          buildFragmentJmx(DEFAULT_FRAGMENT_NAME, buildHttpSamplerJmx()));
-      String methodName1 = "testFragment";
+          buildFragmentJmx(),
+          buildFragmentJmx());
       String methodName2 = "testFragment2";
       assertThat(jmx2dsl(testPlanJmx, tmp))
           .isEqualTo(buildTestPlanDsl(
               Arrays.asList(
-                  buildFragmentMethod(methodName1, DEFAULT_FRAGMENT_NAME, buildHttpSamplerDsl()),
-                  buildFragmentMethod(methodName2, DEFAULT_FRAGMENT_NAME, buildHttpSamplerDsl())),
-              Arrays.asList(methodName1 + "()", methodName2 + "()")
+                  buildFragmentMethod(),
+                  buildFragmentMethod(methodName2, DEFAULT_FRAGMENT_NAME)),
+              Arrays.asList(DEFAULT_FRAGMENT_METHOD_CALL, methodName2 + "()")
           ));
     }
 
     @Test
     public void shouldGenerateDslWithCommentedFragmentCallWhenConvertDisabledFragment(
         @TempDir Path tmp) throws IOException {
-      String testPlanJmx = buildTestPlanJmx(
-          buildFragmentDisabledJmx(DEFAULT_FRAGMENT_NAME, buildHttpSamplerJmx()));
-      String methodName = "testFragment";
+      String testPlanJmx = buildTestPlanJmx(buildFragmentDisabledJmx());
+      String cacheMethodCall = "httpCache()";
       assertThat(jmx2dsl(testPlanJmx, tmp))
-          .isEqualTo(buildTestPlanDsl(
-              buildFragmentMethod(methodName, DEFAULT_FRAGMENT_NAME, buildHttpSamplerDsl()),
-              "//" + methodName + "()"));
+          .isEqualTo(buildTestPlanDsl(Collections.singletonList(buildFragmentMethod()),
+              Arrays.asList("httpCookies()", cacheMethodCall, "//" + DEFAULT_FRAGMENT_METHOD_CALL))
+              .replace(cacheMethodCall + ",", cacheMethodCall + "//,"));
     }
 
   }

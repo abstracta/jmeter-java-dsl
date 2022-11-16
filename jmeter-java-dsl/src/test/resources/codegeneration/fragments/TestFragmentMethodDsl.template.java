@@ -1,5 +1,5 @@
 private DslTestFragmentController {{methodName}}() {
   return fragment({{fragmentName}}
-      {{children}}
+      httpSampler("https://myservice.com")
   );
 }

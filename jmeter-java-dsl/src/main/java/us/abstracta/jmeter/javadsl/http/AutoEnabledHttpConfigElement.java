@@ -188,7 +188,8 @@ public abstract class AutoEnabledHttpConfigElement extends BaseConfigElement {
 
     private boolean findSamplerInTree(HashTree tree) {
       return tree != null && tree.list().stream()
-          .anyMatch(c -> c instanceof HTTPSamplerProxy || findSamplerInTree(tree.getTree(c)));
+          .anyMatch(c -> ((TestElement) c).isEnabled() && (c instanceof HTTPSamplerProxy
+              || findSamplerInTree(tree.getTree(c))));
     }
 
     private static class CallContextEntry {
