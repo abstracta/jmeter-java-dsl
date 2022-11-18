@@ -14,6 +14,12 @@ import us.abstracta.jmeter.javadsl.codegeneration.params.ChildrenParam;
 import us.abstracta.jmeter.javadsl.core.DslTestPlan.TestPlanChild;
 import us.abstracta.jmeter.javadsl.core.threadgroups.BaseThreadGroup.ThreadGroupChild;
 
+/*
+This test element provides its own builder method (and not included in JMeter Dsl) since will only
+be used in conversions, and we currently don't see any really valuable (aside from not creating a
+sample result) benefit, to expose it to DSL users, over using transaction controller for grouping
+requests.
+ */
 public class DslTestFragmentController extends BaseController<DslTestFragmentController> implements
     TestPlanChild {
 

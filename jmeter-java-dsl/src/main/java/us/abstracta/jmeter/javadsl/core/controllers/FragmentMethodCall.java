@@ -15,7 +15,7 @@ import us.abstracta.jmeter.javadsl.codegeneration.MethodCallContext;
  * Fragments method definitions might be the explicitly defined from a test fragment controller or
  * implicitly from module controller target controller.
  *
- * @since 1.2
+ * @since 1.3
  */
 public class FragmentMethodCall extends MethodCall {
 

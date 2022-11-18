@@ -28,7 +28,7 @@ import us.abstracta.jmeter.javadsl.core.testelements.MultiLevelTestElement;
 public class MethodCall {
 
   /**
-   * As of 1.2 use {@link Indentation#INDENT} instead.
+   * As of 1.3 use {@link Indentation#INDENT} instead.
    */
   @Deprecated
   public static final String INDENT = Indentation.INDENT;

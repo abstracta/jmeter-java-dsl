@@ -14,6 +14,11 @@ import java.util.TreeSet;
 import java.util.stream.Collectors;
 import us.abstracta.jmeter.javadsl.core.util.StringTemplate;
 
+/**
+ * Handles resolution of junit 5 test class code generation.
+ *
+ * @since 1.3
+ */
 public class TestClassTemplate {
 
   private final Set<String> dependencies = new TreeSet<>();

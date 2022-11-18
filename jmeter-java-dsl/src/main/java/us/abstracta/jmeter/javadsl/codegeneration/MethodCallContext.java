@@ -144,6 +144,7 @@ public class MethodCallContext {
    * @param key         identifies the entry in context to later on be able to retrieve it.
    * @param computation function used to build the new entry for the given key, if none exists.
    * @see #getEntry(Object) for more details
+   * @since 1.3
    */
   public <V> V computeEntryIfAbsent(Object key, Supplier<V> computation) {
     return (V) entries.computeIfAbsent(key, k -> computation.get());
@@ -208,6 +209,14 @@ public class MethodCallContext {
         .forEach(call::child);
   }
 
+  /**
+   * Allows creating a child context for the given test element and tree.
+   *
+   * @param element      the test element associated to the child context.
+   * @param childrenTree the test element subtree.
+   * @return the created child method context.
+   * @since 1.3
+   */
   public MethodCallContext child(TestElement element, HashTree childrenTree) {
     return new MethodCallContext(element, childrenTree, this, builderRegistry);
   }
@@ -245,6 +254,18 @@ public class MethodCallContext {
     return builderRegistry.findBuilderByClass(builderClass);
   }
 
+  /**
+   * Allows replacing or transforming the method call associated to a given test element.
+   * <p>
+   * This is particularly helpful in scenarios like module controller, where basic conversion of a
+   * controller has to be replaced by a call to a test fragment containing the target controller
+   * pointed by the module controller
+   *
+   * @param element  is the test element associated to the method call to be replaced/transformed.
+   * @param operator provides the logic to be applied to create a new method call from the original
+   *                 test element method call.
+   * @since 1.3
+   */
   public void replaceMethodCall(TestElement element, UnaryOperator<MethodCall> operator) {
     MethodCallContext elementContext = root.contextRegistry.get(element);
     if (elementContext != null) {
