@@ -22,7 +22,7 @@ public class DslIncludeControllerTest {
   @Nested
   public class CodeBuilderTest extends MethodCallFragmentBuilderTest {
 
-    private static final String FRAGMENT_METHOD_CALL = "fragment()";
+    private static final String FRAGMENT_METHOD_CALL = "myfragment()";
 
     @Test
     public void shouldGenerateDslWithFragmentWhenConvertingTestPlanWithIncludeController(
@@ -38,7 +38,7 @@ public class DslIncludeControllerTest {
 
     private File buildIncludedTestPlanJmx(Path tmp) throws IOException {
       String jmx = buildTestPlanJmx(buildFragmentJmx());
-      Path ret = tmp.resolve("fragment.jmx");
+      Path ret = tmp.resolve("myFragment.jmx");
       Files.write(ret, jmx.getBytes(StandardCharsets.UTF_8));
       return ret.toFile();
     }
@@ -55,7 +55,7 @@ public class DslIncludeControllerTest {
           .staticImports(Collections.singleton(DslTestFragmentController.class.getName()))
           .imports(Collections.singleton(DslTestFragmentController.class.getName()))
           .methodDefinitions(
-              Collections.singletonList(buildFragmentMethod("fragment", DEFAULT_FRAGMENT_NAME)))
+              Collections.singletonList(buildFragmentMethod("myfragment", DEFAULT_FRAGMENT_NAME)))
           .solve();
     }
 
