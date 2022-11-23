@@ -147,8 +147,8 @@ These commented lines make the class executable if you have jbang installed by m
 executable (eg: chmod +x ./PerformanceTest.java) and just executing it with ./PerformanceTest.java
 */
 //DEPS org.assertj:assertj-core:3.23.1
-//DEPS org.junit.jupiter:junit-jupiter-engine:5.9.0
-//DEPS org.junit.platform:junit-platform-launcher:1.9.0
+//DEPS org.junit.jupiter:junit-jupiter-engine:5.9.1
+//DEPS org.junit.platform:junit-platform-launcher:1.9.1
 //DEPS us.abstracta.jmeter:jmeter-java-dsl:1.3
 
 import static org.assertj.core.api.Assertions.assertThat;
