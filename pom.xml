@@ -55,7 +55,7 @@
     <junit-platform.version>1.9.1</junit-platform.version>
     <assertj-core.version>3.23.1</assertj-core.version>
     <!-- same version as JMeter dependency -->
-    <jackson.version>2.13.4</jackson.version>
+    <jackson.version>2.14.0</jackson.version>
   </properties>
 
   <modules>
