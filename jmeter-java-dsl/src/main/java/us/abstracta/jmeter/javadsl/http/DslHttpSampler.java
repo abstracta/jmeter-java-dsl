@@ -68,6 +68,31 @@ public class DslHttpSampler extends DslBaseHttpSampler<DslHttpSampler> {
         ));
   }
 
+  public String getMethod() {
+    return this.method;
+  }
+
+  public void setMethod(String method) {
+    this.method = method;
+  }
+
+  public String getBody() {
+    return this.body;
+  }
+
+  public void setBody(String body) {
+    this.body = body;
+  }
+
+  public DslHttpSampler clone() {
+    DslHttpSampler newSampler = new DslHttpSampler(this.getName(), this.getPath());
+    newSampler.setMethod(this.getMethod());
+    newSampler.setBody(this.getBody());
+    newSampler.setHeaders(this.getHeaders());
+    newSampler.setChildren(this.getChildren());
+    return newSampler;
+  }
+
   /**
    * Specifies that the sampler should send an HTTP POST to defined URL.
    *

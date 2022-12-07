@@ -46,6 +46,14 @@ public abstract class DslJsr223TestElement<T extends DslJsr223TestElement<T>> ex
         mapWithEntry("label", "Label", varsNameMapping));
   }
 
+  public DslScriptBuilder getScriptBuilder() {
+    return this.scriptBuilder;
+  }
+
+  public void setScriptBuilder(DslScriptBuilder scriptBuilder) {
+    this.scriptBuilder = scriptBuilder;
+  }
+
   private static <K, V> Map<K, V> mapWithEntry(K key, V value, Map<K, V> map) {
     HashMap<K, V> ret = new HashMap<>(map);
     ret.put(key, value);

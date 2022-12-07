@@ -35,7 +35,7 @@ public class DslJsr223Sampler extends DslJsr223TestElement<DslJsr223Sampler> imp
 
   private static final String DEFAULT_NAME = "JSR223 Sampler";
 
-  protected final List<SamplerChild> children = new ArrayList<>();
+  protected List<SamplerChild> children = new ArrayList<>();
 
   public DslJsr223Sampler(String name, String script) {
     super(name, DEFAULT_NAME, script);
@@ -44,6 +44,21 @@ public class DslJsr223Sampler extends DslJsr223TestElement<DslJsr223Sampler> imp
   public DslJsr223Sampler(String name, SamplerScript script) {
     super(name, DEFAULT_NAME, script, SamplerVars.class,
         Collections.singletonMap("sampleResult", "SampleResult"));
+  }
+
+  public List<SamplerChild> getChildren() {
+    return this.children;
+  }
+
+  public void setChildren(List<SamplerChild> children) {
+    this.children = children;
+  }
+
+  public DslJsr223Sampler clone() {
+    DslJsr223Sampler newSampler = new DslJsr223Sampler(this.getName(), "");
+    newSampler.setScriptBuilder(this.getScriptBuilder());
+    newSampler.setChildren(this.getChildren());
+    return newSampler;
   }
 
   /**

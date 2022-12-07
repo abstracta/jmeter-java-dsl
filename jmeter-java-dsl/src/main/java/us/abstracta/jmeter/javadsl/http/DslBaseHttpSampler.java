@@ -40,7 +40,7 @@ public abstract class DslBaseHttpSampler<T extends DslBaseHttpSampler<T>> extend
       "httpclient.reset_state_on_thread_group_iteration";
 
   protected String path;
-  protected final HttpHeaders headers = new HttpHeaders();
+  protected HttpHeaders headers = new HttpHeaders();
   protected String protocol;
   protected String host;
   protected String port;
@@ -58,6 +58,22 @@ public abstract class DslBaseHttpSampler<T extends DslBaseHttpSampler<T>> extend
     host = parsedUrl.host();
     port = parsedUrl.port();
     path = parsedUrl.path();
+  }
+
+  public String getPath() {
+    return this.path;
+  }
+
+  public void setPath(String path) {
+    this.path = path;
+  }
+
+  public HttpHeaders getHeaders() {
+    return this.headers;
+  }
+
+  public void setHeaders(HttpHeaders headers) {
+    this.headers = headers;
   }
 
   /**

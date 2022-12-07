@@ -20,7 +20,7 @@ import us.abstracta.jmeter.javadsl.core.DslTestPlan;
 public abstract class TestElementContainer<T extends TestElementContainer<T, C>,
     C extends DslTestElement> extends BaseTestElement {
 
-  protected final List<C> children = new ArrayList<>();
+  protected List<C> children = new ArrayList<>();
 
   protected TestElementContainer(String name, Class<? extends JMeterGUIComponent> guiClass,
       List<C> children) {
@@ -41,4 +41,11 @@ public abstract class TestElementContainer<T extends TestElementContainer<T, C>,
     return ret;
   }
 
+  public List<C> getChildren() {
+    return this.children;
+  }
+
+  public void setChildren(List<C> children) {
+    this.children = children;
+  }
 }
