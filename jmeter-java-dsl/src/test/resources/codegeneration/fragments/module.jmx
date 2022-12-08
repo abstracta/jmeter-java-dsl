@@ -1,0 +1,9 @@
+<ModuleController guiclass="ModuleControllerGui" testclass="ModuleController" testname="Module Controller" enabled="true">
+  <collectionProp name="ModuleController.node_path">
+    <stringProp name="764597751">Test Plan</stringProp>
+    <stringProp name="764597751">Test Plan</stringProp>
+    <stringProp name="-1948168983">Thread Group</stringProp>
+    <stringProp name="170071582">{{controllerName}}</stringProp>
+  </collectionProp>
+</ModuleController>
+<hashTree/>

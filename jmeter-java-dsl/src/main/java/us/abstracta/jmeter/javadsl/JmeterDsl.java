@@ -1,6 +1,5 @@
 package us.abstracta.jmeter.javadsl;
 
-import java.io.IOException;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.Collections;
@@ -623,21 +622,45 @@ public class JmeterDsl {
   public static DslOnceOnlyController onceOnlyController(ThreadGroupChild... children) {
     return new DslOnceOnlyController(Arrays.asList(children));
   }
+
   /**
-   * Builds a Runtime Controller that allows it's child elements to be executed for a defined amount of time (seconds)
-   * per thread group iteration.
-   * This can be very useful in tailoring a test plan to more accurately  the actual behavior of users in a system or
-   * perhaps control the execution of a set of samplers for a period of time followed by a request to refresh an auth token.
-   * When the defined execution time of the controller is reached, the runtime controller will stop execution and the next part of the
-   * test plan will be executed
-   *@param seconds defines the number of seconds the runtime controller should be executed on
-   *               each iteration. Can be a variable expression or a fixed value.
-   * @param children contains the test plan elements to execute only one time on first iteration of
-   *                 each thread group.
+   * Builds a Runtime Controller that stops executing child elements when a period of time expires.
+   * <p>
+   * This can be very useful to implement some time based logic like refreshing a token after
+   * certain time while doing http requests (runtimeController + whileController).
+   * <p>
+   * The controller executes each child sequentially until there are no more children to execute or
+   * the time has expired.
+   * <p>
+   * Child elements execution is not interrupted, the controller just checks on each child execution
+   * ending if the time has expired, and if so, don't execute the rest of its child elements.
+   *
+   * @param duration defines de duration after which no further child elements will be executed (on
+   *                 each iteration). Take into consideration that JMeter supports specifying
+   *                 duration in seconds, so if you specify a smaller granularity (like
+   *                 milliseconds) it will be rounded up to seconds.
+   * @param children contains the child elements to execute.
    * @return the controller instance for further configuration and usage.
    * @see DslRuntimeController
+   * @since 1.1
    */
+  public static DslRuntimeController runtimeController(Duration duration,
+      ThreadGroupChild... children) {
+    return new DslRuntimeController(String.valueOf(duration.getSeconds()), Arrays.asList(children));
+  }
 
+  /**
+   * Same as {@link #runtimeController(Duration, ThreadGroupChild...)} but allowing to use JMeter
+   * expressions for the duration.
+   *
+   * @param seconds  defines a JMeter expression that evaluates to a number of seconds the runtime
+   *                 controller will execute child elements for.
+   * @param children contains the child elements to execute.
+   * @return the controller instance for further configuration and usage.
+   * @see #runtimeController(Duration, ThreadGroupChild...)
+   * @see DslRuntimeController
+   * @since 1.1
+   */
   public static DslRuntimeController runtimeController(String seconds,
       ThreadGroupChild... children) {
     return new DslRuntimeController(seconds, Arrays.asList(children));
@@ -1262,8 +1285,8 @@ public class JmeterDsl {
    * This is just a handy short way of generating html reports following naming template
    * <pre>{@code <yyyy-MM-dd HH-mm-ss> <UUID>}</pre>
    * <p>
-   * If you need to have a predictable report name, consider
-   * using {@link #htmlReporter(String, String)} instead.
+   * If you need to have a predictable report name, consider using
+   * {@link #htmlReporter(String, String)} instead.
    *
    * @param reportsDirectory specifies the directory where HTML reports are generated. If the
    *                         reportsDirectory does not exist, then it will be created.
@@ -1272,7 +1295,7 @@ public class JmeterDsl {
    * @see HtmlReporter
    * @since 0.6
    */
-  public static HtmlReporter htmlReporter(String reportsDirectory) throws IOException {
+  public static HtmlReporter htmlReporter(String reportsDirectory) {
     return new HtmlReporter(reportsDirectory, null);
   }
 
@@ -1291,7 +1314,7 @@ public class JmeterDsl {
    * @see HtmlReporter
    * @since 1.0
    */
-  public static HtmlReporter htmlReporter(String reportsDirectory, String name) throws IOException {
+  public static HtmlReporter htmlReporter(String reportsDirectory, String name) {
     return new HtmlReporter(reportsDirectory, name);
   }
 
@@ -1329,8 +1352,8 @@ public class JmeterDsl {
    * The timer uses the minimum and maximum durations to define the range of values to be used in
    * the uniformly distributed selected value. These values differ from the parameters used in
    * JMeter Uniform Random Timer element to make it simpler for general users to use. The generated
-   * JMeter test element uses as "constant delay offset" the minimum value, and as "maximum
-   * random delay" (maximum - minimum) value.
+   * JMeter test element uses as "constant delay offset" the minimum value, and as "maximum random
+   * delay" (maximum - minimum) value.
    * </p>
    *
    * <p>
@@ -1339,9 +1362,8 @@ public class JmeterDsl {
    * <p>
    *
    * @param minimum is used to set the constant delay of the Uniform Random Timer.
-   * @param maximum is used to set the maximum time the timer will be paused and will be used
-   *                      to obtain the random delay from the result of (maximum -
-   *                      minimum).
+   * @param maximum is used to set the maximum time the timer will be paused and will be used to
+   *                obtain the random delay from the result of (maximum - minimum).
    * @return The Uniform Random Timer instance
    * @see DslUniformRandomTimer
    * @since 1.0

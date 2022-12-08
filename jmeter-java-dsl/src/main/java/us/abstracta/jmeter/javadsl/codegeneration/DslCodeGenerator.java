@@ -20,7 +20,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import us.abstracta.jmeter.javadsl.JmeterDsl;
 import us.abstracta.jmeter.javadsl.core.DslTestElement;
+import us.abstracta.jmeter.javadsl.core.controllers.DslIncludeController;
+import us.abstracta.jmeter.javadsl.core.controllers.DslModuleController;
+import us.abstracta.jmeter.javadsl.core.controllers.DslProxyControl;
 import us.abstracta.jmeter.javadsl.core.controllers.DslRecordingController;
+import us.abstracta.jmeter.javadsl.core.controllers.DslTestFragmentController;
 import us.abstracta.jmeter.javadsl.core.engines.JmeterEnvironment;
 import us.abstracta.jmeter.javadsl.core.testelements.BaseTestElement;
 
@@ -47,6 +51,10 @@ public class DslCodeGenerator implements MethodCallBuilderRegistry {
     builders.addAll(findCallBuilders(JmeterDsl.class));
     dependencies.put(JmeterDsl.class, "us.abstracta.jmeter:jmeter-java-dsl");
     builders.add(new DslRecordingController.CodeBuilder());
+    builders.add(new DslProxyControl.CodeBuilder());
+    builders.add(new DslModuleController.CodeBuilder());
+    builders.add(new DslIncludeController.CodeBuilder());
+    builders.addAll(findCallBuilders(DslTestFragmentController.class));
     sortBuilders();
   }
 
@@ -145,8 +153,8 @@ public class DslCodeGenerator implements MethodCallBuilderRegistry {
    * @throws IOException when there is some problem reading the file.
    */
   public String generateCodeFromJmx(File file) throws IOException {
-    return new DslPerformanceTest(buildMethodCallFromJmxFile(file), dependencies)
-        .buildCode();
+    return TestClassTemplate.fromTestPlanMethodCall(buildMethodCallFromJmxFile(file), dependencies)
+        .solve();
   }
 
   public MethodCall buildMethodCallFromJmxFile(File file) throws IOException {

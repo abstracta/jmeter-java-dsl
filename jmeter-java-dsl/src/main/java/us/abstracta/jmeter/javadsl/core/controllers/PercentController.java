@@ -82,10 +82,11 @@ public class PercentController extends BaseController<PercentController> {
 
     @Override
     public boolean matches(MethodCallContext context) {
-      if (!(context.getTestElement() instanceof ThroughputController)) {
+      TestElement elem = context.getTestElement();
+      if (!(elem instanceof ThroughputController)) {
         return false;
       }
-      ThroughputController controller = (ThroughputController) context.getTestElement();
+      ThroughputController controller = (ThroughputController) elem;
       return controller.getStyle() == ThroughputController.BYPERCENT;
     }
 

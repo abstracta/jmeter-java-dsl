@@ -4,6 +4,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.anyUrl;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalToJson;
+import static com.github.tomakehurst.wiremock.client.WireMock.exactly;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.getRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.matching;
@@ -340,6 +341,40 @@ public class DslHttpSamplerTest extends JmeterDslTest {
   }
 
   @Test
+  public void shouldNotDownloadExcludedEmbeddedResourceWhenEnabled() throws Exception {
+    String primaryUrl = "/primary";
+    String resource1Url = "/resource1";
+    String resource2Url = "/resource2";
+    stubFor(get(primaryUrl)
+        .willReturn(HttpResponseBuilder.buildEmbeddedResourcesResponse(resource1Url, resource2Url)));
+    testPlan(
+        threadGroup(1, 1,
+            httpSampler(wiremockUri + primaryUrl)
+                .downloadEmbeddedResourcesNotMatching(".*/resource2.*")
+        )
+    ).run();
+    verify(exactly(0), getRequestedFor(urlPathEqualTo(resource2Url)));
+    verify(getRequestedFor(urlPathEqualTo(resource1Url)));
+  }
+
+  @Test
+  public void shouldDownloadOnlyMatchingEmbeddedResourceWhenEnabled() throws Exception {
+    String primaryUrl = "/primary";
+    String resource1Url = "/resource1";
+    String resource2Url = "/resource2";
+    stubFor(get(primaryUrl)
+        .willReturn(HttpResponseBuilder.buildEmbeddedResourcesResponse(resource1Url, resource2Url)));
+    testPlan(
+        threadGroup(1, 1,
+            httpSampler(wiremockUri + primaryUrl)
+                .downloadEmbeddedResourcesMatching(".*/resource1.*")
+        )
+    ).run();
+    verify(exactly(0), getRequestedFor(urlPathEqualTo(resource2Url)));
+    verify(getRequestedFor(urlPathEqualTo(resource1Url)));
+  }
+
+  @Test
   public void shouldSendQueryParametersWhenGetRequestWithParameters() throws Exception {
     testPlan(
         threadGroup(1, 1,
@@ -387,7 +422,7 @@ public class DslHttpSamplerTest extends JmeterDslTest {
     String part1Value = "value1";
     ContentType part1Encoding = ContentType.TEXT_PLAIN.withCharset(StandardCharsets.US_ASCII);
     String part2Name = "part2";
-    TestResource part2Resource = testResource("custom-sample-jtl.xml");
+    TestResource part2Resource = testResource("jtls/custom-sample-jtl.xml");
     ContentType part2Encoding = ContentType.TEXT_XML;
 
     testPlan(

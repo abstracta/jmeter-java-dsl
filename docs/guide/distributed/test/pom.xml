@@ -34,7 +34,7 @@
     <dependency>
       <groupId>us.abstracta.jmeter</groupId>
       <artifactId>jmeter-java-dsl</artifactId>
-      <version>0.63</version>
+      <version>1.3</version>
       <scope>test</scope>
     </dependency>
     <dependency>

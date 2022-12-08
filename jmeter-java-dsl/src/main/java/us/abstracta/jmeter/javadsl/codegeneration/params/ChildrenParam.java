@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.stream.Collectors;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodCall;
@@ -79,6 +81,12 @@ public class ChildrenParam<T> extends MethodParam {
         .collect(Collectors.toSet());
   }
 
+  public Map<String, MethodCall> getMethodDefinitions() {
+    return children.stream()
+        .flatMap(c -> c.getMethodDefinitions().entrySet().stream())
+        .collect(Collectors.toMap(Entry::getKey, Entry::getValue));
+  }
+
   @Override
   public String buildCode(String indent) {
     List<MethodCall> childrenCalls = children.stream()
@@ -89,7 +97,12 @@ public class ChildrenParam<T> extends MethodParam {
         .map(c -> c.buildCode(indent))
         .filter(s -> !s.isEmpty())
         .collect(Collectors.joining(",\n" + indent));
+    ret = commentLastUncommentedComma(ret);
     return ret.isEmpty() ? ret : "\n" + indent + ret + "\n";
+  }
+
+  private String commentLastUncommentedComma(String ret) {
+    return ret.replaceAll("(?s),((?:\n\\s*//[^\n]+)+)$", "//,$1");
   }
 
   private static int findExecutionOrder(Class<?> returnType) {
@@ -109,6 +122,10 @@ public class ChildrenParam<T> extends MethodParam {
           + " that is not compatible with the declared ones : " + childrenType);
     }
     children.add(child);
+  }
+
+  public void replaceChild(MethodCall original, MethodCall replacement) {
+    children.replaceAll(c -> c == original ? replacement : c);
   }
 
 }

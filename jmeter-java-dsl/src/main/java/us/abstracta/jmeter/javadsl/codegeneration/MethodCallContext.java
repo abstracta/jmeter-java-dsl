@@ -7,7 +7,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
+import java.util.function.Supplier;
+import java.util.function.UnaryOperator;
 import org.apache.jmeter.config.ConfigElement;
 import org.apache.jmeter.testelement.TestElement;
 import org.apache.jorphan.collections.HashTree;
@@ -34,9 +35,13 @@ public class MethodCallContext {
   private final TestElement testElement;
   private final HashTree childrenTree;
   private final MethodCallContext parent;
+  private final MethodCallContext root;
   private final MethodCallBuilderRegistry builderRegistry;
   private final Map<Object, Object> entries = new HashMap<>();
   private final List<MethodCallContextEndListener> endListeners = new ArrayList<>();
+  private MethodCall methodCall;
+  private final Map<TestElement, MethodCallContext> contextRegistry = new HashMap<>();
+  private final Map<TestElement, UnaryOperator<MethodCall>> pendingReplacements = new HashMap<>();
 
   public MethodCallContext(TestElement testElement, HashTree childrenTree,
       MethodCallContext parent, MethodCallBuilderRegistry builderRegistry) {
@@ -44,6 +49,7 @@ public class MethodCallContext {
     // sorting simplifies code builder
     this.childrenTree = childrenTree == null ? new ListedHashTree() : sortTree(childrenTree);
     this.parent = parent;
+    this.root = parent == null ? this : parent.root;
     this.builderRegistry = builderRegistry;
   }
 
@@ -85,7 +91,7 @@ public class MethodCallContext {
    * @return the parent context. Null is returned if the current context is the root context.
    */
   public MethodCallContext getRoot() {
-    return parent == null ? this : parent.getRoot();
+    return root;
   }
 
   /**
@@ -133,6 +139,18 @@ public class MethodCallContext {
   }
 
   /**
+   * Gets existing entry or creates a new one using provided computation function.
+   *
+   * @param key         identifies the entry in context to later on be able to retrieve it.
+   * @param computation function used to build the new entry for the given key, if none exists.
+   * @see #getEntry(Object) for more details
+   * @since 1.3
+   */
+  public <V> V computeEntryIfAbsent(Object key, Supplier<V> computation) {
+    return (V) entries.computeIfAbsent(key, k -> computation.get());
+  }
+
+  /**
    * Allows registering logic that needs to be executed at the end of MethodCall build for this
    * context.
    * <p>
@@ -157,16 +175,22 @@ public class MethodCallContext {
    */
   public MethodCall buildMethodCall() {
     try {
-      MethodCall ret = builderRegistry.findBuilderMatchingContext(this)
+      methodCall = builderRegistry.findBuilderMatchingContext(this)
           .map(b -> b.buildMethodCall(this))
           .orElseGet(() -> {
             LOG.warn("No builder found for {}({}). " + UNSUPPORTED_USAGE_WARNING,
                 testElement.getClass(), testElement.getName());
             return MethodCall.buildUnsupported();
           });
-      addChildrenTo(ret);
-      endListeners.forEach(l -> l.execute(this, ret));
-      return ret;
+      root.contextRegistry.put(testElement, this);
+      methodCall.setCommented(!testElement.isEnabled());
+      addChildrenTo(methodCall);
+      executeEndListeners(methodCall);
+      UnaryOperator<MethodCall> replacement = root.pendingReplacements.remove(testElement);
+      if (replacement != null) {
+        methodCall = replacement.apply(methodCall);
+      }
+      return methodCall;
     } catch (RuntimeException e) {
       LOG.warn("Could not build code for {}({}). " + UNSUPPORTED_USAGE_WARNING,
           testElement.getClass(), testElement.getName(), e);
@@ -174,21 +198,27 @@ public class MethodCallContext {
     }
   }
 
-  private void addChildrenTo(MethodCall call) {
-    List<MethodCall> children = buildChildrenMethodCalls();
-    if (children.isEmpty()) {
-      return;
-    }
-    children.forEach(call::child);
+  private void executeEndListeners(MethodCall ret) {
+    endListeners.forEach(l -> l.execute(this, ret));
   }
 
-  private List<MethodCall> buildChildrenMethodCalls() {
-    return childrenTree.list().stream()
-        .map(c -> (TestElement) c)
-        .filter(TestElement::isEnabled)
-        .map(c -> new MethodCallContext(c, childrenTree.getTree(c), this,
-            builderRegistry).buildMethodCall())
-        .collect(Collectors.toList());
+  private void addChildrenTo(MethodCall call) {
+    childrenTree.list().stream()
+        .map(e -> child((TestElement) e, childrenTree.getTree(e))
+            .buildMethodCall())
+        .forEach(call::child);
+  }
+
+  /**
+   * Allows creating a child context for the given test element and tree.
+   *
+   * @param element      the test element associated to the child context.
+   * @param childrenTree the test element subtree.
+   * @return the created child method context.
+   * @since 1.3
+   */
+  public MethodCallContext child(TestElement element, HashTree childrenTree) {
+    return new MethodCallContext(element, childrenTree, this, builderRegistry);
   }
 
   /**
@@ -207,8 +237,7 @@ public class MethodCallContext {
         .findAny();
     child.ifPresent(childrenTree::remove);
     return child
-        .map(c -> new MethodCallContext((TestElement) c, childrenTree.getTree(c), this,
-            builderRegistry))
+        .map(c -> child((TestElement) c, childrenTree.getTree(c)))
         .orElse(null);
   }
 
@@ -223,6 +252,31 @@ public class MethodCallContext {
    */
   public <T extends MethodCallBuilder> T findBuilder(Class<T> builderClass) {
     return builderRegistry.findBuilderByClass(builderClass);
+  }
+
+  /**
+   * Allows replacing or transforming the method call associated to a given test element.
+   * <p>
+   * This is particularly helpful in scenarios like module controller, where basic conversion of a
+   * controller has to be replaced by a call to a test fragment containing the target controller
+   * pointed by the module controller
+   *
+   * @param element  is the test element associated to the method call to be replaced/transformed.
+   * @param operator provides the logic to be applied to create a new method call from the original
+   *                 test element method call.
+   * @since 1.3
+   */
+  public void replaceMethodCall(TestElement element, UnaryOperator<MethodCall> operator) {
+    MethodCallContext elementContext = root.contextRegistry.get(element);
+    if (elementContext != null) {
+      MethodCall original = elementContext.methodCall;
+      MethodCall replacement = operator.apply(original);
+      if (replacement != original) {
+        elementContext.parent.methodCall.replaceChild(original, replacement);
+      }
+    } else {
+      root.pendingReplacements.put(element, operator);
+    }
   }
 
   public interface MethodCallContextEndListener {

@@ -1,4 +1,5 @@
-name: publish release
+name: release
+run-name: release ${{ inputs.version }}
 on:
   workflow_dispatch:
     inputs:
@@ -66,8 +67,6 @@ jobs:
         run: echo "SNAPSHOT_VERSION=$(.github/next-minor-snapshot.sh ${{ inputs.version }})" >> $GITHUB_ENV
       - name: update to next SNAPSHOT version
         run: mvn --batch-mode --no-transfer-progress versions:set -DnewVersion=${{ env.SNAPSHOT_VERSION }}
-      - name: update docs SNAPSHOT version
-        run: .github/fix-docs-version.sh ${{ env.SNAPSHOT_VERSION }}
       - name: commit SNAPSHOT version
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
@@ -90,4 +89,4 @@ jobs:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
         uses: Ilshidur/action-discord@master
         with:
-          args: 'A new release is out! Check it at ${{ env.GITHUB_SERVER_URL }}/${{ env.GITHUB_REPOSITORY }}/releases/tag/v${{ inputs.version }}'
+          args: 'A new release is out! Check it at https://github.com/abstracta/jmeter-java-dsl/releases/tag/v${{ inputs.version }}'

@@ -6,15 +6,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.apache.http.entity.ContentType;
-import org.apache.jorphan.collections.HashTree;
 import us.abstracta.jmeter.javadsl.codegeneration.params.BoolParam;
 import us.abstracta.jmeter.javadsl.codegeneration.params.ChildrenParam;
-import us.abstracta.jmeter.javadsl.core.BuildTreeContext;
-import us.abstracta.jmeter.javadsl.core.DslTestElement;
 import us.abstracta.jmeter.javadsl.core.DslTestPlan;
 import us.abstracta.jmeter.javadsl.core.testelements.MultiLevelTestElement;
 
@@ -28,7 +27,11 @@ import us.abstracta.jmeter.javadsl.core.testelements.MultiLevelTestElement;
  */
 public class MethodCall {
 
-  public static final String INDENT = "  ";
+  /**
+   * As of 1.3 use {@link Indentation#INDENT} instead.
+   */
+  @Deprecated
+  public static final String INDENT = Indentation.INDENT;
   private static final MethodCall EMPTY_METHOD_CALL = new EmptyMethodCall();
 
   protected final String methodName;
@@ -38,6 +41,7 @@ public class MethodCall {
   private final List<MethodParam> params;
   private final List<MethodCall> chain = new ArrayList<>();
   private final Set<String> requiredStaticImports = new HashSet<>();
+  private boolean commented;
 
   protected MethodCall(String methodName, Class<?> returnType, MethodParam... params) {
     this.methodName = methodName;
@@ -96,23 +100,15 @@ public class MethodCall {
   }
 
   public static MethodCall buildUnsupported() {
-    return new MethodCall("unsupported", UnsupportedTestElement.class);
+    return new MethodCall("unsupported", MultiLevelTestElement.class);
   }
 
-  private static class UnsupportedTestElement implements MultiLevelTestElement {
+  public void setCommented(boolean commented) {
+    this.commented = commented;
+  }
 
-    public void children(DslTestElement... child) {
-    }
-
-    @Override
-    public HashTree buildTreeUnder(HashTree parent, BuildTreeContext context) {
-      return null;
-    }
-
-    @Override
-    public void showInGui() {
-    }
-
+  public boolean isCommented() {
+    return commented;
   }
 
   /**
@@ -134,6 +130,12 @@ public class MethodCall {
     }
 
     @Override
+    public MethodCall child(MethodCall child) {
+      // Just ignoring children
+      return this;
+    }
+
+    @Override
     public String buildCode(String indent) {
       return "";
     }
@@ -146,6 +148,8 @@ public class MethodCall {
         .filter(p -> !p.isIgnored())
         .forEach(p -> ret.addAll(p.getStaticImports()));
     chain.forEach(c -> ret.addAll(c.getStaticImports()));
+    getMethodDefinitions().values()
+        .forEach(m -> ret.addAll(m.getStaticImports()));
     return ret;
   }
 
@@ -155,7 +159,19 @@ public class MethodCall {
         .filter(p -> !p.isIgnored())
         .forEach(p -> ret.addAll(p.getImports()));
     chain.forEach(c -> ret.addAll(c.getImports()));
+    getMethodDefinitions().values()
+        .forEach(m -> {
+          ret.add(m.getReturnType().getName());
+          ret.addAll(m.getImports());
+        });
     return ret;
+  }
+
+  public Map<String, MethodCall> getMethodDefinitions() {
+    return params.stream()
+        .filter(p -> !p.isIgnored())
+        .flatMap(p -> p.getMethodDefinitions().entrySet().stream())
+        .collect(Collectors.toMap(Entry::getKey, Entry::getValue));
   }
 
   public Class<?> getReturnType() {
@@ -180,8 +196,13 @@ public class MethodCall {
    * @return the current call instance for further configuration.
    */
   public MethodCall child(MethodCall child) {
+    solveChildrenParam().addChild(child);
+    return this;
+  }
+
+  private ChildrenParam<?> solveChildrenParam() {
     if (childrenMethod == null) {
-      MethodParam lastParam =  params.isEmpty() ? null : params.get(params.size() - 1);
+      MethodParam lastParam = params.isEmpty() ? null : params.get(params.size() - 1);
       if (lastParam instanceof ChildrenParam && chain.isEmpty()) {
         childrenMethod = this;
         childrenParam = (ChildrenParam<?>) lastParam;
@@ -191,8 +212,7 @@ public class MethodCall {
         childrenParam = (ChildrenParam<?>) childrenMethod.params.get(0);
       }
     }
-    childrenParam.addChild(child);
-    return this;
+    return childrenParam;
   }
 
   private MethodCall findChildrenMethod() {
@@ -227,6 +247,10 @@ public class MethodCall {
       return paramsCode.isEmpty() ? "" : methodName + "(" + paramsCode + indent + ")";
     }
 
+  }
+
+  public void replaceChild(MethodCall original, MethodCall replacement) {
+    solveChildrenParam().replaceChild(original, replacement);
   }
 
   /**
@@ -358,7 +382,7 @@ public class MethodCall {
         .append("(");
     String childIndent = indent + INDENT;
     String paramsCode = buildParamsCode(childIndent);
-    ret.append(reIndentParenthesis(paramsCode));
+    ret.append(paramsCode);
     boolean hasChildren = paramsCode.endsWith("\n");
     if (hasChildren) {
       ret.append(indent);
@@ -373,14 +397,19 @@ public class MethodCall {
       ret.append(".");
       ret.append(chainedCode);
     }
-    return ret.toString();
+    return commented ? commented(ret.toString(), indent) : ret.toString();
   }
 
-  private String reIndentParenthesis(String paramsCode) {
+  private String commented(String str, String indent) {
+    return "//" + str.replace("\n" + indent, "\n" + indent + "//");
+  }
+
+  public String buildAssignmentCode(String indent) {
+    String ret = buildCode(indent);
     String indentedParenthesis = INDENT + ")";
-    return paramsCode.endsWith(indentedParenthesis)
-        ? paramsCode.substring(0, paramsCode.length() - indentedParenthesis.length()) + ")"
-        : paramsCode;
+    return chain.isEmpty() && ret.endsWith(indentedParenthesis)
+        ? ret.substring(0, ret.length() - indentedParenthesis.length()) + ")"
+        : ret;
   }
 
   protected String buildParamsCode(String indent) {

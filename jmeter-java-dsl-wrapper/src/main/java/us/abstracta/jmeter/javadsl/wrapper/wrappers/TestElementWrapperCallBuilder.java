@@ -19,6 +19,7 @@ import org.apache.jmeter.testelement.property.IntegerProperty;
 import org.apache.jmeter.testelement.property.JMeterProperty;
 import org.apache.jmeter.testelement.property.LongProperty;
 import org.apache.jmeter.testelement.property.NullProperty;
+import us.abstracta.jmeter.javadsl.codegeneration.Indentation;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodCall;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodCallContext;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodParam;
@@ -132,7 +133,7 @@ public class TestElementWrapperCallBuilder<T extends TestElement> extends
         return "Collections.singletonList(" + new PropertyParam(prop.get(0)).buildCode(indent)
             + ")";
       }
-      String childIndent = indent + MethodCall.INDENT;
+      String childIndent = indent + Indentation.INDENT;
       return "Arrays.asList(\n"
           + propertyIterator2Stream(prop.iterator())
           .map(p -> childIndent + new PropertyParam(p).buildCode(childIndent))

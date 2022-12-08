@@ -18,7 +18,7 @@ import org.junit.jupiter.api.io.TempDir;
 import us.abstracta.jmeter.javadsl.JmeterDslTest;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodCallBuilderTest;
 import us.abstracta.jmeter.javadsl.core.DslTestPlan;
-import us.abstracta.jmeter.javadsl.core.StringTemplate.StringTemplateAssert;
+import us.abstracta.jmeter.javadsl.core.StringTemplateAssert;
 
 public class JtlWriterTest extends JmeterDslTest {
 
@@ -114,7 +114,7 @@ public class JtlWriterTest extends JmeterDslTest {
             httpSampler(wiremockUri)
         )
     ).run();
-    assertFileMatchesTemplate(resultsFilePath, "default-jtl.template.csv");
+    assertFileMatchesTemplate(resultsFilePath, "jtls/default-jtl.template.csv");
   }
 
   private void assertFileMatchesTemplate(Path resultsFilePath, String templateName)
@@ -138,7 +138,7 @@ public class JtlWriterTest extends JmeterDslTest {
             httpSampler(wiremockUri)
         )
     ).run();
-    assertFileMatchesTemplate(resultsFilePath, "complete-jtl.template.xml");
+    assertFileMatchesTemplate(resultsFilePath, "jtls/complete-jtl.template.xml");
   }
 
   @Test
@@ -155,7 +155,7 @@ public class JtlWriterTest extends JmeterDslTest {
                 )
         )
     ).run();
-    assertFileMatchesTemplate(resultsFilePath, "jtl-with-custom-variable.template.csv");
+    assertFileMatchesTemplate(resultsFilePath, "jtls/jtl-with-custom-variable.template.csv");
   }
 
   @SuppressWarnings("unused")

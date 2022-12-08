@@ -14,18 +14,18 @@ import us.abstracta.jmeter.javadsl.core.threadgroups.BaseThreadGroup;
 import us.abstracta.jmeter.javadsl.core.threadgroups.BaseThreadGroup.ThreadGroupChild;
 
 /**
- * Allows running a part of a test plan repeatedly for a specified number of seconds
- * for each iteration of each thread in a thread group.
+ * Is a controller that stops executing child elements when a period of time expires.
  * <p>
- * Internally this uses JMeter Runtime Controller (Runtime class).
+ * Internally this uses JMeter Runtime Controller.
  *
-  */
+ * @since 1.1
+ */
 public class DslRuntimeController extends BaseController<DslRuntimeController> {
 
   protected String seconds;
 
   public DslRuntimeController(String seconds,
-            List<BaseThreadGroup.ThreadGroupChild> children) {
+      List<BaseThreadGroup.ThreadGroupChild> children) {
     super("Runtime Controller", RunTimeGui.class, children);
     this.seconds = seconds;
   }
@@ -38,17 +38,18 @@ public class DslRuntimeController extends BaseController<DslRuntimeController> {
   }
 
   public static class CodeBuilder extends SingleTestElementCallBuilder<RunTime> {
+
     public CodeBuilder(List<Method> builderMethods) {
       super(RunTime.class, builderMethods);
     }
 
     @Override
-    protected MethodCall buildMethodCall(RunTime testElement,
-                                         MethodCallContext context) {
-      TestElementParamBuilder paramBuilder = new TestElementParamBuilder(testElement,
-              "RuntimeController");
-      return buildMethodCall(paramBuilder.stringParam("seconds"),
-              new ChildrenParam<>(ThreadGroupChild[].class));
+    protected MethodCall buildMethodCall(RunTime testElement, MethodCallContext context) {
+      TestElementParamBuilder paramBuilder = new TestElementParamBuilder(testElement, "RunTime");
+      return buildMethodCall(paramBuilder.durationParam("seconds"),
+          new ChildrenParam<>(ThreadGroupChild[].class));
     }
+
   }
+
 }

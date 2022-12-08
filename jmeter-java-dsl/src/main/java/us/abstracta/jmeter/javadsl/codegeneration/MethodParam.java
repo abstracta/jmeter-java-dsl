@@ -80,6 +80,10 @@ public abstract class MethodParam {
     return Collections.emptySet();
   }
 
+  public Map<String, MethodCall> getMethodDefinitions() {
+    return Collections.emptyMap();
+  }
+
   protected String buildCode(String indent) {
     return buildStringLiteral(getExpression(), indent);
   }

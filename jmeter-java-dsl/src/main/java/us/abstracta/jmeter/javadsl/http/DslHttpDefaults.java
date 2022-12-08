@@ -40,6 +40,8 @@ public class DslHttpDefaults extends BaseConfigElement {
   protected String proxyUser;
   protected String proxyPassword;
   protected boolean downloadEmbeddedResources;
+  protected String embeddedResourcesMatchRegex;
+  protected String embeddedResourcesNotMatchRegex;
   protected HttpClientImpl clientImpl;
 
   public DslHttpDefaults() {
@@ -189,6 +191,54 @@ public class DslHttpDefaults extends BaseConfigElement {
   }
 
   /**
+   * Same as {@link #downloadEmbeddedResources()} but allowing to specify which embedded resources
+   * to actually download.
+   * <p>
+   * This is helpful when only some particular requests need to be downloaded and the rest should be
+   * ignored. Eg: to only make requests to the site under test, and no other external services.
+   * <p>
+   * An alternative is using {@link #downloadEmbeddedResourcesNotMatching(String)}. If a resources
+   * matches this regex and also one specified in
+   * {@link #downloadEmbeddedResourcesNotMatching(String)}, then it will be ignored.
+   *
+   * @param urlRegex specifies the regular expression which will be used to ignore embedded
+   *                 resources that have a URL matching with it.
+   * @return the sampler for further configuration or usage.
+   * @see #downloadEmbeddedResources()
+   * @see #downloadEmbeddedResourcesNotMatching(String)
+   * @since 1.3
+   */
+  public DslHttpDefaults downloadEmbeddedResourcesMatching(String urlRegex) {
+    this.downloadEmbeddedResources = true;
+    this.embeddedResourcesMatchRegex = urlRegex;
+    return this;
+  }
+
+  /**
+   * Same as {@link #downloadEmbeddedResources()} but allowing to ignore embedded resources with URL
+   * matching a given regular expression.
+   * <p>
+   * This is helpful when some particular requests (for example to other external services) don't
+   * want to be included in the test execution.
+   * <p>
+   * An alternative is using {@link #downloadEmbeddedResourcesMatching(String)}. If a resources
+   * matches this regex and also one specified in
+   * {@link #downloadEmbeddedResourcesMatching(String)}, then it will be ignored.
+   *
+   * @param urlRegex specifies the regular expression which will be used to ignore embedded
+   *                 resources that have a URL matching with it.
+   * @return the sampler for further configuration or usage.
+   * @see #downloadEmbeddedResources()
+   * @see #downloadEmbeddedResourcesMatching(String)
+   * @since 1.3
+   */
+  public DslHttpDefaults downloadEmbeddedResourcesNotMatching(String urlRegex) {
+    this.downloadEmbeddedResources = true;
+    this.embeddedResourcesNotMatchRegex = urlRegex;
+    return this;
+  }
+
+  /**
    * Allows specifying a proxy through which all http requests will be sent to their final
    * destination.
    * <p>
@@ -328,6 +378,12 @@ public class DslHttpDefaults extends BaseConfigElement {
     if (downloadEmbeddedResources) {
       ret.setProperty(HTTPSamplerBase.IMAGE_PARSER, true);
       ret.setProperty(HTTPSamplerBase.CONCURRENT_DWN, true);
+      if (embeddedResourcesMatchRegex != null) {
+        ret.setProperty(HTTPSamplerBase.EMBEDDED_URL_RE, embeddedResourcesMatchRegex);
+      }
+      if (embeddedResourcesNotMatchRegex != null) {
+        ret.setProperty(HTTPSamplerBase.EMBEDDED_URL_EXCLUDE_RE, embeddedResourcesNotMatchRegex);
+      }
     }
     if (clientImpl != null) {
       ret.setProperty(HTTPSamplerBase.IMPLEMENTATION, clientImpl.propertyValue);

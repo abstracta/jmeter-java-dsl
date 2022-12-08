@@ -29,7 +29,7 @@ To use the DSL just include it in your project:
 <dependency>
   <groupId>us.abstracta.jmeter</groupId>
   <artifactId>jmeter-java-dsl</artifactId>
-  <version>1.1-SNAPSHOT</version>
+  <version>1.3</version>
   <scope>test</scope>
 </dependency>
 ```
@@ -50,7 +50,7 @@ class JmeterRule implements ComponentMetadataRule {
 
 dependencies {
     ...
-    testImplementation 'us.abstracta.jmeter:jmeter-java-dsl:1.1-SNAPSHOT'
+    testImplementation 'us.abstracta.jmeter:jmeter-java-dsl:1.3'
     components {
         withModule("org.apache.jmeter:ApacheJMeter_core", JmeterRule)
         withModule("org.apache.jmeter:ApacheJMeter_java", JmeterRule)
@@ -133,7 +133,7 @@ java -jar jmx2dsl.jar test-plan.jmx
 :::
 ::: tab Jbang
 ```bash
-jbang us.abstracta.jmeter:jmeter-java-dsl-jmx2dsl:1.1-SNAPSHOT test-plan.jmx
+jbang us.abstracta.jmeter:jmeter-java-dsl-jmx2dsl:1.3 test-plan.jmx
 ```
 :::
 ::::
@@ -147,9 +147,9 @@ These commented lines make the class executable if you have jbang installed by m
 executable (eg: chmod +x ./PerformanceTest.java) and just executing it with ./PerformanceTest.java
 */
 //DEPS org.assertj:assertj-core:3.23.1
-//DEPS org.junit.jupiter:junit-jupiter-engine:5.9.0
-//DEPS org.junit.platform:junit-platform-launcher:1.9.0
-//DEPS us.abstracta.jmeter:jmeter-java-dsl:1.1-SNAPSHOT
+//DEPS org.junit.jupiter:junit-jupiter-engine:5.9.1
+//DEPS org.junit.platform:junit-platform-launcher:1.9.1
+//DEPS us.abstracta.jmeter:jmeter-java-dsl:1.3
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.*;
@@ -224,14 +224,14 @@ By including the following module as a dependency:
 <dependency>
   <groupId>us.abstracta.jmeter</groupId>
   <artifactId>jmeter-java-dsl-blazemeter</artifactId>
-  <version>1.1-SNAPSHOT</version>
+  <version>1.3</version>
   <scope>test</scope>
 </dependency>
 ```
 :::
 ::: tab Gradle
 ```groovy
-testImplementation 'us.abstracta.jmeter:jmeter-java-dsl-blazemeter:1.1-SNAPSHOT'
+testImplementation 'us.abstracta.jmeter:jmeter-java-dsl-blazemeter:1.3'
 ```
 :::
 ::::
@@ -299,14 +299,14 @@ In the same fashion as with BlazeMeter, just by including the following module a
 <dependency>
   <groupId>us.abstracta.jmeter</groupId>
   <artifactId>jmeter-java-dsl-octoperf</artifactId>
-  <version>1.1-SNAPSHOT</version>
+  <version>1.3</version>
   <scope>test</scope>
 </dependency>
 ```
 :::
 ::: tab Gradle
 ```groovy
-testImplementation 'us.abstracta.jmeter:jmeter-java-dsl-octoperf:1.1-SNAPSHOT'
+testImplementation 'us.abstracta.jmeter:jmeter-java-dsl-octoperf:1.3'
 ```
 :::
 ::::
@@ -992,7 +992,7 @@ To use the module, you will need to include the following dependency in your pro
 <dependency>
   <groupId>us.abstracta.jmeter</groupId>
   <artifactId>jmeter-java-dsl-elasticsearch-listener</artifactId>
-  <version>1.1-SNAPSHOT</version>
+  <version>1.3</version>
   <scope>test</scope>
 </dependency>
 ```
@@ -1005,7 +1005,7 @@ maven { url 'https://jitpack.io' }
 
 And the dependency:
 ```groovy
-testImplementation 'us.abstracta.jmeter:jmeter-java-dsl-elasticsearch-listener:1.1-SNAPSHOT'
+testImplementation 'us.abstracta.jmeter:jmeter-java-dsl-elasticsearch-listener:1.3'
 ```
 
 :::
@@ -1109,14 +1109,14 @@ To use it, you need to add the following dependency:
 <dependency>
   <groupId>us.abstracta.jmeter</groupId>
   <artifactId>jmeter-java-dsl-dashboard</artifactId>
-  <version>1.1-SNAPSHOT</version>
+  <version>1.3</version>
   <scope>test</scope>
 </dependency>
 ```
 :::
 ::: tab Gradle
 ```groovy
-testImplementation 'us.abstracta.jmeter:jmeter-java-dsl-dashboard:1.1-SNAPSHOT'
+testImplementation 'us.abstracta.jmeter:jmeter-java-dsl-dashboard:1.3'
 ```
 :::
 ::::
@@ -1273,7 +1273,7 @@ JSR223PostProcessor is a very powerful tool but is not the only, nor the best, a
 
 It is a usual requirement while creating a test plan for an application to be able to use part of a response (e.g.: a generated ID, token, etc.) in a subsequent request. This can be easily achieved using JMeter extractors and variables.
 
-#### Regular Expression Extractor
+#### Regular expressions extraction
 
 Here is an example with jmeter-java-dsl using regular expressions:
 
@@ -1309,7 +1309,7 @@ public class PerformanceTest {
 
 Check [DslRegexExtractor](../../jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/postprocessors/DslRegexExtractor.java) for more details and additional options.
 
-#### Boundary Extractors
+#### Boundaries based extraction
 
 Regular expressions are quite powerful and flexible, but also are complex and performance might not be optimal in some scenarios. When you know that desired extraction is always surrounded by some specific text that never varies, then you can use `boundaryExtractor` which is simpler and in many cases more performant:
 
@@ -1345,7 +1345,7 @@ public class PerformanceTest {
 
 Check [DslBoundaryExtractor](../../jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/postprocessors/DslBoundaryExtractor.java) for more details and additional options.
 
-#### JSON Extractor
+#### JSON extraction
 
 When the response of a request is JSON, then you can use `jsonExtractor` by using [JMESPath query](https://jmespath.org/) like in the following example:
 
@@ -1484,7 +1484,7 @@ JMeter automatically generates a variable `__jm__<loopName>__idx` with the curre
 
 Check [DslForEachController](../../jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/controllers/DslForEachController.java) for more details.
 
-#### While Controller
+#### Iterating while a condition is met
 
 If at any time you want to execute a given part of a test plan, inside a thread iteration, while a condition is met, then you can use `whileController` (internally using [JMeter While Controller](https://jmeter.apache.org/usermanual/component_reference.html#While_Controller)) like in the following example:
 
@@ -1554,7 +1554,7 @@ The default name for the while controller, when not specified, is `while`.
 
 Check [DslWhileController](../../jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/controllers/DslWhileController.java) for more details.
 
-#### For Loop Controller
+#### Iterating a fixed number of times
 
 In simple scenarios where you just want to execute a fixed number of times, within a thread group iteration, a given part of the test plan, you can just use `forLoopController` (which uses [JMeter Loop Controller component](https://jmeter.apache.org/usermanual/component_reference.html#Loop_Controller)) as in the following example:
 
@@ -1592,9 +1592,47 @@ JMeter automatically generates a variable `__jm__<loopName>__idx` with the curre
 
 Check [ForLoopController](../../jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/controllers/ForLoopController.java) for more details.
 
-#### Once Only Controller
+### Iterating for a given period
 
-In some cases, you only need to run part of a test plan once. For these need, you can use `onceOnlyController`. This controller will execute a part of the test plan only one time on the first iteration (using [JMeter Once Only Controller Component](https://jmeter.apache.org/usermanual/component_reference.html#Once_Only_Controller)).
+In some scenarios you might want to execute a given logic until all the steps are executed or a given period of time has passed. In these scenarios you can use `runtimeController` which stops executing children elements when a specified time is reached.
+
+Here is an example which makes requests to a page until token expires by using `runtimeController` in combination with `whileController`.
+
+```java
+import static org.assertj.core.api.Assertions.assertThat;
+import static us.abstracta.jmeter.javadsl.JmeterDsl.*;
+
+import java.io.IOException;
+import java.time.Duration;
+import org.junit.jupiter.api.Test;
+import us.abstracta.jmeter.javadsl.core.TestPlanStats;
+
+public class PerformanceTest {
+
+  @Test
+  public void testPerformance() throws IOException {
+    Duration tokenExpiration = Duration.ofSeconds(5);
+    TestPlanStats stats = testPlan(
+        threadGroup(2, 10,
+            httpSampler("http://my.service/token"),
+            runtimeController(tokenExpiration,
+                whileController("true",
+                    httpSampler("http://my.service/accounts")
+                )
+            )
+        )
+    ).run();
+    assertThat(stats.overall().sampleTimePercentile99()).isLessThan(Duration.ofSeconds(5));
+  }
+
+}
+```
+
+Check [DslRuntimeController](../../jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/controllers/DslRuntimeController.java) for more details.
+
+#### Execute only once in thread
+
+In some cases, you only need to run part of a test plan once. For these need, you can use `onceOnlyController`. This controller will execute a part of the test plan only one time on the first iteration of each thread (using [JMeter Once Only Controller Component](https://jmeter.apache.org/usermanual/component_reference.html#Once_Only_Controller)).
 
 You can use this, for example, for one-time authorization or for setting JMeter variables or properties.
 
@@ -1934,14 +1972,14 @@ To use it, add the following dependency to your project:
 <dependency>
   <groupId>us.abstracta.jmeter</groupId>
   <artifactId>jmeter-java-dsl-parallel</artifactId>
-  <version>1.1-SNAPSHOT</version>
+  <version>1.3</version>
   <scope>test</scope>
 </dependency>
 ```
 :::
 ::: tab Gradle
 ```groovy
-testImplementation 'us.abstracta.jmeter:jmeter-java-dsl-dashboard:1.1-SNAPSHOT'
+testImplementation 'us.abstracta.jmeter:jmeter-java-dsl-dashboard:1.3'
 ```
 :::
 ::::
@@ -1979,7 +2017,7 @@ By default, the controller has no limit on the number of parallel requests per J
 :::
 
 ::: tip
-When requesting embedded resources of an HTML response, prefer using `downloadEmbeddedResources(boolean)` method in `httpSampler` instead. Likewise, when you just need independent parts of a test plan to execute in parallel, prefer using different thread groups for each part.
+When requesting embedded resources of an HTML response, prefer using `downloadEmbeddedResources()` method in `httpSampler` instead. Likewise, when you just need independent parts of a test plan to execute in parallel, prefer using different thread groups for each part.
 :::
 
 Check [ParallelController](../../jmeter-java-dsl-parallel/src/main/java/us/abstracta/jmeter/javadsl/parallel/ParallelController.java) for additional info.
@@ -2381,6 +2419,10 @@ This will make JMeter automatically parse the HTTP response for embedded resourc
 
 Check [JMeter documentation](https://jmeter.apache.org/usermanual/component_reference.html#HTTP_Request) for additional details on downloaded embedded resources.
 
+::: tip
+You can use `downloadEmbeddedResourcesNotMatching(urlRegex)` and `downloadEmbeddedResourcesMatching(urlRegex)` methods if you need to ignore, or only download, some embedded resources requests. For example, when some requests are not related to the system under test. 
+:::
+
 ::: warning
 The DSL, unlike JMeter, uses by default concurrent download of embedded resources (with up to 6 parallel downloads), which is the most used scenario to emulate browser behavior.
 :::
@@ -2552,14 +2594,14 @@ When you want to test a GraphQL service, having properly set each field in an HT
 <dependency>
   <groupId>us.abstracta.jmeter</groupId>
   <artifactId>jmeter-java-dsl-graphql</artifactId>
-  <version>1.1-SNAPSHOT</version>
+  <version>1.3</version>
   <scope>test</scope>
 </dependency>
 ```
 :::
 ::: tab Gradle
 ```groovy
-testImplementation 'us.abstracta.jmeter:jmeter-java-dsl-graphql:1.1-SNAPSHOT'
+testImplementation 'us.abstracta.jmeter:jmeter-java-dsl-graphql:1.3'
 ```
 :::
 ::::
@@ -2645,14 +2687,14 @@ Including the following dependency in your project:
 <dependency>
   <groupId>us.abstracta.jmeter</groupId>
   <artifactId>jmeter-java-dsl-jdbc</artifactId>
-  <version>1.1-SNAPSHOT</version>
+  <version>1.3</version>
   <scope>test</scope>
 </dependency>
 ```
 :::
 ::: tab Gradle
 ```groovy
-testImplementation 'us.abstracta.jmeter:jmeter-java-dsl-jdbc:1.1-SNAPSHOT'
+testImplementation 'us.abstracta.jmeter:jmeter-java-dsl-jdbc:1.3'
 ```
 :::
 ::::
@@ -2893,14 +2935,14 @@ Include the module on your project:
 <dependency>
   <groupId>us.abstracta.jmeter</groupId>
   <artifactId>jmeter-java-dsl-wrapper</artifactId>
-  <version>1.1-SNAPSHOT</version>
+  <version>1.3</version>
   <scope>test</scope>
 </dependency>
 ```
 :::
 ::: tab Gradle
 ```groovy
-testImplementation 'us.abstracta.jmeter:jmeter-java-dsl-wrapper:1.1-SNAPSHOT'
+testImplementation 'us.abstracta.jmeter:jmeter-java-dsl-wrapper:1.3'
 ```
 :::
 ::::

@@ -7,7 +7,7 @@
   <groupId>us.abstracta.jmeter</groupId>
   <artifactId>jmeter-java-dsl-parent</artifactId>
   <packaging>pom</packaging>
-  <version>1.1-SNAPSHOT</version>
+  <version>1.4-SNAPSHOT</version>
 
   <name>${project.artifactId}</name>
   <description>Parent project for all jmeter-java-dsl modules</description>
@@ -45,13 +45,15 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-    <project.build.outputTimestamp>1667589889</project.build.outputTimestamp>
+    <project.build.outputTimestamp>1668796694</project.build.outputTimestamp>
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
     <jmeter.version>5.5</jmeter.version>
-    <testcontainers.version>1.17.3</testcontainers.version>
-    <wiremock.version>2.33.2</wiremock.version>
-    <junit.version>5.9.0</junit.version>
+    <testcontainers.version>1.17.6</testcontainers.version>
+    <wiremock.version>2.35.0</wiremock.version>
+    <junit.version>5.9.1</junit.version>
+    <junit-platform.version>1.9.1</junit-platform.version>
+    <assertj-core.version>3.23.1</assertj-core.version>
     <!-- same version as JMeter dependency -->
     <jackson.version>2.13.4</jackson.version>
   </properties>
@@ -106,7 +108,7 @@
     <dependency>
       <groupId>org.assertj</groupId>
       <artifactId>assertj-core</artifactId>
-      <version>3.23.1</version>
+      <version>${assertj-core.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -124,13 +126,13 @@
     <dependency>
       <groupId>org.junit.platform</groupId>
       <artifactId>junit-platform-commons</artifactId>
-      <version>1.9.0</version>
+      <version>${junit-platform.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.junit-pioneer</groupId>
       <artifactId>junit-pioneer</artifactId>
-      <version>1.7.1</version>
+      <version>1.9.0</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -142,7 +144,7 @@
     <dependency>
       <groupId>com.github.javaparser</groupId>
       <artifactId>javaparser-core</artifactId>
-      <version>3.24.4</version>
+      <version>3.24.8</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
@@ -164,7 +166,7 @@
         <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
-        <version>3.2.2</version>
+        <version>3.3.0</version>
         </plugin>
       </plugins>
     </pluginManagement>
@@ -183,7 +185,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-checkstyle-plugin</artifactId>
-        <version>3.1.2</version>
+        <version>3.2.0</version>
         <executions>
           <execution>
             <id>validate</id>
@@ -224,7 +226,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
-        <version>3.4.0</version>
+        <version>3.4.1</version>
         <executions>
           <execution>
             <id>attach-javadocs</id>

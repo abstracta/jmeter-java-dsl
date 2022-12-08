@@ -130,7 +130,7 @@ public abstract class AutoEnabledHttpConfigElement extends BaseConfigElement {
     private boolean findConfigElementInSamplerScope(MethodCallContext samplerContext) {
       MethodCallContext parent = samplerContext.getParent();
       return samplerContext.getChildrenTree().list().stream()
-          .anyMatch(testElementClass::isInstance)
+          .anyMatch(e -> testElementClass.isInstance(e) && ((TestElement) e).isEnabled())
           || parent != null && findConfigElementInSamplerScope(parent);
     }
 
@@ -140,7 +140,7 @@ public abstract class AutoEnabledHttpConfigElement extends BaseConfigElement {
         addDisabledChild(call);
         return;
       }
-      CallContextEntry parentEntry = getOrCreateContextEntry(parentContext);
+      CallContextEntry parentEntry = solveContextEntry(parentContext);
       parentEntry.pendingDisableConfigs.add(call);
       if (parentEntry.endListenerRegistered) {
         return;
@@ -159,21 +159,19 @@ public abstract class AutoEnabledHttpConfigElement extends BaseConfigElement {
       call.child(buildMethodCall().chain("disable"));
     }
 
-    private CallContextEntry getOrCreateContextEntry(MethodCallContext context) {
-      CallContextEntry ctx = (CallContextEntry) context.getEntry(getClass());
-      if (ctx == null) {
-        ctx = new CallContextEntry();
-        context.setEntry(getClass(), ctx);
-      }
-      return ctx;
+    private CallContextEntry solveContextEntry(MethodCallContext context) {
+      return context.computeEntryIfAbsent(getClass(), CallContextEntry::new);
     }
 
     @Override
     protected MethodCall buildMethodCall(T testElement, MethodCallContext context) {
+      if (!testElement.isEnabled()) {
+        return MethodCall.emptyCall();
+      }
       if (findSamplerInConfigScope(context)) {
         MethodCallContext parent = context.getParent();
         while (parent != null) {
-          getOrCreateContextEntry(parent).hasChildWithConfig = true;
+          solveContextEntry(parent).hasChildWithConfig = true;
           parent = parent.getParent();
         }
         return MethodCall.emptyCall();
@@ -190,7 +188,8 @@ public abstract class AutoEnabledHttpConfigElement extends BaseConfigElement {
 
     private boolean findSamplerInTree(HashTree tree) {
       return tree != null && tree.list().stream()
-          .anyMatch(c -> c instanceof HTTPSamplerProxy || findSamplerInTree(tree.getTree(c)));
+          .anyMatch(c -> ((TestElement) c).isEnabled() && (c instanceof HTTPSamplerProxy
+              || findSamplerInTree(tree.getTree(c))));
     }
 
     private static class CallContextEntry {

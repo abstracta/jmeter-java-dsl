@@ -1,0 +1,3 @@
+org.assertj:assertj-core:${assertj-core.version}
+org.junit.jupiter:junit-jupiter-engine:${junit.version}
+org.junit.platform:junit-platform-launcher:${junit-platform.version}
