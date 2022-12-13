@@ -39,6 +39,7 @@ import us.abstracta.jmeter.javadsl.core.threadgroups.DslDefaultThreadGroup;
 import us.abstracta.jmeter.javadsl.core.threadgroups.DslSetupThreadGroup;
 import us.abstracta.jmeter.javadsl.core.threadgroups.DslTeardownThreadGroup;
 import us.abstracta.jmeter.javadsl.core.threadgroups.RpsThreadGroup;
+import us.abstracta.jmeter.javadsl.core.timers.DslConstantThroughputTimer;
 import us.abstracta.jmeter.javadsl.core.timers.DslConstantTimer;
 import us.abstracta.jmeter.javadsl.core.timers.DslUniformRandomTimer;
 import us.abstracta.jmeter.javadsl.core.util.PropertyScriptBuilder.PropertyScript;
@@ -1334,12 +1335,27 @@ public class JmeterDsl {
   }
 
   /**
+   * Builds a ConstantThrouputTimer which paces samplers to achieve a target constant throughput.
+   *
+   * @param throughput specifies the target samples per minute.
+   * @param mode       specifies the calculation mode to apply.
+   * @return the timer for usage in test plan.
+   * @see DslConstantThroughputTimer
+   */
+
+  public static DslConstantThroughputTimer constantThroughputTimer(
+                DslConstantThroughputTimer.CalcModes mode, Double throughput) {
+    return new DslConstantThroughputTimer(mode, throughput);
+  }
+
+  /**
    * Builds a Constant Timer which pauses the thread with for a given duration.
    *
    * @param duration specifies the duration for the timer to wait.
    * @return the timer for usage in test plan.
    * @since 1.0
    */
+
   public static DslConstantTimer constantTimer(Duration duration) {
     return new DslConstantTimer(duration);
   }
