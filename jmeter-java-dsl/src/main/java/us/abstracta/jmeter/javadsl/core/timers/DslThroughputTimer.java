@@ -19,19 +19,19 @@ import us.abstracta.jmeter.javadsl.codegeneration.TestElementParamBuilder;
  * <p>
  *  There are two different ways of pacing the requests: - delay each thread according to when it
  *  last ran - delay each thread according to when any thread last ran.
- *  The positioning of the timer also determines it's scope i.e at test plan level to control the
+ *  The positioning of the timer also determines it's scope i.e. at test plan level to control the
  *  pacing of multiple samples across multiple threads or under a Thread Group to just influence
  *  samplers in that THread Group or as a child of a sampler to only control that sampler (other
  *  samplers in the same  Thread group maybe influenced but are not directly being paused.
  *
- * @since 0.62
+ * @since 1.4
  */
-public class DslConstantThroughputTimer extends BaseTimer {
+public class DslThroughputTimer extends BaseTimer {
 
   protected  Double throughput;
   protected String calcMode;
 
-  public enum CalcModes {
+  private enum CalcModes {
     ThisThreadOnly,
     AllActiveThreads,
     AllActiveThreadsInCurrentThreadGroup,
@@ -39,10 +39,10 @@ public class DslConstantThroughputTimer extends BaseTimer {
     AllActiveThreadsInCurrentThreadGroup_Shared
   }
 
-  public DslConstantThroughputTimer(CalcModes mode, Double samplesPerMinute) {
+  public DslThroughputTimer(Double samplesPerMinute) {
     super("Constant Throughput Timer", TestBeanGUI.class);
     this.throughput = samplesPerMinute;
-    this.calcMode = String.valueOf(mode);
+    this.calcMode = String.valueOf(CalcModes.AllActiveThreadsInCurrentThreadGroup_Shared);
 
   }
 
@@ -55,6 +55,22 @@ public class DslConstantThroughputTimer extends BaseTimer {
     ret.setThroughput(throughput);
 
     return ret;
+  }
+
+  public DslThroughputTimer modeThisThreadOnly() {
+
+    this.calcMode = String.valueOf(CalcModes.ThisThreadOnly);
+
+    return this;
+
+  }
+
+  public DslThroughputTimer modeAllActiveThreadsShared() {
+
+    this.calcMode = String.valueOf(CalcModes.AllActiveThreads_Shared);
+
+    return this;
+
   }
 
   public static class CodeBuilder extends SingleTestElementCallBuilder<ConstantThroughputTimer> {

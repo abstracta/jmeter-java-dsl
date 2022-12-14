@@ -39,8 +39,8 @@ import us.abstracta.jmeter.javadsl.core.threadgroups.DslDefaultThreadGroup;
 import us.abstracta.jmeter.javadsl.core.threadgroups.DslSetupThreadGroup;
 import us.abstracta.jmeter.javadsl.core.threadgroups.DslTeardownThreadGroup;
 import us.abstracta.jmeter.javadsl.core.threadgroups.RpsThreadGroup;
-import us.abstracta.jmeter.javadsl.core.timers.DslConstantThroughputTimer;
 import us.abstracta.jmeter.javadsl.core.timers.DslConstantTimer;
+import us.abstracta.jmeter.javadsl.core.timers.DslThroughputTimer;
 import us.abstracta.jmeter.javadsl.core.timers.DslUniformRandomTimer;
 import us.abstracta.jmeter.javadsl.core.util.PropertyScriptBuilder.PropertyScript;
 import us.abstracta.jmeter.javadsl.http.DslCacheManager;
@@ -1335,17 +1335,23 @@ public class JmeterDsl {
   }
 
   /**
-   * Builds a ConstantThrouputTimer which paces samplers to achieve a target constant throughput.
+   * Builds a ConstantThroughputTimer which paces samplers to achieve a target constant throughput.
+   * NB The default calculation mode is 'All Threads In Current ThreadGroup (Shared)'.
+   * 2 other common calc modes are available to set-
+   * modeThisThreadOnly: applies the throughput per thread i.e. more threads will increase the
+   * overall throughput
+   * modeAllActiveThreadsShared: applies the target throughput to all threads and samples so that
+   * the overall test throughput matches the target. Timer must be at TestPlan level for this to
+   * work properly
    *
    * @param throughput specifies the target samples per minute.
-   * @param mode       specifies the calculation mode to apply.
    * @return the timer for usage in test plan.
-   * @see DslConstantThroughputTimer
+   * @see DslThroughputTimer
+   * @since 1.4
    */
 
-  public static DslConstantThroughputTimer constantThroughputTimer(
-                DslConstantThroughputTimer.CalcModes mode, Double throughput) {
-    return new DslConstantThroughputTimer(mode, throughput);
+  public static DslThroughputTimer throughputTimer(Double throughput) {
+    return new DslThroughputTimer(throughput);
   }
 
   /**
