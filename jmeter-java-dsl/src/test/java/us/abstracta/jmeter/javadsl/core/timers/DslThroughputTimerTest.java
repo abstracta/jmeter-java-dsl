@@ -9,7 +9,7 @@ import java.time.*;
 import static org.assertj.core.api.Assertions.*;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.*;
 
-public class DslConstantThroughputTimerTest extends JmeterDslTest {
+public class DslThroughputTimerTest extends JmeterDslTest {
 
   @Test
   public void checkCorrectSamplesThroughputTimerDefaultCalcModeAllThreadsInThreadGroupShared() throws Exception {
@@ -20,7 +20,7 @@ public class DslConstantThroughputTimerTest extends JmeterDslTest {
                     throughputTimer(120.0))
     ).run();
 
-    assertThat(stats.byLabel ("dummy").samplesCount()).isBetween(18L,20L);
+    assertThat(stats.byLabel ("dummy").samplesCount()).isEqualTo(20L);
   }
 
   @Test

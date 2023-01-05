@@ -1889,6 +1889,56 @@ Timers apply to all samplers in their scope, adding a pause after pre-processor 
 The generated JMeter test element uses the `Constant Delay Offset` set to `minimum` value, and the `Maximum random delay` set to `(maximum - minimum)` value.
 :::
 
+### Control Throughput
+
+To achieve a specific constant throughput for specific samplers, all samplers in a Thread Group or the entire Test Plan, the `throughputTimer` can be used, which uses JMeter ConstantThroughputTimer.
+
+The default calculation mode is 'AllThreadsInThreadGroupShared' which means that the target throughput is based on all the threads in the Thread Group where the throughputTimer is used.
+
+Here is an example:
+
+```java
+import static org.assertj.core.api.Assertions.assertThat;
+import static us.abstracta.jmeter.javadsl.JmeterDsl.*;
+
+import org.junit.jupiter.api.Test;
+import us.abstracta.jmeter.javadsl.core.TestPlanStats;
+
+public class PerformanceTest {
+
+  @Test
+  public void testPerformance() throws Exception {
+    TestPlanStats stats = testPlan(
+            threadGroup (10,Duration.ofSeconds(10),
+                    dummySampler ("dummy","foo"),
+                    throughputTimer(120.0)) // targetting 120 samples per minute
+    ).run();
+
+    assertThat(stats.byLabel ("dummy").samplesCount()).isEqualTo(20L);
+  }
+  }
+
+}
+```
+
+Other calculation modes available are:
+```java
+                      throughputTimer(120.0)
+                          .modeThisThreadOnly()
+```
+
+and
+```java
+                      throughputTimer(120.0)
+                          .AllActiveThreadsShared()
+```
+
+::: warning
+The troughput timer works by pausing requests to achieve a constant throughtput so the response times and number of threads must be sufficient to achieve the target throughput.
+The placement (scope) of the throughputTimer will determines it's behaviour. i.e if modeAllActiveThreadsShared() is used then the timer must be at TestPlan level for it to work correctly.  
+:::
+
+
 ### Execute part of a test plan part a fraction of the times
 
 In some cases, you may want to execute a given part of the test plan not in every iteration, and only for a given percent of times, to emulate certain probabilistic nature of the flow the users execute.
