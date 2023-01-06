@@ -8,6 +8,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import org.apache.jmeter.reporters.ResultCollector;
 import org.apache.jmeter.samplers.SampleSaveConfiguration;
@@ -16,6 +17,7 @@ import org.apache.jmeter.util.JMeterUtils;
 import org.apache.jmeter.visualizers.SimpleDataWriter;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodCall;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodCallContext;
+import us.abstracta.jmeter.javadsl.codegeneration.MethodParam;
 import us.abstracta.jmeter.javadsl.codegeneration.SingleTestElementCallBuilder;
 import us.abstracta.jmeter.javadsl.codegeneration.TestElementParamBuilder;
 import us.abstracta.jmeter.javadsl.codegeneration.params.BoolParam;
@@ -42,6 +44,7 @@ import us.abstracta.jmeter.javadsl.codegeneration.params.StringParam;
 public class JtlWriter extends BaseListener {
 
   protected String jtlFile;
+  protected SampleStatus logOnly;
   protected boolean saveAsXml;
   protected boolean saveElapsedTime = true;
   protected boolean saveResponseMessage = true;
@@ -87,43 +90,24 @@ public class JtlWriter extends BaseListener {
     return timeFormatter.format(Instant.now()) + " " + UUID.randomUUID() + ".jtl";
   }
 
-  @Override
-  public TestElement buildTestElement() {
-    ResultCollector logger = new ResultCollector();
-    logger.setFilename(jtlFile);
-    SampleSaveConfiguration config = logger.getSaveConfig();
-    config.setAsXml(saveAsXml);
-    config.setTime(saveElapsedTime);
-    config.setMessage(saveResponseMessage);
-    config.setSuccess(saveSuccess);
-    config.setSentBytes(saveSentByteCount);
-    config.setFileName(saveResponseFilename);
-    config.setEncoding(saveEncoding);
-    config.setIdleTime(saveIdleTime);
-    config.setResponseHeaders(saveResponseHeaders);
-    config.setAssertions(saveAssertionResults);
-    config.setFieldNames(saveFieldNames);
-    config.setLabel(saveLabel);
-    config.setThreadName(saveThreadName);
-    config.setAssertionResultsFailureMessage(saveAssertionFailureMessage);
-    config.setThreadCounts(saveActiveThreadCounts);
-    config.setLatency(saveLatency);
-    config.setSampleCount(saveSampleAndErrorCounts);
-    config.setRequestHeaders(saveRequestHeaders);
-    config.setResponseData(saveResponseData);
-    config.setTimestamp(saveTimeStamp);
-    config.setCode(saveResponseCode);
-    config.setDataType(saveDataType);
-    config.setBytes(saveReceivedByteCount);
-    config.setUrl(saveUrl);
-    config.setConnectTime(saveConnectTime);
-    config.setHostname(saveHostname);
-    config.setSamplerData(saveSamplerData);
-    config.setSubresults(saveSubResults);
-    if (!sampleVariables.isEmpty()) {
-      JMeterUtils.setProperty("sample_variables", String.join(",", sampleVariables));
-    }
-    return logger;
+  /**
+   * Allows filtering which sample results to log according to their status.
+   * <p>
+   * This is useful, for example, when you want to have a jtl file with basic information for
+   * success sample results, but a more detailed jtl file for the ones that fail.
+   *
+   * @param status specifies the status of the sample results to log. When set to null it will log
+   *               all sample results. By default, it is set to null.
+   * @return the JtlWriter for further configuration or usage.
+   * @since 1.4
+   */
+  public JtlWriter logOnly(SampleStatus status) {
+    this.logOnly = status;
+    return this;
+  }
+
+  public enum SampleStatus {
+    SUCCESS, ERROR
   }
 
   /**
@@ -665,6 +649,49 @@ public class JtlWriter extends BaseListener {
     return this;
   }
 
+  @Override
+  public TestElement buildTestElement() {
+    ResultCollector logger = new ResultCollector();
+    logger.setFilename(jtlFile);
+    if (logOnly != null) {
+      logger.setSuccessOnlyLogging(logOnly == SampleStatus.SUCCESS);
+      logger.setErrorLogging(logOnly == SampleStatus.ERROR);
+    }
+    SampleSaveConfiguration config = logger.getSaveConfig();
+    config.setAsXml(saveAsXml);
+    config.setTime(saveElapsedTime);
+    config.setMessage(saveResponseMessage);
+    config.setSuccess(saveSuccess);
+    config.setSentBytes(saveSentByteCount);
+    config.setFileName(saveResponseFilename);
+    config.setEncoding(saveEncoding);
+    config.setIdleTime(saveIdleTime);
+    config.setResponseHeaders(saveResponseHeaders);
+    config.setAssertions(saveAssertionResults);
+    config.setFieldNames(saveFieldNames);
+    config.setLabel(saveLabel);
+    config.setThreadName(saveThreadName);
+    config.setAssertionResultsFailureMessage(saveAssertionFailureMessage);
+    config.setThreadCounts(saveActiveThreadCounts);
+    config.setLatency(saveLatency);
+    config.setSampleCount(saveSampleAndErrorCounts);
+    config.setRequestHeaders(saveRequestHeaders);
+    config.setResponseData(saveResponseData);
+    config.setTimestamp(saveTimeStamp);
+    config.setCode(saveResponseCode);
+    config.setDataType(saveDataType);
+    config.setBytes(saveReceivedByteCount);
+    config.setUrl(saveUrl);
+    config.setConnectTime(saveConnectTime);
+    config.setHostname(saveHostname);
+    config.setSamplerData(saveSamplerData);
+    config.setSubresults(saveSubResults);
+    if (!sampleVariables.isEmpty()) {
+      JMeterUtils.setProperty("sample_variables", String.join(",", sampleVariables));
+    }
+    return logger;
+  }
+
   public static class CodeBuilder extends SingleTestElementCallBuilder<ResultCollector> {
 
     public CodeBuilder(List<Method> builderMethods) {
@@ -695,6 +722,7 @@ public class JtlWriter extends BaseListener {
       if (isAllSet(config)) {
         return ret.chain("withAllFields", new BoolParam(true, false));
       }
+      ret.chain("logOnly", SampleStatusParam.fromParamBuilder(paramBuilder));
       return ret.chain("saveAsXml", new BoolParam(config.saveAsXml(), false))
           .chain("withElapsedTime", new BoolParam(config.saveTime(), true))
           .chain("withResponseMessage", new BoolParam(config.saveMessage(), true))
@@ -737,6 +765,47 @@ public class JtlWriter extends BaseListener {
           && config.saveDataType() && config.saveBytes() && config.saveUrl()
           && config.saveConnectTime() && config.saveHostname() && config.saveSamplerData()
           && config.saveSubresults();
+    }
+
+  }
+
+  private static class SampleStatusParam extends MethodParam {
+
+    private final SampleStatus sampleStatus;
+
+    private SampleStatusParam(SampleStatus sampleStatus) {
+      super(SampleStatus.class, null);
+      this.sampleStatus = sampleStatus;
+    }
+
+    public static MethodParam fromParamBuilder(TestElementParamBuilder paramBuilder) {
+      SampleStatus status = null;
+      MethodParam successOnly = paramBuilder.boolParam(
+          "ResultCollector.success_only_logging", false);
+      if (!successOnly.isDefault()) {
+        status = SampleStatus.SUCCESS;
+      } else {
+        MethodParam errorOnly = paramBuilder.boolParam("ResultCollector.error_logging", false);
+        if (!errorOnly.isDefault()) {
+          status = SampleStatus.ERROR;
+        }
+      }
+      return new SampleStatusParam(status);
+    }
+
+    @Override
+    public boolean isDefault() {
+      return sampleStatus == null;
+    }
+
+    @Override
+    public Set<String> getImports() {
+      return Collections.singleton(SampleStatus.class.getName());
+    }
+
+    @Override
+    protected String buildCode(String indent) {
+      return SampleStatus.class.getSimpleName() + "." + sampleStatus.name();
     }
 
   }

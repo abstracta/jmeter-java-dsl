@@ -19,6 +19,7 @@ import us.abstracta.jmeter.javadsl.JmeterDslTest;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodCallBuilderTest;
 import us.abstracta.jmeter.javadsl.core.DslTestPlan;
 import us.abstracta.jmeter.javadsl.core.StringTemplateAssert;
+import us.abstracta.jmeter.javadsl.core.listeners.JtlWriter.SampleStatus;
 
 public class JtlWriterTest extends JmeterDslTest {
 
@@ -162,7 +163,7 @@ public class JtlWriterTest extends JmeterDslTest {
   @Nested
   public class CodeBuilderTest extends MethodCallBuilderTest {
 
-    public DslTestPlan simpleTestPlanWithJtlWriterAndDefaultSaves() {
+    public DslTestPlan testPlanWithJtlWriterAndDefaultSaves() {
       return testPlan(
           threadGroup(1, 1,
               httpSampler("http://localhost")
@@ -171,7 +172,27 @@ public class JtlWriterTest extends JmeterDslTest {
       );
     }
 
-    public DslTestPlan simpleTestPlanWithJtlWriterSavingAllFields() {
+    public DslTestPlan testPlanWithJtlWriterOnlyLoggingSuccessSampleResults() {
+      return testPlan(
+          threadGroup(1, 1,
+              httpSampler("http://localhost")
+          ),
+          jtlWriter("", "results.jtl")
+              .logOnly(SampleStatus.SUCCESS)
+      );
+    }
+
+    public DslTestPlan testPlanWithJtlWriterOnlyLoggingErrorSampleResults() {
+      return testPlan(
+          threadGroup(1, 1,
+              httpSampler("http://localhost")
+          ),
+          jtlWriter("", "results.jtl")
+              .logOnly(SampleStatus.ERROR)
+      );
+    }
+
+    public DslTestPlan testPlanWithJtlWriterSavingAllFields() {
       return testPlan(
           threadGroup(1, 1,
               httpSampler("http://localhost")
@@ -181,7 +202,7 @@ public class JtlWriterTest extends JmeterDslTest {
       );
     }
 
-    public DslTestPlan simpleTestPlanWithJtlWriterAndSavingNonDefaultFields() {
+    public DslTestPlan testPlanWithJtlWriterAndSavingNonDefaultFields() {
       return testPlan(
           threadGroup(1, 1,
               httpSampler("http://localhost")

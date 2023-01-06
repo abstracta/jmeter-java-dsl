@@ -866,7 +866,26 @@ public class PerformanceTest {
 }
 ```
 
+::: tip
 By default, `jtlWriter` will write the most used information to evaluate the performance of the tested service. If you want to trace all the information of each request you may use `jtlWriter` with `withAllFields()` option. Doing this will provide all the information at the cost of additional computation and resource usage (fewer resources for actual load testing). You can tune which fields to include or not with `jtlWriter` and only log what you need, check [JtlWriter](../../jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/listeners/JtlWriter.java) for more details.
+:::
+
+::: tip
+By default, `jtlWriter` will log every sample result, but in some cases you might want to log additional info when a sample result fails. In such scenarios you can use two `jtlWriter` instances like in this example:
+
+```java
+testPlan(
+    threadGroup(2, 10,
+        httpSampler("http://my.service")
+    ),
+    jtlWriter("target/jtls/success")
+      .logOnly(SampleStatus.SUCCESS),
+    jtlWriter("target/jtls/error")
+      .logOnly(SampleStatus.ERROR)
+      .withAllFields(true)
+)
+```
+:::
 
 ::: tip
 `jtlWriter` will automatically generate `.jtl` files applying this format: `<yyyy-MM-dd HH-mm-ss> <UUID>.jtl`.
