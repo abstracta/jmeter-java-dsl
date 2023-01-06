@@ -110,6 +110,10 @@ When working with multiple samplers in a test plan, specify their names (eg: `ht
 :::
 
 ::: tip
+Set connection and response timeouts to avoid potential execution differences when running test plan in different machines. [Here](#timeouts) are more details.
+:::
+
+::: tip
 Since JMeter uses [log4j2](https://logging.apache.org/log4j/2.x/), if you want to control the logging level or output, you can use something similar to this [log4j2.xml](../../jmeter-java-dsl/src/test/resources/log4j2.xml).
 :::
 
@@ -2354,6 +2358,25 @@ testPlan(
 )
 ```
 
+#### Timeouts
+
+By default, JMeter uses system default configurations for connection and response timeouts (maximum time for a connection to be established or a server response after a request, before it fails). This is might make the test behave different depending on the machine where it runs. To avoid this, it is recommended to always set these values. Here is an example:
+
+```
+testPlan(
+    httpDefaults()
+        .connectionTimeout(Duration.ofSeconds(10))
+        .responseTimeout(Duration.ofMinutes(1)),
+    threadGroup(2, 10,
+        httpSampler("http://my.service")
+    )
+)
+```
+
+::: warning
+Currently we are using same defaults as JMeter to avoid breaking existing test plans executions, but in a future major version we plan to change default setting to avoid the common pitfall previously mentioned.
+:::
+
 #### Connections
 
 jmeter-java-dsl, as JMeter (and also K6), by default **reuses HTTP connections between thread iterations** to avoid common issues with port and file descriptors exhaustion which require manual OS tuning and may manifest in many ways.
@@ -2378,7 +2401,7 @@ httpDefaults()
 ```
 
 * This and `resetConnectionsBetweenIterations` apply at the JVM level (due to JMeter limitation), so they affect all requests in the test plan and other ones potentially running in the same JVM instance.
-  :::
+:::
 
 ::: warning
 Using `clientImpl(HttpClientImpl.JAVA)` will ignore any of the previous settings and will reuse connections depending on JVM implementation.
