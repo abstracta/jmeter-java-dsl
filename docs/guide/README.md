@@ -29,7 +29,7 @@ To use the DSL just include it in your project:
 <dependency>
   <groupId>us.abstracta.jmeter</groupId>
   <artifactId>jmeter-java-dsl</artifactId>
-  <version>1.3</version>
+  <version>1.4</version>
   <scope>test</scope>
 </dependency>
 ```
@@ -50,7 +50,7 @@ class JmeterRule implements ComponentMetadataRule {
 
 dependencies {
     ...
-    testImplementation 'us.abstracta.jmeter:jmeter-java-dsl:1.3'
+    testImplementation 'us.abstracta.jmeter:jmeter-java-dsl:1.4'
     components {
         withModule("org.apache.jmeter:ApacheJMeter_core", JmeterRule)
         withModule("org.apache.jmeter:ApacheJMeter_java", JmeterRule)
@@ -137,7 +137,7 @@ java -jar jmx2dsl.jar test-plan.jmx
 :::
 ::: tab Jbang
 ```bash
-jbang us.abstracta.jmeter:jmeter-java-dsl-jmx2dsl:1.3 test-plan.jmx
+jbang us.abstracta.jmeter:jmeter-java-dsl-jmx2dsl:1.4 test-plan.jmx
 ```
 :::
 ::::
@@ -153,7 +153,7 @@ executable (eg: chmod +x ./PerformanceTest.java) and just executing it with ./Pe
 //DEPS org.assertj:assertj-core:3.23.1
 //DEPS org.junit.jupiter:junit-jupiter-engine:5.9.1
 //DEPS org.junit.platform:junit-platform-launcher:1.9.1
-//DEPS us.abstracta.jmeter:jmeter-java-dsl:1.3
+//DEPS us.abstracta.jmeter:jmeter-java-dsl:1.4
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.*;
@@ -228,14 +228,14 @@ By including the following module as a dependency:
 <dependency>
   <groupId>us.abstracta.jmeter</groupId>
   <artifactId>jmeter-java-dsl-blazemeter</artifactId>
-  <version>1.3</version>
+  <version>1.4</version>
   <scope>test</scope>
 </dependency>
 ```
 :::
 ::: tab Gradle
 ```groovy
-testImplementation 'us.abstracta.jmeter:jmeter-java-dsl-blazemeter:1.3'
+testImplementation 'us.abstracta.jmeter:jmeter-java-dsl-blazemeter:1.4'
 ```
 :::
 ::::
@@ -303,14 +303,14 @@ In the same fashion as with BlazeMeter, just by including the following module a
 <dependency>
   <groupId>us.abstracta.jmeter</groupId>
   <artifactId>jmeter-java-dsl-octoperf</artifactId>
-  <version>1.3</version>
+  <version>1.4</version>
   <scope>test</scope>
 </dependency>
 ```
 :::
 ::: tab Gradle
 ```groovy
-testImplementation 'us.abstracta.jmeter:jmeter-java-dsl-octoperf:1.3'
+testImplementation 'us.abstracta.jmeter:jmeter-java-dsl-octoperf:1.4'
 ```
 :::
 ::::
@@ -1015,7 +1015,7 @@ To use the module, you will need to include the following dependency in your pro
 <dependency>
   <groupId>us.abstracta.jmeter</groupId>
   <artifactId>jmeter-java-dsl-elasticsearch-listener</artifactId>
-  <version>1.3</version>
+  <version>1.4</version>
   <scope>test</scope>
 </dependency>
 ```
@@ -1028,7 +1028,7 @@ maven { url 'https://jitpack.io' }
 
 And the dependency:
 ```groovy
-testImplementation 'us.abstracta.jmeter:jmeter-java-dsl-elasticsearch-listener:1.3'
+testImplementation 'us.abstracta.jmeter:jmeter-java-dsl-elasticsearch-listener:1.4'
 ```
 
 :::
@@ -1132,14 +1132,14 @@ To use it, you need to add the following dependency:
 <dependency>
   <groupId>us.abstracta.jmeter</groupId>
   <artifactId>jmeter-java-dsl-dashboard</artifactId>
-  <version>1.3</version>
+  <version>1.4</version>
   <scope>test</scope>
 </dependency>
 ```
 :::
 ::: tab Gradle
 ```groovy
-testImplementation 'us.abstracta.jmeter:jmeter-java-dsl-dashboard:1.3'
+testImplementation 'us.abstracta.jmeter:jmeter-java-dsl-dashboard:1.4'
 ```
 :::
 ::::
@@ -1995,14 +1995,14 @@ To use it, add the following dependency to your project:
 <dependency>
   <groupId>us.abstracta.jmeter</groupId>
   <artifactId>jmeter-java-dsl-parallel</artifactId>
-  <version>1.3</version>
+  <version>1.4</version>
   <scope>test</scope>
 </dependency>
 ```
 :::
 ::: tab Gradle
 ```groovy
-testImplementation 'us.abstracta.jmeter:jmeter-java-dsl-dashboard:1.3'
+testImplementation 'us.abstracta.jmeter:jmeter-java-dsl-dashboard:1.4'
 ```
 :::
 ::::
@@ -2636,14 +2636,14 @@ When you want to test a GraphQL service, having properly set each field in an HT
 <dependency>
   <groupId>us.abstracta.jmeter</groupId>
   <artifactId>jmeter-java-dsl-graphql</artifactId>
-  <version>1.3</version>
+  <version>1.4</version>
   <scope>test</scope>
 </dependency>
 ```
 :::
 ::: tab Gradle
 ```groovy
-testImplementation 'us.abstracta.jmeter:jmeter-java-dsl-graphql:1.3'
+testImplementation 'us.abstracta.jmeter:jmeter-java-dsl-graphql:1.4'
 ```
 :::
 ::::
@@ -2729,14 +2729,14 @@ Including the following dependency in your project:
 <dependency>
   <groupId>us.abstracta.jmeter</groupId>
   <artifactId>jmeter-java-dsl-jdbc</artifactId>
-  <version>1.3</version>
+  <version>1.4</version>
   <scope>test</scope>
 </dependency>
 ```
 :::
 ::: tab Gradle
 ```groovy
-testImplementation 'us.abstracta.jmeter:jmeter-java-dsl-jdbc:1.3'
+testImplementation 'us.abstracta.jmeter:jmeter-java-dsl-jdbc:1.4'
 ```
 :::
 ::::
@@ -2977,14 +2977,14 @@ Include the module on your project:
 <dependency>
   <groupId>us.abstracta.jmeter</groupId>
   <artifactId>jmeter-java-dsl-wrapper</artifactId>
-  <version>1.3</version>
+  <version>1.4</version>
   <scope>test</scope>
 </dependency>
 ```
 :::
 ::: tab Gradle
 ```groovy
-testImplementation 'us.abstracta.jmeter:jmeter-java-dsl-wrapper:1.3'
+testImplementation 'us.abstracta.jmeter:jmeter-java-dsl-wrapper:1.4'
 ```
 :::
 ::::
