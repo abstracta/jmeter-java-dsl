@@ -389,16 +389,8 @@ public class DslHttpSampler extends DslBaseHttpSampler<DslHttpSampler> {
     }
     elem.setFollowRedirects(followRedirects);
     elem.setUseKeepAlive(true);
-    if (downloadEmbeddedResources) {
-      elem.setImageParser(true);
-      elem.setConcurrentDwn(true);
-      if (embeddedResourcesMatchRegex != null) {
-        elem.setEmbeddedUrlRE(embeddedResourcesMatchRegex);
-      }
-      if (embeddedResourcesNotMatchRegex != null) {
-        elem.setEmbeddedUrlExcludeRE(embeddedResourcesNotMatchRegex);
-      }
-    }
+    HttpElementHelper.modifyTestElementEmbeddedResources(elem, downloadEmbeddedResources,
+        embeddedResourcesMatchRegex, embeddedResourcesNotMatchRegex);
     if (clientImpl != null) {
       elem.setImplementation(clientImpl.propertyValue);
     }
@@ -461,12 +453,10 @@ public class DslHttpSampler extends DslBaseHttpSampler<DslHttpSampler> {
 
     @Override
     protected void chainAdditionalOptions(MethodCall ret, TestElementParamBuilder paramBuilder) {
-      ret.chain("encoding", paramBuilder.encodingParam(HTTPSamplerBase.CONTENT_ENCODING, null))
-          .chain("followRedirects", buildFollowRedirectsParam(paramBuilder))
-          .chain("downloadEmbeddedResources",
-              paramBuilder.boolParam(HTTPSamplerBase.IMAGE_PARSER, false))
-          .chain("clientImpl",
-              paramBuilder.enumParam(HTTPSamplerBase.IMPLEMENTATION, HttpClientImpl.HTTP_CLIENT));
+      HttpElementHelper.chainEncodingToMethodCall(ret, paramBuilder);
+      ret.chain("followRedirects", buildFollowRedirectsParam(paramBuilder));
+      HttpElementHelper.chainEmbeddedResourcesOptionsToMethodCall(ret, paramBuilder);
+      HttpElementHelper.chainClientImplToMethodCall(ret, paramBuilder);
     }
 
     @Override

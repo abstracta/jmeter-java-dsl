@@ -36,12 +36,14 @@ public class DslHttpDefaults extends BaseConfigElement {
   protected String port;
   protected String path;
   protected Charset encoding;
-  protected String proxyUrl;
-  protected String proxyUser;
-  protected String proxyPassword;
   protected boolean downloadEmbeddedResources;
   protected String embeddedResourcesMatchRegex;
   protected String embeddedResourcesNotMatchRegex;
+  protected Duration connectionTimeout;
+  protected Duration responseTimeout;
+  protected String proxyUrl;
+  protected String proxyUser;
+  protected String proxyPassword;
   protected HttpClientImpl clientImpl;
 
   public DslHttpDefaults() {
@@ -239,6 +241,41 @@ public class DslHttpDefaults extends BaseConfigElement {
   }
 
   /**
+   * Allows to set the default maximum amount of time to wait for an HTTP connection to be
+   * established.
+   * <p>
+   * This can be overwritten by {@link DslHttpSampler#connectionTimeout(Duration)}.
+   *
+   * @param timeout specifies the duration to be used as connection timeout. When set to 0 it
+   *                specifies to not timeout (wait indefinitely), which is not recommended. When set
+   *                to a negative number the operating system default is used.
+   * @return the sampler for further configuration or usage.
+   * @see DslHttpSampler#connectionTimeout(Duration)
+   * @since 1.4
+   */
+  public DslHttpDefaults connectionTimeout(Duration timeout) {
+    connectionTimeout = timeout;
+    return this;
+  }
+
+  /**
+   * Allows to set the maximum amount of time to wait for a response to an HTTP request.
+   * <p>
+   * This can be overwritten by {@link DslHttpSampler#responseTimeout(Duration)}.
+   *
+   * @param timeout specifies the duration to be used as response timeout. When set to 0 it
+   *                specifies to not timeout (wait indefinitely), which is not recommended. When set
+   *                to a negative number the operating system default is used.
+   * @return the sampler for further configuration or usage.
+   * @see DslHttpSampler#responseTimeout(Duration)
+   * @since 1.4
+   */
+  public DslHttpDefaults responseTimeout(Duration timeout) {
+    responseTimeout = timeout;
+    return this;
+  }
+
+  /**
    * Allows specifying a proxy through which all http requests will be sent to their final
    * destination.
    * <p>
@@ -312,7 +349,8 @@ public class DslHttpDefaults extends BaseConfigElement {
   }
 
   /**
-   * Same as {@link #resetConnectionsBetweenIterations()} but allowing to enable or disable setting.
+   * Same as {@link #resetConnectionsBetweenIterations()} but allowing to enable or disable
+   * setting.
    * <p>
    * This is helpful when the resolution is taken at runtime.
    *
@@ -347,44 +385,15 @@ public class DslHttpDefaults extends BaseConfigElement {
   @Override
   protected TestElement buildTestElement() {
     ConfigTestElement ret = new ConfigTestElement();
-    if (protocol != null) {
-      ret.setProperty(HTTPSamplerBase.PROTOCOL, protocol);
-    }
-    if (host != null) {
-      ret.setProperty(HTTPSamplerBase.DOMAIN, host);
-    }
-    if (port != null) {
-      ret.setProperty(HTTPSamplerBase.PORT, port);
-    }
-    if (path != null) {
-      ret.setProperty(HTTPSamplerBase.PATH, path);
-    }
+    HttpElementHelper.modifyTestElementUrl(ret, protocol, host, port, path);
     if (encoding != null) {
       ret.setProperty(HTTPSamplerBase.CONTENT_ENCODING, encoding.toString());
     }
     ret.setProperty(new TestElementProperty(HTTPSamplerBase.ARGUMENTS, new Arguments()));
-    if (proxyUrl != null) {
-      JmeterUrl parsedUrl = JmeterUrl.valueOf(proxyUrl);
-      ret.setProperty(HTTPSamplerBase.PROXYSCHEME, parsedUrl.protocol());
-      ret.setProperty(HTTPSamplerBase.PROXYHOST, parsedUrl.host());
-      ret.setProperty(HTTPSamplerBase.PROXYPORT, parsedUrl.port());
-      if (proxyUser != null) {
-        ret.setProperty(HTTPSamplerBase.PROXYUSER, proxyUser);
-      }
-      if (proxyPassword != null) {
-        ret.setProperty(HTTPSamplerBase.PROXYPASS, proxyPassword);
-      }
-    }
-    if (downloadEmbeddedResources) {
-      ret.setProperty(HTTPSamplerBase.IMAGE_PARSER, true);
-      ret.setProperty(HTTPSamplerBase.CONCURRENT_DWN, true);
-      if (embeddedResourcesMatchRegex != null) {
-        ret.setProperty(HTTPSamplerBase.EMBEDDED_URL_RE, embeddedResourcesMatchRegex);
-      }
-      if (embeddedResourcesNotMatchRegex != null) {
-        ret.setProperty(HTTPSamplerBase.EMBEDDED_URL_EXCLUDE_RE, embeddedResourcesNotMatchRegex);
-      }
-    }
+    HttpElementHelper.modifyTestElementEmbeddedResources(ret, downloadEmbeddedResources,
+        embeddedResourcesMatchRegex, embeddedResourcesNotMatchRegex);
+    HttpElementHelper.modifyTestElementTimeouts(ret, connectionTimeout, responseTimeout);
+    HttpElementHelper.modifyTestElementProxy(ret, proxyUrl, proxyUser, proxyPassword);
     if (clientImpl != null) {
       ret.setProperty(HTTPSamplerBase.IMPLEMENTATION, clientImpl.propertyValue);
     }
@@ -403,7 +412,7 @@ public class DslHttpDefaults extends BaseConfigElement {
       TestElementParamBuilder paramBuilder = new TestElementParamBuilder(context.getTestElement());
       MethodParam protocol = paramBuilder.stringParam(HTTPSamplerBase.PROTOCOL);
       MethodParam host = paramBuilder.stringParam(HTTPSamplerBase.DOMAIN);
-      MethodParam port = paramBuilder.stringParam(HTTPSamplerBase.PORT);
+      MethodParam port = paramBuilder.intParam(HTTPSamplerBase.PORT);
       MethodParam path = paramBuilder.stringParam(HTTPSamplerBase.PATH, "/");
 
       if (!protocol.isDefault() && !host.isDefault()) {
@@ -415,12 +424,10 @@ public class DslHttpDefaults extends BaseConfigElement {
             .chain("port", port)
             .chain("path", path);
       }
-
-      ret.chain("encoding", paramBuilder.encodingParam(HTTPSamplerBase.CONTENT_ENCODING, null))
-          .chain("downloadEmbeddedResources",
-              paramBuilder.boolParam(HTTPSamplerBase.IMAGE_PARSER, false))
-          .chain("clientImpl",
-              paramBuilder.enumParam(HTTPSamplerBase.IMPLEMENTATION, HttpClientImpl.HTTP_CLIENT));
+      HttpElementHelper.chainEncodingToMethodCall(ret, paramBuilder);
+      HttpElementHelper.chainEmbeddedResourcesOptionsToMethodCall(ret, paramBuilder);
+      HttpElementHelper.chainConnectionOptionsToMethodCall(ret, paramBuilder);
+      HttpElementHelper.chainClientImplToMethodCall(ret, paramBuilder);
       return ret;
     }
 

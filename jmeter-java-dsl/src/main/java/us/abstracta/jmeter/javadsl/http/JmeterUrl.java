@@ -90,7 +90,8 @@ public class JmeterUrl {
       return path;
     } else {
       return (isNullOrEmpty(protocol) ? "http" : protocol) + SCHEME_DELIMITER + host
-          + (isNullOrEmpty(port) ? "" : ":" + port) + (isNullOrEmpty(path) ? "" : path);
+          + (isNullOrEmpty(port) || "0".equals(port) ? "" : ":" + port)
+          + (isNullOrEmpty(path) ? "" : path);
     }
   }
 

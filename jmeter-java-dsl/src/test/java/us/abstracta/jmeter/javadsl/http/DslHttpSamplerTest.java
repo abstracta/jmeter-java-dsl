@@ -654,11 +654,39 @@ public class DslHttpSamplerTest extends JmeterDslTest {
       );
     }
 
+    public DslTestPlan testPlanWithHttpGetAndMatchingEmbeddedResourcesDownload() {
+      return testPlan(
+          threadGroup(1, 1,
+              httpSampler("http://localhost")
+                  .downloadEmbeddedResourcesMatching(".*")
+          )
+      );
+    }
+
+    public DslTestPlan testPlanWithHttpGetAndNotMatchingEmbeddedResourcesDownload() {
+      return testPlan(
+          threadGroup(1, 1,
+              httpSampler("http://localhost")
+                  .downloadEmbeddedResourcesNotMatching(".*demo.*")
+          )
+      );
+    }
+
     public DslTestPlan testPlanWithHttpGetAndJavaClientImpl() {
       return testPlan(
           threadGroup(1, 1,
               httpSampler("http://localhost")
                   .clientImpl(HttpClientImpl.JAVA)
+          )
+      );
+    }
+
+    public DslTestPlan testPlanWithHttpGetAndTimeouts() {
+      return testPlan(
+          threadGroup(1, 1,
+              httpSampler("http://localhost")
+                  .connectionTimeout(Duration.ofSeconds(5))
+                  .responseTimeout(Duration.ofSeconds(10))
           )
       );
     }

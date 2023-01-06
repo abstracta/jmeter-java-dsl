@@ -3,6 +3,7 @@ package us.abstracta.jmeter.javadsl.http;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.jsr223PreProcessor;
 
 import java.lang.reflect.Method;
+import java.time.Duration;
 import java.util.List;
 import java.util.function.Function;
 import org.apache.http.entity.ContentType;
@@ -47,6 +48,8 @@ public abstract class DslBaseHttpSampler<T extends DslBaseHttpSampler<T>> extend
   protected String proxyUrl;
   protected String proxyUser;
   protected String proxyPassword;
+  protected Duration connectionTimeout;
+  protected Duration responseTimeout;
 
   public DslBaseHttpSampler(String name, String url, Class<? extends JMeterGUIComponent> guiClass) {
     super(name, guiClass);
@@ -166,6 +169,42 @@ public abstract class DslBaseHttpSampler<T extends DslBaseHttpSampler<T>> extend
   }
 
   /**
+   * Allows to set the maximum amount of time to wait for an HTTP connection to be established.
+   * <p>
+   * If the connection is not established within the specified timeout, then the request will fail
+   * and sample result will be marked as failed with proper response message.
+   *
+   * @param timeout specifies the duration to be used as connection timeout. When set to 0 it
+   *                specifies to not timeout (wait indefinitely), which is not recommended. When set
+   *                to a negative number the operating system default is used. By default, is set to
+   *                -1.
+   * @return the sampler for further configuration or usage.
+   * @since 1.4
+   */
+  public T connectionTimeout(Duration timeout) {
+    connectionTimeout = timeout;
+    return (T) this;
+  }
+
+  /**
+   * Allows to set the maximum amount of time to wait for a response to an HTTP request.
+   * <p>
+   * If the response takes more than specified time, then the request will fail and sample result
+   * will be marked as failed with proper response message.
+   *
+   * @param timeout specifies the duration to be used as response timeout. When set to 0 it
+   *                specifies to not timeout (wait indefinitely), which is not recommended. When set
+   *                to a negative number the operating system default is used. By default, is set to
+   *                -1.
+   * @return the sampler for further configuration or usage.
+   * @since 1.4
+   */
+  public T responseTimeout(Duration timeout) {
+    responseTimeout = timeout;
+    return (T) this;
+  }
+
+  /**
    * Allows specifying a proxy through which all http requests will be sent to their final
    * destination.
    * <p>
@@ -205,34 +244,13 @@ public abstract class DslBaseHttpSampler<T extends DslBaseHttpSampler<T>> extend
       JMeterUtils.setProperty(RESET_CONNECTIONS_BETWEEN_ITERATIONS_PROP, String.valueOf(false));
     }
     HTTPSamplerProxy ret = new HTTPSamplerProxy();
-    if (protocol != null) {
-      ret.setProtocol(protocol);
-    }
-    if (host != null) {
-      ret.setDomain(host);
-    }
-    if (port != null) {
-      /*
-      need to use this method instead of setPort since we want to be able to set expressions on
-      port (like ${port}).
-      */
-      ret.setProperty(HTTPSamplerBase.PORT, port);
-    }
+    HttpElementHelper.modifyTestElementUrl(ret, protocol, host, port, path);
+    // We need to use this logic since setPath method triggers additional logic
     if (path != null) {
       ret.setPath(path);
     }
-    if (proxyUrl != null) {
-      JmeterUrl parsedUrl = JmeterUrl.valueOf(proxyUrl);
-      ret.setProxyScheme(parsedUrl.protocol());
-      ret.setProxyHost(parsedUrl.host());
-      ret.setProxyPortInt(parsedUrl.port());
-      if (proxyUser != null) {
-        ret.setProxyUser(proxyUser);
-      }
-      if (proxyPassword != null) {
-        ret.setProxyPass(proxyPassword);
-      }
-    }
+    HttpElementHelper.modifyTestElementTimeouts(ret, connectionTimeout, responseTimeout);
+    HttpElementHelper.modifyTestElementProxy(ret, proxyUrl, proxyUser, proxyPassword);
     return configureHttpTestElement(ret);
   }
 
@@ -282,7 +300,7 @@ public abstract class DslBaseHttpSampler<T extends DslBaseHttpSampler<T>> extend
       }
       chainRequestCalls(ret, testElement, context);
       chainAdditionalOptions(ret, paramBuilder);
-      chainProxyOptions(ret, paramBuilder);
+      HttpElementHelper.chainConnectionOptionsToMethodCall(ret, paramBuilder);
       return ret;
     }
 
@@ -326,24 +344,6 @@ public abstract class DslBaseHttpSampler<T extends DslBaseHttpSampler<T>> extend
 
     protected abstract void chainAdditionalOptions(MethodCall ret,
         TestElementParamBuilder paramBuilder);
-
-    private void chainProxyOptions(MethodCall ret, TestElementParamBuilder paramBuilder) {
-      MethodParam protocol = paramBuilder.stringParam(HTTPSamplerBase.PROXYSCHEME);
-      MethodParam host = paramBuilder.stringParam(HTTPSamplerBase.PROXYHOST);
-      MethodParam port = paramBuilder.intParam(HTTPSamplerBase.PROXYPORT);
-      MethodParam user = paramBuilder.stringParam(HTTPSamplerBase.PROXYUSER);
-      MethodParam password = paramBuilder.stringParam(HTTPSamplerBase.PROXYPASS);
-      if (host.isDefault()) {
-        return;
-      }
-      MethodParam proxyUrl = buildUrlParam(protocol, host,
-          port.isDefault() ? new StringParam("") : port, new StringParam(""));
-      if (user.isDefault()) {
-        ret.chain("proxy", proxyUrl);
-      } else {
-        ret.chain("proxy", proxyUrl, user, password);
-      }
-    }
 
   }
 
