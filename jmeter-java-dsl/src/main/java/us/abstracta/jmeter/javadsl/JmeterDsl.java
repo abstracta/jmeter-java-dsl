@@ -1335,26 +1335,6 @@ public class JmeterDsl {
   }
 
   /**
-   * Builds a ConstantThroughputTimer which paces samplers to achieve a target constant throughput.
-   * NB The default calculation mode is 'All Threads In Current ThreadGroup (Shared)'.
-   * 2 other common calc modes are available to set-
-   * modeThisThreadOnly: applies the throughput per thread i.e. more threads will increase the
-   * overall throughput
-   * modeAllActiveThreadsShared: applies the target throughput to all threads and samples so that
-   * the overall test throughput matches the target. Timer must be at TestPlan level for this to
-   * work properly
-   *
-   * @param throughput specifies the target samples per minute.
-   * @return the timer for usage in test plan.
-   * @see DslThroughputTimer
-   * @since 1.4
-   */
-
-  public static DslThroughputTimer throughputTimer(Double throughput) {
-    return new DslThroughputTimer(throughput);
-  }
-
-  /**
    * Builds a Constant Timer which pauses the thread with for a given duration.
    *
    * @param duration specifies the duration for the timer to wait.
@@ -1392,6 +1372,21 @@ public class JmeterDsl {
    */
   public static DslUniformRandomTimer uniformRandomTimer(Duration minimum, Duration maximum) {
     return new DslUniformRandomTimer(minimum, maximum);
+  }
+
+  /**
+   * Builds a Constant Throughput Timer which paces samplers to limit the throughput.
+   * <p>
+   * The timer adds variable pauses to test plan execution to limit the throughput by checking time
+   * between timer executions.
+   *
+   * @param throughputPerMinute specifies the target samples per minute.
+   * @return the timer for usage in test plan.
+   * @see DslThroughputTimer
+   * @since 1.5
+   */
+  public static DslThroughputTimer throughputTimer(double throughputPerMinute) {
+    return new DslThroughputTimer(throughputPerMinute);
   }
 
   /**

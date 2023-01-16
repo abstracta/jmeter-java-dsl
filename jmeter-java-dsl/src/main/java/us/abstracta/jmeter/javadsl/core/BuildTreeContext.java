@@ -7,8 +7,10 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
+import org.apache.jmeter.testelement.TestElement;
 import org.apache.jorphan.collections.HashTree;
 import us.abstracta.jmeter.javadsl.core.listeners.DslVisualizer;
+import us.abstracta.jmeter.javadsl.core.timers.DslThroughputTimer;
 
 /**
  * Contains information that can be used by elements to share info
@@ -23,6 +25,11 @@ public class BuildTreeContext {
   private final Map<String, Object> entries = new HashMap<>();
   private final List<TreeContextEndListener> endListeners = new ArrayList<>();
   private final Map<DslVisualizer, Supplier<Component>> visualizers;
+  /*
+   check comment on buildTreeFor to understand why this field is not final and not initialized in
+   constructor
+   */
+  private DslTestElement element;
 
   public BuildTreeContext() {
     this(null, new LinkedHashMap<>());
@@ -36,6 +43,10 @@ public class BuildTreeContext {
 
   public BuildTreeContext getParent() {
     return parent;
+  }
+
+  public DslTestElement getTestElement() {
+    return element;
   }
 
   public BuildTreeContext getRoot() {
@@ -74,7 +85,13 @@ public class BuildTreeContext {
     return new BuildTreeContext(this, visualizers).buildTreeFor(child, parentTree);
   }
 
+  /*
+  Instead of passing the element as argument to this method we could initialize it in constructor.
+  We might implement this change in a future major release, but for the time being is left as is to
+  avoid breaking API compatibility.
+   */
   public HashTree buildTreeFor(DslTestElement element, HashTree parentTree) {
+    this.element = element;
     HashTree ret = element.buildTreeUnder(parentTree, this);
     endListeners.forEach(l -> l.execute(this, ret));
     return ret;
