@@ -28,12 +28,46 @@ public class DslCookieManager extends AutoEnabledHttpConfigElement {
   protected boolean clearEachIteration = true;
 
   public enum CookiePolicy {
+    /**
+     *Compliant with the well-behaved profile defined by RFC 6265, section 4.
+     */
     STANDARDSTRICT("standard-strict"),
+
+    /**
+     * All cookies are ignored. Same as delete or disable Cookie Manager.
+     */
     IGNORECOOKIES("ignoreCookies"),
+
+    /**
+     * Corresponds to the original draft specification published by Netscape Communications.
+     */
     NETSCAPE("netscape"),
+
+    /**
+     * Select RFC 2965, RFC 2109 or Netscape draft compliant implementation based on cookies
+     * properties sent with the HTTP response.
+     */
+    DEFAULT("default"),
+
+    /**
+     * Compliant with the specification defined by RFC 2109.
+     */
     RFC2109("rfc2109"),
+
+    /**
+     * Compliant with the specification defined by RFC 2965.
+     */
     RFC2965("rfc2965"),
+
+    /**
+     *
+     */
     BESTMATCH("best-match"),
+
+    /**
+     * Simulates the behavior of older versions of browsers like Mozilla FireFox and Internet
+     * Explorer
+     */
     COMPATABILITY("compatability");
 
     private final String cookiePolicy;
@@ -42,12 +76,6 @@ public class DslCookieManager extends AutoEnabledHttpConfigElement {
 
       this.cookiePolicy = cookiePolicy;
     }
-
-    public String getCookiePolicy() {
-
-      return this.cookiePolicy;
-    }
-
   }
 
   public DslCookieManager() {
@@ -64,14 +92,27 @@ public class DslCookieManager extends AutoEnabledHttpConfigElement {
     return this;
   }
 
-  public DslCookieManager setClearCookiesBetweenIterations(boolean clear) {
+  /**
+   * Cookies are cleared each iteration by default. If this is not desirable, for instance if
+   * logging in once and then iterating through actions multiple times, use this to set to false.
+   * @param clear boolean to set clearing of cookies
+   * @return the cookie manager for further configuration or usage.
+   * @since 1.6
+   */
+  public DslCookieManager clearCookiesBetweenIterations(boolean clear) {
     this.clearEachIteration = clear;
     return this;
   }
 
-  public DslCookieManager setCookiePolicy(DslCookieManager.CookiePolicy policy) {
+  /**
+   * Used to set the required cookie policy If 'standard' cookie types are not suitable.
+   * @param policy ENUM for the cookie policy
+   * @return the cookie manager for further configuration or usage.
+   * @since 1.6
+   */
+  public DslCookieManager cookiePolicy(DslCookieManager.CookiePolicy policy) {
 
-    this.cookiePolicy = policy.getCookiePolicy();
+    this.cookiePolicy = policy.cookiePolicy;
     return this;
   }
 
@@ -88,7 +129,5 @@ public class DslCookieManager extends AutoEnabledHttpConfigElement {
     public CodeBuilder(List<Method> builderMethods) {
       super(CookieManager.class, builderMethods);
     }
-
   }
-
 }
