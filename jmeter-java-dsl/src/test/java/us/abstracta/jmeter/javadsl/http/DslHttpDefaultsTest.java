@@ -12,6 +12,8 @@ import static us.abstracta.jmeter.javadsl.JmeterDsl.httpSampler;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.testPlan;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.threadGroup;
 
+import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -20,8 +22,12 @@ import org.assertj.swing.core.BasicRobot;
 import org.assertj.swing.core.Robot;
 import org.assertj.swing.finder.WindowFinder;
 import org.assertj.swing.fixture.FrameFixture;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import us.abstracta.jmeter.javadsl.JmeterDslTest;
+import us.abstracta.jmeter.javadsl.codegeneration.MethodCallBuilderTest;
+import us.abstracta.jmeter.javadsl.core.DslTestPlan;
+import us.abstracta.jmeter.javadsl.http.DslHttpSampler.HttpClientImpl;
 
 public class DslHttpDefaultsTest extends JmeterDslTest {
 
@@ -193,6 +199,122 @@ public class DslHttpDefaultsTest extends JmeterDslTest {
       executor.shutdownNow();
       robot.cleanUp();
     }
+  }
+
+  @Nested
+  public class CodeBuilderTest extends MethodCallBuilderTest {
+
+    public DslTestPlan testPlanWithHttpDefaultSimpleUrl() {
+      return testPlan(
+          threadGroup(1, 1,
+              httpDefaults()
+                  .url("http://localhost")
+          )
+      );
+    }
+
+    public DslTestPlan testPlanWithHttpDefaultCompleteUrl() {
+      return testPlan(
+          threadGroup(1, 1,
+              httpDefaults()
+                  .url("http://localhost:80/users")
+          )
+      );
+    }
+
+    public DslTestPlan testPlanWithHttpDefaultUrlFragments() {
+      return testPlan(
+          threadGroup(1, 1,
+              httpDefaults()
+                  .host("localhost")
+                  .port(80)
+                  .path("/users")
+          )
+      );
+    }
+
+    public DslTestPlan testPlanWithHttpDefaultProtocol() {
+      return testPlan(
+          threadGroup(1, 1,
+              httpDefaults()
+                  .protocol("https")
+          )
+      );
+    }
+
+    public DslTestPlan testPlanWithHttpDefaultCharsetEncoding() {
+      return testPlan(
+          threadGroup(1, 1,
+              httpDefaults()
+                  .encoding(StandardCharsets.ISO_8859_1)
+          )
+      );
+    }
+
+    public DslTestPlan testPlanWithHttpDefaultResourcesDownload() {
+      return testPlan(
+          threadGroup(1, 1,
+              httpDefaults()
+                  .downloadEmbeddedResources()
+          )
+      );
+    }
+
+    public DslTestPlan testPlanWithHttpDefaultMatchingResourcesDownload() {
+      return testPlan(
+          threadGroup(1, 1,
+              httpDefaults()
+                  .downloadEmbeddedResourcesMatching(".*")
+          )
+      );
+    }
+
+    public DslTestPlan testPlanWithHttpDefaultNotMatchingResourcesDownload() {
+      return testPlan(
+          threadGroup(1, 1,
+              httpDefaults()
+                  .downloadEmbeddedResourcesNotMatching(".*demo.*")
+          )
+      );
+    }
+
+    public DslTestPlan testPlanWithHttpDefaultJavaClientImpl() {
+      return testPlan(
+          threadGroup(1, 1,
+              httpDefaults()
+                  .clientImpl(HttpClientImpl.JAVA)
+          )
+      );
+    }
+
+    public DslTestPlan testPlanWithHttpDefaultsTimeouts() {
+      return testPlan(
+          threadGroup(1, 1,
+              httpDefaults()
+                  .connectionTimeout(Duration.ofSeconds(5))
+                  .responseTimeout(Duration.ofSeconds(10))
+          )
+      );
+    }
+
+    public DslTestPlan testPlanWithHttpDefaultsProxyWithoutAuth() {
+      return testPlan(
+          threadGroup(1, 1,
+              httpDefaults()
+                  .proxy("http://localhost:8181")
+          )
+      );
+    }
+
+    public DslTestPlan testPlanWithHttpDefaultsProxyWithAuth() {
+      return testPlan(
+          threadGroup(1, 1,
+              httpDefaults()
+                  .proxy("http://localhost:8181", "user", "password")
+          )
+      );
+    }
+
   }
 
 }

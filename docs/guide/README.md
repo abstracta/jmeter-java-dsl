@@ -29,7 +29,7 @@ To use the DSL just include it in your project:
 <dependency>
   <groupId>us.abstracta.jmeter</groupId>
   <artifactId>jmeter-java-dsl</artifactId>
-  <version>1.3</version>
+  <version>1.4</version>
   <scope>test</scope>
 </dependency>
 ```
@@ -50,7 +50,7 @@ class JmeterRule implements ComponentMetadataRule {
 
 dependencies {
     ...
-    testImplementation 'us.abstracta.jmeter:jmeter-java-dsl:1.3'
+    testImplementation 'us.abstracta.jmeter:jmeter-java-dsl:1.4'
     components {
         withModule("org.apache.jmeter:ApacheJMeter_core", JmeterRule)
         withModule("org.apache.jmeter:ApacheJMeter_java", JmeterRule)
@@ -110,6 +110,10 @@ When working with multiple samplers in a test plan, specify their names (eg: `ht
 :::
 
 ::: tip
+Set connection and response timeouts to avoid potential execution differences when running test plan in different machines. [Here](#timeouts) are more details.
+:::
+
+::: tip
 Since JMeter uses [log4j2](https://logging.apache.org/log4j/2.x/), if you want to control the logging level or output, you can use something similar to this [log4j2.xml](../../jmeter-java-dsl/src/test/resources/log4j2.xml).
 :::
 
@@ -133,7 +137,7 @@ java -jar jmx2dsl.jar test-plan.jmx
 :::
 ::: tab Jbang
 ```bash
-jbang us.abstracta.jmeter:jmeter-java-dsl-jmx2dsl:1.3 test-plan.jmx
+jbang us.abstracta.jmeter:jmeter-java-dsl-jmx2dsl:1.4 test-plan.jmx
 ```
 :::
 ::::
@@ -149,7 +153,7 @@ executable (eg: chmod +x ./PerformanceTest.java) and just executing it with ./Pe
 //DEPS org.assertj:assertj-core:3.23.1
 //DEPS org.junit.jupiter:junit-jupiter-engine:5.9.1
 //DEPS org.junit.platform:junit-platform-launcher:1.9.1
-//DEPS us.abstracta.jmeter:jmeter-java-dsl:1.3
+//DEPS us.abstracta.jmeter:jmeter-java-dsl:1.4
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.*;
@@ -224,14 +228,14 @@ By including the following module as a dependency:
 <dependency>
   <groupId>us.abstracta.jmeter</groupId>
   <artifactId>jmeter-java-dsl-blazemeter</artifactId>
-  <version>1.3</version>
+  <version>1.4</version>
   <scope>test</scope>
 </dependency>
 ```
 :::
 ::: tab Gradle
 ```groovy
-testImplementation 'us.abstracta.jmeter:jmeter-java-dsl-blazemeter:1.3'
+testImplementation 'us.abstracta.jmeter:jmeter-java-dsl-blazemeter:1.4'
 ```
 :::
 ::::
@@ -299,14 +303,14 @@ In the same fashion as with BlazeMeter, just by including the following module a
 <dependency>
   <groupId>us.abstracta.jmeter</groupId>
   <artifactId>jmeter-java-dsl-octoperf</artifactId>
-  <version>1.3</version>
+  <version>1.4</version>
   <scope>test</scope>
 </dependency>
 ```
 :::
 ::: tab Gradle
 ```groovy
-testImplementation 'us.abstracta.jmeter:jmeter-java-dsl-octoperf:1.3'
+testImplementation 'us.abstracta.jmeter:jmeter-java-dsl-octoperf:1.4'
 ```
 :::
 ::::
@@ -862,7 +866,26 @@ public class PerformanceTest {
 }
 ```
 
+::: tip
 By default, `jtlWriter` will write the most used information to evaluate the performance of the tested service. If you want to trace all the information of each request you may use `jtlWriter` with `withAllFields()` option. Doing this will provide all the information at the cost of additional computation and resource usage (fewer resources for actual load testing). You can tune which fields to include or not with `jtlWriter` and only log what you need, check [JtlWriter](../../jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/listeners/JtlWriter.java) for more details.
+:::
+
+::: tip
+By default, `jtlWriter` will log every sample result, but in some cases you might want to log additional info when a sample result fails. In such scenarios you can use two `jtlWriter` instances like in this example:
+
+```java
+testPlan(
+    threadGroup(2, 10,
+        httpSampler("http://my.service")
+    ),
+    jtlWriter("target/jtls/success")
+      .logOnly(SampleStatus.SUCCESS),
+    jtlWriter("target/jtls/error")
+      .logOnly(SampleStatus.ERROR)
+      .withAllFields(true)
+)
+```
+:::
 
 ::: tip
 `jtlWriter` will automatically generate `.jtl` files applying this format: `<yyyy-MM-dd HH-mm-ss> <UUID>.jtl`.
@@ -992,7 +1015,7 @@ To use the module, you will need to include the following dependency in your pro
 <dependency>
   <groupId>us.abstracta.jmeter</groupId>
   <artifactId>jmeter-java-dsl-elasticsearch-listener</artifactId>
-  <version>1.3</version>
+  <version>1.4</version>
   <scope>test</scope>
 </dependency>
 ```
@@ -1005,7 +1028,7 @@ maven { url 'https://jitpack.io' }
 
 And the dependency:
 ```groovy
-testImplementation 'us.abstracta.jmeter:jmeter-java-dsl-elasticsearch-listener:1.3'
+testImplementation 'us.abstracta.jmeter:jmeter-java-dsl-elasticsearch-listener:1.4'
 ```
 
 :::
@@ -1109,14 +1132,14 @@ To use it, you need to add the following dependency:
 <dependency>
   <groupId>us.abstracta.jmeter</groupId>
   <artifactId>jmeter-java-dsl-dashboard</artifactId>
-  <version>1.3</version>
+  <version>1.4</version>
   <scope>test</scope>
 </dependency>
 ```
 :::
 ::: tab Gradle
 ```groovy
-testImplementation 'us.abstracta.jmeter:jmeter-java-dsl-dashboard:1.3'
+testImplementation 'us.abstracta.jmeter:jmeter-java-dsl-dashboard:1.4'
 ```
 :::
 ::::
@@ -1891,16 +1914,15 @@ The generated JMeter test element uses the `Constant Delay Offset` set to `minim
 
 ### Control Throughput
 
-To achieve a specific constant throughput for specific samplers, all samplers in a Thread Group or the entire Test Plan, the `throughputTimer` can be used, which uses JMeter ConstantThroughputTimer.
+To achieve a specific constant throughput for specific samplers or section of a test plan, you can use `throughputTimer`, which uses JMeter `ConstantThroughputTimer`. 
 
-The default calculation mode is 'AllThreadsInThreadGroupShared' which means that the target throughput is based on all the threads in the Thread Group where the throughputTimer is used.
-
-Here is an example:
+Here is an example for generating a maximum of 120 samples per minute:
 
 ```java
 import static org.assertj.core.api.Assertions.assertThat;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.*;
 
+import java.time.Duration;
 import org.junit.jupiter.api.Test;
 import us.abstracta.jmeter.javadsl.core.TestPlanStats;
 
@@ -1909,35 +1931,39 @@ public class PerformanceTest {
   @Test
   public void testPerformance() throws Exception {
     TestPlanStats stats = testPlan(
-            threadGroup (10,Duration.ofSeconds(10),
-                    dummySampler ("dummy","foo"),
-                    throughputTimer(120.0)) // targetting 120 samples per minute
+        threadGroup(10, Duration.ofSeconds(10),
+            throughputTimer(120),
+            httpSampler("http://my.service")
+        ) 
     ).run();
-
-    assertThat(stats.byLabel ("dummy").samplesCount()).isEqualTo(20L);
-  }
   }
 
 }
 ```
 
-Other calculation modes available are:
-```java
-                      throughputTimer(120.0)
-                          .modeThisThreadOnly()
-```
-
-and
-```java
-                      throughputTimer(120.0)
-                          .AllActiveThreadsShared()
-```
-
-::: warning
-The troughput timer works by pausing requests to achieve a constant throughtput so the response times and number of threads must be sufficient to achieve the target throughput.
-The placement (scope) of the throughputTimer will determines it's behaviour. i.e if modeAllActiveThreadsShared() is used then the timer must be at TestPlan level for it to work correctly.  
+::: tip
+By default, `throughtputTimer` will control throughput among active threads. If you want to control throughput per thread, i.e. each thread generating the specified throughput, which means that `totalThoughput = configuredThroughput * numberOfThreads`, you can use `perThread()` method.
 :::
 
+::: tip
+The placement (scope) of the `throughputTimer` will determine its behaviour. E.g. if you place the timer inside an `ifController`, it will only control the execution throughput only for elements inside the `ifController`, or if you place it inside a `threadGroup` other thread groups execution will be directly not affected (nor they would directly affect this timer execution).  
+:::
+
+::: tip
+The timer uses by default even distribution of throughput among the active threads. This means that if you have 10 threads and specify 10 tpm, then each thread will try to execute at 1tpm, not adjusting each thread tpm if some other thread was far from achieving the configured tpm. If you want more precise throughput control, you can use `.calculation()` method, for example, with `THREAD_GROUP_ACCURATE`, but doing so, may lead to unexpected behavior when using multiple timers in same thread group. 
+
+Check [DslThroughputTimer](../../jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/timers/DslThroughputTimer.java) for more details.
+:::
+
+::: warning
+`throughputTimer` works by pausing requests to achieve a constant throughput, so the response times and number of threads must be sufficient to achieve the target throughput. You can think of this timer as a way to limit the maximum throughput, but it does have no way to generate more load if response times are high and threads are not enough. To automatically adjust threads when response times are high you can use `rpsThreadGroup` as described [here](#throughput-based-thread-group).
+:::
+
+::: warning
+On first invocation of `throughputTimer` on each thread, no delay will be generated by the timer, which may lead to initially higher throughput than expected.
+
+For example, in previously provided example, 10 requests (1 for each thread) will run without "throughput control", which means you will get 10 requests at once, and after that, you will get 1 request per second (as expected).
+:::
 
 ### Execute part of a test plan part a fraction of the times
 
@@ -2022,14 +2048,14 @@ To use it, add the following dependency to your project:
 <dependency>
   <groupId>us.abstracta.jmeter</groupId>
   <artifactId>jmeter-java-dsl-parallel</artifactId>
-  <version>1.3</version>
+  <version>1.4</version>
   <scope>test</scope>
 </dependency>
 ```
 :::
 ::: tab Gradle
 ```groovy
-testImplementation 'us.abstracta.jmeter:jmeter-java-dsl-dashboard:1.3'
+testImplementation 'us.abstracta.jmeter:jmeter-java-dsl-dashboard:1.4'
 ```
 :::
 ::::
@@ -2404,6 +2430,25 @@ testPlan(
 )
 ```
 
+#### Timeouts
+
+By default, JMeter uses system default configurations for connection and response timeouts (maximum time for a connection to be established or a server response after a request, before it fails). This is might make the test behave different depending on the machine where it runs. To avoid this, it is recommended to always set these values. Here is an example:
+
+```
+testPlan(
+    httpDefaults()
+        .connectionTimeout(Duration.ofSeconds(10))
+        .responseTimeout(Duration.ofMinutes(1)),
+    threadGroup(2, 10,
+        httpSampler("http://my.service")
+    )
+)
+```
+
+::: warning
+Currently we are using same defaults as JMeter to avoid breaking existing test plans executions, but in a future major version we plan to change default setting to avoid the common pitfall previously mentioned.
+:::
+
 #### Connections
 
 jmeter-java-dsl, as JMeter (and also K6), by default **reuses HTTP connections between thread iterations** to avoid common issues with port and file descriptors exhaustion which require manual OS tuning and may manifest in many ways.
@@ -2428,7 +2473,7 @@ httpDefaults()
 ```
 
 * This and `resetConnectionsBetweenIterations` apply at the JVM level (due to JMeter limitation), so they affect all requests in the test plan and other ones potentially running in the same JVM instance.
-  :::
+:::
 
 ::: warning
 Using `clientImpl(HttpClientImpl.JAVA)` will ignore any of the previous settings and will reuse connections depending on JVM implementation.
@@ -2644,14 +2689,14 @@ When you want to test a GraphQL service, having properly set each field in an HT
 <dependency>
   <groupId>us.abstracta.jmeter</groupId>
   <artifactId>jmeter-java-dsl-graphql</artifactId>
-  <version>1.3</version>
+  <version>1.4</version>
   <scope>test</scope>
 </dependency>
 ```
 :::
 ::: tab Gradle
 ```groovy
-testImplementation 'us.abstracta.jmeter:jmeter-java-dsl-graphql:1.3'
+testImplementation 'us.abstracta.jmeter:jmeter-java-dsl-graphql:1.4'
 ```
 :::
 ::::
@@ -2737,14 +2782,14 @@ Including the following dependency in your project:
 <dependency>
   <groupId>us.abstracta.jmeter</groupId>
   <artifactId>jmeter-java-dsl-jdbc</artifactId>
-  <version>1.3</version>
+  <version>1.4</version>
   <scope>test</scope>
 </dependency>
 ```
 :::
 ::: tab Gradle
 ```groovy
-testImplementation 'us.abstracta.jmeter:jmeter-java-dsl-jdbc:1.3'
+testImplementation 'us.abstracta.jmeter:jmeter-java-dsl-jdbc:1.4'
 ```
 :::
 ::::
@@ -2985,14 +3030,14 @@ Include the module on your project:
 <dependency>
   <groupId>us.abstracta.jmeter</groupId>
   <artifactId>jmeter-java-dsl-wrapper</artifactId>
-  <version>1.3</version>
+  <version>1.4</version>
   <scope>test</scope>
 </dependency>
 ```
 :::
 ::: tab Gradle
 ```groovy
-testImplementation 'us.abstracta.jmeter:jmeter-java-dsl-wrapper:1.3'
+testImplementation 'us.abstracta.jmeter:jmeter-java-dsl-wrapper:1.4'
 ```
 :::
 ::::
