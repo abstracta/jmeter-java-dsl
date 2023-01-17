@@ -19,6 +19,32 @@ import org.apache.jmeter.testelement.TestElement;
  */
 public class DslCookieManager extends AutoEnabledHttpConfigElement {
 
+  protected String cookiePolicy;
+  protected boolean clearEachIteration = false;
+
+  public enum CookiePolicy {
+    STANDARDSTRICT("standard-strict"),
+    IGNORECOOKIES("ignoreCookies"),
+    NETSCAPE("netscape"),
+    RFC2109("rfc2109"),
+    RFC2965("rfc2965"),
+    BESTMATCH("best-match"),
+    COMPATABILITY("compatability");
+
+    private final String cookiePolicy;
+
+    CookiePolicy(String cookiePolicy) {
+
+      this.cookiePolicy = cookiePolicy;
+    }
+
+    public String getCookiePolicy() {
+
+      return this.cookiePolicy;
+    }
+
+  }
+
   public DslCookieManager() {
     super("HTTP Cookie Manager", CookiePanel.class);
   }
@@ -33,10 +59,22 @@ public class DslCookieManager extends AutoEnabledHttpConfigElement {
     return this;
   }
 
+  public DslCookieManager setClearingBetweenIterations(boolean clear) {
+    this.clearEachIteration = clear;
+    return this;
+  }
+
+  public DslCookieManager setCookiePolicy(DslCookieManager.CookiePolicy policy) {
+
+    this.cookiePolicy = policy.getCookiePolicy();
+    return this;
+  }
+
   @Override
   protected TestElement buildTestElement() {
     CookieManager ret = new CookieManager();
-    ret.setClearEachIteration(true);
+    ret.setClearEachIteration(clearEachIteration);
+    ret.setCookiePolicy(cookiePolicy);
     return ret;
   }
 

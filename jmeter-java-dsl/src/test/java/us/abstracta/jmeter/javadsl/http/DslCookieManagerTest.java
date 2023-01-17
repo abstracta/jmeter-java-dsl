@@ -41,6 +41,22 @@ public class DslCookieManagerTest {
       );
     }
 
+    public DslTestPlan testPlanWithCookiePolicy() {
+      return testPlan(
+          httpCookies().setCookiePolicy(DslCookieManager.CookiePolicy.NETSCAPE),
+          threadGroup(1, 1
+          )
+      );
+    }
+
+    public DslTestPlan testPlanWithClearIterationsOff() {
+      return testPlan(
+          httpCookies().setClearingBetweenIterations(false),
+          threadGroup(1, 1
+          )
+      );
+    }
+
   }
 
 }
