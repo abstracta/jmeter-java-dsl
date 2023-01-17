@@ -51,7 +51,7 @@ public class DslCookieManagerTest {
 
     public DslTestPlan testPlanWithClearIterationsOff() {
       return testPlan(
-          httpCookies().setClearingBetweenIterations(false),
+          httpCookies().setClearCookiesBetweenIterations(false),
           threadGroup(1, 1
           )
       );

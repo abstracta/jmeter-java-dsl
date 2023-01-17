@@ -15,12 +15,17 @@ import org.apache.jmeter.testelement.TestElement;
  * This element has to be added before any http sampler to be considered, and if you add multiple
  * instances of cookie manager to a test plan, only the first one will be considered.
  *
+ * Clearing cookies on each iteration is defaulted to true but setClearCookiesBetweenIterations()
+ * can be used to set to false if required.
+ * The default cookie policy is 'standard' but setCookiePolicy() can be used to specify the
+ * required cookie policy
+ *
  * @since 0.17
  */
 public class DslCookieManager extends AutoEnabledHttpConfigElement {
 
   protected String cookiePolicy;
-  protected boolean clearEachIteration = false;
+  protected boolean clearEachIteration = true;
 
   public enum CookiePolicy {
     STANDARDSTRICT("standard-strict"),
@@ -59,7 +64,7 @@ public class DslCookieManager extends AutoEnabledHttpConfigElement {
     return this;
   }
 
-  public DslCookieManager setClearingBetweenIterations(boolean clear) {
+  public DslCookieManager setClearCookiesBetweenIterations(boolean clear) {
     this.clearEachIteration = clear;
     return this;
   }
