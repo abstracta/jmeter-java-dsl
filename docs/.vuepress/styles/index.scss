@@ -1,0 +1,16 @@
+:root {
+    --c-brand: #00ace6;
+    --c-brand-light: #54bdf9;
+}
+
+html.dark {
+    // brand colors
+    --c-brand: #54bdf9;
+    --c-brand-light: #00ace6;
+}
+
+/* This is a fix to avoid, when building (does not happen with dev server),
+showing two external link icons for external links containing icons.*/
+a.external-link>svg~span:nth-child(2) {
+  display: none;
+}
