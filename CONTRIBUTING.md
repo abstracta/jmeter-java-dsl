@@ -41,7 +41,7 @@ Check [DslTestPlan] for an example code builder, and [MethodCallBuilder] for add
 
 When you want to run a test plan, it needs to run in a JMeter engine. By default, DslTestPlan uses [EmbeddedJmeterEngine](jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/engines/EmbeddedJmeterEngine.java), which is the fastest and easiest way to run a test plan, but you might use EmbeddedJmeterEngine as an example and implement your custom engine (for example to run tests in some cloud provider like BlazeMeter).
 
-When a test plan runs, the engine returns an instance of [TestPlanStats](jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/TestPlanStats.java), grouping information by test element name (aka label). This allows isers to check the expected statistics and verify that everything worked within expected boundaries.
+When a test plan runs, the engine returns an instance of [TestPlanStats](jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/TestPlanStats.java), grouping information by test element name (aka label). This allows users to check the expected statistics and verify that everything worked within expected boundaries.
 
 ## Class diagram
 
@@ -71,7 +71,7 @@ Additionally, the project uses checkstyle for enforcing code consistency and con
    * Use short but descriptive module names for easy inclusion in users' projects and identification.
 4. Implement a new DSL Test element
    * Use descriptive naming in the new class and package. If the name collides with JMeter class names or concepts, then consider prepending `Dsl` to it.
-   * Extend from one of the existing base classes (like [BaseSampler], [BaseConfigElement], etc) or extend from `BaseTestElement` and proper interface for the test element (like [DslTimer], [DslPostProcessor], etc).
+   * Extend from one of the existing base classes (like [BaseSampler], [BaseConfigElement], etc.) or extend from `BaseTestElement` and proper interface for the test element (like [DslTimer], [DslPostProcessor], etc).
    * Add proper java doc, explaining the feature implemented by the DSL new test element. Include the `@since` tag with the next minor version of the DSL (ie: if the current version is `0.44`, then use `0.45`).
    * Consider each instance of a DslTestElement as potentially creating multiple instances of the same sampler (or as if `buildTestElement` could be invoked several times without affecting the status of the element). In particular, avoid storing the already built test element in the DSL test element, and only create it in `buildTestElement` (and child methods).
    * Consider DslTestElement fields that might be interesting for advanced users and framework developers usage (eg: to alter an existing test plan, or query settings about it) for protected visibility instead of private. In the same fashion, for such fields, avoid them being marked as final. This allows for greater flexibility of usage of the DSL while not polluting the user API with methods that they usually would not use.
@@ -129,7 +129,7 @@ Additionally, the project uses checkstyle for enforcing code consistency and con
       * In MethodCallBuilderTest defined tests you should not use methods for abstracting duplicate logic between tests (nor variables or constants for literals). Code duplication in this case is acceptable and expected.
       * Check [DslTestPlanTest](jmeter-java-dsl/src/test/java/us/abstracta/jmeter/javadsl/core/DslTestPlanTest.java) for some tests examples.
 8. Run `mvn clean package` and fix any potential code styling issues or failing tests.
-9. Add section in [user guide](docs/guide/README.md) describing the new feature. Consider running in the `docs` directory `yarn install` and `yarn dev` (this requires node 14 and yarn installed on your machine) to run a local server for docs, where you can review that new changes are properly showing.
+9. Add a new section [user guide](docs/guide), by adding a new md file and proper `@include` in parent section, describing the new feature. Consider running in the `docs` directory `yarn install` and `yarn dev` (this requires node 14 and yarn installed on your machine) to run a local server for docs, where you can review that new changes are properly showing.
 10. Commit changes to git, using as a comment a subject line that describes general changes, and if necessary, some additional details describing the reason why the change is necessary.
 11. Submit a pull request to the repository including a meaningful name.
 12. Check GitHub Actions execution to verify that no test fails on the CI pipeline.
