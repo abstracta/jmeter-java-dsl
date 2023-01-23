@@ -14,7 +14,7 @@ public class ProxyServer {
 
   private final Server server = new Server(0);
   private String credentials;
-  private boolean proxiedRequest;
+  private volatile boolean proxiedRequest;
 
   public ProxyServer auth(String username, String password) {
     this.credentials = Base64.getEncoder()
@@ -58,8 +58,8 @@ public class ProxyServer {
       }
 
       private void handleProxiedRequest(HttpServletResponse response) {
-        response.setStatus(HttpStatus.SC_NO_CONTENT);
         proxiedRequest = true;
+        response.setStatus(HttpStatus.SC_NO_CONTENT);
       }
 
     };
