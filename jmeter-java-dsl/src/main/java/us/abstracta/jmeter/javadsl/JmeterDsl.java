@@ -43,6 +43,7 @@ import us.abstracta.jmeter.javadsl.core.timers.DslConstantTimer;
 import us.abstracta.jmeter.javadsl.core.timers.DslThroughputTimer;
 import us.abstracta.jmeter.javadsl.core.timers.DslUniformRandomTimer;
 import us.abstracta.jmeter.javadsl.core.util.PropertyScriptBuilder.PropertyScript;
+import us.abstracta.jmeter.javadsl.http.DslAuthManager;
 import us.abstracta.jmeter.javadsl.http.DslCacheManager;
 import us.abstracta.jmeter.javadsl.http.DslCookieManager;
 import us.abstracta.jmeter.javadsl.http.DslHttpDefaults;
@@ -832,6 +833,19 @@ public class JmeterDsl {
    */
   public static DslCacheManager httpCache() {
     return new DslCacheManager();
+  }
+
+  /**
+   * Builds an Auth manager which simplifies configuration for automatic authentication of HTTP
+   * requests.
+   *
+   * @return the Auth manager instance which allows to specify different authentications for
+   * different URLs.
+   * @see DslAuthManager
+   * @since 1.5
+   */
+  public static DslAuthManager httpAuth() {
+    return new DslAuthManager();
   }
 
   /**

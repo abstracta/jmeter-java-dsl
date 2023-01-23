@@ -18,6 +18,11 @@ import java.util.stream.Stream;
  *
  * @since 0.45
  */
+/*
+This class should extend CodeSegment, but we haven't changed it yet since such change would break
+compatibility for users extending from MethodParam. They would be required to change buildCode
+method visibility from protected to public.
+ */
 public abstract class MethodParam {
 
   protected final Class<?> paramType;

@@ -7,6 +7,7 @@ Here we show some of them, but check [JmeterDsl](/jmeter-java-dsl/src/main/java/
 @include(methods-and-body.md)
 @include(parameters.md)
 @include(headers.md)
+@include(auth.md)
 @include(multipart.md)
 @include(cookies-and-cache.md)
 @include(timeouts.md)

@@ -5,9 +5,9 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -25,7 +25,7 @@ import us.abstracta.jmeter.javadsl.core.testelements.MultiLevelTestElement;
  *
  * @since 0.45
  */
-public class MethodCall {
+public class MethodCall implements CodeSegment {
 
   /**
    * As of 1.3 use {@link Indentation#INDENT} instead.
@@ -39,11 +39,11 @@ public class MethodCall {
   private MethodCall childrenMethod;
   private ChildrenParam<?> childrenParam;
   private final List<MethodParam> params;
-  private final List<MethodCall> chain = new ArrayList<>();
+  private final List<CodeSegment> chain = new ArrayList<>();
   private final Set<String> requiredStaticImports = new HashSet<>();
   private boolean commented;
 
-  protected MethodCall(String methodName, Class<?> returnType, MethodParam... params) {
+  public MethodCall(String methodName, Class<?> returnType, MethodParam... params) {
     this.methodName = methodName;
     this.returnType = returnType;
     this.params = Arrays.asList(params);
@@ -142,6 +142,7 @@ public class MethodCall {
 
   }
 
+  @Override
   public Set<String> getStaticImports() {
     Set<String> ret = new HashSet<>(requiredStaticImports);
     params.stream()
@@ -153,6 +154,7 @@ public class MethodCall {
     return ret;
   }
 
+  @Override
   public Set<String> getImports() {
     Set<String> ret = new HashSet<>();
     params.stream()
@@ -167,11 +169,14 @@ public class MethodCall {
     return ret;
   }
 
+  @Override
   public Map<String, MethodCall> getMethodDefinitions() {
-    return params.stream()
+    Map<String, MethodCall> ret = new LinkedHashMap<>();
+    params.stream()
         .filter(p -> !p.isIgnored())
-        .flatMap(p -> p.getMethodDefinitions().entrySet().stream())
-        .collect(Collectors.toMap(Entry::getKey, Entry::getValue));
+        .forEach(p -> ret.putAll(p.getMethodDefinitions()));
+    chain.forEach(c -> ret.putAll(c.getMethodDefinitions()));
+    return ret;
   }
 
   public Class<?> getReturnType() {
@@ -303,6 +308,11 @@ public class MethodCall {
     return this;
   }
 
+  public MethodCall chain(MethodCall methodCall) {
+    chain.add(methodCall);
+    return methodCall;
+  }
+
   private Method findMethodInClassHierarchyMatchingParams(String methodName, Class<?> methodClass,
       MethodParam[] params) {
     Method ret = null;
@@ -345,6 +355,11 @@ public class MethodCall {
     return true;
   }
 
+  public MethodCall chainComment(String comment) {
+    chain.add(new Comment(comment));
+    return this;
+  }
+
   protected static UnsupportedOperationException buildNoMatchingMethodFoundException(
       String methodCondition, MethodParam[] params) {
     return new UnsupportedOperationException(
@@ -376,6 +391,7 @@ public class MethodCall {
     return buildCode("");
   }
 
+  @Override
   public String buildCode(String indent) {
     StringBuilder ret = new StringBuilder();
     ret.append(methodName)
@@ -389,14 +405,10 @@ public class MethodCall {
     }
     ret.append(")");
     String chainedCode = buildChainedCode(childIndent);
-    if (!chainedCode.isEmpty()) {
-      if (!hasChildren) {
-        ret.append("\n")
-            .append(childIndent);
-      }
-      ret.append(".");
-      ret.append(chainedCode);
+    if (!chainedCode.isEmpty() && hasChildren) {
+      chainedCode = chainedCode.substring(1 + childIndent.length());
     }
+    ret.append(chainedCode);
     return commented ? commented(ret.toString(), indent) : ret.toString();
   }
 
@@ -422,10 +434,17 @@ public class MethodCall {
   }
 
   private String buildChainedCode(String indent) {
-    return chain.stream()
-        .map(c -> c.buildCode(indent))
-        .filter(s -> !s.isEmpty())
-        .collect(Collectors.joining("\n" + indent + "."));
+    StringBuilder ret = new StringBuilder();
+    for (CodeSegment seg : chain) {
+      String segCode = seg.buildCode(indent);
+      if (!segCode.isEmpty()) {
+        ret.append("\n")
+            .append(indent)
+            .append(seg instanceof MethodCall ? "." : "")
+            .append(segCode);
+      }
+    }
+    return ret.toString();
   }
 
 }
