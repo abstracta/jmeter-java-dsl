@@ -403,6 +403,15 @@ public class DslDefaultThreadGroupTest {
       );
     }
 
+    public DslTestPlan infiniteIterationsThreadGroup() {
+      return testPlan(
+          threadGroup(1, -1,
+              httpSampler("http://localhost"),
+              httpSampler("http://myhost")
+          )
+      );
+    }
+
     public DslTestPlan simpleThreadGroupWithRampAndIterations() {
       return testPlan(
           threadGroup()
@@ -482,6 +491,18 @@ public class DslDefaultThreadGroupTest {
               .holdFor(Duration.ofSeconds(1))
               .rampTo(1, Duration.ofSeconds(2))
               .holdIterating(1)
+              .children(
+                  httpSampler("http://localhost"),
+                  httpSampler("http://myhost")
+              )
+      );
+    }
+
+    public DslTestPlan simpleThreadGroupWithRampAndInfiniteIterations() {
+      return testPlan(
+          threadGroup()
+              .rampTo(1, Duration.ofSeconds(2))
+              .holdIterating(-1)
               .children(
                   httpSampler("http://localhost"),
                   httpSampler("http://myhost")

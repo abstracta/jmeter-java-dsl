@@ -92,6 +92,16 @@ public class JmeterDsl {
    * @param threads    specifies the number of threads to simulate concurrent virtual users.
    * @param iterations specifies the number of iterations that each virtual user will run of
    *                   children elements until it stops.
+   *                   <p>
+   *                   If you specify -1, then threads will iterate until test plan execution is
+   *                   interrupted (you manually stop the running process, there is an error and
+   *                   thread group is configured to stop on error, or some other explicit
+   *                   termination condition).
+   *                   <p>
+   *                   <b>Setting this property to -1 is in general not advised</b>, since you might
+   *                   inadvertently end up running a test plan without
+   *                   limits consuming unnecessary computing power. Prefer specifying a big value
+   *                   as a safe limit for iterations or duration instead.
    * @param children   contains the test elements that each thread will execute in each iteration.
    * @return the thread group instance.
    * @see DslDefaultThreadGroup
