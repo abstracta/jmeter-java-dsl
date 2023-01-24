@@ -70,7 +70,7 @@ public abstract class MethodCallBuilderTest {
         .getMethods().stream()
         .collect(
             Collectors.toMap(NodeWithSimpleName::getNameAsString,
-                m -> m.getBody().map(Objects::toString).orElse("")));
+                m -> m.getBody().map(Objects::toString).orElse("").replace("\r\n", "\n")));
   }
 
   @ParameterizedTest(name = "{0}")
@@ -87,12 +87,12 @@ public abstract class MethodCallBuilderTest {
   private String buildMethodBodyWith(String code) {
     // we reformat code to match MethodDeclaration.getBody reformatted code
     String ret = code
-        .replaceAll("(\n\\s*)//([^\n]+)\n\\s*\\.","$1.//$2<EOC>")
+        .replaceAll("(\n\\s*)//([^\n]+)\n\\s*\\.", "$1.//$2<EOC>")
         .replaceAll("\n\\s+", " ")
         .replaceAll("\\(\\s*", "(")
         .replaceAll("\\s*\\)", ")")
         .replaceAll("\\s*\\.", ".")
-        .replace("<EOC>","\n    ");
+        .replace("<EOC>", "\n    ");
     return "{\n    return " + ret + ";\n}";
   }
 
