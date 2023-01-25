@@ -5,8 +5,11 @@ import java.util.List;
 import org.apache.jmeter.protocol.http.control.CookieManager;
 import org.apache.jmeter.protocol.http.gui.CookiePanel;
 import org.apache.jmeter.testelement.TestElement;
-import us.abstracta.jmeter.javadsl.codegeneration.*;
-import us.abstracta.jmeter.javadsl.codegeneration.params.*;
+import us.abstracta.jmeter.javadsl.codegeneration.MethodCall;
+import us.abstracta.jmeter.javadsl.codegeneration.MethodCallContext;
+import us.abstracta.jmeter.javadsl.codegeneration.MethodParam;
+import us.abstracta.jmeter.javadsl.codegeneration.TestElementParamBuilder;
+import us.abstracta.jmeter.javadsl.codegeneration.params.EnumParam;
 
 /**
  * Allows configuring cookies settings used by HTTP samplers.
@@ -31,7 +34,7 @@ public class DslCookieManager extends AutoEnabledHttpConfigElement {
 
   public enum CookiePolicy implements EnumParam.EnumPropertyValue {
 
-    STANDARD ("standard"),
+    STANDARD("standard"),
     /**
      * Compliant with the well-behaved profile defined by RFC 6265, section 4.
      */
@@ -70,7 +73,7 @@ public class DslCookieManager extends AutoEnabledHttpConfigElement {
 
     /**
      * Simulates the behavior of older versions of browsers like Mozilla FireFox and Internet
-     * Explorer
+     * Explorer.
      */
     COMPATABILITY("compatability");
 
@@ -148,12 +151,15 @@ public class DslCookieManager extends AutoEnabledHttpConfigElement {
     protected MethodCall buildMethodCall(MethodCallContext context) {
       TestElement testElement = context.getTestElement();
 
-      TestElementParamBuilder paramBuilder = new TestElementParamBuilder(testElement, "CookieManager");
-      MethodParam clearBetweenIterations = paramBuilder.boolParam("clearEachIteration", true);
+      TestElementParamBuilder paramBuilder = new TestElementParamBuilder(testElement,
+          "CookieManager");
+      MethodParam clearBetweenIterations = paramBuilder.boolParam("clearEachIteration",
+          true);
       MethodParam policy = paramBuilder.enumParam("policy", CookiePolicy.STANDARD);
       if (!clearBetweenIterations.isDefault() || !policy.isDefault()) {
         return buildMethodCall()
-            .chain("clearCookiesBetweenIterations", clearBetweenIterations).chain("cookiePolicy", policy);
+            .chain("clearCookiesBetweenIterations", clearBetweenIterations)
+            .chain("cookiePolicy", policy);
       } else {
         return super.buildMethodCall(context);
       }
