@@ -18,7 +18,6 @@ public class DslThroughputTimerTest extends JmeterDslTest {
   private static final int THREADS = 2;
   private static final int REQUESTS_PER_SECOND = 2;
   private static final int THROUGHPUT = REQUESTS_PER_SECOND * 60;
-  private static final double THRESHOLD = 0.30;
   private static final Duration TEST_DURATION = Duration.ofSeconds(5);
 
   @Test
@@ -33,13 +32,15 @@ public class DslThroughputTimerTest extends JmeterDslTest {
             sampler()
         )
     ).run();
-    assertThatSamplesCountIsAround(REQUESTS_PER_SECOND * TEST_DURATION.getSeconds(), stats);
+    assertThatSamplesCountIsAround(REQUESTS_PER_SECOND * TEST_DURATION.getSeconds(), THREADS * 2,
+        stats);
   }
 
-  private void assertThatSamplesCountIsAround(long expected, TestPlanStats stats) {
+  private void assertThatSamplesCountIsAround(long expected, int threads, TestPlanStats stats) {
+    // we always add a threshold depending on number of threads since last execution will always
+    // run past the specified time
     assertThat(stats.overall().samplesCount())
-        .isBetween(expected - Math.round(expected * THRESHOLD),
-            expected + Math.round(expected * THRESHOLD));
+        .isBetween(expected, expected + threads);
   }
 
   @NotNull
@@ -60,7 +61,8 @@ public class DslThroughputTimerTest extends JmeterDslTest {
             sampler()
         )
     ).run();
-    assertThatSamplesCountIsAround(2 * REQUESTS_PER_SECOND * TEST_DURATION.getSeconds(), stats);
+    assertThatSamplesCountIsAround(2 * REQUESTS_PER_SECOND * TEST_DURATION.getSeconds(),
+        2 * THREADS, stats);
   }
 
   @Test
@@ -74,7 +76,7 @@ public class DslThroughputTimerTest extends JmeterDslTest {
         )
     ).run();
     assertThatSamplesCountIsAround(THREADS * REQUESTS_PER_SECOND * TEST_DURATION.getSeconds(),
-        stats);
+        THREADS, stats);
   }
 
   @Nested

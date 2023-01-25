@@ -1,8 +1,10 @@
 ---
 home: true
+heroHeight: 68
 heroImage: /logo.svg
-actionText: User Guide →
-actionLink: /guide/
+actions:
+  - text: User Guide →
+    link: /guide/
 features:
 - title: 💙 Git, IDE & Programmers Friendly
   details: Simple way of defining performance tests that takes advantage of IDEs autocompletion and inline documentation.
@@ -10,6 +12,8 @@ features:
   details: Use the most popular performance tool and take advantage of the wide support of protocols and tools.
 - title: 😎 Built-in features & extensibility
   details: Built-in additional features which ease usage (like <a href="guide/#dsl-code-generation-from-jmx-file">jmx2dsl</a>)  and CI/CD pipelines integration.
+footer: Made by <a href="https://abstracta.us">Abstracta</a> with ❤️ | Apache 2.0 Licensed | Powered by <a href="https://v2.vuepress.vuejs.org/">Vuepress</a>
+footerHtml: true
 ---
 
 ## Example
@@ -20,7 +24,7 @@ Add dependency to your project:
 <dependency>
   <groupId>us.abstracta.jmeter</groupId>
   <artifactId>jmeter-java-dsl</artifactId>
-  <version>1.4</version>
+  <version>1.5</version>
   <scope>test</scope>
 </dependency>
 ```

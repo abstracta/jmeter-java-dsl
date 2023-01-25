@@ -7,10 +7,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
-import org.apache.jmeter.testelement.TestElement;
 import org.apache.jorphan.collections.HashTree;
 import us.abstracta.jmeter.javadsl.core.listeners.DslVisualizer;
-import us.abstracta.jmeter.javadsl.core.timers.DslThroughputTimer;
 
 /**
  * Contains information that can be used by elements to share info
@@ -98,7 +96,9 @@ public class BuildTreeContext {
   }
 
   public interface TreeContextEndListener {
+    
     void execute(BuildTreeContext context, HashTree tree);
+
   }
 
 }

@@ -36,7 +36,7 @@ jobs:
         with:
           commit_message: '[skip ci] Set release version'
           branch: master
-          file_pattern: 'pom.xml */pom.xml README.md docs/index.md docs/guide/README.md'
+          file_pattern: 'pom.xml */pom.xml README.md docs/index.md docs/guide/**'
       - name: package release
         run: mvn --batch-mode --no-transfer-progress clean install --settings .github/settings.xml
         env:
@@ -72,7 +72,7 @@ jobs:
         with:
           commit_message: '[skip ci] Set SNAPSHOT version'
           branch: master
-          file_pattern: 'pom.xml */pom.xml README.md docs/index.md docs/guide/README.md'
+          file_pattern: 'pom.xml */pom.xml README.md docs/index.md docs/guide/**'
       - name: deploy github pages
         run: .github/vuepress-deploy.sh
         env:

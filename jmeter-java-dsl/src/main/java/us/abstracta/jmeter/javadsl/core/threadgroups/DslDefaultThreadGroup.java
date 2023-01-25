@@ -38,9 +38,6 @@ public class DslDefaultThreadGroup extends BaseThreadGroup<DslDefaultThreadGroup
       List<ThreadGroupChild> children) {
     this(name, children);
     checkThreadCount(threads);
-    if (iterations <= 0) {
-      throw new IllegalArgumentException("Iterations must be >=1");
-    }
     stages.add(new Stage(threads, Duration.ZERO, null));
     stages.add(new Stage(threads, null, iterations));
   }
@@ -241,15 +238,23 @@ public class DslDefaultThreadGroup extends BaseThreadGroup<DslDefaultThreadGroup
    * at all.
    *
    * @param iterations number of iterations to execute the test plan steps each thread.
+   *                   <p>
+   *                   If you specify -1, then threads will iterate until test plan execution is
+   *                   interrupted (you manually stop the running process, there is an error and
+   *                   thread group is configured to stop on error, or some other explicit
+   *                   termination condition).
+   *                   <p>
+   *                   <b>Setting this property to -1 is in general not advised</b>, since you
+   *                   might
+   *                   inadvertently end up running a test plan without limits consuming unnecessary
+   *                   computing power. Prefer specifying a big value as a safe limit for iterations
+   *                   or duration instead.
    * @return the thread group for further configuration or usage.
    * @throws IllegalStateException when adding iterations would result in not supported JMeter
    *                               thread group.
    * @since 0.18
    */
   public DslDefaultThreadGroup holdIterating(int iterations) {
-    if (iterations < 0) {
-      throw new IllegalArgumentException("Iterations must be >=0");
-    }
     checkIterationsPreConditions();
     addStage(new Stage(getLastStage().threadCount(), null, iterations));
     return this;
