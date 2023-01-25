@@ -5,6 +5,7 @@ import java.util.List;
 import org.apache.jmeter.protocol.http.control.CookieManager;
 import org.apache.jmeter.protocol.http.gui.CookiePanel;
 import org.apache.jmeter.testelement.TestElement;
+import us.abstracta.jmeter.javadsl.codegeneration.*;
 
 /**
  * Allows configuring cookies settings used by HTTP samplers.
@@ -28,8 +29,10 @@ public class DslCookieManager extends AutoEnabledHttpConfigElement {
   protected boolean clearEachIteration = true;
 
   public enum CookiePolicy {
+
+    STANDARD ("standard"),
     /**
-     *Compliant with the well-behaved profile defined by RFC 6265, section 4.
+     * Compliant with the well-behaved profile defined by RFC 6265, section 4.
      */
     STANDARDSTRICT("standard-strict"),
 
@@ -70,11 +73,18 @@ public class DslCookieManager extends AutoEnabledHttpConfigElement {
      */
     COMPATABILITY("compatability");
 
+
+
     private final String cookiePolicy;
 
     CookiePolicy(String cookiePolicy) {
 
       this.cookiePolicy = cookiePolicy;
+    }
+
+    @Override
+    public String propertyValue() {
+      return cookiePolicy;
     }
   }
 
@@ -95,6 +105,7 @@ public class DslCookieManager extends AutoEnabledHttpConfigElement {
   /**
    * Cookies are cleared each iteration by default. If this is not desirable, for instance if
    * logging in once and then iterating through actions multiple times, use this to set to false.
+   *
    * @param clear boolean to set clearing of cookies
    * @return the cookie manager for further configuration or usage.
    * @since 1.6
@@ -106,6 +117,7 @@ public class DslCookieManager extends AutoEnabledHttpConfigElement {
 
   /**
    * Used to set the required cookie policy If 'standard' cookie types are not suitable.
+   *
    * @param policy ENUM for the cookie policy
    * @return the cookie manager for further configuration or usage.
    * @since 1.6
@@ -128,6 +140,24 @@ public class DslCookieManager extends AutoEnabledHttpConfigElement {
 
     public CodeBuilder(List<Method> builderMethods) {
       super(CookieManager.class, builderMethods);
+    }
+
+    @Override
+    protected MethodCall buildMethodCall(MethodCallContext context) {
+      TestElement testElement = context.getTestElement();
+
+      // the string is the prefix JMeter uses for jmeter properties when storing in JMX. Is actually optional but when you have multiple properties with same prefix is handy to set it here and don't have to specify it in each property
+      TestElementParamBuilder paramBuilder = new TestElementParamBuilder(testElement, "CookieManager");
+      // the string here corresponds to the jmeter property name in JMX (removing the prefix if you already added it in param builder)
+      MethodParam clearBetweenIterations = paramBuilder.boolParam("clearEachIteration", true);
+      MethodParam policy = paramBuilder.enumParam("policy", CookiePolicy.STANDARD);
+      if (!clearBetweenIterations.isDefault() || !policy.isDefault()) {
+        return buildMethodCall()
+            // this string is the name of the method that allows setting the property
+            .chain("cleanBetweenIterations", clearBetweenIterations).chain("cookiePolicy", policy);
+      } else {
+        return super.buildMethodCall(testElement, context);
+      }
     }
   }
 }
