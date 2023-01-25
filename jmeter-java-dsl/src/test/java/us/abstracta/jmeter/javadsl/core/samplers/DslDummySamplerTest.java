@@ -103,7 +103,12 @@ public class DslDummySamplerTest {
     assertThat(result).isEqualTo(
         buildResultMap(label, url, requestBody, successful, responseCode, responseMessage,
             RESPONSE_BODY));
-    assertThat(actualResponseTime).isGreaterThanOrEqualTo(responseTime.toMillis());
+    /*
+     sometimes measured time may differ for a few milliseconds. Add some threshold to avoid
+     fragility.
+     */
+    long timeThresholdMillis = 10;
+    assertThat(actualResponseTime).isGreaterThanOrEqualTo(responseTime.toMillis() - timeThresholdMillis);
     assertThat(processingTime).isGreaterThanOrEqualTo(actualResponseTime);
   }
 

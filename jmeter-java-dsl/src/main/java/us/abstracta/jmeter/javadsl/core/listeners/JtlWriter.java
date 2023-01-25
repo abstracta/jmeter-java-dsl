@@ -10,6 +10,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.regex.Pattern;
 import org.apache.jmeter.reporters.ResultCollector;
 import org.apache.jmeter.samplers.SampleSaveConfiguration;
 import org.apache.jmeter.testelement.TestElement;
@@ -715,7 +716,7 @@ public class JtlWriter extends BaseListener {
     protected MethodCall buildMethodCall(ResultCollector collector, MethodCallContext context) {
       TestElementParamBuilder paramBuilder = new TestElementParamBuilder(collector);
       String fileName = paramBuilder.stringParam(ResultCollector.FILENAME).getExpression();
-      String[] fileParts = fileName.split(File.separator, 2);
+      String[] fileParts = fileName.split(Pattern.quote(File.separator), 2);
       MethodCall ret = buildMethodCall(new StringParam(fileParts.length > 1 ? fileParts[0] : ""),
           new StringParam(fileParts[fileParts.length - 1]));
       SampleSaveConfiguration config = collector.getSaveConfig();
