@@ -6,6 +6,7 @@ import org.apache.jmeter.protocol.http.control.CookieManager;
 import org.apache.jmeter.protocol.http.gui.CookiePanel;
 import org.apache.jmeter.testelement.TestElement;
 import us.abstracta.jmeter.javadsl.codegeneration.*;
+import us.abstracta.jmeter.javadsl.codegeneration.params.*;
 
 /**
  * Allows configuring cookies settings used by HTTP samplers.
@@ -28,7 +29,7 @@ public class DslCookieManager extends AutoEnabledHttpConfigElement {
   protected String cookiePolicy;
   protected boolean clearEachIteration = true;
 
-  public enum CookiePolicy {
+  public enum CookiePolicy implements EnumParam.EnumPropertyValue {
 
     STANDARD ("standard"),
     /**
@@ -116,7 +117,8 @@ public class DslCookieManager extends AutoEnabledHttpConfigElement {
   }
 
   /**
-   * Used to set the required cookie policy If 'standard' cookie types are not suitable.
+   * Used to set the required cookie policy If 'standard' cookie types are not suitable, for
+   * instance if the application under test only supports a specific cookie implementation.
    *
    * @param policy ENUM for the cookie policy
    * @return the cookie manager for further configuration or usage.
@@ -154,9 +156,9 @@ public class DslCookieManager extends AutoEnabledHttpConfigElement {
       if (!clearBetweenIterations.isDefault() || !policy.isDefault()) {
         return buildMethodCall()
             // this string is the name of the method that allows setting the property
-            .chain("cleanBetweenIterations", clearBetweenIterations).chain("cookiePolicy", policy);
+            .chain("clearCookiesBetweenIterations", clearBetweenIterations).chain("cookiePolicy", policy);
       } else {
-        return super.buildMethodCall(testElement, context);
+        return super.buildMethodCall(context);
       }
     }
   }

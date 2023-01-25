@@ -8,6 +8,7 @@ import static us.abstracta.jmeter.javadsl.JmeterDsl.threadGroup;
 import org.junit.jupiter.api.Nested;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodCallBuilderTest;
 import us.abstracta.jmeter.javadsl.core.DslTestPlan;
+import us.abstracta.jmeter.javadsl.http.DslCookieManager.CookiePolicy;
 
 public class DslCookieManagerTest {
 
@@ -43,7 +44,7 @@ public class DslCookieManagerTest {
 
     public DslTestPlan testPlanWithCookiePolicy() {
       return testPlan(
-          httpCookies().cookiePolicy(DslCookieManager.CookiePolicy.NETSCAPE),
+          httpCookies().cookiePolicy(CookiePolicy.NETSCAPE),
           threadGroup(1, 1
           )
       );
