@@ -148,14 +148,11 @@ public class DslCookieManager extends AutoEnabledHttpConfigElement {
     protected MethodCall buildMethodCall(MethodCallContext context) {
       TestElement testElement = context.getTestElement();
 
-      // the string is the prefix JMeter uses for jmeter properties when storing in JMX. Is actually optional but when you have multiple properties with same prefix is handy to set it here and don't have to specify it in each property
       TestElementParamBuilder paramBuilder = new TestElementParamBuilder(testElement, "CookieManager");
-      // the string here corresponds to the jmeter property name in JMX (removing the prefix if you already added it in param builder)
       MethodParam clearBetweenIterations = paramBuilder.boolParam("clearEachIteration", true);
       MethodParam policy = paramBuilder.enumParam("policy", CookiePolicy.STANDARD);
       if (!clearBetweenIterations.isDefault() || !policy.isDefault()) {
         return buildMethodCall()
-            // this string is the name of the method that allows setting the property
             .chain("clearCookiesBetweenIterations", clearBetweenIterations).chain("cookiePolicy", policy);
       } else {
         return super.buildMethodCall(context);
