@@ -6,6 +6,8 @@ testPlan()
             .set("scheme", "https"),
           httpDefaults()
             .url("https://abstracta.us"),
+          httpCookies()
+            .clearCookiesBetweenIterations(false),
           httpCache()
             .disable(),
           threadGroup(1, 1,

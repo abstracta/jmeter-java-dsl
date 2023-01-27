@@ -81,6 +81,12 @@
       <version>4.4.16</version>
     </dependency>
     <dependency>
+      <groupId>org.apache.httpcomponents</groupId>
+      <artifactId>httpclient</artifactId>
+      <!-- Same version as JMeter dependency -->
+      <version>4.5.13</version>
+    </dependency>
+    <dependency>
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
       <!-- Same version as JMeter dependency -->

@@ -44,7 +44,8 @@ public class DslCookieManagerTest {
 
     public DslTestPlan testPlanWithCookiePolicy() {
       return testPlan(
-          httpCookies().cookiePolicy(CookiePolicy.NETSCAPE),
+          httpCookies()
+              .cookiePolicy(CookiePolicy.NETSCAPE),
           threadGroup(1, 1
           )
       );
@@ -52,7 +53,8 @@ public class DslCookieManagerTest {
 
     public DslTestPlan testPlanWithClearIterationsOff() {
       return testPlan(
-          httpCookies().clearCookiesBetweenIterations(false),
+          httpCookies()
+              .clearCookiesBetweenIterations(false),
           threadGroup(1, 1
           )
       );

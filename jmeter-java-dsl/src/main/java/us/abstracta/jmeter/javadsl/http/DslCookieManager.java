@@ -20,76 +20,91 @@ import us.abstracta.jmeter.javadsl.codegeneration.params.EnumParam;
  * This element has to be added before any http sampler to be considered, and if you add multiple
  * instances of cookie manager to a test plan, only the first one will be considered.
  *
- * Clearing cookies on each iteration is defaulted to true but setClearCookiesBetweenIterations()
- * can be used to set to false if required.
- * The default cookie policy is 'standard' but setCookiePolicy() can be used to specify the
- * required cookie policy
- *
  * @since 0.17
  */
 public class DslCookieManager extends AutoEnabledHttpConfigElement {
 
-  protected String cookiePolicy;
+  protected CookiePolicy cookiePolicy = CookiePolicy.STANDARD;
   protected boolean clearEachIteration = true;
 
   public enum CookiePolicy implements EnumParam.EnumPropertyValue {
 
+    /**
+     * Compliant with <a href="https://www.rfc-editor.org/rfc/rfc6265">RFC 6265</a> using a relaxed
+     * interpretation of HTTP state management.
+     * <p>
+     * This is the default value, and should work in most cases.
+     *
+     * @see org.apache.http.impl.cookie.RFC6265LaxSpec
+     */
     STANDARD("standard"),
     /**
-     * Compliant with the well-behaved profile defined by RFC 6265, section 4.
+     * Compliant with <a href="https://www.rfc-editor.org/rfc/rfc6265">RFC 6265</a> using strict
+     * adherence to state management of RFC 6265 section 4.
+     * <p>
+     * This might come in handy when you actually want to verify that a service is in strict
+     * adherence to the RFC.
+     *
+     * @see org.apache.http.impl.cookie.RFC6265StrictSpec
      */
-    STANDARDSTRICT("standard-strict"),
-
+    STANDARD_STRICT("standard-strict"),
     /**
-     * All cookies are ignored. Same as delete or disable Cookie Manager.
-     */
-    IGNORECOOKIES("ignoreCookies"),
-
-    /**
-     * Corresponds to the original draft specification published by Netscape Communications.
-     */
-    NETSCAPE("netscape"),
-
-    /**
-     * Select RFC 2965, RFC 2109 or Netscape draft compliant implementation based on cookies
+     * Selects RFC 2965, RFC 2109 or Netscape draft compliant implementation based on cookies
      * properties sent with the HTTP response.
+     * <p>
+     * This is helpful to test browser compatibility with old versions of RFCs. In general prefer
+     * using the STANDARD cookie policy.
+     *
+     * @see org.apache.http.impl.cookie.DefaultCookieSpec
      */
-    DEFAULT("default"),
-
+    BEST_MATCH("best-match"),
     /**
-     * Compliant with the specification defined by RFC 2109.
-     */
-    RFC2109("rfc2109"),
-
-    /**
-     * Compliant with the specification defined by RFC 2965.
+     * Compliant with <a href="https://www.rfc-editor.org/rfc/rfc2965">RFC 2965</a>.
+     * <p>
+     * This RFC is obsolete and replaced by RFC 6265, so this option should only be used in legacy
+     * applications that use this RFC.
+     * <p>
+     * You may use {@link #BEST_MATCH} as alternative which in general should also be compatible
+     * with RFC 2965.
+     *
+     * @see org.apache.http.impl.cookie.RFC2965Spec
      */
     RFC2965("rfc2965"),
-
     /**
+     * Compliant with <a href="https://www.rfc-editor.org/rfc/rfc2109">RFC 2109</a>.
+     * <p>
+     * This RFC is obsolete and replaced by RFC 6265, so this option should only be used in legacy
+     * applications that use this RFC.
+     * <p>
+     * You may use {@link #BEST_MATCH} as alternative which in general should also be compatible
+     * with RFC 2109.
      *
+     * @see org.apache.http.impl.cookie.RFC2109Spec
      */
-    BESTMATCH("best-match"),
-
+    RFC2109("rfc2109"),
     /**
-     * Simulates the behavior of older versions of browsers like Mozilla FireFox and Internet
-     * Explorer.
+     * Conforms to the original draft specification published by Netscape Communications.
+     * <p>
+     * This should be in general be avoided, unless is necessary to test legacy applications.
+     * <p>
+     * You may use {@link #BEST_MATCH} as alternative which in general should also be compatible
+     * with Netscape policy.
+     *
+     * @see org.apache.http.impl.cookie.NetscapeDraftSpec
      */
-    COMPATABILITY("compatability");
+    NETSCAPE("netscape");
 
-
-
-    private final String cookiePolicy;
+    private final String propertyValue;
 
     CookiePolicy(String cookiePolicy) {
-
-      this.cookiePolicy = cookiePolicy;
+      this.propertyValue = cookiePolicy;
     }
 
     @Override
     public String propertyValue() {
-      return cookiePolicy;
+      return propertyValue;
     }
+
   }
 
   public DslCookieManager() {
@@ -97,7 +112,7 @@ public class DslCookieManager extends AutoEnabledHttpConfigElement {
   }
 
   /**
-   * disables HTTP cookies handling for the test plan.
+   * Disables HTTP cookies handling for the test plan.
    *
    * @return the DslCookieManager to allow fluent API usage.
    */
@@ -107,10 +122,12 @@ public class DslCookieManager extends AutoEnabledHttpConfigElement {
   }
 
   /**
+   * Allows to enable or disable clearing cookies between thread group iterations.
+   * <p>
    * Cookies are cleared each iteration by default. If this is not desirable, for instance if
    * logging in once and then iterating through actions multiple times, use this to set to false.
    *
-   * @param clear boolean to set clearing of cookies
+   * @param clear boolean to set clearing of cookies. By default, it is set to true.
    * @return the cookie manager for further configuration or usage.
    * @since 1.6
    */
@@ -120,16 +137,19 @@ public class DslCookieManager extends AutoEnabledHttpConfigElement {
   }
 
   /**
-   * Used to set the required cookie policy If 'standard' cookie types are not suitable, for
-   * instance if the application under test only supports a specific cookie implementation.
+   * Used to set the required cookie policy used to manage cookies.
+   * <p>
+   * You might need to change the 'standard' cookie policy if the application under test only
+   * supports a specific cookie implementation.
    *
-   * @param policy ENUM for the cookie policy
+   * @param policy specifies the particular cookie policy to use. By default, it is set to standard
+   *               cookie policy.
    * @return the cookie manager for further configuration or usage.
+   * @see CookiePolicy
    * @since 1.6
    */
   public DslCookieManager cookiePolicy(DslCookieManager.CookiePolicy policy) {
-
-    this.cookiePolicy = policy.cookiePolicy;
+    this.cookiePolicy = policy;
     return this;
   }
 
@@ -137,7 +157,7 @@ public class DslCookieManager extends AutoEnabledHttpConfigElement {
   protected TestElement buildTestElement() {
     CookieManager ret = new CookieManager();
     ret.setClearEachIteration(clearEachIteration);
-    ret.setCookiePolicy(cookiePolicy);
+    ret.setCookiePolicy(cookiePolicy.propertyValue);
     return ret;
   }
 
@@ -150,7 +170,6 @@ public class DslCookieManager extends AutoEnabledHttpConfigElement {
     @Override
     protected MethodCall buildMethodCall(MethodCallContext context) {
       TestElement testElement = context.getTestElement();
-
       TestElementParamBuilder paramBuilder = new TestElementParamBuilder(testElement,
           "CookieManager");
       MethodParam clearBetweenIterations = paramBuilder.boolParam("clearEachIteration",
@@ -164,5 +183,7 @@ public class DslCookieManager extends AutoEnabledHttpConfigElement {
         return super.buildMethodCall(context);
       }
     }
+
   }
+
 }
