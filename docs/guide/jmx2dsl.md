@@ -13,7 +13,7 @@ java -jar jmx2dsl.jar test-plan.jmx
 
 ::: code-group-item Jbang
 ```bash
-jbang us.abstracta.jmeter:jmeter-java-dsl-jmx2dsl:1.6 test-plan.jmx
+jbang us.abstracta.jmeter:jmeter-java-dsl-jmx2dsl:1.7 test-plan.jmx
 ```
 :::
 ::::
@@ -29,7 +29,7 @@ executable (eg: chmod +x ./PerformanceTest.java) and just executing it with ./Pe
 //DEPS org.assertj:assertj-core:3.23.1
 //DEPS org.junit.jupiter:junit-jupiter-engine:5.9.1
 //DEPS org.junit.platform:junit-platform-launcher:1.9.1
-//DEPS us.abstracta.jmeter:jmeter-java-dsl:1.6
+//DEPS us.abstracta.jmeter:jmeter-java-dsl:1.7
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.*;
