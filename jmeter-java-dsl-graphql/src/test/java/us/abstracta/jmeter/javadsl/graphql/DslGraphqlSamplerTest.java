@@ -3,6 +3,7 @@ package us.abstracta.jmeter.javadsl.graphql;
 import static com.github.tomakehurst.wiremock.client.WireMock.anyUrl;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalToJson;
+import static com.github.tomakehurst.wiremock.client.WireMock.getRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.verify;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.testPlan;
@@ -123,6 +124,18 @@ public class DslGraphqlSamplerTest extends JmeterDslTest {
     verify(postRequestedFor(anyUrl())
         .withRequestBody(equalToJson(
             buildRequestBody(null, Collections.singletonMap(graphqlVarName, varValue)))));
+  }
+
+  @Test
+  public void shouldSendGraphqlQueryToServerWhenGraphqlSamplerWithHttpGet()
+      throws Exception {
+    testPlan(
+        threadGroup(1, 1,
+            graphqlSampler(wiremockUri, QUERY)
+                .httpGet()
+        )
+    ).run();
+    verify(getRequestedFor(anyUrl()).withQueryParam("query", equalTo(QUERY)));
   }
 
   @Nested

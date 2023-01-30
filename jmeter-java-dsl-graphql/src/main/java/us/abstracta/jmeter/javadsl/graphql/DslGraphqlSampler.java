@@ -15,11 +15,13 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 import org.apache.http.entity.ContentType;
 import org.apache.jmeter.config.Arguments;
+import org.apache.jmeter.protocol.http.config.GraphQLRequestParams;
 import org.apache.jmeter.protocol.http.config.gui.GraphQLUrlConfigGui;
 import org.apache.jmeter.protocol.http.control.HeaderManager;
 import org.apache.jmeter.protocol.http.control.gui.GraphQLHTTPSamplerGui;
 import org.apache.jmeter.protocol.http.sampler.HTTPSamplerBase;
 import org.apache.jmeter.protocol.http.sampler.HTTPSamplerProxy;
+import org.apache.jmeter.protocol.http.util.GraphQLRequestParamUtils;
 import org.apache.jmeter.protocol.http.util.HTTPArgument;
 import org.apache.jmeter.protocol.http.util.HTTPConstants;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodCall;
@@ -48,6 +50,7 @@ public class DslGraphqlSampler extends DslBaseHttpSampler<DslGraphqlSampler> {
   protected String operationName;
   protected final Map<String, Object> variables = new LinkedHashMap<>();
   protected String variablesJson;
+  protected String method = HTTPConstants.POST;
 
   public DslGraphqlSampler(String name, String url, String query) {
     super(name != null ? name : DEFAULT_NAME, url, GraphQLHTTPSamplerGui.class);
@@ -155,15 +158,30 @@ public class DslGraphqlSampler extends DslBaseHttpSampler<DslGraphqlSampler> {
     return this;
   }
 
+  /**
+   * Allows specifying to use HTTP GET method instead of POST method.
+   * <p>
+   * This method is helpful in some particular cases where you might want to send request with GET
+   * method instead of POST method to properly emulate a client using such HTTP method.
+   *
+   * @return the sampler for further configuration or usage.
+   * @since 1.7
+   */
+  public DslGraphqlSampler httpGet() {
+    method = HTTPConstants.GET;
+    return this;
+  }
+
   @Override
   public HTTPSamplerProxy configureHttpTestElement(HTTPSamplerProxy elem) {
-    elem.setMethod(HTTPConstants.POST);
+    elem.setMethod(method);
     elem.setProperty(GraphQLUrlConfigGui.OPERATION_NAME, operationName);
     elem.setProperty(GraphQLUrlConfigGui.QUERY, query);
-    elem.setProperty(HTTPSamplerBase.POST_BODY_RAW, false);
+    elem.setProperty(HTTPSamplerBase.POST_BODY_RAW, !HTTPConstants.GET.equals(method));
     String varsJson = buildVariablesJson();
     elem.setProperty(GraphQLUrlConfigGui.VARIABLES, varsJson);
-    elem.setArguments(buildHttpArguments(buildGraphqlBody(varsJson)));
+    elem.setArguments(HTTPConstants.GET.equals(method) ? buildHttpGetArguments(varsJson)
+        : buildHttpPostArguments(varsJson));
     return elem;
   }
 
@@ -182,31 +200,33 @@ public class DslGraphqlSampler extends DslBaseHttpSampler<DslGraphqlSampler> {
     }
   }
 
-  /*
-   until jmeter 5.5 is released (which fixes this issue:
-   https://bz.apache.org/bugzilla/show_bug.cgi?id=65108) we need custom serialization instead of
-   GraphQLRequestParamUtils.toPostBodyString.
-   */
-  private String buildGraphqlBody(String jsonVariables) {
-    Map<String, Object> ret = new LinkedHashMap<>();
-    ret.put("operationName", operationName);
-    if (!jsonVariables.trim().isEmpty()) {
-      ret.put("variables", new RawValue(jsonVariables));
+  private Arguments buildHttpGetArguments(String jsonVariables) {
+    Arguments args = new Arguments();
+    if (operationName != null && !operationName.trim().isEmpty()) {
+      args.addArgument(new HTTPArgument("operationName", operationName.trim()));
     }
-    ret.put("query", query);
-    try {
-      return OBJECT_MAPPER.writeValueAsString(ret);
-    } catch (JsonProcessingException e) {
-      throw new RuntimeException("Cannot serialize JSON for POST body string", e);
+    args.addArgument(
+        new HTTPArgument("query", GraphQLRequestParamUtils.queryToGetParamValue(query)));
+    if (variablesJson != null && !variablesJson.trim().isEmpty()) {
+      args.addArgument(new HTTPArgument("variables", jsonVariables));
     }
+    return args;
   }
 
-  private Arguments buildHttpArguments(String body) {
+  private Arguments buildHttpPostArguments(String jsonVariables) {
     Arguments args = new Arguments();
-    HTTPArgument arg = new HTTPArgument("", body, false);
+    HTTPArgument arg = new HTTPArgument("", buildGraphqlBody(jsonVariables));
     arg.setAlwaysEncoded(false);
     args.addArgument(arg);
     return args;
+  }
+
+  private String buildGraphqlBody(String jsonVariables) {
+    GraphQLRequestParams params = new GraphQLRequestParams();
+    params.setOperationName(operationName);
+    params.setQuery(query);
+    params.setVariables(jsonVariables);
+    return GraphQLRequestParamUtils.toPostBodyString(params);
   }
 
   public static class CodeBuilder extends BaseHttpSamplerCodeBuilder {
