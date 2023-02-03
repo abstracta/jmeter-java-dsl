@@ -65,7 +65,7 @@
     <module>jmeter-java-dsl-parallel</module>
     <module>jmeter-java-dsl-jdbc</module>
     <module>jmeter-java-dsl-wrapper</module>
-    <module>jmeter-java-dsl-jmx2dsl</module>
+    <module>jmeter-java-dsl-cli</module>
     <module>jmeter-java-dsl-graphql</module>
     <module>jmeter-java-dsl-octoperf</module>
   </modules>

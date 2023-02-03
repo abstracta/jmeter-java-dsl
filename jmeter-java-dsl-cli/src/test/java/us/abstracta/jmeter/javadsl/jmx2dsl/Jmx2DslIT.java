@@ -11,7 +11,6 @@ import java.util.Collections;
 import org.apache.http.entity.ContentType;
 import org.junit.jupiter.api.Test;
 import us.abstracta.jmeter.javadsl.codegeneration.TestClassTemplate;
-import us.abstracta.jmeter.javadsl.jmx2dsl.Jmx2Dsl.ManifestVersionProvider;
 import us.abstracta.jmeter.javadsl.util.TestResource;
 
 public class Jmx2DslIT {
@@ -19,7 +18,7 @@ public class Jmx2DslIT {
   @Test
   public void shouldGetConvertedFileWhenConvert() throws Exception {
     Process p = new ProcessBuilder()
-        .command("java", "-jar", "target/jmx2dsl.jar",
+        .command("java", "-jar", "target/jmdsl.jar", "jmx2dsl",
             new TestResource("test-plan.jmx").filePath())
         .start();
     String output = processOutput2String(p);

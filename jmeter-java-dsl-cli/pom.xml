@@ -9,14 +9,24 @@
     <version>1.8-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
-  <artifactId>jmeter-java-dsl-jmx2dsl</artifactId>
+  <artifactId>jmeter-java-dsl-cli</artifactId>
 
   <name>${project.artifactId}</name>
-  <description>Module which includes executable jar to convert JMX files to DSL code</description>
+  <description>Module which includes executable jar with different utility commands (like jmx2dsl)</description>
 
   <properties>
     <picocli.version>4.7.0</picocli.version>
+    <log4j.version>2.19.0</log4j.version>
+    <!-- same version as JMeter dependency -->
+    <slf4j.version>1.7.36</slf4j.version>
   </properties>
+
+  <repositories>
+    <repository>
+      <id>jitpack.io</id>
+      <url>https://jitpack.io</url>
+    </repository>
+  </repositories>
 
   <dependencies>
     <dependency>
@@ -45,6 +55,8 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
+      <!-- We can't use IntelliJ to test jmx2dsl with elasticsearch conversion due to this
+      limitation: https://youtrack.jetbrains.com/issue/IDEA-126596-->
       <groupId>us.abstracta.jmeter</groupId>
       <artifactId>jmeter-java-dsl-elasticsearch-listener</artifactId>
       <version>${project.version}</version>
@@ -53,6 +65,28 @@
       <groupId>info.picocli</groupId>
       <artifactId>picocli</artifactId>
       <version>${picocli.version}</version>
+    </dependency>
+    <!-- TODO change the version to a tag when plugin release is properly fixed in jitpack.
+     https://www.jitpack.io/#Blazemeter/CorrelationRecorder-->
+    <dependency>
+      <groupId>com.github.Blazemeter</groupId>
+      <artifactId>CorrelationRecorder</artifactId>
+      <version>42d23f6ae0</version>
+    </dependency>
+    <dependency>
+      <groupId>org.seleniumhq.selenium</groupId>
+      <artifactId>selenium-chrome-driver</artifactId>
+      <version>4.8.0</version>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <version>${slf4j.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>jul-to-slf4j</artifactId>
+      <version>${slf4j.version}</version>
     </dependency>
     <dependency>
       <groupId>us.abstracta.jmeter</groupId>
@@ -64,7 +98,7 @@
   </dependencies>
 
   <build>
-    <finalName>jmx2dsl</finalName>
+    <finalName>jmdsl</finalName>
     <testResources>
       <testResource>
         <directory>src/test/resources</directory>
@@ -101,7 +135,7 @@
             <configuration>
               <!-- Tune shade to reduce final size. Every time a new dependency is added to this
               project dependencies should be reviewed (with mvn dependency:tree) to identify any
-              dependencies that may not be needed in jmx2dsl and can be excluded  -->
+              dependencies that may not be needed by cli and can be excluded  -->
               <artifactSet>
                 <includes>
                   <include>us.abstracta.jmeter:*</include>
@@ -138,11 +172,29 @@
                   <include>com.github.weisj:darklaf-theme</include>
                   <include>com.github.weisj:darklaf-core</include>
                   <include>com.github.weisj:darklaf-utils</include>
-                  <include>com.github.delirius325:jmeter-elasticsearch-backend-listener</include>
+                  <include>org.seleniumhq.selenium:*</include>
+                  <include>com.google.guava:guava</include>
+                  <include>com.github.Blazemeter:CorrelationRecorder</include>
+                  <include>com.fasterxml.jackson.core:jackson-annotations</include>
+                  <include>org.apache.commons:commons-text</include>
+                  <include>dev.failsafe:failsafe</include>
+                  <include>io.netty:netty-buffer</include>
+                  <include>io.netty:netty-codec</include>
+                  <include>io.netty:netty-codec-http</include>
+                  <include>io.netty:netty-common</include>
+                  <include>io.netty:netty-handler</include>
+                  <include>io.netty:netty-resolver</include>
+                  <include>io.netty:netty-transport</include>
+                  <include>org.asynchttpclient:async-http-client</include>
+                  <include>org.asynchttpclient:async-http-client-netty-utils</include>
+                  <include>org.reactivestreams:reactive-streams</include>
+                  <include>org.apache.commons:commons-exec</include>
+                  <include>org.slf4j:jul-to-slf4j</include>
+                  <include>org.apache.httpcomponents:httpmime</include>
+                  <include>org.brotli:dec</include>
+                  <include>org.jsoup:jsoup</include>
+                  <include>com.typesafe.netty:netty-reactive-streams</include>
                 </includes>
-                <excludes>
-                  <exclude>kg.apc:jmeter-plugins-charts</exclude>
-                </excludes>
               </artifactSet>
               <filters>
                 <filter>
@@ -159,13 +211,16 @@
                     <exclude>META-INF/*.SF</exclude>
                     <exclude>META-INF/*.DSA</exclude>
                     <exclude>META-INF/*.RSA</exclude>
+                    <exclude>module-info.class</exclude>
+                    <exclude>**/pom.properties</exclude>
+                    <exclude>**/pom.xml</exclude>
                   </excludes>
                 </filter>
               </filters>
               <transformers>
                 <transformer
                   implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                  <mainClass>us.abstracta.jmeter.javadsl.jmx2dsl.Jmx2Dsl</mainClass>
+                  <mainClass>us.abstracta.jmeter.javadsl.cli.Cli</mainClass>
                   <manifestEntries>
                     <Multi-Release>true</Multi-Release>
                   </manifestEntries>
