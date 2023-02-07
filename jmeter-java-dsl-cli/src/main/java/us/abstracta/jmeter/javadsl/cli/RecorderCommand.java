@@ -43,21 +43,24 @@ public class RecorderCommand implements Callable<Integer> {
 
   @Option(names = {CONFIG_OPTION}, paramLabel = "YAML_CONFIG_FILE",
       description = {
-          "Yaml configuration file as an alternative to command line options.\n"
-              + "This provides an alternative to passing every configuration as parameter and make "
-              + "configuration more reusable and shareable.\n"
-              + "Each option corresponds to a property in yaml file under `recorder` element and "
+          "Yaml configuration file as an alternative to command line options.",
+          "This provides an alternative to passing every configuration as parameter and make "
+              + "configuration more reusable and shareable.",
+          "Each option corresponds to a property in yaml file under `recorder` element "
               + "replacing hyphens with camel case (eg: --header-excludes, is renamed to "
-              + "headerExcludes)\n"
-              + "Check the config file schema at: "
+              + "headerExcludes).",
+          "Check the config file schema at: "
               + "https://github.com/abstracta/jmeter-java-dsl/releases/download/"
-              + "v${sys:jmdsl.version}/jmdsl-config-schema.json."})
+              + "v${sys:jmdsl.version}/jmdsl-config-schema.json.",
+          "Default: ${DEFAULT-VALUE}."
+      }, defaultValue = ".jmdsl.yml")
   private File config;
 
   @Option(names = {"--workdir"}, defaultValue = "recording",
       description = {"Directory where logs (eg: jtl files) and other relevant data is stored.",
           "This directory contains useful information for reviewing recording details to tune "
-              + "recorded test plan, or to trace issues."})
+              + "recorded test plan, or to trace issues.",
+          "Default: ${DEFAULT_VALUE}"})
   private String workdir;
 
   @ArgGroup(validate = false, heading = "Requests filtering:%n")
@@ -124,7 +127,7 @@ public class RecorderCommand implements Callable<Integer> {
         description = {"Specifies not to use the default headers filter.",
             "This option might be helpful when you want a to record all headers which require "
                 + "specific values by the service under test (eg: User-Agent, Referer, etc).",
-            "These are the headers that are ignored by default: ${sys:defaultHeadersFilter}"})
+            "The default filter ignores these headers: ${sys:defaultHeadersFilter}"})
     private boolean ignoreDefaultHeaderFilter;
   }
 
@@ -203,12 +206,10 @@ public class RecorderCommand implements Callable<Integer> {
 
     @Override
     public String defaultValue(ArgSpec argSpec) throws Exception {
-      OptionSpec configOption = argSpec.command().findOption(CONFIG_OPTION);
-      if (configOption == null) {
-        return null;
-      }
       if (config == null) {
-        Map<String, Object> configMap = loadConfig(configOption.getValue());
+        OptionSpec configOption = argSpec.command().findOption(CONFIG_OPTION);
+        Map<String, Object> configMap = loadConfig(configOption.getValue(),
+            new File(configOption.defaultValue()));
         config = Optional.ofNullable(configMap.get(argSpec.command().name()))
             .map(c -> (Map<String, Object>) c)
             .orElse(Collections.emptyMap());
@@ -223,9 +224,15 @@ public class RecorderCommand implements Callable<Integer> {
       }
     }
 
-    private Map<String, Object> loadConfig(File filePath) throws IOException {
+    private Map<String, Object> loadConfig(File configFile, File defaultConfig) throws IOException {
+      if (configFile == null) {
+        if (!defaultConfig.exists()) {
+          return Collections.emptyMap();
+        }
+        configFile = defaultConfig;
+      }
       ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
-      return mapper.readValue(filePath, new TypeReference<Map<String, Object>>() {
+      return mapper.readValue(configFile, new TypeReference<Map<String, Object>>() {
       });
     }
 
