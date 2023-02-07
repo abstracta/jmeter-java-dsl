@@ -27,6 +27,12 @@ public class Cli {
 
   public static void main(String[] args) {
     System.setProperty("log4j2.Script.enableLanguages", "javascript");
+    try {
+      String version = new ManifestVersionProvider().getVersion()[0];
+      System.setProperty("jmdsl.version", version != null ? version : "");
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
     SLF4JBridgeHandler.removeHandlersForRootLogger();
     SLF4JBridgeHandler.install();
     int exitCode = new CommandLine(new Cli()).execute(args);

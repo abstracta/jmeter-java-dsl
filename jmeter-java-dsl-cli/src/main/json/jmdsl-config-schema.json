@@ -1,0 +1,69 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "$id": "https://github.com/abstracta/jmeter-java-dsl/jmeter-java-dsl-cli/config-schema.json",
+  "title": "cli configuration",
+  "description": "Defines configuration to be used with cli",
+  "type": "object",
+  "properties": {
+    "recorder": {
+      "title": "recorder command configuration",
+      "type": "object",
+      "properties": {
+        "url": {
+          "description": "Initial URL to start recording from",
+          "examples": [
+            "http://myservice.com"
+          ],
+          "type": "string"
+        },
+        "workdir": {
+          "description": "Directory where logs (eg: jtl files) and other relevant data is stored",
+          "type": "string",
+          "default": "recording"
+        },
+        "urlIncludes": {
+          "description": "Regular expressions used to only record requests with matching URLs.\nNOTE: Don't include scheme (e.g: http://) in regex",
+          "examples": [
+            "[^?]*mysite.com.*"
+          ],
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "urlExcludes": {
+          "description": "Regular expressions used to NOT record requests with matching URLs.\nNOTE: Don't include scheme (e.g: http://) in regex",
+          "examples": [
+            ".*google.com.*"
+          ],
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "urlIgnoreDefaultFilter": {
+          "description": "Specifies to use or not the default URL filter. The default filter ignores URLs matching: (?i).*\\.(bmp|css|js|gif|ico|jpe?g|png|svg|swf|ttf|woff2?|webp)(\\?.*)?",
+          "type": "boolean",
+          "default": false
+        },
+        "headerExcludes": {
+          "description": "Regular expressions used to ignore matching headers from recording",
+          "examples": [
+            "(?i)sec-.*"
+          ],
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "headerIgnoreDefaultFilter": {
+          "description": "Specifies to use or not the default headers filter. The default filter ignores these headers: Accept-Language,Upgrade-Insecure-Requests,Accept-Encoding,User-Agent,Accept,Referer,Origin,X-Requested-With,Cache-Control",
+          "type": "boolean",
+          "default": false
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

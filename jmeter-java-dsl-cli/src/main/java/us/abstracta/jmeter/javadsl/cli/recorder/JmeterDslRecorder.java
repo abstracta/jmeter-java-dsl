@@ -20,10 +20,10 @@ public class JmeterDslRecorder implements AutoCloseable {
       "Upgrade-Insecure-Requests", "Accept-Encoding", "User-Agent", "Accept", "Referer", "Origin",
       "X-Requested-With", "Cache-Control");
 
-  private final List<String> includingUrls = new ArrayList<>();
-  private final List<String> excludingUrls = new ArrayList<>(
+  private final List<String> urlIncludes = new ArrayList<>();
+  private final List<String> urlExcludes = new ArrayList<>(
       Collections.singletonList(DEFAULT_EXCLUDED_URLS));
-  private final List<String> excludingHeaders = new ArrayList<>(DEFAULT_EXCLUDED_HEADERS);
+  private final List<String> headerExcludes = new ArrayList<>(DEFAULT_EXCLUDED_HEADERS);
   private final List<CorrelationRule> correlations = new ArrayList<>();
   private JmeterProxyRecorder proxy;
   private String logsDirectory;
@@ -33,28 +33,28 @@ public class JmeterDslRecorder implements AutoCloseable {
     return this;
   }
 
-  public JmeterDslRecorder clearUrlsFilter() {
-    excludingUrls.clear();
+  public JmeterDslRecorder clearUrlFilter() {
+    urlExcludes.clear();
     return this;
   }
 
-  public JmeterDslRecorder urlsMatching(List<String> regexes) {
-    includingUrls.addAll(regexes);
+  public JmeterDslRecorder urlIncludes(List<String> regexes) {
+    urlIncludes.addAll(regexes);
     return this;
   }
 
-  public JmeterDslRecorder notUrlsMatching(List<String> regexes) {
-    excludingUrls.addAll(regexes);
+  public JmeterDslRecorder urlsExcludes(List<String> regexes) {
+    urlExcludes.addAll(regexes);
     return this;
   }
 
-  public JmeterDslRecorder clearHeadersFilter() {
-    excludingHeaders.clear();
+  public JmeterDslRecorder clearHeaderFilter() {
+    headerExcludes.clear();
     return this;
   }
 
-  public JmeterDslRecorder notHeadersMatching(List<String> regexes) {
-    excludingHeaders.addAll(regexes);
+  public JmeterDslRecorder headerExcludes(List<String> regexes) {
+    headerExcludes.addAll(regexes);
     return this;
   }
 
@@ -66,9 +66,9 @@ public class JmeterDslRecorder implements AutoCloseable {
     new JmeterEnvironment();
     proxy = new JmeterProxyRecorder()
         .logsDirectory(logsDirectory)
-        .excludeHeaders(excludingHeaders)
-        .includeUrls(includingUrls)
-        .excludeUrls(excludingUrls)
+        .headerExcludes(headerExcludes)
+        .urlIncludes(urlIncludes)
+        .urlExcludes(urlExcludes)
         .correlationRules(correlations);
     proxy.startRecording();
     return this;

@@ -58,7 +58,7 @@ public class JmeterProxyRecorder extends CorrelationProxyControl {
   private static final Duration RECORDING_POLL_PERIOD = Duration.ofSeconds(3);
   private static final Duration RECORDING_STOP_TIMEOUT = Duration.ofSeconds(30);
 
-  private final List<Pattern> excludedHeaders = new ArrayList<>();
+  private final List<Pattern> headerExcludes = new ArrayList<>();
   private JMeterTreeModel treeModel;
   private String logsDirectory;
 
@@ -72,20 +72,20 @@ public class JmeterProxyRecorder extends CorrelationProxyControl {
     return this;
   }
 
-  public JmeterProxyRecorder excludeHeaders(List<String> regexes) {
-    this.excludedHeaders.addAll(regexes.stream()
+  public JmeterProxyRecorder headerExcludes(List<String> regexes) {
+    this.headerExcludes.addAll(regexes.stream()
         .map(Pattern::compile)
         .collect(Collectors.toList()));
     return this;
   }
 
-  public JmeterProxyRecorder includeUrls(List<String> includingUrls) {
-    includingUrls.forEach(this::addIncludedPattern);
+  public JmeterProxyRecorder urlIncludes(List<String> regexes) {
+    regexes.forEach(this::addIncludedPattern);
     return this;
   }
 
-  public JmeterProxyRecorder excludeUrls(List<String> excludingUrls) {
-    excludingUrls.forEach(this::addExcludedPattern);
+  public JmeterProxyRecorder urlExcludes(List<String> regexes) {
+    regexes.forEach(this::addExcludedPattern);
     return this;
   }
 
@@ -178,7 +178,7 @@ public class JmeterProxyRecorder extends CorrelationProxyControl {
     }
     CollectionProperty headers = ((HeaderManager) headerManager.get()).getHeaders();
     List<JMeterProperty> filteredHeaders = StreamSupport.stream(headers.spliterator(), false)
-        .filter(h -> excludedHeaders.stream().noneMatch(p -> p.matcher(h.getName()).matches()))
+        .filter(h -> headerExcludes.stream().noneMatch(p -> p.matcher(h.getName()).matches()))
         .collect(Collectors.toList());
     if (filteredHeaders.isEmpty()) {
       children.remove(headerManager.get());
