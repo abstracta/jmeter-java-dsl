@@ -15,7 +15,8 @@ import us.abstracta.jmeter.javadsl.wrapper.WrapperJmeterDsl;
 @Command(name = "jmx2dsl", header = "Converts a JMX file to DSL code",
     description = "Conversion is a constantly improving process, so, if you find something that "
         + "is not properly converted, or you have ideas for improvement, please create an issue at "
-        + "https://github.com/abstracta/jmeter-java-dsl/issues to help us improving it.")
+        + "https://github.com/abstracta/jmeter-java-dsl/issues to help us improving it.",
+    usageHelpAutoWidth = true)
 public class Jmx2DslCommand implements Callable<Integer> {
 
   private static final String VERSION = getVersion();

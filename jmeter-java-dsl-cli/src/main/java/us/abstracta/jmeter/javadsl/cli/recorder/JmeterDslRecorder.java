@@ -1,6 +1,7 @@
 package us.abstracta.jmeter.javadsl.cli.recorder;
 
 import com.blazemeter.jmeter.correlation.core.CorrelationRule;
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -9,6 +10,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeoutException;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import us.abstracta.jmeter.javadsl.codegeneration.DslCodeGenerator;
 import us.abstracta.jmeter.javadsl.core.engines.JmeterEnvironment;
 
@@ -20,15 +23,17 @@ public class JmeterDslRecorder implements AutoCloseable {
       "Upgrade-Insecure-Requests", "Accept-Encoding", "User-Agent", "Accept", "Referer", "Origin",
       "X-Requested-With", "Cache-Control");
 
-  private final List<String> urlIncludes = new ArrayList<>();
-  private final List<String> urlExcludes = new ArrayList<>(
-      Collections.singletonList(DEFAULT_EXCLUDED_URLS));
-  private final List<String> headerExcludes = new ArrayList<>(DEFAULT_EXCLUDED_HEADERS);
+  private final List<Pattern> urlIncludes = new ArrayList<>();
+  private final List<Pattern> urlExcludes = new ArrayList<>(
+      Collections.singletonList(Pattern.compile(DEFAULT_EXCLUDED_URLS)));
+  private final List<Pattern> headerExcludes = new ArrayList<>(DEFAULT_EXCLUDED_HEADERS.stream()
+      .map(Pattern::compile)
+      .collect(Collectors.toList()));
   private final List<CorrelationRule> correlations = new ArrayList<>();
   private JmeterProxyRecorder proxy;
-  private String logsDirectory;
+  private File logsDirectory;
 
-  public JmeterDslRecorder logsDirectory(String logsDirectory) {
+  public JmeterDslRecorder logsDirectory(File logsDirectory) {
     this.logsDirectory = logsDirectory;
     return this;
   }
@@ -38,12 +43,12 @@ public class JmeterDslRecorder implements AutoCloseable {
     return this;
   }
 
-  public JmeterDslRecorder urlIncludes(List<String> regexes) {
+  public JmeterDslRecorder urlIncludes(List<Pattern> regexes) {
     urlIncludes.addAll(regexes);
     return this;
   }
 
-  public JmeterDslRecorder urlsExcludes(List<String> regexes) {
+  public JmeterDslRecorder urlsExcludes(List<Pattern> regexes) {
     urlExcludes.addAll(regexes);
     return this;
   }
@@ -53,7 +58,7 @@ public class JmeterDslRecorder implements AutoCloseable {
     return this;
   }
 
-  public JmeterDslRecorder headerExcludes(List<String> regexes) {
+  public JmeterDslRecorder headerExcludes(List<Pattern> regexes) {
     headerExcludes.addAll(regexes);
     return this;
   }

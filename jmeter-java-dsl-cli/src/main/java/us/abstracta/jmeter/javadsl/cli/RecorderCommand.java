@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.time.Duration;
 import java.util.Collections;
 import java.util.List;
@@ -34,7 +35,7 @@ import us.abstracta.jmeter.javadsl.cli.RecorderCommand.YamlConfigProvider;
 import us.abstracta.jmeter.javadsl.cli.recorder.JmeterDslRecorder;
 
 @Command(name = "recorder", header = "Record a JMeter DSL test plan using a browser",
-    defaultValueProvider = YamlConfigProvider.class)
+    defaultValueProvider = YamlConfigProvider.class, usageHelpAutoWidth = true)
 public class RecorderCommand implements Callable<Integer> {
 
   private static final Logger LOG = LoggerFactory.getLogger(RecorderCommand.class);
@@ -61,7 +62,7 @@ public class RecorderCommand implements Callable<Integer> {
           "This directory contains useful information for reviewing recording details to tune "
               + "recorded test plan, or to trace issues.",
           "Default: ${DEFAULT_VALUE}"})
-  private String workdir;
+  private File workdir;
 
   @ArgGroup(validate = false, heading = "Requests filtering:%n")
   private RequestsFiltering requestsFiltering = new RequestsFiltering();
@@ -84,7 +85,7 @@ public class RecorderCommand implements Callable<Integer> {
                 + " and default URLs filter.",
             "Check " + IGNORE_DEFAULT_URL_FILTER_OPTION
                 + " for more details on default URLs filter."})
-    private List<String> urlIncludes = Collections.emptyList();
+    private List<Pattern> urlIncludes = Collections.emptyList();
 
     @Option(names = {URL_EXCLUDES_OPTION}, paramLabel = "REGEX", split = ",",
         description = {
@@ -95,7 +96,7 @@ public class RecorderCommand implements Callable<Integer> {
                 + " and default URLs filter.",
             "Check " + IGNORE_DEFAULT_URL_FILTER_OPTION
                 + " for more details on default URLs filter."})
-    private List<String> urlExcludes = Collections.emptyList();
+    private List<Pattern> urlExcludes = Collections.emptyList();
 
     @Option(names = {IGNORE_DEFAULT_URL_FILTER_OPTION},
         description = {"Specifies not to use the default URL filter.",
@@ -121,7 +122,7 @@ public class RecorderCommand implements Callable<Integer> {
             "These regexes will be used in combination with default headers filter.",
             "Check " + IGNORE_DEFAULT_HEADER_FILTER_OPTION
                 + " for more details on default headers filter."})
-    private List<String> headerExcludes = Collections.emptyList();
+    private List<Pattern> headerExcludes = Collections.emptyList();
 
     @Option(names = {IGNORE_DEFAULT_HEADER_FILTER_OPTION},
         description = {"Specifies not to use the default headers filter.",
@@ -133,7 +134,7 @@ public class RecorderCommand implements Callable<Integer> {
 
   @Parameters(paramLabel = "URL", description = {"Initial URL to start the recording",
       "E.g.: https://mysite.com"}, arity = "0..1")
-  private String url;
+  private URL url;
 
   public RecorderCommand() {
     // This is required since is not possible to include non-constant values on annotations
@@ -148,7 +149,7 @@ public class RecorderCommand implements Callable<Integer> {
           buildChromeOptions(recorder.getProxy()));
       try {
         if (url != null) {
-          driver.get(url);
+          driver.get(url.toString());
         }
         awaitDriverClosed(driver);
       } finally {
@@ -218,7 +219,7 @@ public class RecorderCommand implements Callable<Integer> {
       if (ret == null) {
         return null;
       } else if (ret instanceof List) {
-        return String.join(",", (List) ret);
+        return String.join(argSpec.splitRegex(), (List) ret);
       } else {
         return (String) ret;
       }

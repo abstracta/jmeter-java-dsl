@@ -60,32 +60,30 @@ public class JmeterProxyRecorder extends CorrelationProxyControl {
 
   private final List<Pattern> headerExcludes = new ArrayList<>();
   private JMeterTreeModel treeModel;
-  private String logsDirectory;
+  private File logsDirectory;
 
   public JmeterProxyRecorder() {
     setSamplerFollowRedirects(true);
     setDefaultEncoding("UTF-8");
   }
 
-  public JmeterProxyRecorder logsDirectory(String logsDirectory) {
+  public JmeterProxyRecorder logsDirectory(File logsDirectory) {
     this.logsDirectory = logsDirectory;
     return this;
   }
 
-  public JmeterProxyRecorder headerExcludes(List<String> regexes) {
-    this.headerExcludes.addAll(regexes.stream()
-        .map(Pattern::compile)
-        .collect(Collectors.toList()));
+  public JmeterProxyRecorder headerExcludes(List<Pattern> regexes) {
+    this.headerExcludes.addAll(regexes);
     return this;
   }
 
-  public JmeterProxyRecorder urlIncludes(List<String> regexes) {
-    regexes.forEach(this::addIncludedPattern);
+  public JmeterProxyRecorder urlIncludes(List<Pattern> regexes) {
+    regexes.forEach(r -> this.addIncludedPattern(r.toString()));
     return this;
   }
 
-  public JmeterProxyRecorder urlExcludes(List<String> regexes) {
-    regexes.forEach(this::addExcludedPattern);
+  public JmeterProxyRecorder urlExcludes(List<Pattern> regexes) {
+    regexes.forEach(r -> this.addExcludedPattern(r.toString()));
     return this;
   }
 
@@ -124,7 +122,7 @@ public class JmeterProxyRecorder extends CorrelationProxyControl {
             new DslRecordingController()
         ),
         new DslRecorder(this, Collections.singletonList(
-            JmeterDsl.jtlWriter(logsDirectory)
+            JmeterDsl.jtlWriter(logsDirectory.toString())
                 .withAllFields()
         ))
     ).buildTreeUnder(rootTree, new BuildTreeContext());
