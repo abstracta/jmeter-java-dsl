@@ -63,6 +63,11 @@ public class JmeterDslRecorder implements AutoCloseable {
     return this;
   }
 
+  public JmeterDslRecorder correlationRule(CorrelationRuleBuilder ruleBuilder) {
+    correlations.add(ruleBuilder.build());
+    return this;
+  }
+
   public String getProxy() {
     return "localhost:8888";
   }

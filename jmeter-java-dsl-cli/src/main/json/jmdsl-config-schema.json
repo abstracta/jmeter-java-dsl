@@ -60,6 +60,38 @@
           "description": "Specifies to use or not the default headers filter. The default filter ignores these headers: Accept-Language,Upgrade-Insecure-Requests,Accept-Encoding,User-Agent,Accept,Referer,Origin,X-Requested-With,Cache-Control",
           "type": "boolean",
           "default": false
+        },
+        "correlations": {
+          "description": "Specifies list of correlation rules between requests and previous responses, avoiding fixed and brittle recorded test plans",
+          "type": "array",
+          "items": {
+            "title": "correlation",
+            "type": "object",
+            "properties": {
+              "variable": {
+                "description": "Name of the variable used to store a value extracted from a response and to be used in a following request",
+                "examples": [
+                  "productId"
+                ],
+                "type": "string"
+              },
+              "extractor": {
+                "description": "Regular expression used to extract values from responses to be used in following requests. The first capturing group defines the extracted value, while the rest of the regex is used for context matching",
+                "examples": [
+                  "name=\"productId\" value=\"([^\"]+)\""
+                ],
+                "type": "string"
+              },
+              "replacement": {
+                "description": "Regular expression used to replace in requests previously extracted values. The first capturing group defines the place where the extracted value should appear (and replaced by variable reference), while the rest of the regex is used for context matching",
+                "examples": [
+                  "productId=(.*)"
+                ],
+                "type": "string"
+              }
+            },
+            "additionalProperties": false
+          }
         }
       },
       "additionalProperties": false

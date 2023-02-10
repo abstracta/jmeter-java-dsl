@@ -1,19 +1,14 @@
 package us.abstracta.jmeter.javadsl.cli;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.time.Duration;
 import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.Callable;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.io.output.NullOutputStream;
 import org.openqa.selenium.NoSuchWindowException;
@@ -26,44 +21,76 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import picocli.CommandLine.ArgGroup;
 import picocli.CommandLine.Command;
-import picocli.CommandLine.IDefaultValueProvider;
-import picocli.CommandLine.Model.ArgSpec;
-import picocli.CommandLine.Model.OptionSpec;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
-import us.abstracta.jmeter.javadsl.cli.RecorderCommand.YamlConfigProvider;
+import us.abstracta.jmeter.javadsl.cli.recorder.CorrelationRuleBuilder;
 import us.abstracta.jmeter.javadsl.cli.recorder.JmeterDslRecorder;
 
 @Command(name = "recorder", header = "Record a JMeter DSL test plan using a browser",
-    defaultValueProvider = YamlConfigProvider.class, usageHelpAutoWidth = true)
+    description = {
+        "This is an initial implementation of recording facility. We have many ideas to improve "
+            + "recording process, but we would really like to hear yours. Please open discussions "
+            + "or issues in https://github.com/abstracta/jmeter-java-dsl repository so we can "
+            + "improve this farther!"},
+    usageHelpAutoWidth = true, sortOptions = false)
 public class RecorderCommand implements Callable<Integer> {
 
   private static final Logger LOG = LoggerFactory.getLogger(RecorderCommand.class);
   private static final Duration BROWSER_OPEN_POLL_PERIOD = Duration.ofMillis(500);
-  private static final String CONFIG_OPTION = "--config";
+  private static final String WORKDIR_OPTION = "--workdir";
+  private static final String CORRELATIONS_OPTION = "--correlations";
 
-  @Option(names = {CONFIG_OPTION}, paramLabel = "YAML_CONFIG_FILE",
-      description = {
-          "Yaml configuration file as an alternative to command line options.",
-          "This provides an alternative to passing every configuration as parameter and make "
-              + "configuration more reusable and shareable.",
-          "Each option corresponds to a property in yaml file under `recorder` element "
-              + "replacing hyphens with camel case (eg: --header-excludes, is renamed to "
-              + "headerExcludes).",
-          "Check the config file schema at: "
-              + "https://github.com/abstracta/jmeter-java-dsl/releases/download/"
-              + "v${sys:jmdsl.version}/jmdsl-config-schema.json.",
-          "Default: ${DEFAULT-VALUE}."
-      }, defaultValue = ".jmdsl.yml")
-  private File config;
+  @Parameters(paramLabel = "URL", description = {"Initial URL to start the recording",
+      "E.g.: https://mysite.com"}, arity = "0..1")
+  private URL url;
 
-  @Option(names = {"--workdir"}, defaultValue = "recording",
+  @Option(names = {WORKDIR_OPTION}, defaultValue = "recording",
       description = {"Directory where logs (eg: jtl files) and other relevant data is stored.",
+          "E.g.: " + WORKDIR_OPTION + "=target/recording",
           "This directory contains useful information for reviewing recording details to tune "
               + "recorded test plan, or to trace issues.",
           "Default: ${DEFAULT_VALUE}"})
   private File workdir;
 
+  @Option(names = {JmdslConfig.CONFIG_OPTION}, paramLabel = "YAML_CONFIG_FILE",
+      description = {
+          "Yaml configuration file as an alternative to command line options.",
+          "E.g.: " + JmdslConfig.CONFIG_OPTION + "=mysite.jmdsl.yml",
+          "This provides an alternative to passing every configuration as parameter and make "
+              + "configuration more reusable and shareable.",
+          "Each recorder command option can be set in a property in yaml file under `recorder` "
+              + "element, replacing hyphens with camel case (eg: --header-excludes, is renamed to "
+              + "headerExcludes).",
+          "You can check the config file schema for more details at: "
+              + "https://github.com/abstracta/jmeter-java-dsl/releases/download/"
+              + "v${sys:jmdsl.version}/jmdsl-config-schema.json.",
+          "Default: ${DEFAULT-VALUE}."
+      }, defaultValue = JmdslConfig.DEFAULT_CONFIG_FILE)
+  @JsonIgnore
+  private File configFile;
+
+  @Option(names = {CORRELATIONS_OPTION}, paramLabel = "VARIABLE,EXTRACTOR_REGEX,REPLACEMENT_REGEX",
+      split = ";", converter = CorrelationRuleBuilderConverter.class,
+      description = {
+          "Correlation rules which define what parts of responses have to be used in following "
+              + "requests.",
+          "E.g.: " + CORRELATIONS_OPTION + "='productId,name=\\\"productId\\\" "
+              + "value=\\\"([^\\\"]+)\\\",productId=(.*);productPrice,name=\\\"productPrice\\\" "
+              + "value=\\\"([^\\\"]+)\\\",productPrice=(.*)'",
+          "Defining proper correlation rules avoids fixed values in recorded test plans, making "
+              + "them more resilient to changes.",
+          "Each rule is defined by a variable name (to store extracted values), a regular "
+              + "expression to extract values to be used in following requests and another regular "
+              + "expression to replace extracted values in requests.",
+          "First capturing group of extractor regex captures the actual value to be extracted.",
+          "First capturing group of replacement regex defines the actual string to be replaced by "
+              + "the variable reference.",
+          "Consider specifying correlation rules in a config yaml (through "
+              + JmdslConfig.CONFIG_OPTION + " option) file to avoid command line options "
+              + "limitations, foster re-usability, and easier tuning."})
+  private List<CorrelationRuleBuilder> correlations = Collections.emptyList();
+
+  @JsonUnwrapped
   @ArgGroup(validate = false, heading = "Requests filtering:%n")
   private RequestsFiltering requestsFiltering = new RequestsFiltering();
 
@@ -76,11 +103,11 @@ public class RecorderCommand implements Callable<Integer> {
     @Option(names = {URL_INCLUDES_OPTION}, paramLabel = "REGEX", split = ",",
         description = {
             "Regular expressions which specify to only record requests with matching URLs.",
+            "E.g.: " + URL_INCLUDES_OPTION + "=[^?]*mysite.com.*",
             "URLs are stripped from the scheme part (eg: http://) before matching the pattern. "
                 + "E.g: mysite.com/accounts is used instead of http://mysite.com/accounts).",
             "Usually you would like to use a regex that matches the domain of the service under "
-                + "test to avoid generating load to external servers. Eg: " + URL_INCLUDES_OPTION
-                + "=[^?]*mysite.com.*",
+                + "test to avoid generating load to external servers.",
             "These regexes will be used in combination with " + URL_EXCLUDES_OPTION
                 + " and default URLs filter.",
             "Check " + IGNORE_DEFAULT_URL_FILTER_OPTION
@@ -90,6 +117,7 @@ public class RecorderCommand implements Callable<Integer> {
     @Option(names = {URL_EXCLUDES_OPTION}, paramLabel = "REGEX", split = ",",
         description = {
             "Regular expressions which specify to NOT record requests with matching URLs.",
+            "E.g.: " + URL_EXCLUDES_OPTION + "=(?i).*\\.html(\\?.*)?",
             "URLs are stripped from the scheme part (eg: http://) before matching the pattern. "
                 + "E.g: mysite.com/accounts is used  instead of http://mysite.com/accounts).",
             "These regexes will be used in combination with " + URL_INCLUDES_OPTION
@@ -106,6 +134,7 @@ public class RecorderCommand implements Callable<Integer> {
     private boolean ignoreDefaultUrlFilter;
   }
 
+  @JsonUnwrapped
   @ArgGroup(validate = false, heading = "Headers filtering:%n")
   private HeadersFiltering headersFiltering = new HeadersFiltering();
 
@@ -132,10 +161,6 @@ public class RecorderCommand implements Callable<Integer> {
     private boolean ignoreDefaultHeaderFilter;
   }
 
-  @Parameters(paramLabel = "URL", description = {"Initial URL to start the recording",
-      "E.g.: https://mysite.com"}, arity = "0..1")
-  private URL url;
-
   public RecorderCommand() {
     // This is required since is not possible to include non-constant values on annotations
     System.setProperty("defaultHeadersFilter",
@@ -144,6 +169,7 @@ public class RecorderCommand implements Callable<Integer> {
 
   @Override
   public Integer call() throws Exception {
+    loadConfigFileDefaults();
     try (JmeterDslRecorder recorder = buildRecorder()) {
       ChromeDriver driver = new ChromeDriver(buildDriverService(),
           buildChromeOptions(recorder.getProxy()));
@@ -159,6 +185,11 @@ public class RecorderCommand implements Callable<Integer> {
     return 0;
   }
 
+  private void loadConfigFileDefaults() throws IOException {
+    new JmdslConfig(this)
+        .updateWithDefaultsFrom(JmdslConfig.fromConfigFile(configFile));
+  }
+
   private JmeterDslRecorder buildRecorder() throws IOException {
     JmeterDslRecorder ret = new JmeterDslRecorder()
         .logsDirectory(workdir);
@@ -171,6 +202,7 @@ public class RecorderCommand implements Callable<Integer> {
       ret.clearHeaderFilter();
     }
     ret.headerExcludes(headersFiltering.headerExcludes);
+    correlations.forEach(ret::correlationRule);
     return ret.start();
   }
 
@@ -199,67 +231,6 @@ public class RecorderCommand implements Callable<Integer> {
     } catch (NoSuchWindowException e) {
       LOG.debug("Detected window close", e);
     }
-  }
-
-  public static class YamlConfigProvider implements IDefaultValueProvider {
-
-    private Map<String, Object> config;
-
-    @Override
-    public String defaultValue(ArgSpec argSpec) throws Exception {
-      if (config == null) {
-        OptionSpec configOption = argSpec.command().findOption(CONFIG_OPTION);
-        Map<String, Object> configMap = loadConfig(configOption.getValue(),
-            new File(configOption.defaultValue()));
-        config = Optional.ofNullable(configMap.get(argSpec.command().name()))
-            .map(c -> (Map<String, Object>) c)
-            .orElse(Collections.emptyMap());
-      }
-      Object ret = config.get(buildConfigName(argSpec));
-      if (ret == null) {
-        return null;
-      } else if (ret instanceof List) {
-        return String.join(argSpec.splitRegex(), (List) ret);
-      } else {
-        return (String) ret;
-      }
-    }
-
-    private Map<String, Object> loadConfig(File configFile, File defaultConfig) throws IOException {
-      if (configFile == null) {
-        if (!defaultConfig.exists()) {
-          return Collections.emptyMap();
-        }
-        configFile = defaultConfig;
-      }
-      ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
-      return mapper.readValue(configFile, new TypeReference<Map<String, Object>>() {
-      });
-    }
-
-    private String buildConfigName(ArgSpec argSpec) {
-      return argSpec instanceof OptionSpec
-          ? buildOptionConfigName((OptionSpec) argSpec)
-          : argSpec.paramLabel().toLowerCase(Locale.US);
-    }
-
-    private String buildOptionConfigName(OptionSpec argSpec) {
-      String optionName = argSpec.names()[0].substring(2);
-      // start at 2 to skip -- prefix
-      Matcher wordStartMatcher = Pattern.compile("-\\w")
-          .matcher(optionName);
-      StringBuilder ret = new StringBuilder();
-      int position = 0;
-      while (wordStartMatcher.find()) {
-        ret.append(optionName, position, wordStartMatcher.start());
-        // start at 1 to skip hyphen
-        ret.append(wordStartMatcher.group().substring(1).toUpperCase(Locale.US));
-        position = wordStartMatcher.end();
-      }
-      ret.append(optionName, position, optionName.length());
-      return ret.toString();
-    }
-
   }
 
 }
