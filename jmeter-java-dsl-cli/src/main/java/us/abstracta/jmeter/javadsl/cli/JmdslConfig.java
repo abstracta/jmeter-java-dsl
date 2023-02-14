@@ -1,6 +1,7 @@
 package us.abstracta.jmeter.javadsl.cli;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
@@ -17,6 +18,7 @@ public class JmdslConfig {
 
   public static final String CONFIG_OPTION = "--config";
   public static final String DEFAULT_CONFIG_FILE = ".jmdsl.yml";
+  private static final String PICOCLI_NO_DEFAULT_VALUE_MARKER = "__no_default_value__";
 
   private RecorderCommand recorder;
 
@@ -46,10 +48,20 @@ public class JmdslConfig {
 
   private static void applyDefaultsFromTo(Object defaults, Object target) {
     Arrays.stream(target.getClass().getDeclaredFields())
-        .filter(f -> f.isAnnotationPresent(Option.class) || f.isAnnotationPresent(Parameters.class))
+        .filter(f -> !f.isAnnotationPresent(JsonIgnore.class)
+            && (f.isAnnotationPresent(Option.class) || f.isAnnotationPresent(Parameters.class)))
         .filter(f -> {
           Object prevVal = getField(f, target);
-          return prevVal == null || prevVal instanceof List && (((List) prevVal).isEmpty());
+          String defaultValue = f.isAnnotationPresent(Option.class) ?
+              f.getAnnotation(Option.class).defaultValue() :
+              f.getAnnotation(Parameters.class).defaultValue();
+          if (PICOCLI_NO_DEFAULT_VALUE_MARKER.equals(defaultValue)) {
+            defaultValue = null;
+          }
+          return prevVal == null
+              || defaultValue != null && defaultValue.equals(prevVal.toString())
+              || prevVal instanceof Boolean && !(Boolean) prevVal
+              || prevVal instanceof List && (((List) prevVal).isEmpty());
         })
         .forEach(f -> setField(f, target, getField(f, defaults)));
     Arrays.stream(target.getClass().getDeclaredFields())
