@@ -5,26 +5,19 @@ import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.time.Duration;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.regex.Pattern;
-import org.apache.commons.io.output.NullOutputStream;
-import org.openqa.selenium.NoSuchWindowException;
-import org.openqa.selenium.Proxy;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.chrome.ChromeDriverService;
-import org.openqa.selenium.chrome.ChromeDriverService.Builder;
-import org.openqa.selenium.chrome.ChromeOptions;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import picocli.CommandLine.ArgGroup;
 import picocli.CommandLine.Command;
+import picocli.CommandLine.ITypeConverter;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
+import picocli.CommandLine.TypeConversionException;
 import us.abstracta.jmeter.javadsl.cli.recorder.CorrelationRuleBuilder;
 import us.abstracta.jmeter.javadsl.cli.recorder.JmeterDslRecorder;
+import us.abstracta.jmeter.javadsl.cli.recorder.RecordingBrowser;
 
 @Command(name = "recorder", header = "Record a JMeter DSL test plan using a browser",
     description = {
@@ -35,8 +28,6 @@ import us.abstracta.jmeter.javadsl.cli.recorder.JmeterDslRecorder;
     usageHelpAutoWidth = true, sortOptions = false)
 public class RecorderCommand implements Callable<Integer> {
 
-  private static final Logger LOG = LoggerFactory.getLogger(RecorderCommand.class);
-  private static final Duration BROWSER_OPEN_POLL_PERIOD = Duration.ofMillis(500);
   private static final String WORKDIR_OPTION = "--workdir";
   private static final String CORRELATIONS_OPTION = "--correlations";
 
@@ -170,17 +161,9 @@ public class RecorderCommand implements Callable<Integer> {
   @Override
   public Integer call() throws Exception {
     loadConfigFileDefaults();
-    try (JmeterDslRecorder recorder = buildRecorder()) {
-      ChromeDriver driver = new ChromeDriver(buildDriverService(),
-          buildChromeOptions(recorder.getProxy()));
-      try {
-        if (url != null) {
-          driver.get(url.toString());
-        }
-        awaitDriverClosed(driver);
-      } finally {
-        driver.quit();
-      }
+    try (JmeterDslRecorder recorder = buildRecorder();
+        RecordingBrowser browser = new RecordingBrowser(url, recorder.getProxy())) {
+      browser.awaitClosed();
     }
     return 0;
   }
@@ -206,31 +189,25 @@ public class RecorderCommand implements Callable<Integer> {
     return ret.start();
   }
 
-  private ChromeDriverService buildDriverService() {
-    ChromeDriverService ret = new Builder().build();
-    ret.sendOutputTo(NullOutputStream.NULL_OUTPUT_STREAM);
-    return ret;
-  }
+  public static class CorrelationRuleBuilderConverter implements
+      ITypeConverter<CorrelationRuleBuilder> {
 
-  private ChromeOptions buildChromeOptions(String proxyHost) {
-    ChromeOptions ret = new ChromeOptions();
-    Proxy proxy = new Proxy();
-    proxy.setHttpProxy(proxyHost);
-    proxy.setSslProxy(proxyHost);
-    ret.setProxy(proxy);
-    ret.setAcceptInsecureCerts(true);
-    return ret;
-  }
-
-  private void awaitDriverClosed(ChromeDriver driver) throws InterruptedException {
-    try {
-      while (true) {
-        driver.getWindowHandle();
-        Thread.sleep(BROWSER_OPEN_POLL_PERIOD.toMillis());
+    @Override
+    public CorrelationRuleBuilder convert(String value) {
+      String[] parts = value.split(",");
+      if (parts.length < 2 || parts.length > 3) {
+        throw new TypeConversionException(
+            "Invalid format: must be 'variable,extractor,replacement' but was '" + value + "'");
       }
-    } catch (NoSuchWindowException e) {
-      LOG.debug("Detected window close", e);
+      return new CorrelationRuleBuilder(parts[0], compileRegex(parts[1]),
+          parts.length > 2 ? compileRegex(parts[2]) : null);
     }
+
+    private Pattern compileRegex(String param) {
+      // remove quotes escaping required to avoid picocli interpretation
+      return Pattern.compile(param.replace("\\\"", "\""));
+    }
+
   }
 
 }
