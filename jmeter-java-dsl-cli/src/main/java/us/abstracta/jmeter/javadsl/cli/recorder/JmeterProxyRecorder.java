@@ -65,6 +65,8 @@ public class JmeterProxyRecorder extends CorrelationProxyControl {
   public JmeterProxyRecorder() {
     setSamplerFollowRedirects(true);
     setDefaultEncoding("UTF-8");
+    // Automatically group requests into transactions
+    setGroupingMode(4);
   }
 
   public JmeterProxyRecorder logsDirectory(File logsDirectory) {

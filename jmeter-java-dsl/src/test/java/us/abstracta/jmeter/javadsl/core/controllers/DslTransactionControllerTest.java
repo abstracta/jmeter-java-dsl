@@ -58,6 +58,18 @@ public class DslTransactionControllerTest extends JmeterDslTest {
       );
     }
 
+    // This is required for proper conversion of automatically recorded transactions
+    public DslTestPlan testPlanWithEmptyTransactionName() {
+      return testPlan(
+          threadGroup(1, 1,
+              transaction("",
+                  httpSampler("http://localhost"),
+                  httpSampler("http://mysite.com")
+              )
+          )
+      );
+    }
+
     public DslTestPlan testPlanWithTransactionAndNonDefaultFlags() {
       return testPlan(
           threadGroup(1, 1,
