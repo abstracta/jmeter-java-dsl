@@ -76,11 +76,44 @@
                 "type": "string"
               },
               "extractor": {
-                "description": "Regular expression used to extract values from responses to be used in following requests. The first capturing group defines the extracted value, while the rest of the regex is used for context matching",
-                "examples": [
-                  "name=\"productId\" value=\"([^\"]+)\""
-                ],
-                "type": "string"
+                "description": "Defines regular expression and, optionally, other parameters which define how to extract values from responses (or even requests), to be used in following requests",
+                "oneOf": [
+                  {
+                    "description": "Regular expression where the first capturing group defines the extracted value, while the rest is used for context matching",
+                    "type": "string",
+                    "examples": [
+                      "name=\"productId\" value=\"([^\"]+)\""
+                    ]
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "regex": {
+                        "description": "Regular expression where the first capturing group defines the extracted value, while the rest is used for context matching",
+                        "type": "string",
+                        "examples": [
+                          "name=\"productId\" value=\"([^\"]+)\""
+                        ]
+                      },
+                      "target": {
+                        "description": "Specifies sample result property to apply the extractor to.\nFor details on available options check: https://javadoc.io/static/us.abstracta.jmeter/jmeter-java-dsl/1.8/us/abstracta/jmeter/javadsl/core/postprocessors/DslRegexExtractor.TargetField.html#enum.constant.summary",
+                        "type": "string",
+                        "enum": [
+                          "RESPONSE_BODY",
+                          "RESPONSE_HEADERS",
+                          "REQUEST_URL",
+                          "REQUEST_HEADERS",
+                          "RESPONSE_BODY_UNESCAPED",
+                          "RESPONSE_BODY_AS_A_DOCUMENT",
+                          "RESPONSE_CODE",
+                          "RESPONSE_MESSAGE"
+                        ],
+                        "default": "RESPONSE_BODY"
+                      }
+                    },
+                    "required": ["regex"]
+                  }
+                ]
               },
               "replacement": {
                 "description": "Regular expression used to replace in requests previously extracted values. The first capturing group defines the place where the extracted value should appear (and replaced by variable reference), while the rest of the regex is used for context matching",
