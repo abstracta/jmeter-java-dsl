@@ -42,6 +42,7 @@ public class MethodCall implements CodeSegment {
   private final List<CodeSegment> chain = new ArrayList<>();
   private final Set<String> requiredStaticImports = new HashSet<>();
   private boolean commented;
+  private String commentPrefix;
 
   public MethodCall(String methodName, Class<?> returnType, MethodParam... params) {
     this.methodName = methodName;
@@ -109,6 +110,10 @@ public class MethodCall implements CodeSegment {
 
   public boolean isCommented() {
     return commented;
+  }
+
+  public void prefixComment(String comment) {
+    commentPrefix = comment;
   }
 
   /**
@@ -394,6 +399,12 @@ public class MethodCall implements CodeSegment {
   @Override
   public String buildCode(String indent) {
     StringBuilder ret = new StringBuilder();
+    if (commentPrefix != null) {
+      ret.append("//")
+          .append(commentPrefix)
+          .append("\n")
+          .append(indent);
+    }
     ret.append(methodName)
         .append("(");
     String childIndent = indent + INDENT;

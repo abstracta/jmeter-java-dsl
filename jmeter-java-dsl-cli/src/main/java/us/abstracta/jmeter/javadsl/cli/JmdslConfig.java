@@ -52,9 +52,9 @@ public class JmdslConfig {
             && (f.isAnnotationPresent(Option.class) || f.isAnnotationPresent(Parameters.class)))
         .filter(f -> {
           Object prevVal = getField(f, target);
-          String defaultValue = f.isAnnotationPresent(Option.class) ?
-              f.getAnnotation(Option.class).defaultValue() :
-              f.getAnnotation(Parameters.class).defaultValue();
+          String defaultValue = f.isAnnotationPresent(Option.class)
+              ? f.getAnnotation(Option.class).defaultValue()
+              : f.getAnnotation(Parameters.class).defaultValue();
           if (PICOCLI_NO_DEFAULT_VALUE_MARKER.equals(defaultValue)) {
             defaultValue = null;
           }

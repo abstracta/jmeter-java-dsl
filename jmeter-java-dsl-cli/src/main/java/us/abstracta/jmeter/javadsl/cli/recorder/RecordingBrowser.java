@@ -22,9 +22,9 @@ public class RecordingBrowser implements AutoCloseable {
   public RecordingBrowser(URL url, String proxyHost) {
     driver = new ChromeDriver(buildDriverService(),
         buildChromeOptions(proxyHost));
-      if (url != null) {
-        driver.get(url.toString());
-      }
+    if (url != null) {
+      driver.get(url.toString());
+    }
   }
 
   private ChromeDriverService buildDriverService() {

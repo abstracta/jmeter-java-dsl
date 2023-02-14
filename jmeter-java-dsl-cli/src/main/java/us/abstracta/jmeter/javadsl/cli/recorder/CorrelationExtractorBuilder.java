@@ -72,7 +72,8 @@ public class CorrelationExtractorBuilder {
 
   }
 
-  public static class CorrelationExtractorDeserializer extends JsonDeserializer<CorrelationExtractorBuilder> {
+  public static class CorrelationExtractorDeserializer extends
+      JsonDeserializer<CorrelationExtractorBuilder> {
 
     @Override
     public CorrelationExtractorBuilder deserialize(JsonParser p, DeserializationContext ctxt)

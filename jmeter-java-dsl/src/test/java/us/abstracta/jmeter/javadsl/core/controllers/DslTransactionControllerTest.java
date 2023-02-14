@@ -62,6 +62,7 @@ public class DslTransactionControllerTest extends JmeterDslTest {
     public DslTestPlan testPlanWithEmptyTransactionName() {
       return testPlan(
           threadGroup(1, 1,
+              //TODO you should set a proper transaction name to avoid incorrect metrics reporting
               transaction("",
                   httpSampler("http://localhost"),
                   httpSampler("http://mysite.com")

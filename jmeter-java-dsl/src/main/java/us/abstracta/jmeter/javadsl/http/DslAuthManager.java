@@ -94,7 +94,7 @@ public class DslAuthManager extends BaseConfigElement {
     private void chainAuth(Authorization auth, MethodCall ret) {
       if (auth.getMechanism() == Mechanism.BASIC) {
         ret.chainComment(
-                "WARNING: including passwords in code repositories may lead to security leaks. "
+                "TODO including passwords in code repositories may lead to security leaks. "
                     + "Review generated code and consider externalizing any credentials. "
                     + "Eg: System.getenv(\"AUTH_PASSWORD\")")
             .chain("basicAuth", new StringParam(auth.getURL()), new StringParam(auth.getUser()),
