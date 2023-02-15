@@ -113,7 +113,7 @@ public class DslTransactionController extends BaseController<DslTransactionContr
       MethodCall ret = buildMethodCall(new StringParam(testElement.getName()),
           new ChildrenParam<>(ThreadGroupChild[].class));
       if (testElement.getName().isEmpty()) {
-        ret.prefixComment(
+        ret.headingComment(
             "TODO you should set a proper transaction name to avoid incorrect metrics reporting");
       }
       return ret.chain("generateParentSample", paramBuilder.boolParam("parent", false))

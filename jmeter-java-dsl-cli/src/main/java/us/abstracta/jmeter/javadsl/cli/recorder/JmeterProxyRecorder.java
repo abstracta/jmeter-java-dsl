@@ -6,6 +6,7 @@ import com.blazemeter.jmeter.correlation.core.CorrelationRule;
 import com.blazemeter.jmeter.correlation.core.RulesGroup;
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.time.Duration;
 import java.time.Instant;
@@ -57,6 +58,7 @@ public class JmeterProxyRecorder extends CorrelationProxyControl {
 
   private static final Duration RECORDING_POLL_PERIOD = Duration.ofSeconds(3);
   private static final Duration RECORDING_STOP_TIMEOUT = Duration.ofSeconds(30);
+  private static final int GROUPING_IN_TRANSACTIONS = 4;
 
   private final List<Pattern> headerExcludes = new ArrayList<>();
   private JMeterTreeModel treeModel;
@@ -64,9 +66,8 @@ public class JmeterProxyRecorder extends CorrelationProxyControl {
 
   public JmeterProxyRecorder() {
     setSamplerFollowRedirects(true);
-    setDefaultEncoding("UTF-8");
-    // Automatically group requests into transactions
-    setGroupingMode(4);
+    setDefaultEncoding(StandardCharsets.UTF_8.name());
+    setGroupingMode(GROUPING_IN_TRANSACTIONS);
   }
 
   public JmeterProxyRecorder logsDirectory(File logsDirectory) {

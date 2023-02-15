@@ -222,6 +222,27 @@ public class MethodCallContext {
   }
 
   /**
+   * Adds a child method call context, as first child call, built using provided test element and
+   * tree.
+   * <p>
+   * This is useful when it is needed to modify existing test plan, for example, to optimize it and
+   * use default config elements that avoid code duplication in children elements.
+   *
+   * @param testElement  specifies the test element from which to create the new method call.
+   * @param childrenTree specifies children elements of the test element, which are also going to be
+   *                     built and attached as children method calls of the method call created for
+   *                     the test element.
+   * @return the created child method call context.
+   * @since 1.8
+   */
+  public MethodCallContext prependChild(TestElement testElement, HashTree childrenTree) {
+    MethodCallContext child = child(testElement, childrenTree);
+    MethodCall childCall = child.buildMethodCall();
+    methodCall.prependChild(childCall);
+    return child;
+  }
+
+  /**
    * Allows removing an instance of the given test element class from the children tree.
    * <p>
    * If multiple instances exists, then only the first one is removed.
@@ -252,6 +273,19 @@ public class MethodCallContext {
    */
   public <T extends MethodCallBuilder> T findBuilder(Class<T> builderClass) {
     return builderRegistry.findBuilderByClass(builderClass);
+  }
+
+  /**
+   * The method call created for this context.
+   * <p>
+   * This is useful mainly when method calls need to be modified after their creation, for example
+   * in an end listener ({@link #addEndListener(MethodCallContextEndListener)}).
+   *
+   * @return the created method call, if it has been already created, null otherwise.
+   * @since 1.8
+   */
+  public MethodCall getMethodCall() {
+    return methodCall;
   }
 
   /**

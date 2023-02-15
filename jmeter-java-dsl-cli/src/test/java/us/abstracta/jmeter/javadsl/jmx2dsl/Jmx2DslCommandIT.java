@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test;
 import us.abstracta.jmeter.javadsl.codegeneration.TestClassTemplate;
 import us.abstracta.jmeter.javadsl.util.TestResource;
 
-public class Jmx2DslIT {
+public class Jmx2DslCommandIT {
 
   @Test
   public void shouldGetConvertedFileWhenConvert() throws Exception {

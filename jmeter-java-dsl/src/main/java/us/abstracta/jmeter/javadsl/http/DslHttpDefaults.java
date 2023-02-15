@@ -3,6 +3,7 @@ package us.abstracta.jmeter.javadsl.http;
 import java.lang.reflect.Method;
 import java.nio.charset.Charset;
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.List;
 import org.apache.jmeter.config.Arguments;
 import org.apache.jmeter.config.ConfigTestElement;
@@ -12,9 +13,11 @@ import org.apache.jmeter.testelement.TestElement;
 import org.apache.jmeter.testelement.property.TestElementProperty;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodCall;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodCallContext;
+import us.abstracta.jmeter.javadsl.codegeneration.MethodCallContext.MethodCallContextEndListener;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodParam;
 import us.abstracta.jmeter.javadsl.codegeneration.SingleGuiClassCallBuilder;
 import us.abstracta.jmeter.javadsl.codegeneration.TestElementParamBuilder;
+import us.abstracta.jmeter.javadsl.codegeneration.params.EncodingParam;
 import us.abstracta.jmeter.javadsl.core.configs.BaseConfigElement;
 import us.abstracta.jmeter.javadsl.http.DslBaseHttpSampler.BaseHttpSamplerCodeBuilder;
 import us.abstracta.jmeter.javadsl.http.DslHttpSampler.HttpClientImpl;
@@ -428,7 +431,118 @@ public class DslHttpDefaults extends BaseConfigElement {
       HttpElementHelper.chainEmbeddedResourcesOptionsToMethodCall(ret, paramBuilder);
       HttpElementHelper.chainConnectionOptionsToMethodCall(ret, paramBuilder);
       HttpElementHelper.chainClientImplToMethodCall(ret, paramBuilder);
+      registerDependency(context);
       return ret;
+    }
+
+    public void registerDependency(MethodCallContext context) {
+      MethodCallContext parentCtx = context.getParent();
+      BuildContextEndListener endListener = parentCtx.computeEntryIfAbsent(DslHttpDefaults.class,
+          () -> new BuildContextEndListener(parentCtx));
+      String encoding = context.getTestElement()
+          .getPropertyAsString(HTTPSamplerBase.CONTENT_ENCODING);
+      boolean isDefaultCandidate = context.getTestElement()
+          .getPropertyAsString(TestElement.GUI_CLASS)
+          .equals(HttpDefaultsGui.class.getName());
+      endListener.registerEncoding(encoding, context, isDefaultCandidate);
+    }
+
+    private static class BuildContextEndListener implements MethodCallContextEndListener {
+
+      private final List<EncodedCall> calls = new ArrayList<>();
+
+      private BuildContextEndListener(MethodCallContext parentCtx) {
+        parentCtx.addEndListener(this);
+      }
+
+      public void registerEncoding(String encoding, MethodCallContext ret,
+          boolean isDefaultCandidate) {
+        calls.add(new EncodedCall(encoding, ret, isDefaultCandidate));
+      }
+
+      @Override
+      public void execute(MethodCallContext ctx, MethodCall ret) {
+        final EncodedCall defaultsCall = findDefaultsCall(ctx);
+        if (defaultsCall != null) {
+          calls.stream()
+              .filter(c -> c != defaultsCall && !c.isDefaultCandidate
+                  && c.encoding.equals(defaultsCall.encoding))
+              .forEach(EncodedCall::removeEncoding);
+        }
+        MethodCallContext parentCtx = ctx.getParent();
+        if (parentCtx != null) {
+          BuildContextEndListener parentListener = parentCtx.computeEntryIfAbsent(
+              DslHttpDefaults.class, () -> new BuildContextEndListener(parentCtx));
+          parentListener.registerEncoding(defaultsCall != null ? defaultsCall.encoding : "",
+              defaultsCall != null ? defaultsCall.ctx : null, false);
+        }
+      }
+
+      private EncodedCall findDefaultsCall(MethodCallContext ctx) {
+        if (calls.size() == 1) {
+          return calls.get(0);
+        }
+        EncodedCall defaultsCall = calls.stream()
+            .filter(c -> c.isDefaultCandidate && !c.encoding.isEmpty())
+            .findAny()
+            .orElse(null);
+        if (defaultsCall != null) {
+          return defaultsCall;
+        }
+        String someEncoding = calls.stream()
+            .filter(c -> !c.encoding.isEmpty())
+            .map(c -> c.encoding)
+            .findAny()
+            .orElse(null);
+        if (someEncoding != null && calls.stream()
+            .allMatch(c -> c.isDefaultCandidate || c.encoding.equals(someEncoding))) {
+          defaultsCall = calls.stream()
+              .filter(c -> c.isDefaultCandidate)
+              .findAny()
+              .orElse(null);
+          if (defaultsCall == null) {
+            defaultsCall = buildDefaultsCall(ctx);
+          }
+          defaultsCall.setEncoding(someEncoding);
+          return defaultsCall;
+        }
+        return null;
+      }
+
+      private EncodedCall buildDefaultsCall(MethodCallContext ctx) {
+        MethodCallContext child = ctx.prependChild(
+            new DslHttpDefaults().buildConfiguredTestElement(), null);
+        return new EncodedCall("", child, true);
+      }
+
+    }
+
+  }
+
+  public static class EncodedCall {
+
+    private String encoding;
+    private final MethodCallContext ctx;
+    private final boolean isDefaultCandidate;
+
+    public EncodedCall(String encoding, MethodCallContext ctx, boolean isDefaultCandidate) {
+      this.encoding = encoding;
+      this.ctx = ctx;
+      this.isDefaultCandidate = isDefaultCandidate;
+    }
+
+    public void setEncoding(String encoding) {
+      this.encoding = encoding;
+      ctx.getMethodCall().chain("encoding", new EncodingParam(encoding, null));
+    }
+
+    public void removeEncoding() {
+      MethodCall methodCall = ctx.getMethodCall();
+      methodCall.unchain("encoding");
+      if (methodCall.getReturnType() == DslHttpDefaults.class && methodCall.chainSize() == 0) {
+        ctx.getParent().getMethodCall()
+            .replaceChild(methodCall, MethodCall.emptyCall());
+      }
     }
 
   }

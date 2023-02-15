@@ -289,6 +289,8 @@ public abstract class DslBaseHttpSampler<T extends DslBaseHttpSampler<T>> extend
       MethodParam url = buildUrlParam(protocol, domain,
           new StringParam(port.isDefault() ? "" : "" + port.getExpression()), path);
       MethodCall ret = buildBaseHttpMethodCall(name, url, paramBuilder);
+      context.findBuilder(DslHttpDefaults.CodeBuilder.class)
+          .registerDependency(context);
       context.findBuilder(DslCacheManager.CodeBuilder.class)
           .registerDependency(context, ret);
       context.findBuilder(DslCookieManager.CodeBuilder.class)
@@ -336,9 +338,9 @@ public abstract class DslBaseHttpSampler<T extends DslBaseHttpSampler<T>> extend
       ret.chain("contentType", new ContentTypeParam(contentType));
     }
 
-    protected void chainHeaders(MethodCall ret, MethodCallContext headers) {
-      if (headers != null) {
-        ret.reChain(headers.buildMethodCall());
+    protected void chainHeaders(MethodCall ret, MethodCallContext headersContext) {
+      if (headersContext != null) {
+        ret.reChain(headersContext.buildMethodCall());
       }
     }
 

@@ -133,4 +133,8 @@ public class ChildrenParam<T> extends MethodParam {
     children.replaceAll(c -> c == original ? replacement : c);
   }
 
+  public void prependChild(MethodCall child) {
+    children.add(0, child);
+  }
+
 }

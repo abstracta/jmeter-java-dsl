@@ -5,7 +5,8 @@ testPlan()
             .set("host", "abstracta.us")
             .set("scheme", "https"),
           httpDefaults()
-            .url("https://abstracta.us"),
+            .url("https://abstracta.us")
+            .encoding(StandardCharsets.UTF_8),
           httpCookies()
             .clearCookiesBetweenIterations(false),
           httpCache()
@@ -24,7 +25,6 @@ testPlan()
                 .header("Accept-Encoding", "gzip, deflate, br")
                 .header("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:97.0) Gecko/20100101 Firefox/97.0")
                 .header("Sec-Fetch-Dest", "document")
-                .encoding(StandardCharsets.UTF_8)
             ),
             transaction("/solutions/software-testing-107",
               httpSampler("/solutions/software-testing-107", "/solutions/software-testing")
@@ -40,7 +40,6 @@ testPlan()
                 .header("Accept-Encoding", "gzip, deflate, br")
                 .header("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:97.0) Gecko/20100101 Firefox/97.0")
                 .header("Sec-Fetch-Dest", "document")
-                .encoding(StandardCharsets.UTF_8)
             )
           ),
           resultsTreeVisualizer()

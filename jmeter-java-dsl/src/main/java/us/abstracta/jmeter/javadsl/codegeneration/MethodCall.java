@@ -39,10 +39,10 @@ public class MethodCall implements CodeSegment {
   private MethodCall childrenMethod;
   private ChildrenParam<?> childrenParam;
   private final List<MethodParam> params;
-  private final List<CodeSegment> chain = new ArrayList<>();
+  private List<CodeSegment> chain = new ArrayList<>();
   private final Set<String> requiredStaticImports = new HashSet<>();
   private boolean commented;
-  private String commentPrefix;
+  private String headingComment;
 
   public MethodCall(String methodName, Class<?> returnType, MethodParam... params) {
     this.methodName = methodName;
@@ -100,20 +100,49 @@ public class MethodCall implements CodeSegment {
     }
   }
 
+  /**
+   * Allows to build a special method call used when some conversion is not supported.
+   *
+   * @return the special method call to include as child of other method calls.
+   */
   public static MethodCall buildUnsupported() {
     return new MethodCall("unsupported", MultiLevelTestElement.class);
   }
 
+  /**
+   * Marks or un-marks this method call as to be commented out.
+   * <p>
+   * This is mainly used when you want to provide users with an easy way to enable an existing part
+   * of a test plan that is currently not enabled or used.
+   *
+   * @param commented specifies to comment or uncomment this method call.
+   * @since 1.3
+   */
   public void setCommented(boolean commented) {
     this.commented = commented;
   }
 
+  /**
+   * Allows to check if this method call is marked to be commented out.
+   *
+   * @return true if the method call is marked to be commented out, false otherwise.
+   * @since 1.3
+   */
   public boolean isCommented() {
     return commented;
   }
 
-  public void prefixComment(String comment) {
-    commentPrefix = comment;
+  /**
+   * Allow to add a heading comment to the method call.
+   * <p>
+   * This is helpful to add some note or comment on created element. Mainly comments that require
+   * users attention, like reviewing and/or changing a particular part of test plan.
+   *
+   * @param comment specifies the comment to add before the method call.
+   * @since 1.8
+   */
+  public void headingComment(String comment) {
+    headingComment = comment;
   }
 
   /**
@@ -259,8 +288,31 @@ public class MethodCall implements CodeSegment {
 
   }
 
+  /**
+   * Allows replacing a child method call with another.
+   * <p>
+   * This is useful when some element has to alter an already built method call, for example when
+   * replacing module controllers by test fragment method calls.
+   *
+   * @param original    the method call to be replaced.
+   * @param replacement the method call to be used instead of the original one.
+   * @since 1.3
+   */
   public void replaceChild(MethodCall original, MethodCall replacement) {
     solveChildrenParam().replaceChild(original, replacement);
+  }
+
+  /**
+   * Allows adding a child method at the beginning of children methods.
+   * <p>
+   * This is mainly useful when in need to add configuration elements, that are usually added at the
+   * beginning of children calls.
+   *
+   * @param child the child method to add at the beginning of children methods.
+   * @since 1.8
+   */
+  public void prependChild(MethodCall child) {
+    solveChildrenParam().prependChild(child);
   }
 
   /**
@@ -313,6 +365,19 @@ public class MethodCall implements CodeSegment {
     return this;
   }
 
+  /**
+   * Allows to chain a method call in current method call.
+   * <p>
+   * This method is handy when you want to chain a method that actually currently is not available.
+   * Mainly as a marker of a feature that could be implemented in the future but still isn't (like
+   * authentication methods still not implemented).
+   * <p>
+   * In general cases {@link #chain(String, MethodParam...)} should be used instead.
+   *
+   * @param methodCall specifies the method call to chain
+   * @return current method call for further usage.
+   * @since 1.5
+   */
   public MethodCall chain(MethodCall methodCall) {
     chain.add(methodCall);
     return methodCall;
@@ -360,6 +425,16 @@ public class MethodCall implements CodeSegment {
     return true;
   }
 
+  /**
+   * Allows to add a comment as part of the chain of commands.
+   * <p>
+   * This is useful to add notes to drive user attention to some particular chained method. For
+   * example, when parameters passed to a chained method need to be reviewed or changed.
+   *
+   * @param comment the comment to chain.
+   * @return the method call for further usage.
+   * @since 1.5
+   */
   public MethodCall chainComment(String comment) {
     chain.add(new Comment(comment));
     return this;
@@ -387,6 +462,36 @@ public class MethodCall implements CodeSegment {
   }
 
   /**
+   * Allows to remove an existing chained method call.
+   * <p>
+   * This is useful when you need to alter an already created method call, for example, when
+   * optimizing a conversion and removing settings that are already covered by some other
+   * configuration element (eg: httpDefaults).
+   *
+   * @param methodName specifies the name of the chained method to be removed. If there are multiple
+   *                   methods chained with same name, then all of them will be removed.
+   * @since 1.8
+   */
+  public void unchain(String methodName) {
+    chain = chain.stream()
+        .filter(m -> !(m instanceof MethodCall && methodName.equals(((MethodCall) m).methodName)))
+        .collect(Collectors.toList());
+  }
+
+  /**
+   * Allows to check the number of method calls chained into current method call.
+   * <p>
+   * This is useful to check, for example, if a particular test element has any non default
+   * settings.
+   *
+   * @return the number chained method calls.
+   * @since 1.8
+   */
+  public int chainSize() {
+    return chain.size();
+  }
+
+  /**
    * Generates the code for this method call and all associated parameters, children elements and
    * chained methods.
    *
@@ -399,9 +504,9 @@ public class MethodCall implements CodeSegment {
   @Override
   public String buildCode(String indent) {
     StringBuilder ret = new StringBuilder();
-    if (commentPrefix != null) {
+    if (headingComment != null) {
       ret.append("//")
-          .append(commentPrefix)
+          .append(headingComment)
           .append("\n")
           .append(indent);
     }
