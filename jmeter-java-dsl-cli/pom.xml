@@ -21,13 +21,6 @@
     <slf4j.version>1.7.36</slf4j.version>
   </properties>
 
-  <repositories>
-    <repository>
-      <id>jitpack.io</id>
-      <url>https://jitpack.io</url>
-    </repository>
-  </repositories>
-
   <dependencies>
     <dependency>
       <groupId>us.abstracta.jmeter</groupId>
@@ -66,12 +59,10 @@
       <artifactId>picocli</artifactId>
       <version>${picocli.version}</version>
     </dependency>
-    <!-- TODO change the version to a tag when plugin release is properly fixed in jitpack.
-     https://www.jitpack.io/#Blazemeter/CorrelationRecorder-->
     <dependency>
-      <groupId>com.github.Blazemeter</groupId>
-      <artifactId>CorrelationRecorder</artifactId>
-      <version>42d23f6ae0</version>
+      <groupId>com.blazemeter</groupId>
+      <artifactId>jmeter-bzm-correlation-recorder</artifactId>
+      <version>1.2.3</version>
     </dependency>
     <dependency>
       <groupId>org.seleniumhq.selenium</groupId>
@@ -179,7 +170,7 @@
                   <include>com.github.weisj:darklaf-utils</include>
                   <include>org.seleniumhq.selenium:*</include>
                   <include>com.google.guava:guava</include>
-                  <include>com.github.Blazemeter:CorrelationRecorder</include>
+                  <include>com.blazemeter:jmeter-bzm-correlation-recorder</include>
                   <include>com.fasterxml.jackson.core:jackson-annotations</include>
                   <include>org.apache.commons:commons-text</include>
                   <include>dev.failsafe:failsafe</include>
