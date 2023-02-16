@@ -58,7 +58,6 @@ public class JmeterProxyRecorder extends CorrelationProxyControl {
 
   private static final Duration RECORDING_POLL_PERIOD = Duration.ofSeconds(3);
   private static final Duration RECORDING_STOP_TIMEOUT = Duration.ofSeconds(30);
-  private static final int GROUPING_IN_TRANSACTIONS = 4;
 
   private final List<Pattern> headerExcludes = new ArrayList<>();
   private JMeterTreeModel treeModel;
@@ -67,7 +66,6 @@ public class JmeterProxyRecorder extends CorrelationProxyControl {
   public JmeterProxyRecorder() {
     setSamplerFollowRedirects(true);
     setDefaultEncoding(StandardCharsets.UTF_8.name());
-    setGroupingMode(GROUPING_IN_TRANSACTIONS);
   }
 
   public JmeterProxyRecorder logsDirectory(File logsDirectory) {

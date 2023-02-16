@@ -26,7 +26,7 @@ public class Cli {
   }
 
   public static void main(String[] args) throws Exception {
-    System.setProperty("log4j2.Script.enableLanguages", "javascript");
+    System.setProperty("log4j2.Script.enableLanguages", "bsh");
     String version = new ManifestVersionProvider().getVersion()[0];
     System.setProperty("jmdsl.version", version != null ? version : "");
     SLF4JBridgeHandler.removeHandlersForRootLogger();
