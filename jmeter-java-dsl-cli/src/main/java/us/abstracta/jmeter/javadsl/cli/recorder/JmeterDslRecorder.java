@@ -19,16 +19,15 @@ public class JmeterDslRecorder implements AutoCloseable {
 
   public static final String DEFAULT_EXCLUDED_URLS =
       "(?i).*\\.(bmp|css|js|gif|ico|jpe?g|png|svg|swf|ttf|woff2?|webp)(\\?.*)?";
-  public static final List<String> DEFAULT_EXCLUDED_HEADERS = Arrays.asList("Accept-Language",
-      "Upgrade-Insecure-Requests", "Accept-Encoding", "User-Agent", "Accept", "Referer", "Origin",
-      "X-Requested-With", "Cache-Control");
+  public static final String DEFAULT_EXCLUDED_HEADERS =
+      "(?i)(Sec-.*|Accept|Accept-(Language|Encoding)|Upgrade-Insecure-Requests|User-Agent|"
+          + "Referer|Origin|X-Requested-With|Cache-Control)";
 
   private final List<Pattern> urlIncludes = new ArrayList<>();
   private final List<Pattern> urlExcludes = new ArrayList<>(
       Collections.singletonList(Pattern.compile(DEFAULT_EXCLUDED_URLS)));
-  private final List<Pattern> headerExcludes = new ArrayList<>(DEFAULT_EXCLUDED_HEADERS.stream()
-      .map(Pattern::compile)
-      .collect(Collectors.toList()));
+  private final List<Pattern> headerExcludes = new ArrayList<>(
+      Collections.singletonList(Pattern.compile(DEFAULT_EXCLUDED_HEADERS)));
   private final List<CorrelationRule> correlations = new ArrayList<>();
   private JmeterProxyRecorder proxy;
   private File logsDirectory;

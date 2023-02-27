@@ -39,7 +39,7 @@ public class RecordingBrowser implements AutoCloseable {
     proxy.setHttpProxy(proxyHost);
     proxy.setSslProxy(proxyHost);
     ret.setProxy(proxy);
-    ret.addArguments("--incognito");
+    ret.addArguments("--incognito", "--proxy-bypass-list=<-loopback>");
     ret.setAcceptInsecureCerts(true);
     return ret;
   }

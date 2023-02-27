@@ -148,14 +148,9 @@ public class RecorderCommand implements Callable<Integer> {
         description = {"Specifies not to use the default headers filter.",
             "This option might be helpful when you want a to record all headers which require "
                 + "specific values by the service under test (eg: User-Agent, Referer, etc).",
-            "The default filter ignores these headers: ${sys:defaultHeadersFilter}"})
+            "The default filter ignores headers matching: "
+                + JmeterDslRecorder.DEFAULT_EXCLUDED_HEADERS})
     private boolean ignoreDefaultHeaderFilter;
-  }
-
-  public RecorderCommand() {
-    // This is required since is not possible to include non-constant values on annotations
-    System.setProperty("defaultHeadersFilter",
-        String.join(",", JmeterDslRecorder.DEFAULT_EXCLUDED_HEADERS));
   }
 
   @Override
