@@ -60,8 +60,8 @@ public class JmeterProxyRecorder extends CorrelationProxyControl {
   private static final Duration RECORDING_STOP_TIMEOUT = Duration.ofSeconds(30);
 
   private final List<Pattern> headerExcludes = new ArrayList<>();
-  private JMeterTreeModel treeModel;
   private File logsDirectory;
+  private JMeterTreeModel treeModel;
 
   public JmeterProxyRecorder() {
     setSamplerFollowRedirects(true);
@@ -70,6 +70,11 @@ public class JmeterProxyRecorder extends CorrelationProxyControl {
 
   public JmeterProxyRecorder logsDirectory(File logsDirectory) {
     this.logsDirectory = logsDirectory;
+    return this;
+  }
+
+  public JmeterProxyRecorder logFilteredRequests(boolean enabled) {
+    setNotifyChildSamplerListenerOfFilteredSamplers(enabled);
     return this;
   }
 

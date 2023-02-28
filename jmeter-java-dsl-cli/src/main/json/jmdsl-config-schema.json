@@ -46,6 +46,11 @@
           "type": "boolean",
           "default": false
         },
+        "logFilteredRequests": {
+          "description": "Specifies to include in generated JTL file, filtered and not recorded requests or not.",
+          "type": "boolean",
+          "default": false
+        },
         "headerExcludes": {
           "description": "Regular expressions used to ignore matching headers from recording",
           "examples": [

@@ -29,11 +29,17 @@ public class JmeterDslRecorder implements AutoCloseable {
   private final List<Pattern> headerExcludes = new ArrayList<>(
       Collections.singletonList(Pattern.compile(DEFAULT_EXCLUDED_HEADERS)));
   private final List<CorrelationRule> correlations = new ArrayList<>();
-  private JmeterProxyRecorder proxy;
   private File logsDirectory;
+  private boolean logFilteredRequests;
+  private JmeterProxyRecorder proxy;
 
   public JmeterDslRecorder logsDirectory(File logsDirectory) {
     this.logsDirectory = logsDirectory;
+    return this;
+  }
+
+  public JmeterDslRecorder logFilteredRequests(boolean enabled) {
+    this.logFilteredRequests = enabled;
     return this;
   }
 
@@ -75,6 +81,7 @@ public class JmeterDslRecorder implements AutoCloseable {
     new JmeterEnvironment();
     proxy = new JmeterProxyRecorder()
         .logsDirectory(logsDirectory)
+        .logFilteredRequests(logFilteredRequests)
         .headerExcludes(headerExcludes)
         .urlIncludes(urlIncludes)
         .urlExcludes(urlExcludes)

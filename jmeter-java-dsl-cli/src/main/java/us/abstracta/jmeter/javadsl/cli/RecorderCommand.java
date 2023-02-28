@@ -123,6 +123,14 @@ public class RecorderCommand implements Callable<Integer> {
                 + "downloading static resources/assets (like images, styles, etc).",
             "The default filter ignores URLs matching: " + JmeterDslRecorder.DEFAULT_EXCLUDED_URLS})
     private boolean ignoreDefaultUrlFilter;
+
+    @Option(names = {"--log-filtered-requests"},
+        description = {
+            "Specifies to include in recording log (jtl) requests that where not recorded.",
+            "This option might be helpful when we need to review if recorded request are expected "
+                + "ones or filtering options need to be tuned."})
+    private boolean logFilteredRequests;
+
   }
 
   @JsonUnwrapped
@@ -179,6 +187,7 @@ public class RecorderCommand implements Callable<Integer> {
     if (headersFiltering.ignoreDefaultHeaderFilter) {
       ret.clearHeaderFilter();
     }
+    ret.logFilteredRequests(requestsFiltering.logFilteredRequests);
     ret.headerExcludes(headersFiltering.headerExcludes);
     correlations.forEach(ret::correlationRule);
     return ret.start();
