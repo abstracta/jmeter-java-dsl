@@ -99,6 +99,15 @@
       <testResource>
         <directory>src/test/resources</directory>
         <filtering>true</filtering>
+        <includes>
+          <include>version.txt</include>
+        </includes>
+      </testResource>
+      <testResource>
+        <directory>src/test/resources</directory>
+        <excludes>
+          <exclude>version.txt</exclude>
+        </excludes>
       </testResource>
     </testResources>
     <plugins>
