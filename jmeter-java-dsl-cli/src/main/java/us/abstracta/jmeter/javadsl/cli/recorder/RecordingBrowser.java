@@ -2,6 +2,7 @@ package us.abstracta.jmeter.javadsl.cli.recorder;
 
 import java.net.URL;
 import java.time.Duration;
+import java.util.List;
 import org.apache.commons.io.output.NullOutputStream;
 import org.openqa.selenium.NoSuchWindowException;
 import org.openqa.selenium.Proxy;
@@ -19,9 +20,9 @@ public class RecordingBrowser implements AutoCloseable {
 
   private final ChromeDriver driver;
 
-  public RecordingBrowser(URL url, String proxyHost) {
+  public RecordingBrowser(URL url, String proxyHost, List<String> args) {
     driver = new ChromeDriver(buildDriverService(),
-        buildChromeOptions(proxyHost));
+        buildChromeOptions(proxyHost, args));
     if (url != null) {
       driver.get(url.toString());
     }
@@ -33,13 +34,14 @@ public class RecordingBrowser implements AutoCloseable {
     return ret;
   }
 
-  private ChromeOptions buildChromeOptions(String proxyHost) {
+  private ChromeOptions buildChromeOptions(String proxyHost, List<String> args) {
     ChromeOptions ret = new ChromeOptions();
     Proxy proxy = new Proxy();
     proxy.setHttpProxy(proxyHost);
     proxy.setSslProxy(proxyHost);
     ret.setProxy(proxy);
     ret.addArguments("--incognito", "--proxy-bypass-list=<-loopback>");
+    ret.addArguments(args);
     ret.setAcceptInsecureCerts(true);
     return ret;
   }

@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+        <meta name="description" content="" />
+        <meta name="author" content="" />
+        <title>Retail Store Sample App</title>
+
+        <link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
+
+        <link rel="stylesheet" href="/webjars/bootstrap-icons/font/bootstrap-icons.css">
+        <link rel="stylesheet" href="/webjars/bootstrap/dist/css/bootstrap.min.css">
+        <link rel="stylesheet" href="/assets/css/styles.css">
+    </head>
+    <body class="d-flex flex-column min-vh-100 bg-light">
+        <section style="background-color: #e9ecef">
+          <div class="container" style="text-align: center"></div>
+      </section>
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+            <div class="container">
+                <a class="navbar-brand" href="/home">Retail Store Sample</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4">
+                        <li class="nav-item"><a id="menu-home" class="nav-link active" aria-current="page" href="/home">Home</a></li>
+                        <li class="nav-item"><a id="menu-catalog" class="nav-link" href="/catalog">Catalog</a></li>
+                    </ul>
+                    <a id="go-cart" class="btn btn-outline-dark" href="/cart">
+                        <i class="bi-cart-fill me-1"></i>
+                        Cart
+                        <span class="badge bg-dark text-white ms-1 rounded-pill">0</span>
+                    </a>
+                </div>
+            </div>
+        </nav>
+        <div>
+          
+<section class="bg-primary p-y-lg">
+    <div class="container">
+        <article class="my-5">
+            <h1 class="display-4 text-white"> Shop for top products <br> in our store  </h1>
+            <p class="lead text-white">Latest Products, Low Prices</p>
+        </article>
+    </div>
+</section>
+<div>
+    <div class="container pt-4">
+        <div class="mt-4">
+            <h2 style="margin-bottom: 20px">Hot products!</h2>
+            <div class="row gx-4 gx-lg-5 row-cols-4 justify-content-center">
+                <div class="col mb-5">
+                    <div class="card h-100 product">
+    <img class="card-img-top" src="/assets/gentleman.jpg" alt="..." />
+    <ul class="list-group list-group-flush">
+        <li class="list-group-item">
+            <div class="py-2">
+                <div>
+                    <a href="/catalog/510a0d7e-8e83-4193-b483-e27e09ddc34d"><h5 class="fw-bolder">Gentleman</h5></a>
+                    <div class="mb-2"><div>
+    <span class="bi bi-star-fill" style="color: lightgrey"></span>
+    <span class="bi bi-star-fill" style="color: lightgrey"></span>
+    <span class="bi bi-star-fill" style="color: lightgrey"></span>
+    <span class="bi bi-star-fill" style="color: lightgrey"></span>
+    <span class="bi bi-star-fill" style="color: lightgrey"></span>
+</div></div>
+                    <div>$<span>795</span></div>
+                </div>
+            </div>
+        </li>
+        <li class="list-group-item">
+            <div class="my-2">
+                <form action="/cart" method="POST">
+                    <input type="hidden" name="productId" value="510a0d7e-8e83-4193-b483-e27e09ddc34d"/>
+                    <a href="#" onclick="this.closest('form').submit();return false;" class="btn btn-dark mt-auto"><i class="bi bi-cart pe-2"></i>Add to cart</a>
+                </form>
+            </div>
+        </li>
+    </ul>
+</div>
+                </div>
+                <div class="col mb-5">
+                    <div class="card h-100 product">
+    <img class="card-img-top" src="/assets/pocket_watch.jpg" alt="..." />
+    <ul class="list-group list-group-flush">
+        <li class="list-group-item">
+            <div class="py-2">
+                <div>
+                    <a href="/catalog/6d62d909-f957-430e-8689-b5129c0bb75e"><h5 class="fw-bolder">Pocket Watch</h5></a>
+                    <div class="mb-2"><div>
+    <span class="bi bi-star-fill" style="color: lightgrey"></span>
+    <span class="bi bi-star-fill" style="color: lightgrey"></span>
+    <span class="bi bi-star-fill" style="color: lightgrey"></span>
+    <span class="bi bi-star-fill" style="color: lightgrey"></span>
+    <span class="bi bi-star-fill" style="color: lightgrey"></span>
+</div></div>
+                    <div>$<span>385</span></div>
+                </div>
+            </div>
+        </li>
+        <li class="list-group-item">
+            <div class="my-2">
+                <form action="/cart" method="POST">
+                    <input type="hidden" name="productId" value="6d62d909-f957-430e-8689-b5129c0bb75e"/>
+                    <a href="#" onclick="this.closest('form').submit();return false;" class="btn btn-dark mt-auto"><i class="bi bi-cart pe-2"></i>Add to cart</a>
+                </form>
+            </div>
+        </li>
+    </ul>
+</div>
+                </div>
+                <div class="col mb-5">
+                    <div class="card h-100 product">
+    <img class="card-img-top" src="/assets/chrono_classic.jpg" alt="..." />
+    <ul class="list-group list-group-flush">
+        <li class="list-group-item">
+            <div class="py-2">
+                <div>
+                    <a href="/catalog/808a2de1-1aaa-4c25-a9b9-6612e8f29a38"><h5 class="fw-bolder">Chronograf Classic</h5></a>
+                    <div class="mb-2"><div>
+    <span class="bi bi-star-fill" style="color: lightgrey"></span>
+    <span class="bi bi-star-fill" style="color: lightgrey"></span>
+    <span class="bi bi-star-fill" style="color: lightgrey"></span>
+    <span class="bi bi-star-fill" style="color: lightgrey"></span>
+    <span class="bi bi-star-fill" style="color: lightgrey"></span>
+</div></div>
+                    <div>$<span>5100</span></div>
+                </div>
+            </div>
+        </li>
+        <li class="list-group-item">
+            <div class="my-2">
+                <form action="/cart" method="POST">
+                    <input type="hidden" name="productId" value="808a2de1-1aaa-4c25-a9b9-6612e8f29a38"/>
+                    <a href="#" onclick="this.closest('form').submit();return false;" class="btn btn-dark mt-auto"><i class="bi bi-cart pe-2"></i>Add to cart</a>
+                </form>
+            </div>
+        </li>
+    </ul>
+</div>
+                </div>
+                <div class="col mb-5">
+                    <div class="card h-100 product">
+    <img class="card-img-top" src="/assets/wood_watch.jpg" alt="..." />
+    <ul class="list-group list-group-flush">
+        <li class="list-group-item">
+            <div class="py-2">
+                <div>
+                    <a href="/catalog/a0a4f044-b040-410d-8ead-4de0446aec7e"><h5 class="fw-bolder">Wood Watch</h5></a>
+                    <div class="mb-2"><div>
+    <span class="bi bi-star-fill" style="color: lightgrey"></span>
+    <span class="bi bi-star-fill" style="color: lightgrey"></span>
+    <span class="bi bi-star-fill" style="color: lightgrey"></span>
+    <span class="bi bi-star-fill" style="color: lightgrey"></span>
+    <span class="bi bi-star-fill" style="color: lightgrey"></span>
+</div></div>
+                    <div>$<span>50</span></div>
+                </div>
+            </div>
+        </li>
+        <li class="list-group-item">
+            <div class="my-2">
+                <form action="/cart" method="POST">
+                    <input type="hidden" name="productId" value="a0a4f044-b040-410d-8ead-4de0446aec7e"/>
+                    <a href="#" onclick="this.closest('form').submit();return false;" class="btn btn-dark mt-auto"><i class="bi bi-cart pe-2"></i>Add to cart</a>
+                </form>
+            </div>
+        </li>
+    </ul>
+</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<section class="p-y-m border-top bg-white">
+    <div class="container">
+
+        <header class="mt-2 mb-5">
+            <h3>Why choose us</h3>
+        </header>
+
+        <div class="row mb-4">
+            <div class="col-lg-4 col-md-6">
+                <figure class="couplet align-items-center mb-4">
+                    <div class="picture">
+                        <span class="rounded-circle shadow-sm text-primary home-icon" style="background-color: #dbe9ff !important">
+                            <i class="bi bi-heart-fill"></i>
+                        </span>
+                    </div>
+                    <figcaption class="description">
+                        <h6 class="title">We love our customers!</h6>
+                        <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit.</p>
+                    </figcaption>
+                </figure>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <figure class="couplet align-items-center  mb-4">
+                    <div class="picture">
+                        <span class="rounded-circle shadow-sm text-primary home-icon" style="background-color: #dbe9ff !important">
+                            <i class="bi bi-currency-dollar"></i>
+                        </span>
+                    </div>
+                    <figcaption class="description">
+                        <h6 class="title">Lowest prices</h6>
+                        <p>Aenean commodo ligula eget dolor. Aenean massa.</p>
+                    </figcaption>
+                </figure>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <figure class="couplet align-items-center  mb-4">
+                    <div class="picture">
+                        <span class="rounded-circle shadow-sm text-primary home-icon" style="background-color: #dbe9ff !important">
+                            <i class="bi bi-box2-fill"></i>
+                        </span>
+                    </div>
+                    <figcaption class="description">
+                        <h6 class="title">Reliable shipping</h6>
+                        <p>Com sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.</p>
+                    </figcaption>
+                </figure>
+            </div>
+        </div>
+    </div>
+</section>
+
+        </div>
+        <footer class="text-center text-lg-start bg-primary mt-auto">
+          <section class="d-flex justify-content-center justify-content-lg-between p-4 border-bottom">
+            <div class="container text-center text-md-start">
+              <div class="row mt-5">
+                <div class="col-md-3 col-lg-4 col-xl-3 mx-auto mb-4">
+                  <h6 class="text-uppercase fw-bold mb-4">
+                    Our store
+                  </h6>
+                  <p>
+                    Watches?
+                  </p>
+                </div>
+                <div class="col-md-2 col-lg-2 col-xl-2 mx-auto mb-4">
+                  <h6 class="text-uppercase fw-bold mb-4">
+                    Categories
+                  </h6>
+                  <p>
+                    <a href="#!">Smart</a>
+                  </p>
+                  <p>
+                    <a href="#!">Dress</a>
+                  </p>
+                  <p>
+                    <a href="#!">Luxury</a>
+                  </p>
+                  <p>
+                    <a href="#!">Casual</a>
+                  </p>
+                </div>
+                <div class="col-md-3 col-lg-2 col-xl-2 mx-auto mb-4">
+                  <h6 class="text-uppercase fw-bold mb-4">
+                    Useful links
+                  </h6>
+                  <p>
+                    <a href="#!">About us</a>
+                  </p>
+                  <p>
+                    <a href="#!">Terms</a>
+                  </p>
+                  <p>
+                    <a href="#!">FAQ</a>
+                  </p>
+                  <p>
+                    <a href="#!">Blog</a>
+                  </p>
+                </div>
+                <div class="col-md-4 col-lg-3 col-xl-3 mx-auto mb-md-0 mb-4">
+                  <h6 class="text-uppercase fw-bold mb-4">Contact</h6>
+                  <p>
+                    <i class="bi bi-envelope-fill"></i>
+                    Email
+                  </p>
+                  <p>
+                    <i class="bi bi-telephone-fill"></i>
+                    Phone
+                  </p>
+                </div>
+              </div>
+            </div>
+          </section>
+        </footer>
+        <div style="position: static !important;"></div>
+
+        <script src="https://cdn.jsdelivr.net/npm/tiny-slider@2.9.2/dist/min/tiny-slider.js" integrity="sha256-CApIX5Te4OdXVy1iWP+5+qG/iHa+8apfYOFagdVMRwk=" crossorigin="anonymous"></script>
+        <script src="/webjars/bootstrap/dist/js/bootstrap.min.js"></script>
+
+        <script src="js/scripts.js"></script>
+    </body>
+</html>

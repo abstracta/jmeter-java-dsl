@@ -1,0 +1,52 @@
+{
+  "mappings": [
+    {
+      "request": {
+        "url": "/",
+        "method": "GET"
+      },
+      "response": {
+        "status": 303,
+        "headers": {
+          "Location": "/home",
+          "Set-Cookie": "SESSIONID=7b2c2f9a-0aca-4322-951b-4832863a0b04"
+        }
+      }
+    },
+    {
+      "request": {
+        "url": "/cart",
+        "method": "POST",
+        "bodyPatterns": [
+          {
+            "equalTo": "productId=510a0d7e-8e83-4193-b483-e27e09ddc34d",
+            "caseInsensitive": false
+          }
+        ]
+      },
+      "response": {
+        "status": 303,
+        "headers": {
+          "Location": "/cart"
+        }
+      }
+    },
+    {
+      "priority": 10,
+      "request": {
+        "urlPattern": "/[^\\./]+",
+        "method": "GET"
+      },
+      "response": {
+        "status": 200,
+        "bodyFileName": "{{substring request.path 1}}.html",
+        "headers": {
+          "Content-Type": "text/html",
+          "Content-Language": "es-ES",
+          "X-Content-Encoding-Over-Network": "gzip"
+        },
+        "transformers": ["response-template"]
+      }
+    }
+  ]
+}

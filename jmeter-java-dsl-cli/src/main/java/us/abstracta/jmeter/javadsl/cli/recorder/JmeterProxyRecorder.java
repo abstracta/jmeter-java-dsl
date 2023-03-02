@@ -122,7 +122,7 @@ public class JmeterProxyRecorder extends CorrelationProxyControl {
   private HashTree buildTree() {
     HashTree rootTree = new ListedHashTree();
     JmeterDsl.testPlan(
-        JmeterDsl.threadGroup(50, Duration.ofMinutes(5),
+        JmeterDsl.threadGroup(1, 1,
             JmeterDsl.httpCookies(),
             JmeterDsl.httpCache(),
             new DslRecordingController()

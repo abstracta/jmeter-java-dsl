@@ -161,11 +161,16 @@ public class RecorderCommand implements Callable<Integer> {
     private boolean ignoreDefaultHeaderFilter;
   }
 
+  // This option is used to allow automating integration testing
+  @Option(names = {"--browser-arguments"}, hidden = true, split = ",")
+  private List<String> browserArguments;
+
   @Override
   public Integer call() throws Exception {
     loadConfigFileDefaults();
     try (JmeterDslRecorder recorder = buildRecorder();
-        RecordingBrowser browser = new RecordingBrowser(url, recorder.getProxy())) {
+        RecordingBrowser browser = new RecordingBrowser(url, recorder.getProxy(),
+            browserArguments)) {
       browser.awaitClosed();
     }
     return 0;

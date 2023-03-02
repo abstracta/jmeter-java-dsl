@@ -6,12 +6,12 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeoutException;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
+import us.abstracta.jmeter.javadsl.JmeterDsl;
+import us.abstracta.jmeter.javadsl.cli.Cli.ManifestVersionProvider;
 import us.abstracta.jmeter.javadsl.codegeneration.DslCodeGenerator;
 import us.abstracta.jmeter.javadsl.core.engines.JmeterEnvironment;
 
@@ -102,11 +102,23 @@ public class JmeterDslRecorder implements AutoCloseable {
       proxy.saveRecordingTo(jmx.toFile());
       String code = new DslCodeGenerator()
           .addBuilders(new JmeterProxyRecorder.CodeBuilder())
+          .addDependency(JmeterDsl.class,
+              "us.abstracta.jmeter:jmeter-java-dsl" + getJmeterDslVersion())
           .generateCodeFromJmx(jmx.toFile());
       System.out.println(code);
     } finally {
       jmx.toFile().delete();
     }
+  }
+
+  private String getJmeterDslVersion() {
+    try {
+      String ret = new ManifestVersionProvider().getVersion()[0];
+      return (ret != null ? ":" + ret : "");
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
+
   }
 
 }

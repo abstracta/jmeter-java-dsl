@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+        <meta name="description" content="" />
+        <meta name="author" content="" />
+        <title>Retail Store Sample App</title>
+
+        <link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
+
+        <link rel="stylesheet" href="/webjars/bootstrap-icons/font/bootstrap-icons.css">
+        <link rel="stylesheet" href="/webjars/bootstrap/dist/css/bootstrap.min.css">
+        <link rel="stylesheet" href="/assets/css/styles.css">
+    </head>
+    <body class="d-flex flex-column min-vh-100 bg-light">
+        <section style="background-color: #e9ecef">
+          <div class="container" style="text-align: center"></div>
+      </section>
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+            <div class="container">
+                <a class="navbar-brand" href="/home">Retail Store Sample</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4">
+                        <li class="nav-item"><a id="menu-home" class="nav-link active" aria-current="page" href="/home">Home</a></li>
+                        <li class="nav-item"><a id="menu-catalog" class="nav-link" href="/catalog">Catalog</a></li>
+                    </ul>
+                    <a id="go-cart" class="btn btn-outline-dark" href="/cart">
+                        <i class="bi-cart-fill me-1"></i>
+                        Cart
+                        <span class="badge bg-dark text-white ms-1 rounded-pill">1</span>
+                    </a>
+                </div>
+            </div>
+        </nav>
+        <div>
+          
+<section class="bg-primary p-y-sm">
+    <div class="container">
+        <ol class="breadcrumb custom mb-0">
+            <li class="breadcrumb-item"><a href="/home">Home</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Cart</li>
+        </ol>
+    </div>
+</section>
+<section class="p-y-m">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-9">
+
+                <div class="card basket" id="basket">
+                    <div class="content-body">
+                        <h4 class="card-title mb-4">Shopping cart</h4>
+
+                        
+                        <article class="row gy-3 mb-4 cart-item">
+                            <div class="col-lg-5">
+                                <figure class="couplet me-lg-5">
+                                    <div class="picture" style="height: 80px"><img
+                                            style="max-height: 100%; max-width: 100%" src="/assets/gentleman.jpg"
+                                            class="img-sm img-thumbnail"></div>
+                                    <figcaption class="description">
+                                        <a href="#" class="title item-name">Gentleman</a>
+                                    </figcaption>
+                                </figure>
+                            </div>
+                            <div class="col-lg-2 col-sm-4 col-6">
+                                <div class="lh-sm">
+                                    <var class="h6">$
+                                        795
+                                    </var> <br>
+                                    <small class="text-muted"> $
+                                        795
+                                        x 1 </small>
+                                </div>
+                            </div>
+                            <div class="col-lg col-sm-4">
+                                <div class="float-lg-end">
+                                    <form action="/cart/remove" method="POST">
+                                        <input type="hidden" name="productId" value="510a0d7e-8e83-4193-b483-e27e09ddc34d"/>
+                                        <button type="submit" class="btn btn-remove remove-item text-danger">Remove</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </article>
+
+                    </div>
+
+                </div>
+
+            </div>
+            <aside class="col-lg-3">
+
+                <div class="card">
+                    <div class="card-body">
+                        <dl class="sidebarlist-align">
+                            <dt>Total:</dt>
+                            <dd class="text-end text-dark font-weight-bold"> $
+                                795
+                            </dd>
+                        </dl>
+
+                        <div class="d-grid gap-2 my-3">
+                            <a href="/checkout" class="btn btn-success w-100"> Checkout </a>
+                        </div>
+                    </div>
+                </div>
+
+            </aside>
+
+        </div>
+        <br><br>
+    </div>
+</section>
+
+        </div>
+        <footer class="text-center text-lg-start bg-primary mt-auto">
+          <section class="d-flex justify-content-center justify-content-lg-between p-4 border-bottom">
+            <div class="container text-center text-md-start">
+              <div class="row mt-5">
+                <div class="col-md-3 col-lg-4 col-xl-3 mx-auto mb-4">
+                  <h6 class="text-uppercase fw-bold mb-4">
+                    Our store
+                  </h6>
+                  <p>
+                    Watches?
+                  </p>
+                </div>
+                <div class="col-md-2 col-lg-2 col-xl-2 mx-auto mb-4">
+                  <h6 class="text-uppercase fw-bold mb-4">
+                    Categories
+                  </h6>
+                  <p>
+                    <a href="#!">Smart</a>
+                  </p>
+                  <p>
+                    <a href="#!">Dress</a>
+                  </p>
+                  <p>
+                    <a href="#!">Luxury</a>
+                  </p>
+                  <p>
+                    <a href="#!">Casual</a>
+                  </p>
+                </div>
+                <div class="col-md-3 col-lg-2 col-xl-2 mx-auto mb-4">
+                  <h6 class="text-uppercase fw-bold mb-4">
+                    Useful links
+                  </h6>
+                  <p>
+                    <a href="#!">About us</a>
+                  </p>
+                  <p>
+                    <a href="#!">Terms</a>
+                  </p>
+                  <p>
+                    <a href="#!">FAQ</a>
+                  </p>
+                  <p>
+                    <a href="#!">Blog</a>
+                  </p>
+                </div>
+                <div class="col-md-4 col-lg-3 col-xl-3 mx-auto mb-md-0 mb-4">
+                  <h6 class="text-uppercase fw-bold mb-4">Contact</h6>
+                  <p>
+                    <i class="bi bi-envelope-fill"></i>
+                    Email
+                  </p>
+                  <p>
+                    <i class="bi bi-telephone-fill"></i>
+                    Phone
+                  </p>
+                </div>
+              </div>
+            </div>
+          </section>
+        </footer>
+        <div style="position: static !important;"></div>
+
+        <script src="https://cdn.jsdelivr.net/npm/tiny-slider@2.9.2/dist/min/tiny-slider.js" integrity="sha256-CApIX5Te4OdXVy1iWP+5+qG/iHa+8apfYOFagdVMRwk=" crossorigin="anonymous"></script>
+        <script src="/webjars/bootstrap/dist/js/bootstrap.min.js"></script>
+
+        <script src="js/scripts.js"></script>
+    </body>
+</html>
