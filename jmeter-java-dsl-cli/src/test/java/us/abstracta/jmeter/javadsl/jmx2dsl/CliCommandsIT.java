@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -23,8 +24,11 @@ import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 import us.abstracta.jmeter.javadsl.codegeneration.TestClassTemplate;
+import us.abstracta.jmeter.javadsl.core.StringTemplateAssert;
 import us.abstracta.jmeter.javadsl.util.TestResource;
 
 public class CliCommandsIT {
@@ -84,8 +88,8 @@ public class CliCommandsIT {
       Process p = startCommand("recorder", "--config=" + resourcePath("retailstore.jmdsl.yml"),
           "--browser-arguments=--headless=new,--remote-debugging-port=" + browserDebuggingPort);
       addProductToCart(browserDebuggingPort);
-      assertThat(getProcessOutput(p))
-          .isEqualTo(buildExpectedTestClass("RecordedTestPlan.java", ContentType.class,
+      StringTemplateAssert.assertThat(getProcessOutput(p))
+          .matches(buildExpectedTestClass("RecordedTestPlan.template.java", ContentType.class,
               StandardCharsets.class, HTTPConstants.class));
     } finally {
       mock.stop();
@@ -123,7 +127,10 @@ public class CliCommandsIT {
   }
 
   private static WebElement findFirstProductCartButton(ChromeDriver driver) {
-    List<WebElement> products = driver.findElements(By.cssSelector(".product"));
+    By productsLocator = By.cssSelector(".product");
+    new WebDriverWait(driver, Duration.ofSeconds(10))
+        .until(ExpectedConditions.numberOfElementsToBeMoreThan(productsLocator, 0));
+    List<WebElement> products = driver.findElements(productsLocator);
     return products.get(0)
         .findElement(By.xpath("//a[contains(.,'Add to cart')]"));
   }

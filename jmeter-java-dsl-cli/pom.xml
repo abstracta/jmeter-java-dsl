@@ -19,6 +19,7 @@
     <log4j.version>2.19.0</log4j.version>
     <!-- same version as JMeter dependency -->
     <slf4j.version>1.7.36</slf4j.version>
+    <selenium.version>4.8.0</selenium.version>
   </properties>
 
   <dependencies>
@@ -67,7 +68,7 @@
     <dependency>
       <groupId>org.seleniumhq.selenium</groupId>
       <artifactId>selenium-chrome-driver</artifactId>
-      <version>4.8.0</version>
+      <version>${selenium.version}</version>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
@@ -83,6 +84,12 @@
       <groupId>com.fasterxml.jackson.dataformat</groupId>
       <artifactId>jackson-dataformat-yaml</artifactId>
       <version>${jackson.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.seleniumhq.selenium</groupId>
+      <artifactId>selenium-support</artifactId>
+      <version>${selenium.version}</version>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>us.abstracta.jmeter</groupId>

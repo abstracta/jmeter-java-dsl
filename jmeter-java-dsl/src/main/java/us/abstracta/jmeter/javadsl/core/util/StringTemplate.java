@@ -43,6 +43,7 @@ public class StringTemplate {
       "^(\\w+)?(:[^~]*)?(~.*)?$");
   private final String template;
   private final Map<String, Object> bindings = new HashMap<>();
+  private boolean ignoreMissingBindings;
 
   public StringTemplate(String template) {
     this.template = template;
@@ -90,6 +91,11 @@ public class StringTemplate {
     return this;
   }
 
+  public StringTemplate ignoreMissingBindings() {
+    ignoreMissingBindings = true;
+    return this;
+  }
+
   public String solve() {
     return processTemplate(s -> s, this::solveExpression);
   }
@@ -98,26 +104,22 @@ public class StringTemplate {
     Matcher varExpressionMatcher = EXPRESSION_WITH_VAR_NAME_PATTERN.matcher(expression);
     if (!varExpressionMatcher.matches()) {
       Object bind = bindings.get(expression);
-      if (bind == null) {
-        throw buildNoBindingException(expression);
-      }
-      return bind.toString();
+      return bind != null ? bind.toString() : handleMissingBinding(expression);
     }
     String varName = varExpressionMatcher.group(1);
-    Object bind = bindings.get(varExpressionMatcher.group(1));
+    Object bind = bindings.get(varName);
     if (bind != null) {
       return bind.toString();
     }
     String defaultVal = varExpressionMatcher.group(2);
-    if (defaultVal == null) {
-      throw buildNoBindingException("No binding was found for: " + varName);
-    } else {
-      return defaultVal.substring(1);
-    }
+    return defaultVal != null ? defaultVal.substring(1) : handleMissingBinding(varName);
   }
 
-  private IllegalStateException buildNoBindingException(String expression) {
-    return new IllegalStateException("No binding was found for: " + expression);
+  private String handleMissingBinding(String expression) {
+    if (ignoreMissingBindings) {
+      return EXPRESSION_START_MARKER + expression + EXPRESSION_END_MARKER;
+    }
+    throw new IllegalStateException("No binding was found for: " + expression);
   }
 
 }

@@ -103,6 +103,7 @@ public class TestClassTemplate {
           .bind("imports", buildImports(defaultImports.get(false), imports))
           .bind("methodDefinitions", buildMethodDefinitions(methodDefinitions))
           .bind("testPlan", testPlan)
+          .ignoreMissingBindings()
           .solve();
     } catch (IOException e) {
       // Only would happen if can't access resource that should be included in jar
