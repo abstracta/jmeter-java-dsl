@@ -19,6 +19,7 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: '14'
+      - uses: browser-actions/setup-chrome@v1
       - name: check version
         run: .github/semver-check.sh ${{ inputs.version }}
       - name: create release draft
