@@ -71,7 +71,7 @@ public abstract class StringTemplateAssert<SELF extends StringTemplateAssert<SEL
   public static class StringTemplateAssertPath extends
       StringTemplateAssert<StringTemplateAssertPath, Path> {
 
-    public StringTemplateAssertPath(Path actual) {
+    private StringTemplateAssertPath(Path actual) {
       super(actual, StringTemplateAssertPath.class);
     }
 
@@ -90,7 +90,7 @@ public abstract class StringTemplateAssert<SELF extends StringTemplateAssert<SEL
   public static class StringTemplateAssertString extends
       StringTemplateAssert<StringTemplateAssertString, String> {
 
-    public StringTemplateAssertString(String actual) {
+    private StringTemplateAssertString(String actual) {
       super(actual, StringTemplateAssertString.class);
     }
 
