@@ -170,7 +170,7 @@ public class RecorderCommand implements Callable<Integer> {
     loadConfigFileDefaults();
     try (JmeterDslRecorder recorder = buildRecorder();
         RecordingBrowser browser = new RecordingBrowser(url, recorder.getProxy(),
-            browserArguments)) {
+            browserArguments != null ? browserArguments : Collections.emptyList())) {
       browser.awaitClosed();
     }
     return 0;
