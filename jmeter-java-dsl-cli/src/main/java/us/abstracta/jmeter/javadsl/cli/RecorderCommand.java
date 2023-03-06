@@ -9,6 +9,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.regex.Pattern;
+import org.apache.jmeter.protocol.http.proxy.Proxy;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.core.LoggerContext;
+import org.apache.logging.log4j.core.config.Configuration;
+import org.apache.logging.log4j.core.config.Configurator;
+import org.apache.logging.log4j.core.config.LoggerConfig;
 import picocli.CommandLine.ArgGroup;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.ITypeConverter;
@@ -161,6 +168,14 @@ public class RecorderCommand implements Callable<Integer> {
     private boolean ignoreDefaultHeaderFilter;
   }
 
+  @Option(names = {"--quiet"}, description = {"Specifies to avoid logging messages.",
+      "This is helpful when sending recording output to a file."})
+  private boolean quiet;
+
+  @Option(names = {"--verbose"}, description = {
+      "Specifies to log additional information that may help tracing recording issues."})
+  private boolean verbose;
+
   // This option is used to allow automating integration testing
   @Option(names = {"--browser-arguments"}, hidden = true, split = ",")
   private List<String> browserArguments;
@@ -168,12 +183,33 @@ public class RecorderCommand implements Callable<Integer> {
   @Override
   public Integer call() throws Exception {
     loadConfigFileDefaults();
+    setupLogging();
     try (JmeterDslRecorder recorder = buildRecorder();
         RecordingBrowser browser = new RecordingBrowser(url, recorder.getProxy(),
             browserArguments != null ? browserArguments : Collections.emptyList())) {
       browser.awaitClosed();
     }
     return 0;
+  }
+
+  private void setupLogging() {
+    if (quiet) {
+      Configurator.setAllLevels(LogManager.ROOT_LOGGER_NAME, Level.OFF);
+      return;
+    }
+    LoggerContext ctx = (LoggerContext) LogManager.getContext(false);
+    if (verbose) {
+      Configuration config = ctx.getConfiguration();
+      LoggerConfig recorderLogger = config.getLoggerConfig(
+          JmeterDslRecorder.class.getPackage().getName());
+      recorderLogger.setLevel(Level.DEBUG);
+      LoggerConfig proxyLogger = config.getLoggerConfig(Proxy.class.getName());
+      proxyLogger.setLevel(Level.WARN);
+      proxyLogger.removeFilter(proxyLogger.getFilter());
+      LoggerConfig rootLogger = config.getLoggerConfig(LogManager.ROOT_LOGGER_NAME);
+      rootLogger.setLevel(Level.WARN);
+    }
+    ctx.updateLoggers();
   }
 
   private void loadConfigFileDefaults() throws IOException {

@@ -10,6 +10,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeoutException;
 import java.util.regex.Pattern;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import us.abstracta.jmeter.javadsl.JmeterDsl;
 import us.abstracta.jmeter.javadsl.cli.Cli.ManifestVersionProvider;
 import us.abstracta.jmeter.javadsl.codegeneration.DslCodeGenerator;
@@ -22,6 +24,7 @@ public class JmeterDslRecorder implements AutoCloseable {
   public static final String DEFAULT_EXCLUDED_HEADERS =
       "(?i)(Sec-.*|Accept|Accept-(Language|Encoding)|Upgrade-Insecure-Requests|User-Agent|"
           + "Referer|Origin|X-Requested-With|Cache-Control)";
+  private static final Logger LOG = LoggerFactory.getLogger(JmeterDslRecorder.class);
 
   private final List<Pattern> urlIncludes = new ArrayList<>();
   private final List<Pattern> urlExcludes = new ArrayList<>(
@@ -78,6 +81,7 @@ public class JmeterDslRecorder implements AutoCloseable {
   }
 
   public JmeterDslRecorder start() throws IOException {
+    LOG.info("Starting recorder proxy to record flow requests.");
     new JmeterEnvironment();
     proxy = new JmeterProxyRecorder()
         .logsDirectory(logsDirectory)
@@ -96,7 +100,10 @@ public class JmeterDslRecorder implements AutoCloseable {
   }
 
   public void stop() throws InterruptedException, TimeoutException, IOException {
+    LOG.info("Stopping recorder proxy. This may take some time since it needs to wait for all "
+        + "requests finish their recording processing (like applying correlation rules).");
     proxy.stopRecording();
+    LOG.info("Converting recorded test plan to JMeter DSL.");
     Path jmx = Files.createTempFile("recording", ".jmx");
     try {
       proxy.saveRecordingTo(jmx.toFile());

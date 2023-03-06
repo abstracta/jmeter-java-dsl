@@ -21,6 +21,8 @@ public class RecordingBrowser implements AutoCloseable {
   private final ChromeDriver driver;
 
   public RecordingBrowser(URL url, String proxyHost, List<String> args) {
+    LOG.info("Starting browser. Wait until a browser window appears and use provided browser to "
+        + "record the flow.");
     driver = new ChromeDriver(buildDriverService(),
         buildChromeOptions(proxyHost, args));
     if (url != null) {
@@ -30,7 +32,9 @@ public class RecordingBrowser implements AutoCloseable {
 
   private ChromeDriverService buildDriverService() {
     ChromeDriverService ret = new Builder().build();
-    ret.sendOutputTo(NullOutputStream.NULL_OUTPUT_STREAM);
+    if (!LOG.isDebugEnabled()) {
+      ret.sendOutputTo(NullOutputStream.NULL_OUTPUT_STREAM);
+    }
     return ret;
   }
 
@@ -53,7 +57,7 @@ public class RecordingBrowser implements AutoCloseable {
         Thread.sleep(BROWSER_OPEN_POLL_PERIOD.toMillis());
       }
     } catch (NoSuchWindowException e) {
-      LOG.debug("Detected window close", e);
+      LOG.info("Detected browser close");
     }
   }
 
