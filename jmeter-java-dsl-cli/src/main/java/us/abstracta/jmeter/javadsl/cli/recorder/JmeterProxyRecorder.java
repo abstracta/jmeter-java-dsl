@@ -204,15 +204,20 @@ public class JmeterProxyRecorder extends CorrelationProxyControl {
 
   private void awaitRecordingEnd() throws TimeoutException, InterruptedException {
     Instant start = Instant.now();
-    HashTree currentRecording = (HashTree) treeModel.getTestPlan().clone();
-    HashTree lastRecording;
+    boolean hasPendingRequests;
+    synchronized (this) {
+      hasPendingRequests = !this.getPendingProxies().isEmpty();
+    }
+    boolean hadPendingRequests;
     boolean timeout;
     do {
-      lastRecording = currentRecording;
-      Thread.sleep(RECORDING_POLL_PERIOD.toMillis());
-      currentRecording = (HashTree) treeModel.getTestPlan().clone();
+      hadPendingRequests = hasPendingRequests;
+      synchronized (this) {
+        this.wait(RECORDING_POLL_PERIOD.toMillis());
+        hasPendingRequests = !this.getPendingProxies().isEmpty();
+      }
       timeout = Duration.between(start, Instant.now()).compareTo(RECORDING_STOP_TIMEOUT) >= 0;
-    } while (!currentRecording.equals(lastRecording) && !timeout);
+    } while ((hasPendingRequests || hadPendingRequests) && !timeout);
     if (timeout) {
       throw new TimeoutException(
           "Timeout waiting for recording to stop adding items to test plan after "
