@@ -79,6 +79,10 @@ public class JmdslConfig {
   }
 
   private static void setField(Field field, Object instance, Object value) {
+    // keep with default field value if value to set is null
+    if (value == null) {
+      return;
+    }
     try {
       field.set(instance, value);
     } catch (IllegalAccessException e) {

@@ -1,6 +1,5 @@
 recorder:
   url: http://localhost:8088
-  workdir: target/recording
   urlIncludes:
     - localhost:8088.*
   correlations:

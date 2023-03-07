@@ -42,9 +42,9 @@ public class RecorderCommand implements Callable<Integer> {
       "E.g.: https://mysite.com"}, arity = "0..1")
   private URL url;
 
-  @Option(names = {WORKDIR_OPTION}, defaultValue = "recording",
+  @Option(names = {WORKDIR_OPTION}, defaultValue = "target/recording",
       description = {"Directory where logs (eg: jtl files) and other relevant data is stored.",
-          "E.g.: " + WORKDIR_OPTION + "=target/recording",
+          "E.g.: " + WORKDIR_OPTION + "=recording",
           "This directory contains useful information for reviewing recording details to tune "
               + "recorded test plan, or to trace issues.",
           "Default: ${DEFAULT_VALUE}"})
