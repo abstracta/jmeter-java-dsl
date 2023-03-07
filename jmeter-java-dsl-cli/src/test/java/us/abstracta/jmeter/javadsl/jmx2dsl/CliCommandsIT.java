@@ -85,7 +85,8 @@ public class CliCommandsIT {
     WireMockServer mock = startRetailStoreMock();
     try {
       int browserDebuggingPort = 8087;
-      Process p = startCommand("recorder", "--config=" + resourcePath("retailstore.jmdsl.yml"),
+      Process p = startCommand("recorder", "--quiet",
+          "--config=" + resourcePath("retailstore.jmdsl.yml"),
           "--browser-arguments=--headless=new,--remote-debugging-port=" + browserDebuggingPort);
       addProductToCart(browserDebuggingPort);
       StringTemplateAssert.assertThat(getProcessOutput(p))
