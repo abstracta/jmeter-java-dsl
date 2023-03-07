@@ -23,7 +23,7 @@ public class SaveTestPlanAsJMX {
 This can be helpful to share a Java DSL defined test plan with people not used to the DSL or to use some JMeter feature (or plugin) that is not yet supported by the DSL (**but, we strongly encourage you to report it as an issue [here](https://github.com/abstracta/jmeter-java-dsl/issues)** so we can include such support into the DSL for the rest of the community).
 
 ::: tip
-If you get any error (like `CannotResolveClassException`) while loading the JMX in JMeter GUI, you can try copying jmeter-java-dsl jar (and any other potential modules you use) to JMeter lib library, restart JMeter and try loading the JMX again.
+If you get any error (like `CannotResolveClassException`) while loading the JMX in JMeter GUI, you can try copying `jmeter-java-dsl` jar (and any other potential modules you use) to JMeter `lib` directory, restart JMeter and try loading the JMX again.
 :::
 
 ::: tip

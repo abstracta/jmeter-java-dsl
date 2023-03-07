@@ -12,7 +12,7 @@
   <artifactId>jmeter-java-dsl-cli</artifactId>
 
   <name>${project.artifactId}</name>
-  <description>Module which includes executable jar with different utility commands (like jmx2dsl)</description>
+  <description>Module which includes executable jar with different utility commands (like jmx2dsl and recorder)</description>
 
   <properties>
     <picocli.version>4.7.0</picocli.version>

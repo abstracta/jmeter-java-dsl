@@ -59,7 +59,7 @@ More examples can be found in [tests](jmeter-java-dsl/src/test/java/us/abstracta
 
 [Here](https://github.com/abstracta/jmeter-java-dsl-sample) is a sample project for reference or for starting new projects from scratch.
 
-> **Tip 1:** Check [jmx2dsl](https://abstracta.github.io/jmeter-java-dsl/guide/#dsl-code-generation-from-jmx-file) provided tool, which allows easy conversion of JMX files to JMeter DSL code.
+> **Tip 1:** Check [the DSL recorder](https://abstracta.github.io/jmeter-java-dsl/guide/#dsl-recorder) and [jmx2dsl](https://abstracta.github.io/jmeter-java-dsl/guide/#dsl-code-generation-from-jmx-file) to ease test plan creation or migration from existing JMX files.
 >
 > **Tip 2:** Since JMeter uses [log4j2](https://logging.apache.org/log4j/2.x/), if you want to control the logging level or output, you can use something similar to the tests included [log4j2.xml](jmeter-java-dsl/src/test/resources/log4j2.xml).
 >

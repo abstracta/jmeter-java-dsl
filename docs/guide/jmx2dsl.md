@@ -1,19 +1,19 @@
 ## DSL code generation from JMX file
 
-To ease migrating existing JMeter test plans and ease learning about DSL features, the DSL provides `jmx2dsl` (download the latest version from [releases page](https://github.com/abstracta/jmeter-java-dsl/releases) or use [jbang](https://www.jbang.dev/documentation/guide/latest/index.html)) command line tool which you can use to generate DSL code from existing JMX files.
+To ease migrating existing JMeter test plans and ease learning about DSL features, the DSL provides `jmx2dsl` cli command (download the latest cli version from [releases page](https://github.com/abstracta/jmeter-java-dsl/releases) or use [jbang](https://www.jbang.dev/documentation/guide/latest/index.html)) command line tool which you can use to generate DSL code from existing JMX files.
 
 As an example:
 
 :::: code-group
 ::: code-group-item Java
 ```bash
-java -jar jmx2dsl.jar test-plan.jmx
+java -jar jmdsl.jar jmx2dsl test-plan.jmx
 ```
 :::
 
 ::: code-group-item Jbang
 ```bash
-jbang us.abstracta.jmeter:jmeter-java-dsl-jmx2dsl:1.7 test-plan.jmx
+jbang us.abstracta.jmeter:jmeter-java-dsl-cli:1.7 jmx2dsl test-plan.jmx
 ```
 :::
 ::::
