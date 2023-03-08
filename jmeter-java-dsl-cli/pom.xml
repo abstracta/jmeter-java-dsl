@@ -15,7 +15,7 @@
   <description>Module which includes executable jar with different utility commands (like jmx2dsl and recorder)</description>
 
   <properties>
-    <picocli.version>4.7.0</picocli.version>
+    <picocli.version>4.7.1</picocli.version>
     <log4j.version>2.19.0</log4j.version>
     <!-- same version as JMeter dependency -->
     <slf4j.version>1.7.36</slf4j.version>
