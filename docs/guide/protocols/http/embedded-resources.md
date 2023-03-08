@@ -40,3 +40,7 @@ You can use `downloadEmbeddedResourcesNotMatching(urlRegex)` and `downloadEmbedd
 ::: warning
 The DSL, unlike JMeter, uses by default concurrent download of embedded resources (with up to 6 parallel downloads), which is the most used scenario to emulate browser behavior.
 :::
+
+::: warning
+Using `downloadEmbeddedResources` doesn't allow to download all resources that a browser could download, since it does not execute any JavaScript. For instance, resources URLs solved through JavaScript or direct JavaScript requests will not be requested. Even with this limitation, in many cases just downloading "static" resources is a good enough solution for performance testing. 
+:::
