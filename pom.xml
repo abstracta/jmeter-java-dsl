@@ -54,7 +54,7 @@
     <junit.version>5.9.1</junit.version>
     <junit-platform.version>1.9.1</junit-platform.version>
     <assertj-core.version>3.23.1</assertj-core.version>
-    <jackson.version>2.14.1</jackson.version>
+    <jackson.version>2.14.2</jackson.version>
   </properties>
 
   <modules>
