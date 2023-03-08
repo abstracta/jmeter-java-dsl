@@ -43,7 +43,7 @@ public class PerformanceTest {
     ).runIn(new OctoPerfEngine(System.getenv("OCTOPERF_API_KEY"))
         .projectName("DSL test")
         .totalUsers(500)
-        .rampUp(Duration.ofMinutes(1))
+        .rampUpFor(Duration.ofMinutes(1))
         .holdFor(Duration.ofMinutes(10))
         .testTimeout(Duration.ofMinutes(20)));
     assertThat(stats.overall().sampleTimePercentile99()).isLessThan(Duration.ofSeconds(5));
