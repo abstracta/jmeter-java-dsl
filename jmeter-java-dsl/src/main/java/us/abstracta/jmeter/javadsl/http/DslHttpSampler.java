@@ -441,6 +441,9 @@ public class DslHttpSampler extends DslBaseHttpSampler<DslHttpSampler> {
 
   public static class CodeBuilder extends BaseHttpSamplerCodeBuilder {
 
+    public static final String PREFER_ENCODED_PARAMS = getBuilderOptionName(CodeBuilder.class,
+        "preferEncodedParams");
+
     public CodeBuilder(List<Method> builderMethods) {
       super(DEFAULT_NAME, HttpTestSampleGui.class, builderMethods);
     }
@@ -502,7 +505,8 @@ public class DslHttpSampler extends DslBaseHttpSampler<DslHttpSampler> {
       } else {
         for (JMeterProperty prop : args) {
           HTTPArgument arg = (HTTPArgument) prop.getObjectValue();
-          if (arg.isAlwaysEncoded()) {
+          if (arg.isAlwaysEncoded() || (preferEncodedParams(buildContext)
+              && !differsFromEncodedParam(arg))) {
             ret.chain("param", new StringParam(arg.getName()), new StringParam(arg.getValue()));
           } else {
             ret.chain("rawParam", new StringParam(arg.getName()),
@@ -510,6 +514,16 @@ public class DslHttpSampler extends DslBaseHttpSampler<DslHttpSampler> {
           }
         }
       }
+    }
+
+    private boolean preferEncodedParams(MethodCallContext buildContext) {
+      Object option = buildContext.getBuilderOption(PREFER_ENCODED_PARAMS);
+      return option != null && (boolean) option;
+    }
+
+    private boolean differsFromEncodedParam(HTTPArgument arg) {
+      return !arg.getName().equals(arg.getEncodedName())
+          || !arg.getValue().equals(arg.getEncodedValue());
     }
 
     private boolean isRawBody(Arguments args) {

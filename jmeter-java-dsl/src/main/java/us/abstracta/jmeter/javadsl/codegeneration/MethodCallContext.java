@@ -313,6 +313,10 @@ public class MethodCallContext {
     }
   }
 
+  public Object getBuilderOption(String optionName) {
+    return root.getEntry(optionName);
+  }
+
   public interface MethodCallContextEndListener {
 
     void execute(MethodCallContext context, MethodCall call);

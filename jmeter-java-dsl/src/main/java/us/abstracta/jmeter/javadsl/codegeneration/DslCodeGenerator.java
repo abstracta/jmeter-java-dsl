@@ -46,6 +46,7 @@ public class DslCodeGenerator implements MethodCallBuilderRegistry {
 
   private final List<MethodCallBuilder> builders = new ArrayList<>();
   private final Map<Class<?>, String> dependencies = new HashMap<>();
+  private final Map<String, Object> builderOptions = new HashMap<>();
 
   public DslCodeGenerator() {
     builders.addAll(findCallBuilders(JmeterDsl.class));
@@ -161,8 +162,10 @@ public class DslCodeGenerator implements MethodCallBuilderRegistry {
     JmeterEnvironment env = new JmeterEnvironment();
     HashTree tree = env.loadTree(new File(file.getPath()));
     TestElement testPlanElem = (TestElement) tree.getArray()[0];
-    return new MethodCallContext(testPlanElem, tree.getTree(testPlanElem), null, this)
-        .buildMethodCall();
+    MethodCallContext ctx = new MethodCallContext(testPlanElem, tree.getTree(testPlanElem), null,
+        this);
+    builderOptions.forEach(ctx::setEntry);
+    return ctx.buildMethodCall();
   }
 
   @Override
@@ -179,6 +182,11 @@ public class DslCodeGenerator implements MethodCallBuilderRegistry {
         .map(builderClass::cast)
         .findAny()
         .orElse(null);
+  }
+
+  public DslCodeGenerator setBuilderOption(String optionName, Object optionValue) {
+    builderOptions.put(optionName, optionValue);
+    return this;
   }
 
 }

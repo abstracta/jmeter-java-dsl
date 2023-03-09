@@ -16,6 +16,7 @@ import us.abstracta.jmeter.javadsl.JmeterDsl;
 import us.abstracta.jmeter.javadsl.cli.Cli.ManifestVersionProvider;
 import us.abstracta.jmeter.javadsl.codegeneration.DslCodeGenerator;
 import us.abstracta.jmeter.javadsl.core.engines.JmeterEnvironment;
+import us.abstracta.jmeter.javadsl.http.DslHttpSampler;
 
 public class JmeterDslRecorder implements AutoCloseable {
 
@@ -111,6 +112,7 @@ public class JmeterDslRecorder implements AutoCloseable {
           .addBuilders(new JmeterProxyRecorder.CodeBuilder())
           .addDependency(JmeterDsl.class,
               "us.abstracta.jmeter:jmeter-java-dsl" + getJmeterDslVersion())
+          .setBuilderOption(DslHttpSampler.CodeBuilder.PREFER_ENCODED_PARAMS, true)
           .generateCodeFromJmx(jmx.toFile());
       System.out.println(code);
     } finally {

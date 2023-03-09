@@ -113,8 +113,15 @@ public abstract class MethodCallBuilder {
     return 1;
   }
 
-  public static Stream<JMeterProperty> propertyIterator2Stream(PropertyIterator iter) {
+  protected static Stream<JMeterProperty> propertyIterator2Stream(PropertyIterator iter) {
     return StreamSupport.stream(Spliterators.spliteratorUnknownSize(iter, 0), false);
+  }
+
+  protected static String getBuilderOptionName(Class<?> builderClass, String optionName) {
+    String builderName = builderClass.getName();
+    String builderNamePrefix = builderName.substring(builderName.lastIndexOf('.',
+        builderName.length() - builderClass.getSimpleName().length() - 2));
+    return  builderNamePrefix + "." + optionName;
   }
 
 }
