@@ -1,10 +1,6 @@
 package us.abstracta.jmeter.javadsl.core.listeners;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.DirectoryStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
@@ -36,6 +32,7 @@ public class HtmlReporter extends BaseListener {
   protected File reportDirectory;
   protected final ApdexThresholds apdexThresholds = new ApdexThresholds();
   protected final Map<String, ApdexThresholds> labelApdexThresholds = new HashMap<>();
+  private Duration granularity;
 
   public HtmlReporter(String reportsDirectoryPath, String name) {
     super("Simple Data Writer", SimpleDataWriter.class);
@@ -49,13 +46,6 @@ public class HtmlReporter extends BaseListener {
     DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd hh-mm-ss")
         .withZone(ZoneId.systemDefault());
     return timeFormatter.format(Instant.now()) + " " + UUID.randomUUID();
-  }
-
-  private boolean isEmptyDirectory(File reportDirectory) throws IOException {
-    try (DirectoryStream<Path> dirContentsStream = Files.newDirectoryStream(
-        reportDirectory.toPath())) {
-      return !dirContentsStream.iterator().hasNext();
-    }
   }
 
   public static class ApdexThresholds {
@@ -73,100 +63,22 @@ public class HtmlReporter extends BaseListener {
 
   }
 
-  @Override
-  public TestElement buildTestElement() {
-    if (!reportDirectory.exists()) {
-      reportDirectory.mkdirs();
-    }
-    File resultsFile = new File(reportDirectory, "report.jtl");
-    HtmlReportSummariser reporter = new HtmlReportSummariser(resultsFile, apdexThresholds,
-        labelApdexThresholds);
-    ResultCollector logger = new AutoFlushingResultCollector(reporter);
-    logger.setFilename(resultsFile.getPath());
-
-    return logger;
-  }
-
-  private static class HtmlReportSummariser extends Summariser {
-
-    private final File resultsFile;
-    private final ApdexThresholds apdexThresholds;
-    private final Map<String, ApdexThresholds> labelApdexThresholds;
-    private final AtomicInteger hostsCount = new AtomicInteger(0);
-
-    private HtmlReportSummariser(File resultsFile, ApdexThresholds apdexThresholds,
-        Map<String, ApdexThresholds> labelApdexThresholds) {
-      this.resultsFile = resultsFile;
-      this.apdexThresholds = apdexThresholds;
-      this.labelApdexThresholds = labelApdexThresholds;
-    }
-
-    @Override
-    public void testStarted(String host) {
-      super.testStarted(host);
-      hostsCount.incrementAndGet();
-    }
-
-    @Override
-    public void sampleOccurred(SampleEvent e) {
-      // same as previous method
-    }
-
-    @Override
-    public void testEnded(String host) {
-      // verify that all remote hosts have ended before generating report
-      if (hostsCount.decrementAndGet() <= 0) {
-        try {
-          configureApdexThresholds();
-          JMeterUtils.setProperty(JMeter.JMETER_REPORT_OUTPUT_DIR_PROPERTY,
-              new File(resultsFile.getParent()).getAbsolutePath());
-          new ReportGenerator(resultsFile.getPath(), null).generate();
-        } catch (GenerationException | ConfigurationException e) {
-          throw new RuntimeException(e);
-        }
-      }
-    }
-
-    private void configureApdexThresholds() {
-      if (apdexThresholds.satisfied != null) {
-        JMeterUtils.setProperty(ReportGeneratorConfiguration.REPORT_GENERATOR_KEY_PREFIX
-            + ".apdex_satisfied_threshold", "" + apdexThresholds.satisfied.toMillis());
-      }
-      if (apdexThresholds.tolerated != null) {
-        JMeterUtils.setProperty(ReportGeneratorConfiguration.REPORT_GENERATOR_KEY_PREFIX
-            + ".apdex_tolerated_threshold", "" + apdexThresholds.tolerated.toMillis());
-      }
-      String transactionsApdex = labelApdexThresholds.entrySet().stream()
-          .map(e -> e.getKey() + ":" + e.getValue().satisfied.toMillis() + "|"
-              + e.getValue().tolerated.toMillis())
-          .collect(Collectors.joining(";"));
-      if (!transactionsApdex.isEmpty()) {
-        JMeterUtils.setProperty(ReportGeneratorConfiguration.REPORT_GENERATOR_KEY_PREFIX
-            + ".apdex_per_transaction", "" + transactionsApdex);
-      }
-    }
-
-  }
-
-  /*
-   this class is required to assure (even in remote execution) that file is written before
-   generating report
+  /**
+   * Allows specifying the granularity for time graphs.
+   * <p>
+   * This is handy if you need to get more or less detail presented in time graphs.
+   *
+   * @param granularity specifies the granularity to be set. When not specified, the default value
+   *                    is 1 minute. Due to <a
+   *                    href="https://bz.apache.org/bugzilla/show_bug.cgi?id=60149">existing
+   *                    bug</a>, set this value to a duration greater than 1 second to avoid issues
+   *                    with TPS graphs.
+   * @return the HtmlReporter for further configuration and usage.
+   * @since 1.9
    */
-  public static class AutoFlushingResultCollector extends ResultCollector {
-
-    public AutoFlushingResultCollector() {
-    }
-
-    public AutoFlushingResultCollector(Summariser summer) {
-      super(summer);
-    }
-
-    @Override
-    public void testEnded(String host) {
-      flushFile();
-      super.testEnded(host);
-    }
-
+  public HtmlReporter timeGraphsGranularity(Duration granularity) {
+    this.granularity = granularity;
+    return this;
   }
 
   /**
@@ -209,6 +121,101 @@ public class HtmlReporter extends BaseListener {
     labelApdexThresholds.put(sampleLabelRegex,
         new ApdexThresholds(satisfiedThreshold, toleratedThreshold));
     return this;
+  }
+
+  @Override
+  public TestElement buildTestElement() {
+    if (!reportDirectory.exists()) {
+      reportDirectory.mkdirs();
+    }
+    File resultsFile = new File(reportDirectory, "report.jtl");
+    HtmlReportSummariser reporter = new HtmlReportSummariser(resultsFile);
+    ResultCollector logger = new AutoFlushingResultCollector(reporter);
+    logger.setFilename(resultsFile.getPath());
+    return logger;
+  }
+
+  private class HtmlReportSummariser extends Summariser {
+
+    private final File resultsFile;
+    private final AtomicInteger hostsCount = new AtomicInteger(0);
+
+    private HtmlReportSummariser(File resultsFile) {
+      this.resultsFile = resultsFile;
+    }
+
+    @Override
+    public void testStarted(String host) {
+      super.testStarted(host);
+      hostsCount.incrementAndGet();
+    }
+
+    @Override
+    public void sampleOccurred(SampleEvent e) {
+      // same as previous method
+    }
+
+    @Override
+    public void testEnded(String host) {
+      // verify that all remote hosts have ended before generating report
+      if (hostsCount.decrementAndGet() <= 0) {
+        try {
+          configureApdexThresholds();
+          configureGranularity();
+          JMeterUtils.setProperty(JMeter.JMETER_REPORT_OUTPUT_DIR_PROPERTY,
+              new File(resultsFile.getParent()).getAbsolutePath());
+          new ReportGenerator(resultsFile.getPath(), null).generate();
+        } catch (GenerationException | ConfigurationException e) {
+          throw new RuntimeException(e);
+        }
+      }
+    }
+
+    private void configureApdexThresholds() {
+      if (apdexThresholds.satisfied != null) {
+        JMeterUtils.setProperty(ReportGeneratorConfiguration.REPORT_GENERATOR_KEY_PREFIX
+            + ".apdex_satisfied_threshold", "" + apdexThresholds.satisfied.toMillis());
+      }
+      if (apdexThresholds.tolerated != null) {
+        JMeterUtils.setProperty(ReportGeneratorConfiguration.REPORT_GENERATOR_KEY_PREFIX
+            + ".apdex_tolerated_threshold", "" + apdexThresholds.tolerated.toMillis());
+      }
+      String transactionsApdex = labelApdexThresholds.entrySet().stream()
+          .map(e -> e.getKey() + ":" + e.getValue().satisfied.toMillis() + "|"
+              + e.getValue().tolerated.toMillis())
+          .collect(Collectors.joining(";"));
+      if (!transactionsApdex.isEmpty()) {
+        JMeterUtils.setProperty(ReportGeneratorConfiguration.REPORT_GENERATOR_KEY_PREFIX
+            + ".apdex_per_transaction", "" + transactionsApdex);
+      }
+    }
+
+    private void configureGranularity() {
+      JMeterUtils.setProperty("jmeter.reportgenerator.overall_granularity",
+          String.valueOf(granularity.toMillis()));
+    }
+
+  }
+
+  /*
+   this class is required to assure (even in remote execution) that file is written before
+   generating report
+   */
+  public static class AutoFlushingResultCollector extends ResultCollector {
+
+    public AutoFlushingResultCollector() {
+    }
+
+    public AutoFlushingResultCollector(Summariser summer) {
+      super(summer);
+    }
+
+    @Override
+    public void testEnded(String host) {
+      flushFile();
+      super.testEnded(host);
+    }
+
   }
 
 }
