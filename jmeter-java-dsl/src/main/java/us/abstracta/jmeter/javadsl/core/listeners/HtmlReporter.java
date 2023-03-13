@@ -191,8 +191,10 @@ public class HtmlReporter extends BaseListener {
     }
 
     private void configureGranularity() {
-      JMeterUtils.setProperty("jmeter.reportgenerator.overall_granularity",
-          String.valueOf(granularity.toMillis()));
+      if (granularity != null) {
+        JMeterUtils.setProperty("jmeter.reportgenerator.overall_granularity",
+            String.valueOf(granularity.toMillis()));
+      }
     }
 
   }
