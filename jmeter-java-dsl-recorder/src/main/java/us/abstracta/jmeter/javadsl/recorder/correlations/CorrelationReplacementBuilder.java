@@ -1,4 +1,4 @@
-package us.abstracta.jmeter.javadsl.cli.recorder;
+package us.abstracta.jmeter.javadsl.recorder.correlations;
 
 import com.blazemeter.jmeter.correlation.core.replacements.CorrelationReplacement;
 import com.blazemeter.jmeter.correlation.core.replacements.RegexCorrelationReplacement;
@@ -11,7 +11,7 @@ import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import java.io.IOException;
 import java.util.regex.Pattern;
-import us.abstracta.jmeter.javadsl.cli.recorder.CorrelationReplacementBuilder.CorrelationReplacementDeserializer;
+import us.abstracta.jmeter.javadsl.recorder.correlations.CorrelationReplacementBuilder.CorrelationReplacementDeserializer;
 
 @JsonDeserialize(using = CorrelationReplacementDeserializer.class)
 public class CorrelationReplacementBuilder {

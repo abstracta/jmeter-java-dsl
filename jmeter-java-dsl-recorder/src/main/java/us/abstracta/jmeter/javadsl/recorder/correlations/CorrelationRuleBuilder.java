@@ -1,4 +1,4 @@
-package us.abstracta.jmeter.javadsl.cli.recorder;
+package us.abstracta.jmeter.javadsl.recorder.correlations;
 
 import com.blazemeter.jmeter.correlation.core.CorrelationRule;
 import com.fasterxml.jackson.annotation.JsonCreator;

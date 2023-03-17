@@ -1,8 +1,9 @@
-package us.abstracta.jmeter.javadsl.cli.recorder;
+package us.abstracta.jmeter.javadsl.recorder;
 
 import com.blazemeter.jmeter.correlation.core.CorrelationRule;
 import java.io.File;
 import java.io.IOException;
+import java.net.ServerSocket;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -13,12 +14,13 @@ import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import us.abstracta.jmeter.javadsl.JmeterDsl;
-import us.abstracta.jmeter.javadsl.cli.Cli.ManifestVersionProvider;
 import us.abstracta.jmeter.javadsl.codegeneration.DslCodeGenerator;
 import us.abstracta.jmeter.javadsl.core.engines.JmeterEnvironment;
 import us.abstracta.jmeter.javadsl.http.DslHttpSampler;
+import us.abstracta.jmeter.javadsl.recorder.correlations.CorrelationRuleBuilder;
+import us.abstracta.jmeter.javadsl.util.TestResource;
 
-public class JmeterDslRecorder implements AutoCloseable {
+public class JmeterDslRecorder {
 
   public static final String DEFAULT_EXCLUDED_URLS =
       "(?i).*\\.(bmp|css|js|gif|ico|jpe?g|png|svg|swf|ttf|woff2?|webp)(\\?.*)?";
@@ -33,9 +35,19 @@ public class JmeterDslRecorder implements AutoCloseable {
   private final List<Pattern> headerExcludes = new ArrayList<>(
       Collections.singletonList(Pattern.compile(DEFAULT_EXCLUDED_HEADERS)));
   private final List<CorrelationRule> correlations = new ArrayList<>();
+  private final int port = findAvailablePort();
+  private String recording;
   private File logsDirectory;
   private boolean logFilteredRequests;
   private JmeterProxyRecorder proxy;
+
+  private int findAvailablePort() {
+    try (ServerSocket serverSocket = new ServerSocket(0)) {
+      return serverSocket.getLocalPort();
+    } catch (IOException e) {
+      throw new RuntimeException("Could not find an available port", e);
+    }
+  }
 
   public JmeterDslRecorder logsDirectory(File logsDirectory) {
     this.logsDirectory = logsDirectory;
@@ -57,7 +69,7 @@ public class JmeterDslRecorder implements AutoCloseable {
     return this;
   }
 
-  public JmeterDslRecorder urlsExcludes(List<Pattern> regexes) {
+  public JmeterDslRecorder urlExcludes(List<Pattern> regexes) {
     urlExcludes.addAll(regexes);
     return this;
   }
@@ -78,13 +90,14 @@ public class JmeterDslRecorder implements AutoCloseable {
   }
 
   public String getProxy() {
-    return "localhost:8888";
+    return "localhost:" + port;
   }
 
   public JmeterDslRecorder start() throws IOException {
     LOG.info("Starting recorder proxy to record flow requests.");
     new JmeterEnvironment();
     proxy = new JmeterProxyRecorder()
+        .port(port)
         .logsDirectory(logsDirectory)
         .logFilteredRequests(logFilteredRequests)
         .headerExcludes(headerExcludes)
@@ -95,12 +108,7 @@ public class JmeterDslRecorder implements AutoCloseable {
     return this;
   }
 
-  @Override
-  public void close() throws Exception {
-    stop();
-  }
-
-  public void stop() throws InterruptedException, TimeoutException, IOException {
+  public void stop() throws IOException, InterruptedException, TimeoutException {
     LOG.info("Stopping recorder proxy. This may take some time since it needs to wait for all "
         + "requests finish their recording processing (like applying correlation rules).");
     proxy.stopRecording();
@@ -108,26 +116,27 @@ public class JmeterDslRecorder implements AutoCloseable {
     Path jmx = Files.createTempFile("recording", ".jmx");
     try {
       proxy.saveRecordingTo(jmx.toFile());
-      String code = new DslCodeGenerator()
+      recording = new DslCodeGenerator()
           .addBuilders(new JmeterProxyRecorder.CodeBuilder())
           .addDependency(JmeterDsl.class,
-              "us.abstracta.jmeter:jmeter-java-dsl" + getJmeterDslVersion())
+              "us.abstracta.jmeter:jmeter-java-dsl:" + getJmeterDslVersion())
           .setBuilderOption(DslHttpSampler.CodeBuilder.PREFER_ENCODED_PARAMS, true)
           .generateCodeFromJmx(jmx.toFile());
-      System.out.println(code);
     } finally {
       jmx.toFile().delete();
     }
   }
 
+  public String getRecording() {
+    return recording;
+  }
+
   private String getJmeterDslVersion() {
     try {
-      String ret = new ManifestVersionProvider().getVersion()[0];
-      return (ret != null ? ":" + ret : "");
-    } catch (Exception e) {
+      return new TestResource("us/abstracta/jmeter/javadsl/version.txt").rawContents();
+    } catch (IOException e) {
       throw new RuntimeException(e);
     }
-
   }
 
 }

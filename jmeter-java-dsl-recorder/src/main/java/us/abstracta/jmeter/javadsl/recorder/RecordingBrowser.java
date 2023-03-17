@@ -1,4 +1,4 @@
-package us.abstracta.jmeter.javadsl.cli.recorder;
+package us.abstracta.jmeter.javadsl.recorder;
 
 import java.net.URL;
 import java.time.Duration;
@@ -20,11 +20,10 @@ public class RecordingBrowser implements AutoCloseable {
 
   private final ChromeDriver driver;
 
-  public RecordingBrowser(URL url, String proxyHost, List<String> args) {
+  public RecordingBrowser(URL url, String recordingProxy, List<String> args) {
     LOG.info("Starting browser. Wait until a browser window appears and use provided browser to "
         + "record the flow.");
-    driver = new ChromeDriver(buildDriverService(),
-        buildChromeOptions(proxyHost, args));
+    driver = new ChromeDriver(buildDriverService(), buildChromeOptions(recordingProxy, args));
     if (url != null) {
       driver.get(url.toString());
     }
@@ -38,16 +37,24 @@ public class RecordingBrowser implements AutoCloseable {
     return ret;
   }
 
-  private ChromeOptions buildChromeOptions(String proxyHost, List<String> args) {
+  private ChromeOptions buildChromeOptions(String recordingProxy, List<String> args) {
     ChromeOptions ret = new ChromeOptions();
     Proxy proxy = new Proxy();
-    proxy.setHttpProxy(proxyHost);
-    proxy.setSslProxy(proxyHost);
+    proxy.setHttpProxy(recordingProxy);
+    proxy.setSslProxy(recordingProxy);
     ret.setProxy(proxy);
-    ret.addArguments("--incognito", "--proxy-bypass-list=<-loopback>");
+    /*
+     remote-allow-origins is required due to this issue:
+     https://github.com/SeleniumHQ/selenium/issues/11750
+     */
+    ret.addArguments("--incognito", "--proxy-bypass-list=<-loopback>", "--remote-allow-origins=*");
     ret.addArguments(args);
     ret.setAcceptInsecureCerts(true);
     return ret;
+  }
+
+  public ChromeDriver getDriver() {
+    return driver;
   }
 
   public void awaitClosed() throws InterruptedException {

@@ -22,9 +22,9 @@ import picocli.CommandLine.ITypeConverter;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
 import picocli.CommandLine.TypeConversionException;
-import us.abstracta.jmeter.javadsl.cli.recorder.CorrelationRuleBuilder;
-import us.abstracta.jmeter.javadsl.cli.recorder.JmeterDslRecorder;
-import us.abstracta.jmeter.javadsl.cli.recorder.RecordingBrowser;
+import us.abstracta.jmeter.javadsl.recorder.JmeterDslRecorder;
+import us.abstracta.jmeter.javadsl.recorder.RecordingBrowser;
+import us.abstracta.jmeter.javadsl.recorder.correlations.CorrelationRuleBuilder;
 
 @Command(name = "recorder", header = "Record a JMeter DSL test plan using a browser",
     description = {
@@ -184,12 +184,23 @@ public class RecorderCommand implements Callable<Integer> {
   public Integer call() throws Exception {
     loadConfigFileDefaults();
     setupLogging();
-    try (JmeterDslRecorder recorder = buildRecorder();
-        RecordingBrowser browser = new RecordingBrowser(url, recorder.getProxy(),
-            browserArguments != null ? browserArguments : Collections.emptyList())) {
-      browser.awaitClosed();
+    JmeterDslRecorder recorder = buildRecorder();
+    recorder.start();
+    try {
+      try (RecordingBrowser browser = new RecordingBrowser(url, recorder.getProxy(),
+          browserArguments != null ? browserArguments : Collections.emptyList())) {
+        browser.awaitClosed();
+      }
+    } finally {
+      recorder.stop();
+      System.out.println(recorder.getRecording());
     }
     return 0;
+  }
+
+  private void loadConfigFileDefaults() throws IOException {
+    new JmdslConfig(this)
+        .updateWithDefaultsFrom(JmdslConfig.fromConfigFile(configFile));
   }
 
   private void setupLogging() {
@@ -212,11 +223,6 @@ public class RecorderCommand implements Callable<Integer> {
     ctx.updateLoggers();
   }
 
-  private void loadConfigFileDefaults() throws IOException {
-    new JmdslConfig(this)
-        .updateWithDefaultsFrom(JmdslConfig.fromConfigFile(configFile));
-  }
-
   private JmeterDslRecorder buildRecorder() throws IOException {
     JmeterDslRecorder ret = new JmeterDslRecorder()
         .logsDirectory(workdir);
@@ -224,14 +230,14 @@ public class RecorderCommand implements Callable<Integer> {
       ret.clearUrlFilter();
     }
     ret.urlIncludes(requestsFiltering.urlIncludes);
-    ret.urlsExcludes(requestsFiltering.urlExcludes);
+    ret.urlExcludes(requestsFiltering.urlExcludes);
     if (headersFiltering.ignoreDefaultHeaderFilter) {
       ret.clearHeaderFilter();
     }
     ret.logFilteredRequests(requestsFiltering.logFilteredRequests);
     ret.headerExcludes(headersFiltering.headerExcludes);
     correlations.forEach(ret::correlationRule);
-    return ret.start();
+    return ret;
   }
 
   public static class CorrelationRuleBuilderConverter implements

@@ -1,8 +1,0 @@
-recorder:
-  url: http://localhost:8088
-  urlIncludes:
-    - localhost:8088.*
-  correlations:
-    - variable: productId
-      extractor: name="productId" value="([^"]+)"
-      replacement: productId=(.*)

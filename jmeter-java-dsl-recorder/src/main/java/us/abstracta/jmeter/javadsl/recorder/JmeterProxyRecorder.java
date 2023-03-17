@@ -1,4 +1,4 @@
-package us.abstracta.jmeter.javadsl.cli.recorder;
+package us.abstracta.jmeter.javadsl.recorder;
 
 import com.blazemeter.jmeter.correlation.CorrelationProxyControl;
 import com.blazemeter.jmeter.correlation.CorrelationProxyControlGui;
@@ -64,8 +64,12 @@ public class JmeterProxyRecorder extends CorrelationProxyControl {
   private JMeterTreeModel treeModel;
 
   public JmeterProxyRecorder() {
-    setSamplerFollowRedirects(true);
     setDefaultEncoding(StandardCharsets.UTF_8.name());
+  }
+
+  public JmeterProxyRecorder port(int port) {
+    setPort(port);
+    return this;
   }
 
   public JmeterProxyRecorder logsDirectory(File logsDirectory) {
@@ -121,16 +125,17 @@ public class JmeterProxyRecorder extends CorrelationProxyControl {
 
   private HashTree buildTree() {
     HashTree rootTree = new ListedHashTree();
+    List<TestPlanChild> recorderChildren = logsDirectory != null
+        ? Collections.singletonList(JmeterDsl.jtlWriter(logsDirectory.toString())
+        .withAllFields())
+        : Collections.emptyList();
     JmeterDsl.testPlan(
         JmeterDsl.threadGroup(1, 1,
             JmeterDsl.httpCookies(),
             JmeterDsl.httpCache(),
             new DslRecordingController()
         ),
-        new DslRecorder(this, Collections.singletonList(
-            JmeterDsl.jtlWriter(logsDirectory.toString())
-                .withAllFields()
-        ))
+        new DslRecorder(this, recorderChildren)
     ).buildTreeUnder(rootTree, new BuildTreeContext());
     return rootTree;
   }

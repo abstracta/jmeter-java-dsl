@@ -1,4 +1,4 @@
-package us.abstracta.jmeter.javadsl.cli.recorder;
+package us.abstracta.jmeter.javadsl.recorder.correlations;
 
 import com.blazemeter.jmeter.correlation.core.extractors.CorrelationExtractor;
 import com.blazemeter.jmeter.correlation.core.extractors.RegexCorrelationExtractor;
@@ -12,8 +12,8 @@ import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import java.io.IOException;
 import java.util.regex.Pattern;
-import us.abstracta.jmeter.javadsl.cli.recorder.CorrelationExtractorBuilder.CorrelationExtractorDeserializer;
 import us.abstracta.jmeter.javadsl.core.postprocessors.DslRegexExtractor;
+import us.abstracta.jmeter.javadsl.recorder.correlations.CorrelationExtractorBuilder.CorrelationExtractorDeserializer;
 
 @JsonDeserialize(using = CorrelationExtractorDeserializer.class)
 public class CorrelationExtractorBuilder {
@@ -23,6 +23,17 @@ public class CorrelationExtractorBuilder {
 
   public CorrelationExtractorBuilder(Pattern regex) {
     this.regex = regex;
+  }
+
+  /**
+   * Allows specifying over which part of sample results to try applying the extractor.
+   *
+   * @param target specifies the field to apply the extractor to.
+   * @return the CorrelationExtractorBuilder for further usage.
+   */
+  public CorrelationExtractorBuilder target(TargetField target) {
+    this.target = target;
+    return this;
   }
 
   public CorrelationExtractor<?> build() {

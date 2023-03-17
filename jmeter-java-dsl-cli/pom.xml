@@ -17,9 +17,6 @@
   <properties>
     <picocli.version>4.7.1</picocli.version>
     <log4j.version>2.19.0</log4j.version>
-    <!-- same version as JMeter dependency -->
-    <slf4j.version>1.7.36</slf4j.version>
-    <selenium.version>4.8.0</selenium.version>
   </properties>
 
   <dependencies>
@@ -56,24 +53,9 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>info.picocli</groupId>
-      <artifactId>picocli</artifactId>
-      <version>${picocli.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>com.blazemeter</groupId>
-      <artifactId>jmeter-bzm-correlation-recorder</artifactId>
-      <version>1.2.3</version>
-    </dependency>
-    <dependency>
-      <groupId>org.seleniumhq.selenium</groupId>
-      <artifactId>selenium-chrome-driver</artifactId>
-      <version>${selenium.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
-      <version>${slf4j.version}</version>
+      <groupId>us.abstracta.jmeter</groupId>
+      <artifactId>jmeter-java-dsl-recorder</artifactId>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
@@ -81,15 +63,14 @@
       <version>${slf4j.version}</version>
     </dependency>
     <dependency>
+      <groupId>info.picocli</groupId>
+      <artifactId>picocli</artifactId>
+      <version>${picocli.version}</version>
+    </dependency>
+    <dependency>
       <groupId>com.fasterxml.jackson.dataformat</groupId>
       <artifactId>jackson-dataformat-yaml</artifactId>
       <version>${jackson.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.seleniumhq.selenium</groupId>
-      <artifactId>selenium-support</artifactId>
-      <version>${selenium.version}</version>
-      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>us.abstracta.jmeter</groupId>
@@ -97,6 +78,19 @@
       <type>test-jar</type>
       <version>${project.version}</version>
       <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>us.abstracta.jmeter</groupId>
+      <artifactId>jmeter-java-dsl-recorder</artifactId>
+      <type>test-jar</type>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <!-- This should be in test scope, but defined in compile scope to avoid shade ignoring it -->
+    <dependency>
+      <groupId>org.seleniumhq.selenium</groupId>
+      <artifactId>selenium-chrome-driver</artifactId>
+      <version>${selenium.version}</version>
     </dependency>
   </dependencies>
 
