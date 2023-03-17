@@ -25,7 +25,7 @@ public abstract class MethodCallFragmentBuilderTest {
   protected static String testResourceContents(String resourceName) {
     try {
       return testResource(resourceName.startsWith("/") ? resourceName.substring(1)
-          : "codegeneration/" + resourceName).contents();
+          : "codegeneration/" + resourceName).rawContents();
     } catch (IOException e) {
       throw new RuntimeException(e);
     }

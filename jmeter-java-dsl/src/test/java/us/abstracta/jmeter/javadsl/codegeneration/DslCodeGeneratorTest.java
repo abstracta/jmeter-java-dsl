@@ -30,7 +30,7 @@ public class DslCodeGeneratorTest {
   }
 
   private File solveTemplateResource(String resourcePath, Path tempDir) throws IOException {
-    String templateContents = new StringTemplate(new TestResource(resourcePath).contents())
+    String templateContents = new StringTemplate(new TestResource(resourcePath).rawContents())
         .solve();
     Path solvedTemplate = tempDir.resolve("test-plan.jmx");
     Files.write(solvedTemplate, templateContents.getBytes(StandardCharsets.UTF_8));
@@ -42,7 +42,7 @@ public class DslCodeGeneratorTest {
     return new TestClassTemplate()
         .dependencies(Collections.singleton("us.abstracta.jmeter:jmeter-java-dsl"))
         .imports(imports)
-        .testPlan(new TestResource(RESOURCES_FOLDER + "/" + testPlanCodeResource).contents())
+        .testPlan(new TestResource(RESOURCES_FOLDER + "/" + testPlanCodeResource).rawContents())
         .solve();
   }
 

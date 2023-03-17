@@ -69,7 +69,7 @@ public class ElasticsearchBackendListenerTest extends JmeterDslTest {
   private void createIndex(RestHighLevelClient client) throws IOException {
     client.indices().putTemplate(
         new PutIndexTemplateRequest("jmeter")
-            .source(testResource("index-template.json").contents(), XContentType.JSON),
+            .source(testResource("index-template.json").rawContents(), XContentType.JSON),
         RequestOptions.DEFAULT);
   }
 

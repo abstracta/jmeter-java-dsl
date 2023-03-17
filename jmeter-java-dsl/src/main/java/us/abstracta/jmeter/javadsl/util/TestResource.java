@@ -1,5 +1,7 @@
 package us.abstracta.jmeter.javadsl.util;
 
+import java.io.BufferedInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -65,12 +67,37 @@ public class TestResource {
    * <p>
    * Take into consideration that this uses UTF_8 encoding for reading the file and that file should
    * be in general be a textual one (otherwise decoding it may fail).
+   * <p>
+   * Note that this method is known to have some issues, check {@link #rawContents()}.
    *
    * @return text decoded contents of the file.
    * @throws IOException if there is some problem reading associated resource contents.
    */
   public String contents() throws IOException {
     return String.join("\n", Files.readAllLines(file().toPath(), StandardCharsets.UTF_8));
+  }
+
+  /**
+   * Gets all the contents of the resource without replacing OS specific new lines characters.
+   * <p>
+   * Additionally, this method works even when resource is inside jar, when {@link #contents()}
+   * doesn't.
+   * <p>
+   * In version 2.0 we will replace {@link #contents()} by this method, but for the time being
+   * keeping both as to avoid breaking existing users code that might be using contents().
+   *
+   * @return text contents of the resource.
+   * @throws IOException if there is some problem reading associated resource contents.
+   * @since 1.9
+   */
+  public String rawContents() throws IOException {
+    try (BufferedInputStream bis = new BufferedInputStream(resource.openStream())) {
+      ByteArrayOutputStream buf = new ByteArrayOutputStream();
+      for (int result = bis.read(); result != -1; result = bis.read()) {
+        buf.write((byte) result);
+      }
+      return buf.toString(StandardCharsets.UTF_8.name());
+    }
   }
 
 }

@@ -124,7 +124,7 @@ public class JmeterDslCoreTest extends JmeterDslTest {
 
   private void copyJmxWithDynamicFieldsTo(File jmxFile) throws IOException {
     try (FileWriter fw = new FileWriter(jmxFile)) {
-      fw.write(new StringTemplate(testResource(TEST_PLAN_RESOURCE_PATH).contents())
+      fw.write(new StringTemplate(testResource(TEST_PLAN_RESOURCE_PATH).rawContents())
           .bind("port", URI.create(wiremockUri).getPort())
           .bind("jtlFile", new File(jmxFile.getParent(), "results.jtl").getPath())
           .solve());

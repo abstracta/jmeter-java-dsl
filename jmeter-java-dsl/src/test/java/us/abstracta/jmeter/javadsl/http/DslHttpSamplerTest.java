@@ -24,13 +24,11 @@ import static us.abstracta.jmeter.javadsl.JmeterDsl.testResource;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.threadGroup;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.transaction;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.time.Duration;
 import java.util.regex.Pattern;
 import org.apache.http.HttpStatus;
@@ -44,6 +42,7 @@ import us.abstracta.jmeter.javadsl.codegeneration.MethodCallBuilderTest;
 import us.abstracta.jmeter.javadsl.core.DslTestPlan;
 import us.abstracta.jmeter.javadsl.core.TestPlanStats;
 import us.abstracta.jmeter.javadsl.http.DslHttpSampler.HttpClientImpl;
+import us.abstracta.jmeter.javadsl.util.TestResource;
 
 public class DslHttpSamplerTest extends JmeterDslTest {
 
@@ -425,7 +424,7 @@ public class DslHttpSamplerTest extends JmeterDslTest {
     String part1Value = "value1";
     ContentType part1Encoding = ContentType.TEXT_PLAIN.withCharset(StandardCharsets.US_ASCII);
     String part2Name = "part2";
-    File part2File = testResource("jtls/custom-sample-jtl.xml").file();
+    TestResource part2File = testResource("jtls/custom-sample-jtl.xml");
     ContentType part2Encoding = ContentType.TEXT_XML;
 
     testPlan(
@@ -433,7 +432,7 @@ public class DslHttpSamplerTest extends JmeterDslTest {
             httpSampler(wiremockUri)
                 .method(HTTPConstants.POST)
                 .bodyPart(part1Name, part1Value, part1Encoding)
-                .bodyFilePart(part2Name, part2File.getPath(), part2Encoding)
+                .bodyFilePart(part2Name, part2File.filePath(), part2Encoding)
         )
     ).run();
     verify(postRequestedFor(anyUrl())
@@ -446,24 +445,16 @@ public class DslHttpSamplerTest extends JmeterDslTest {
   }
 
   private String buildMultiPartBodyPattern(String part1Name, String part1Value,
-      ContentType part1Encoding, String part2Name, File part2File, ContentType part2Encoding)
-      throws IOException {
+      ContentType part1Encoding, String part2Name, TestResource part2File,
+      ContentType part2Encoding) throws IOException {
     String separatorPattern = "--" + MULTIPART_BOUNDARY_PATTERN;
     return separatorPattern + CRLN
         + Pattern.quote(buildBodyPart(part1Name, null, part1Value, part1Encoding, "8bit"))
         + separatorPattern + CRLN
-        /*
-        cant use TestResource.getContents since it doesn't keep CR, which makes the test to fail
-        in windows
-        */
         + Pattern.quote(
-        buildBodyPart(part2Name, part2File.getName(), readFileContents(part2File), part2Encoding,
+        buildBodyPart(part2Name, part2File.file().getName(), part2File.rawContents(), part2Encoding,
             "binary"))
         + separatorPattern + "--" + CRLN;
-  }
-
-  private String readFileContents(File f) throws IOException {
-    return new String(Files.readAllBytes(f.toPath()), StandardCharsets.UTF_8);
   }
 
   private String buildBodyPart(String name, String fileName, String value, ContentType contentType,
