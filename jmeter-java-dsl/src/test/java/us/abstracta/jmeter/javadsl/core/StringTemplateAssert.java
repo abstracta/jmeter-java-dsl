@@ -43,7 +43,7 @@ public abstract class StringTemplateAssert<SELF extends StringTemplateAssert<SEL
   protected abstract ErrorMessageFactory getErrorMessageFactory(List<Delta<String>> diffs);
 
   public SELF matches(TestResource template) throws IOException {
-    return matches(template.contents());
+    return matches(template.rawContents());
   }
 
   public SELF matches(String templateContents) throws IOException {
@@ -54,7 +54,11 @@ public abstract class StringTemplateAssert<SELF extends StringTemplateAssert<SEL
               new StringInputStream(templateContents, StandardCharsets.UTF_8)).stream()
           .filter(d -> !isDiffMatching(d))
           .collect(Collectors.toList());
-      throw failures.failure(this.info, getErrorMessageFactory(diffs));
+      if (diffs.isEmpty()) {
+        objects.assertEqual(info, actualContent, templateContents);
+      } else {
+        throw failures.failure(this.info, getErrorMessageFactory(diffs));
+      }
     }
     return (SELF) this;
   }
