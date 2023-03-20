@@ -24,7 +24,7 @@ Add dependency to your project:
 <dependency>
   <groupId>us.abstracta.jmeter</groupId>
   <artifactId>jmeter-java-dsl</artifactId>
-  <version>1.8.1</version>
+  <version>1.9</version>
   <scope>test</scope>
 </dependency>
 ```
