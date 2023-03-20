@@ -9,15 +9,20 @@ import org.apache.jmeter.config.Arguments;
 import org.apache.jmeter.config.ConfigTestElement;
 import org.apache.jmeter.protocol.http.config.gui.HttpDefaultsGui;
 import org.apache.jmeter.protocol.http.sampler.HTTPSamplerBase;
+import org.apache.jmeter.protocol.http.sampler.HTTPSamplerProxy;
 import org.apache.jmeter.testelement.TestElement;
 import org.apache.jmeter.testelement.property.TestElementProperty;
+import org.apache.jorphan.collections.HashTree;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodCall;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodCallContext;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodCallContext.MethodCallContextEndListener;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodParam;
 import us.abstracta.jmeter.javadsl.codegeneration.SingleGuiClassCallBuilder;
 import us.abstracta.jmeter.javadsl.codegeneration.TestElementParamBuilder;
+import us.abstracta.jmeter.javadsl.codegeneration.params.BoolParam;
 import us.abstracta.jmeter.javadsl.codegeneration.params.EncodingParam;
+import us.abstracta.jmeter.javadsl.core.BuildTreeContext;
+import us.abstracta.jmeter.javadsl.core.BuildTreeContext.TreeContextEndListener;
 import us.abstracta.jmeter.javadsl.core.configs.BaseConfigElement;
 import us.abstracta.jmeter.javadsl.http.DslBaseHttpSampler.BaseHttpSamplerCodeBuilder;
 import us.abstracta.jmeter.javadsl.http.DslHttpSampler.HttpClientImpl;
@@ -48,6 +53,7 @@ public class DslHttpDefaults extends BaseConfigElement {
   protected String proxyUser;
   protected String proxyPassword;
   protected HttpClientImpl clientImpl;
+  protected Boolean followRedirects;
 
   public DslHttpDefaults() {
     super("HTTP Request Defaults", HttpDefaultsGui.class);
@@ -166,6 +172,20 @@ public class DslHttpDefaults extends BaseConfigElement {
    */
   public DslHttpDefaults encoding(Charset encoding) {
     this.encoding = encoding;
+    return this;
+  }
+
+  /**
+   * Specifies if by default HTTP redirects should be automatically followed (a new request
+   * automatically created) when detected, or not.
+   *
+   * @param enable specifies whether to enable or disable automatic redirections by defaults. When
+   *               not set then the default is true.
+   * @return the config element for further configuration or usage.
+   * @since 1.9
+   */
+  public DslHttpDefaults followRedirects(boolean enable) {
+    this.followRedirects = enable;
     return this;
   }
 
@@ -339,7 +359,8 @@ public class DslHttpDefaults extends BaseConfigElement {
    * <p>
    * When using reset connection for each thread consider tuning OS like explained in "Configure
    * your environment" section of
-   * <a href="https://medium.com/@chientranthien/how-to-generate-high-load-benchmark-with-jmeter-80e828a67592">this article</a>.
+   * <a href="https://medium.com/@chientranthien/how-to-generate-high-load-benchmark-with-jmeter-80e828a67592">this
+   * article</a>.
    * <p>
    * <b>Warning:</b> This setting is applied at JVM level, which means that it will affect the
    * entire test plan and potentially other test plans running in the same JVM instance.
@@ -403,6 +424,62 @@ public class DslHttpDefaults extends BaseConfigElement {
     return ret;
   }
 
+  @Override
+  public HashTree buildTreeUnder(HashTree parent, BuildTreeContext context) {
+    HashTree ret = super.buildTreeUnder(parent, context);
+    if (followRedirects != null) {
+      buildEndListener(context.getParent()).followRedirects = followRedirects;
+    }
+    return ret;
+  }
+
+  private static DefaultsTreeContextEndListener buildEndListener(BuildTreeContext parentCtx) {
+    return parentCtx.getOrCreateEntry(DslHttpDefaults.class.getName(),
+        () -> new DefaultsTreeContextEndListener(parentCtx));
+  }
+
+  /* Set as protected to avoid this method to appear to users while creating a test plan,
+  but still be visible for DslHttpSampler */
+  protected static void addPendingFollowRedirectsElement(HTTPSamplerProxy element,
+      BuildTreeContext context) {
+    buildEndListener(context.getRoot()).pendingFollowRedirectsElements.add(element);
+  }
+
+  private static class DefaultsTreeContextEndListener implements TreeContextEndListener {
+
+    private Boolean followRedirects;
+    private final List<HTTPSamplerProxy> pendingFollowRedirectsElements = new ArrayList<>();
+
+    private DefaultsTreeContextEndListener(BuildTreeContext context) {
+      context.addEndListener(this);
+    }
+
+    @Override
+    public void execute(BuildTreeContext context, HashTree tree) {
+      if (followRedirects != null) {
+        setChildrenToFollowRedirects(tree);
+      } else {
+        pendingFollowRedirectsElements.stream()
+            .filter(e -> e.getPropertyAsString(HTTPSamplerBase.FOLLOW_REDIRECTS).isEmpty())
+            .forEach(e -> e.setFollowRedirects(true));
+      }
+    }
+
+    private void setChildrenToFollowRedirects(HashTree tree) {
+      tree.forEach((key, value) -> {
+        if (key instanceof HTTPSamplerProxy) {
+          HTTPSamplerProxy sampler = (HTTPSamplerProxy) key;
+          if (sampler.getPropertyAsString(HTTPSamplerBase.FOLLOW_REDIRECTS).isEmpty()) {
+            sampler.setFollowRedirects(followRedirects);
+          }
+        } else {
+          setChildrenToFollowRedirects(value);
+        }
+      });
+    }
+
+  }
+
   public static class CodeBuilder extends SingleGuiClassCallBuilder {
 
     public CodeBuilder(List<Method> builderMethods) {
@@ -437,95 +514,144 @@ public class DslHttpDefaults extends BaseConfigElement {
 
     public void registerDependency(MethodCallContext context) {
       MethodCallContext parentCtx = context.getParent();
-      BuildContextEndListener endListener = parentCtx.computeEntryIfAbsent(DslHttpDefaults.class,
-          () -> new BuildContextEndListener(parentCtx));
-      String encoding = context.getTestElement()
-          .getPropertyAsString(HTTPSamplerBase.CONTENT_ENCODING);
-      boolean isDefaultCandidate = context.getTestElement()
-          .getPropertyAsString(TestElement.GUI_CLASS)
+      DefaultsMethodContextEndListener endListener = parentCtx.computeEntryIfAbsent(
+          DslHttpDefaults.class, () -> new DefaultsMethodContextEndListener(parentCtx));
+      TestElement testElement = context.getTestElement();
+      String encoding = testElement.getPropertyAsString(HTTPSamplerBase.CONTENT_ENCODING);
+      boolean isDefaultCandidate = testElement.getPropertyAsString(TestElement.GUI_CLASS)
           .equals(HttpDefaultsGui.class.getName());
       endListener.registerEncoding(encoding, context, isDefaultCandidate);
+      boolean followRedirects =
+          isDefaultCandidate || testElement.getPropertyAsBoolean(HTTPSamplerBase.FOLLOW_REDIRECTS);
+      endListener.registerFollowRedirect(followRedirects, context, isDefaultCandidate);
     }
 
-    private static class BuildContextEndListener implements MethodCallContextEndListener {
+    private static class DefaultsMethodContextEndListener implements MethodCallContextEndListener {
 
-      private final List<EncodedCall> calls = new ArrayList<>();
+      private final List<EncodedCall> encodedCalls = new ArrayList<>();
+      private final List<RedirectableCall> redirectableCalls = new ArrayList<>();
 
-      private BuildContextEndListener(MethodCallContext parentCtx) {
+      private DefaultsMethodContextEndListener(MethodCallContext parentCtx) {
         parentCtx.addEndListener(this);
       }
 
       public void registerEncoding(String encoding, MethodCallContext ret,
           boolean isDefaultCandidate) {
-        calls.add(new EncodedCall(encoding, ret, isDefaultCandidate));
+        encodedCalls.add(new EncodedCall(encoding, ret, isDefaultCandidate));
+      }
+
+      public void registerFollowRedirect(boolean followRedirects, MethodCallContext ret,
+          boolean isDefaultCandidate) {
+        redirectableCalls.add(new RedirectableCall(followRedirects, ret, isDefaultCandidate));
       }
 
       @Override
       public void execute(MethodCallContext ctx, MethodCall ret) {
-        final EncodedCall defaultsCall = findDefaultsCall(ctx);
+        solveDefaultEncoding(ctx);
+        solveDefaultFollowRedirects(ctx);
+      }
+
+      private void solveDefaultEncoding(MethodCallContext ctx) {
+        EncodedCall defaultsCall = findDefaultEncodingCall(ctx);
         if (defaultsCall != null) {
-          calls.stream()
+          encodedCalls.stream()
               .filter(c -> c != defaultsCall && !c.isDefaultCandidate
                   && c.encoding.equals(defaultsCall.encoding))
               .forEach(EncodedCall::removeEncoding);
         }
-        MethodCallContext parentCtx = ctx.getParent();
-        if (parentCtx != null) {
-          BuildContextEndListener parentListener = parentCtx.computeEntryIfAbsent(
-              DslHttpDefaults.class, () -> new BuildContextEndListener(parentCtx));
+        DefaultsMethodContextEndListener parentListener = buildParentContextEndListener(ctx);
+        if (parentListener != null) {
           parentListener.registerEncoding(defaultsCall != null ? defaultsCall.encoding : "",
               defaultsCall != null ? defaultsCall.ctx : null, false);
         }
       }
 
-      private EncodedCall findDefaultsCall(MethodCallContext ctx) {
-        if (calls.size() == 1) {
-          return calls.get(0);
+      private static DefaultsMethodContextEndListener buildParentContextEndListener(
+          MethodCallContext ctx) {
+        MethodCallContext parentCtx = ctx.getParent();
+        return (parentCtx != null) ? parentCtx.computeEntryIfAbsent(DslHttpDefaults.class,
+            () -> new DefaultsMethodContextEndListener(parentCtx)) : null;
+      }
+
+      private EncodedCall findDefaultEncodingCall(MethodCallContext ctx) {
+        if (encodedCalls.size() == 1) {
+          return encodedCalls.get(0);
         }
-        EncodedCall defaultsCall = calls.stream()
+        EncodedCall ret = encodedCalls.stream()
             .filter(c -> c.isDefaultCandidate && !c.encoding.isEmpty())
             .findAny()
             .orElse(null);
-        if (defaultsCall != null) {
-          return defaultsCall;
+        if (ret != null) {
+          return ret;
         }
-        String someEncoding = calls.stream()
+        String someEncoding = encodedCalls.stream()
             .filter(c -> !c.encoding.isEmpty())
             .map(c -> c.encoding)
             .findAny()
             .orElse(null);
-        if (someEncoding != null && calls.stream()
+        if (someEncoding != null && encodedCalls.stream()
             .allMatch(c -> c.isDefaultCandidate || c.encoding.equals(someEncoding))) {
-          defaultsCall = calls.stream()
+          ret = encodedCalls.stream()
               .filter(c -> c.isDefaultCandidate)
               .findAny()
               .orElse(null);
-          if (defaultsCall == null) {
-            defaultsCall = buildDefaultsCall(ctx);
+          if (ret == null) {
+            ret = new EncodedCall("", buildDefaultsCall(ctx), true);
           }
-          defaultsCall.setEncoding(someEncoding);
-          return defaultsCall;
+          ret.setEncoding(someEncoding);
+          return ret;
         }
         return null;
       }
 
-      private EncodedCall buildDefaultsCall(MethodCallContext ctx) {
-        MethodCallContext child = ctx.prependChild(
-            new DslHttpDefaults().buildConfiguredTestElement(), null);
-        return new EncodedCall("", child, true);
+      private MethodCallContext buildDefaultsCall(MethodCallContext ctx) {
+        return ctx.prependChild(new DslHttpDefaults().buildConfiguredTestElement(), null);
+      }
+
+      private void solveDefaultFollowRedirects(MethodCallContext ctx) {
+        RedirectableCall defaultsCall = findDefaultRedirectableCall(ctx);
+        if (defaultsCall != null) {
+          redirectableCalls.stream()
+              .filter(c -> c != defaultsCall)
+              .forEach(RedirectableCall::removeFollowRedirects);
+        }
+        DefaultsMethodContextEndListener parentListener = buildParentContextEndListener(ctx);
+        if (parentListener != null) {
+          parentListener.registerFollowRedirect(
+              defaultsCall == null || defaultsCall.followRedirects,
+              defaultsCall != null ? defaultsCall.ctx : null, false);
+        }
+      }
+
+      private RedirectableCall findDefaultRedirectableCall(MethodCallContext ctx) {
+        if (redirectableCalls.size() == 1) {
+          return redirectableCalls.get(0);
+        }
+        if (redirectableCalls.stream().allMatch(c -> c.isDefaultCandidate || !c.followRedirects)) {
+          RedirectableCall ret = redirectableCalls.stream()
+              .filter(c -> c.isDefaultCandidate)
+              .findAny()
+              .orElse(null);
+          if (ret == null) {
+            ret = new RedirectableCall(false, buildDefaultsCall(ctx), true);
+          }
+          ret.setFollowRedirects(false);
+          return ret;
+        }
+        return null;
       }
 
     }
 
   }
 
-  public static class EncodedCall {
+  private static class EncodedCall {
 
     private String encoding;
     private final MethodCallContext ctx;
     private final boolean isDefaultCandidate;
 
-    public EncodedCall(String encoding, MethodCallContext ctx, boolean isDefaultCandidate) {
+    private EncodedCall(String encoding, MethodCallContext ctx, boolean isDefaultCandidate) {
       this.encoding = encoding;
       this.ctx = ctx;
       this.isDefaultCandidate = isDefaultCandidate;
@@ -537,12 +663,41 @@ public class DslHttpDefaults extends BaseConfigElement {
     }
 
     public void removeEncoding() {
-      MethodCall methodCall = ctx.getMethodCall();
-      methodCall.unchain("encoding");
-      if (methodCall.getReturnType() == DslHttpDefaults.class && methodCall.chainSize() == 0) {
-        ctx.getParent().getMethodCall()
-            .replaceChild(methodCall, MethodCall.emptyCall());
-      }
+      ctx.getMethodCall().unchain("encoding");
+      removeEmptyDefaultsCall(ctx);
+    }
+
+  }
+
+  private static void removeEmptyDefaultsCall(MethodCallContext ctx) {
+    MethodCall methodCall = ctx.getMethodCall();
+    if (methodCall.getReturnType() == DslHttpDefaults.class && methodCall.chainSize() == 0) {
+      ctx.getParent().getMethodCall()
+          .replaceChild(methodCall, MethodCall.emptyCall());
+    }
+  }
+
+  private static class RedirectableCall {
+
+    private boolean followRedirects;
+    private final MethodCallContext ctx;
+    private final boolean isDefaultCandidate;
+
+    private RedirectableCall(boolean followRedirects, MethodCallContext ctx,
+        boolean isDefaultCandidate) {
+      this.followRedirects = followRedirects;
+      this.ctx = ctx;
+      this.isDefaultCandidate = isDefaultCandidate;
+    }
+
+    public void setFollowRedirects(boolean followRedirects) {
+      this.followRedirects = followRedirects;
+      ctx.getMethodCall().chain("followRedirects", new BoolParam(followRedirects, true));
+    }
+
+    public void removeFollowRedirects() {
+      ctx.getMethodCall().unchain("followRedirects");
+      removeEmptyDefaultsCall(ctx);
     }
 
   }

@@ -22,6 +22,7 @@ import org.apache.jmeter.protocol.http.util.HTTPConstants;
 import org.apache.jmeter.protocol.http.util.HTTPConstantsInterface;
 import org.apache.jmeter.protocol.http.util.HTTPFileArg;
 import org.apache.jmeter.testelement.property.JMeterProperty;
+import org.apache.jorphan.collections.HashTree;
 import us.abstracta.jmeter.javadsl.JmeterDsl;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodCall;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodCallContext;
@@ -30,6 +31,7 @@ import us.abstracta.jmeter.javadsl.codegeneration.TestElementParamBuilder;
 import us.abstracta.jmeter.javadsl.codegeneration.params.BoolParam;
 import us.abstracta.jmeter.javadsl.codegeneration.params.EnumParam.EnumPropertyValue;
 import us.abstracta.jmeter.javadsl.codegeneration.params.StringParam;
+import us.abstracta.jmeter.javadsl.core.BuildTreeContext;
 import us.abstracta.jmeter.javadsl.core.preprocessors.DslJsr223PreProcessor.PreProcessorScript;
 import us.abstracta.jmeter.javadsl.core.preprocessors.DslJsr223PreProcessor.PreProcessorVars;
 import us.abstracta.jmeter.javadsl.core.util.JmeterFunction;
@@ -49,11 +51,12 @@ public class DslHttpSampler extends DslBaseHttpSampler<DslHttpSampler> {
   protected boolean multiPart;
   protected final List<HTTPFileArg> files = new ArrayList<>();
   protected Charset encoding;
-  protected boolean followRedirects = true;
+  protected Boolean followRedirects;
   protected boolean downloadEmbeddedResources;
   protected String embeddedResourcesMatchRegex;
   protected String embeddedResourcesNotMatchRegex;
   protected HttpClientImpl clientImpl;
+  protected HTTPSamplerProxy element;
 
   public DslHttpSampler(String name, String url) {
     super(name != null ? name : DEFAULT_NAME, url, HttpTestSampleGui.class);
@@ -372,6 +375,7 @@ public class DslHttpSampler extends DslBaseHttpSampler<DslHttpSampler> {
 
   @Override
   public HTTPSamplerProxy configureHttpTestElement(HTTPSamplerProxy elem) {
+    this.element = elem;
     elem.setMethod(method);
     elem.setArguments(buildArguments());
     if (multiPart) {
@@ -387,7 +391,9 @@ public class DslHttpSampler extends DslBaseHttpSampler<DslHttpSampler> {
     if (encoding != null) {
       elem.setContentEncoding(encoding.toString());
     }
-    elem.setFollowRedirects(followRedirects);
+    if (followRedirects != null) {
+      elem.setFollowRedirects(followRedirects);
+    }
     elem.setUseKeepAlive(true);
     HttpElementHelper.modifyTestElementEmbeddedResources(elem, downloadEmbeddedResources,
         embeddedResourcesMatchRegex, embeddedResourcesNotMatchRegex);
@@ -395,6 +401,19 @@ public class DslHttpSampler extends DslBaseHttpSampler<DslHttpSampler> {
       elem.setImplementation(clientImpl.propertyValue);
     }
     return elem;
+  }
+
+  @Override
+  public HashTree buildTreeUnder(HashTree parent, BuildTreeContext context) {
+    HashTree ret = super.buildTreeUnder(parent, context);
+    if (followRedirects == null) {
+      /*
+      Not setting follow redirects default value in buildTestElement and differing it, allows for
+      httpDefaults to define follow redirect behavior for elements that have not specified a value.
+       */
+      DslHttpDefaults.addPendingFollowRedirectsElement(element, context);
+    }
+    return ret;
   }
 
   private Arguments buildArguments() {

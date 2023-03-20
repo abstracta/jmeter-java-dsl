@@ -1,5 +1,6 @@
 package us.abstracta.jmeter.javadsl.http;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.exactly;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.getRequestedFor;
@@ -18,6 +19,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import javax.swing.JFrame;
+import org.apache.http.HttpStatus;
 import org.assertj.swing.core.BasicRobot;
 import org.assertj.swing.core.Robot;
 import org.assertj.swing.finder.WindowFinder;
@@ -180,6 +182,27 @@ public class DslHttpDefaultsTest extends JmeterDslTest {
     ).run();
     verify(exactly(0), getRequestedFor(urlPathEqualTo(resource2Url)));
     verify(getRequestedFor(urlPathEqualTo(resource1Url)));
+  }
+
+  @Test
+  public void shouldNotFollowRedirectWhenDefaultsDisablingRedirectsAndNoSettingInSampler()
+      throws Exception {
+    String redirectPath = "/redirected";
+    setupMockedRedirectionTo(redirectPath);
+    testPlan(
+        threadGroup(1, 1,
+            httpSampler(wiremockUri)
+        ),
+        httpDefaults()
+            .followRedirects(false)
+    ).run();
+    verify(exactly(0), getRequestedFor(urlPathEqualTo(redirectPath)));
+  }
+
+  private void setupMockedRedirectionTo(String redirectPath) {
+    stubFor(get("/").willReturn(
+        aResponse().withStatus(HttpStatus.SC_MOVED_PERMANENTLY)
+            .withHeader("Location", wiremockUri + redirectPath)));
   }
 
   @Test

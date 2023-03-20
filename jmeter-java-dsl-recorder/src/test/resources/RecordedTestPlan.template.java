@@ -1,7 +1,8 @@
 testPlan(
         threadGroup(1, 1,
           httpDefaults()
-            .encoding(StandardCharsets.UTF_8),
+            .encoding(StandardCharsets.UTF_8)
+            .followRedirects(false),
           httpSampler("/-1", "http://localhost:{{\d+}}"),
           httpSampler("/home-{{\d+}}", "http://localhost:{{\d+}}/home")
             .children(
@@ -11,7 +12,7 @@ testPlan(
           httpSampler("/cart-{{\d+}}", "http://localhost:{{\d+}}/cart")
             .method(HTTPConstants.POST)
             .contentType(ContentType.APPLICATION_FORM_URLENCODED)
-            .rawParam("productId", "${productId#2}"),
+            .param("productId", "${productId#2}"),
           httpSampler("/cart-{{\d+}}", "http://localhost:{{\d+}}/cart")
             .children(
               regexExtractor("productId#4", "name=\"productId\" value=\"([^\"]+)\"")
