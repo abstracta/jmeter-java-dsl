@@ -80,3 +80,15 @@ In case you want to get debug logs for HTTP calls to OctoPerf API, you can inclu
 ::: warning
 If you use JSR223 Pre- or Post- processors with Java code (lambdas) instead of strings ([here](../response-processing/jsr223-post-processor#change-sample-result-statuses-with-custom-logic) are some examples), or use one of the HTTP Sampler methods which receive a function as parameter (as in [here](../request-generation/jsr223-pre-processor#provide-request-parameters-programmatically-per-request)), then OctoPerf execution won't work. You can migrate them to use `jsrPreProcessor` with string scripts instead. Check the associated method's documentation for more details.
 :::
+
+::: warning
+By default the engine is configured to timeout if test execution takes more than 1 hour.
+This timeout exists to avoid any potential problem with OctoPerf execution not detected by the
+client, and avoid keeping the test indefinitely running until is interrupted by a user,
+which is specially annoying when running tests in automated fashion, for example in CI/CD.
+It is strongly advised to **set this timeout properly in each run**, according to the expected test
+execution time plus some additional margin (to consider for additional delays in OctoPerf
+test setup and teardown) to avoid unexpected test plan execution failure (due to timeout) or
+unnecessary waits when there is some unexpected issue with OctoPerf execution.
+:::
+

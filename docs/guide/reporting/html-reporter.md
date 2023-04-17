@@ -41,3 +41,7 @@ If you need a particular name for the report directory, for example for postproc
 
 Make sure when specifying the name, for it to be unique, otherwise report generation will fail after test plan execution.
 :::
+
+::: tip
+Time graphs by default group metrics per minute, but you can change this with provided `timeGraphsGranularity` method.
+:::
