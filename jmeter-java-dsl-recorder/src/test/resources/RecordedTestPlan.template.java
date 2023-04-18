@@ -3,7 +3,7 @@ testPlan(
           httpDefaults()
             .encoding(StandardCharsets.UTF_8)
             .followRedirects(false),
-          httpSampler("/-1", "http://localhost:{{\d+}}"),
+          httpSampler("/-{{\d+}}", "http://localhost:{{\d+}}"),
           httpSampler("/home-{{\d+}}", "http://localhost:{{\d+}}/home")
             .children(
               regexExtractor("productId#2", "name=\"productId\" value=\"([^\"]+)\"")
