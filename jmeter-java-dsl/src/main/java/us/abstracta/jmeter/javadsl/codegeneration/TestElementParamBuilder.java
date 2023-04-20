@@ -133,6 +133,21 @@ public class TestElementParamBuilder {
   /**
    * Generates a MethodParam representing a long test element property.
    *
+   * @param propName     is the name of the property holding a long value. For nested properties (a
+   *                     property that is inside another object property) you can use the slash
+   *                     character to separate the levels (eg: http_config/use_proxy).
+   * @param defaultValue is the default value used by the test element for this property.
+   * @return the MethodParam instance.
+   * @throws UnsupportedOperationException when no long can be parsed from the property value.
+   * @since 1.10
+   */
+  public MethodParam longParam(String propName, Long defaultValue) {
+    return buildParam(propName, LongParam::new, defaultValue);
+  }
+
+  /**
+   * Same as {@link #longParam(String, Long)} but with no default value.
+   *
    * @param propName is the name of the property holding a long value. For nested properties (a
    *                 property that is inside another object property) you can use the slash
    *                 character to separate the levels (eg: http_config/use_proxy).
@@ -141,7 +156,7 @@ public class TestElementParamBuilder {
    * @since 0.61
    */
   public MethodParam longParam(String propName) {
-    return buildParam(propName, LongParam::new, (Long) null);
+    return longParam(propName, null);
   }
 
   /**

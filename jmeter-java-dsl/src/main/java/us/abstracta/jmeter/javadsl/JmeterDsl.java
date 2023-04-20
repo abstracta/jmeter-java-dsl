@@ -8,6 +8,7 @@ import us.abstracta.jmeter.javadsl.core.DslTestElement;
 import us.abstracta.jmeter.javadsl.core.DslTestPlan;
 import us.abstracta.jmeter.javadsl.core.DslTestPlan.TestPlanChild;
 import us.abstracta.jmeter.javadsl.core.assertions.DslResponseAssertion;
+import us.abstracta.jmeter.javadsl.core.configs.DslCounter;
 import us.abstracta.jmeter.javadsl.core.configs.DslCsvDataSet;
 import us.abstracta.jmeter.javadsl.core.configs.DslVariables;
 import us.abstracta.jmeter.javadsl.core.controllers.DslForEachController;
@@ -98,10 +99,11 @@ public class JmeterDsl {
    *                   thread group is configured to stop on error, or some other explicit
    *                   termination condition).
    *                   <p>
-   *                   <b>Setting this property to -1 is in general not advised</b>, since you might
-   *                   inadvertently end up running a test plan without
-   *                   limits consuming unnecessary computing power. Prefer specifying a big value
-   *                   as a safe limit for iterations or duration instead.
+   *                   <b>Setting this property to -1 is in general not advised</b>, since you
+   *                   might
+   *                   inadvertently end up running a test plan without limits consuming unnecessary
+   *                   computing power. Prefer specifying a big value as a safe limit for iterations
+   *                   or duration instead.
    * @param children   contains the test elements that each thread will execute in each iteration.
    * @return the thread group instance.
    * @see DslDefaultThreadGroup
@@ -1453,6 +1455,19 @@ public class JmeterDsl {
    */
   public static DslCsvDataSet csvDataSet(TestResource resource) {
     return new DslCsvDataSet(resource.filePath());
+  }
+
+  /**
+   * Builds a counter for easy usage of auto incremental numbers in test plans.
+   * <p>
+   * This element is handy when generating uto incremental ids, positions in a list, etc.
+   *
+   * @param name specifies the variable name used for holding the counter value.
+   * @return the counter for further configuration and usage.
+   * @since 1.10
+   */
+  public static DslCounter counter(String name) {
+    return new DslCounter(name);
   }
 
   /**

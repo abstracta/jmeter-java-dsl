@@ -1,8 +1,8 @@
 ### Provide request parameters programmatically per request
 
-With the standard DSL you can provide static values to request parameters, such as a body. However, you may also want to be able to modify your requests for each call. This is common in cases where your request creates something that must have unique values.
+So far we have seen a few ways to generate requests with information extracted from CSV or through a counter, but this is not enough for some scenarios. When you need more flexibility and power you can use `jsr223preProcessor` to specify your own logic to build each request.
 
-Here is an example of how to achieve this:
+Here is an example:
 
 ```java
 import static org.assertj.core.api.Assertions.assertThat;
@@ -57,6 +57,10 @@ post(s -> buildRequestBody(s.vars), Type.TEXT_PLAIN)
 
 ::: warning
 Using java code (lambdas) will only work with embedded JMeter engine (no support for saving to JMX and running it in JMeter GUI, or running it with BlazeMeter or OctoPerf). Use the first option to avoid such limitations.
+:::
+
+::: tip
+`jsr223PreProcessor` is quite powerful. But, provided example can easily be achieved through the usage of [counter element](./counter#counter).  
 :::
 
 Check [DslJsr223PreProcessor](/jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/preprocessors/DslJsr223PreProcessor.java) & [DslHttpSampler](/jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/http/DslHttpSampler.java) for more details and additional options.
