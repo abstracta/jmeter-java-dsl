@@ -56,7 +56,7 @@ post(s -> buildRequestBody(s.vars), Type.TEXT_PLAIN)
 ```
 
 ::: warning
-Using java code (lambdas) will only work with embedded JMeter engine (no support for saving to JMX and running it in JMeter GUI, or running it with BlazeMeter or OctoPerf). Use the first option to avoid such limitations.
+Using java code (lambdas) will only work with embedded JMeter engine (no support for saving to JMX and running it in JMeter GUI, or running it with BlazeMeter, OctoPerf or Azure). Use the first option to avoid such limitations.
 :::
 
 ::: tip

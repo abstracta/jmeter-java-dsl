@@ -21,3 +21,4 @@ jobs:
         env:
           BZ_TOKEN: ${{ secrets.BZ_TOKEN }}
           OCTOPERF_API_KEY: ${{ secrets.OCTOPERF_API_KEY }}
+          AZURE_CREDS: ${{ secrets.AZURE_CREDS }}

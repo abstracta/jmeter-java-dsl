@@ -10,6 +10,7 @@ import us.abstracta.jmeter.javadsl.core.TestPlanStats;
 import us.abstracta.jmeter.javadsl.core.stats.CountMetricSummary;
 import us.abstracta.jmeter.javadsl.core.stats.StatsSummary;
 import us.abstracta.jmeter.javadsl.core.stats.TimeMetricSummary;
+import us.abstracta.jmeter.javadsl.engines.RemoteEngineTimeMetricSummary;
 import us.abstracta.jmeter.javadsl.octoperf.api.BenchResult;
 import us.abstracta.jmeter.javadsl.octoperf.api.TableEntry;
 import us.abstracta.jmeter.javadsl.octoperf.api.TableEntry.TableValue;
@@ -141,83 +142,31 @@ public class OctoPerfTestPlanStats extends TestPlanStats {
 
   }
 
-  public static class OctoPerfTime implements TimeMetricSummary {
-
-    private final Duration mean;
-    private final Duration min;
-    private final Duration max;
-    private final Duration median;
-    private final Duration perc90;
-    private final Duration perc95;
-    private final Duration perc99;
+  public static class OctoPerfTime extends RemoteEngineTimeMetricSummary {
 
     public OctoPerfTime(double mean, double min, double max, double median, double perc90,
         double perc95, double perc99) {
-      this.mean = durationFromSecs(mean);
-      this.min = durationFromSecs(min);
-      this.max = durationFromSecs(max);
-      this.median = durationFromSecs(median);
-      this.perc90 = durationFromSecs(perc90);
-      this.perc95 = durationFromSecs(perc95);
-      this.perc99 = durationFromSecs(perc99);
+      super((long) min * 1000, (long) max * 1000, mean * 1000, median * 1000, perc90 * 1000,
+          perc95 * 1000, perc99 * 1000);
     }
 
     public OctoPerfTime(OctoPerfTime time1, OctoPerfTime time2, long count1, long count2) {
-      mean = weightedDuration(time1.mean, time2.mean, count1, count2);
-      min = time1.min.compareTo(time2.min) < 0 ? time1.min : time2.min;
-      max = time1.max.compareTo(time2.max) > 0 ? time1.max : time2.max;
-      /*
-       since OctoPerf does not provide these metrics per label, we approximate them with weighted
-       values
-       */
-      median = weightedDuration(time1.median, time2.median, count1, count2);
-      perc90 = weightedDuration(time1.perc90, time2.perc90, count1, count2);
-      perc95 = weightedDuration(time1.perc95, time2.perc95, count1, count2);
-      perc99 = weightedDuration(time1.perc99, time2.perc99, count1, count2);
+      super((time1.min.compareTo(time2.min) < 0 ? time1.min : time2.min).toMillis(),
+          (time1.max.compareTo(time2.max) > 0 ? time1.max : time2.max).toMillis(),
+          /*
+           since OctoPerf does not provide these metrics per label, we approximate them with
+           weighted values
+           */
+          weightedDuration(time1.mean, time2.mean, count1, count2),
+          weightedDuration(time1.median, time2.median, count1, count2),
+          weightedDuration(time1.percentile90, time2.percentile90, count1, count2),
+          weightedDuration(time1.percentile95, time2.percentile95, count1, count2),
+          weightedDuration(time1.percentile99, time2.percentile99, count1, count2)
+      );
     }
 
-    private Duration durationFromSecs(double secs) {
-      return Duration.ofMillis(Math.round(secs * 1000));
-    }
-
-    private Duration weightedDuration(Duration d1, Duration d2, long w1, long w2) {
-      return Duration.ofMillis(
-          Math.round(((double) d1.toMillis() * w1) + ((double) d2.toMillis() * w2)) / (w1 + w2));
-    }
-
-    @Override
-    public Duration mean() {
-      return mean;
-    }
-
-    @Override
-    public Duration min() {
-      return min;
-    }
-
-    @Override
-    public Duration max() {
-      return max;
-    }
-
-    @Override
-    public Duration median() {
-      return median;
-    }
-
-    @Override
-    public Duration perc90() {
-      return perc90;
-    }
-
-    @Override
-    public Duration perc95() {
-      return perc95;
-    }
-
-    @Override
-    public Duration perc99() {
-      return perc99;
+    private static double weightedDuration(Duration d1, Duration d2, long w1, long w2) {
+      return ((double) d1.toMillis() * w1) + ((double) d2.toMillis() * w2) / (w1 + w2);
     }
 
   }

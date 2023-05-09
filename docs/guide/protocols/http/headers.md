@@ -31,5 +31,5 @@ testPlan(
 ```
 
 ::: tip
-You can also use lambda expressions for dynamically building HTTP Headers, but the same limitations apply as in other cases (running in BlazeMeter, OctoPerf, or using generated JMX file).
+You can also use lambda expressions for dynamically building HTTP Headers, but the same limitations apply as in other cases (running in BlazeMeter, OctoPerf, Azure, or using generated JMX file).
 :::

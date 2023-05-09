@@ -1,29 +1,18 @@
 package us.abstracta.jmeter.javadsl.octoperf;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
-import com.fasterxml.jackson.annotation.PropertyAccessor;
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import devcsrj.okhttp3.logging.HttpLoggingInterceptor;
-import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
-import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
-import okhttp3.ResponseBody;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import retrofit2.Call;
-import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.jackson.JacksonConverterFactory;
 import retrofit2.http.Body;
 import retrofit2.http.DELETE;
 import retrofit2.http.GET;
@@ -33,6 +22,8 @@ import retrofit2.http.PUT;
 import retrofit2.http.Part;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
+import us.abstracta.jmeter.javadsl.engines.BaseRemoteEngineApiClient;
+import us.abstracta.jmeter.javadsl.engines.RemoteEngineException;
 import us.abstracta.jmeter.javadsl.octoperf.api.BenchReport;
 import us.abstracta.jmeter.javadsl.octoperf.api.BenchReport.StatisticTableReportItem;
 import us.abstracta.jmeter.javadsl.octoperf.api.BenchReport.SummaryReportItem;
@@ -45,52 +36,35 @@ import us.abstracta.jmeter.javadsl.octoperf.api.User;
 import us.abstracta.jmeter.javadsl.octoperf.api.VirtualUser;
 import us.abstracta.jmeter.javadsl.octoperf.api.Workspace;
 
-public class OctoPerfClient implements Closeable {
+public class OctoPerfClient extends BaseRemoteEngineApiClient {
 
   private static final Logger LOG = LoggerFactory.getLogger(OctoPerfClient.class);
   private static final String BASE_URL = "https://api.octoperf.com";
   private static final String BASE_APP_URL = BASE_URL + "/app/#/app";
 
   private final OctoPerfApi api;
-  private final OkHttpClient httpClient;
+  private final String apiKey;
 
   public OctoPerfClient(String apiKey) {
-    httpClient = buildHttpClient(apiKey);
-    api = new Retrofit.Builder()
-        .baseUrl(BASE_URL)
-        .addConverterFactory(buildConverterFactory())
-        .client(httpClient)
-        .build()
-        .create(OctoPerfApi.class);
-  }
-
-  private JacksonConverterFactory buildConverterFactory() {
-    return JacksonConverterFactory.create(new ObjectMapper()
-        .setVisibility(PropertyAccessor.FIELD, Visibility.ANY)
-        .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-        .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
-        .registerModule(new JavaTimeModule()));
-  }
-
-  private OkHttpClient buildHttpClient(String apiKey) {
-    OkHttpClient.Builder builder = new OkHttpClient.Builder()
-        .addInterceptor(chain -> {
-          Request request = chain.request()
-              .newBuilder()
-              .header("Authorization", "Bearer " + apiKey)
-              .build();
-          return chain.proceed(request);
-        });
-    if (LOG.isDebugEnabled()) {
-      builder.addInterceptor(new HttpLoggingInterceptor());
-    }
-    return builder.build();
+    super(LOG);
+    this.apiKey = apiKey;
+    api = buildApiFor(BASE_URL, OctoPerfApi.class);
   }
 
   @Override
-  public void close() {
-    httpClient.dispatcher().executorService().shutdown();
-    httpClient.connectionPool().evictAll();
+  protected String buildAuthorizationHeaderValue(Request request) {
+    return "Bearer " + apiKey;
+  }
+
+  @Override
+  protected ObjectMapper buildConverterMapper() {
+    return super.buildConverterMapper()
+        .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+  }
+
+  @Override
+  protected RemoteEngineException buildRemoteEngineException(int code, String message) {
+    return new OctoPerfException(code, message);
   }
 
   private interface OctoPerfApi {
@@ -149,16 +123,6 @@ public class OctoPerfClient implements Closeable {
 
   public User findCurrentUser() throws IOException {
     return execApiCall(api.findCurrentUser());
-  }
-
-  private <T> T execApiCall(Call<T> call) throws IOException {
-    Response<T> response = call.execute();
-    if (!response.isSuccessful()) {
-      try (ResponseBody errorBody = response.errorBody()) {
-        throw new OctoPerfException(response.code(), errorBody.string());
-      }
-    }
-    return response.body();
   }
 
   public Workspace findDefaultWorkspace() throws IOException {

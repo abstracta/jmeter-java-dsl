@@ -36,7 +36,7 @@ If you use JSR223 Pre- or Post-processors with Java code (lambdas) instead of st
 
 ### Run JMX file
 
-jmeter-java-dsl also provides means to easily run a test plan from a JMX file either locally, in BlazeMeter (through [previously mentioned jmeter-java-dsl-blazemeter module](./scale/blazemeter#blazemeter)) or OctoPerf (through [jmeter-java-dsl-octoperf module](./scale/octoperf#octoperf)). Here is an example:
+jmeter-java-dsl also provides means to easily run a test plan from a JMX file either locally, in BlazeMeter (through [previously mentioned jmeter-java-dsl-blazemeter module](./scale/blazemeter#blazemeter)), OctoPerf (through [jmeter-java-dsl-octoperf module](./scale/octoperf#octoperf)), or Azure Load testing (through [jmeter-java-dsl-azure module](./scale/azure#azure-load-testing)). Here is an example:
 
 ```java
 import static org.assertj.core.api.Assertions.assertThat;

@@ -1,0 +1,126 @@
+package us.abstracta.jmeter.javadsl.engines;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.concurrent.TimeoutException;
+import org.apache.jmeter.threads.ThreadGroup;
+import org.apache.jorphan.collections.HashTree;
+import org.apache.jorphan.collections.ListedHashTree;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import us.abstracta.jmeter.javadsl.core.BuildTreeContext;
+import us.abstracta.jmeter.javadsl.core.DslJmeterEngine;
+import us.abstracta.jmeter.javadsl.core.DslTestPlan;
+import us.abstracta.jmeter.javadsl.core.TestPlanStats;
+import us.abstracta.jmeter.javadsl.core.engines.JmeterEnvironment;
+
+/**
+ * Contains common logic to ease creation of remote engines (like BlazeMeter).
+ *
+ * @param <C> specifies the type of the class used to interact with the remote engine API.
+ * @param <S> specifies the type of test plan stats returned by this engine.
+ * @since 1.10
+ */
+public abstract class BaseRemoteEngine<C extends BaseRemoteEngineApiClient, S extends TestPlanStats>
+    implements DslJmeterEngine {
+
+  private static final Logger LOG = LoggerFactory.getLogger(BaseRemoteEngine.class);
+  protected C apiClient;
+
+  @Override
+  public TestPlanStats run(DslTestPlan testPlan)
+      throws IOException, InterruptedException, TimeoutException {
+    /*
+     Create file within temporary directory instead of just temporary file, to control the name of
+     the file, which might later on be relevant or visible for the engine.
+     */
+    File jmxFile = Files.createTempDirectory("jmeter-dsl").resolve("test.jmx").toFile();
+    try (C cli = buildClient()) {
+      this.apiClient = cli;
+      JmeterEnvironment env = new JmeterEnvironment();
+      HashTree tree = buildTree(testPlan);
+      saveTestPlanTo(jmxFile, tree, env);
+      return run(jmxFile, tree);
+    } finally {
+      if (jmxFile.delete()) {
+        jmxFile.getParentFile().delete();
+      }
+    }
+  }
+
+  /**
+   * Executes the given jmx file (generated from a DSL test plan) in the remote engine service.
+   * <p>
+   * This method needs to be implemented by each remote engine containing common setup y resources
+   * resolution logic, test plan upload, test execution start, waiting for test execution to end and
+   * test plan statistics retrieval after test execution ends.
+   *
+   * @param jmxFile specifies the temporary file which contains a JMeter test plan generated from a
+   *                JMeter DSL test plan.
+   * @param tree    specifies the JMeter tree generated from the JMeter DSL test plan. This is
+   *                usually helpful in case some analysis or inspection is required on the test plan
+   *                for its remote execution.
+   * @return the test plan statistics collected by remote engine service.
+   * @throws IOException          is thrown when there is some communication problem with the remote
+   *                              engine service.
+   * @throws InterruptedException is thrown when the user has interrupted the execution of the test
+   *                              plan.
+   * @throws TimeoutException     is thrown when test plan is taking more time than expected
+   *                              executing, or some intermediary phase (test plan validation,
+   *                              upload, statistics retrieval, etc) takes more than expected.
+   */
+  protected abstract S run(File jmxFile, HashTree tree)
+      throws IOException, InterruptedException, TimeoutException;
+
+  private HashTree buildTree(DslTestPlan testPlan) {
+    HashTree ret = new ListedHashTree();
+    BuildTreeContext context = new BuildTreeContext();
+    context.buildTreeFor(testPlan, ret);
+    context.getVisualizers().forEach((v, e) ->
+        LOG.warn("This engine does not currently support displaying visualizers. Ignoring {}.",
+            v.getClass().getSimpleName())
+    );
+    return ret;
+  }
+
+  private void saveTestPlanTo(File jmxFile, HashTree tree, JmeterEnvironment env)
+      throws IOException {
+    try (FileOutputStream output = new FileOutputStream(jmxFile.getPath())) {
+      env.saveTree(tree, output);
+    }
+  }
+
+  /**
+   * Builds the API client class that is required for interaction with the remote engine service.
+   *
+   * @return the API client instance for the remote engine usage.
+   */
+  protected abstract C buildClient();
+
+  protected ThreadGroup extractFirstThreadGroup(HashTree tree) {
+    HashTree testPlanTree = tree.getTree(tree.list().iterator().next());
+    return (ThreadGroup) testPlanTree.list().stream()
+        // we don't want to catch subclasses (setup & teardown), only exact class.
+        .filter(e -> e.getClass() == ThreadGroup.class)
+        .findFirst()
+        .orElse(null);
+  }
+
+  /**
+   * Allows to easily check if a given timeout has expired since a given process start time.
+   *
+   * @param timeout specifies the duration after the given start, that defines if the associated
+   *                process has timed out or not.
+   * @param start   specifies the instant when the associated process started.
+   * @return true if the time since the given start is greater or equal to given timeout. False
+   * otherwise.
+   */
+  protected boolean hasTimedOut(Duration timeout, Instant start) {
+    return Duration.between(start, Instant.now()).compareTo(timeout) >= 0;
+  }
+
+}

@@ -37,7 +37,7 @@ To be able to run the test you require the `rmi_keystore.jks` file in the workin
 :::
 
 ::: warning
-In general, prefer using BlazeMeter or OctoPerf options which avoid all the setup and maintenance costs of the infrastructure required by JMeter remote testing, also benefiting from other additional useful features they provide (like reporting capabilities).
+In general, prefer using BlazeMeter, OctoPerf or Azure options which avoid all the setup and maintenance costs of the infrastructure required by JMeter remote testing, also benefiting from other additional useful features they provide (like reporting capabilities).
 :::
 
 ::: tip

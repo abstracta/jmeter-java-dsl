@@ -43,7 +43,7 @@ ifController(s -> s.vars.get("ACCOUNT_ID") != null,
 ```
 
 ::: warning
-Using java code (lambdas) will only work with embedded JMeter engine (no support for saving to JMX and running it in JMeter GUI, or running it with BlazeMeter or OctoPerf). Use the first option to avoid such limitations.
+Using java code (lambdas) will only work with embedded JMeter engine (no support for saving to JMX and running it in JMeter GUI, or running it with BlazeMeter, OctoPerf or Azure). Use the first option to avoid such limitations.
 :::
 
 Check [DslIfController](/jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/controllers/DslIfController.java) and [JMeter Component documentation](https://jmeter.apache.org/usermanual/component_reference.html#If_Controller) for more details.

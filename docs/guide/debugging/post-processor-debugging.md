@@ -11,6 +11,6 @@ DSL provides following methods to ease results and variables visualization and d
 :::
 
 ::: tip
-Remove such post processors when no longer needed (when debugging is finished). Leaving them would generate errors when loading generated JMX test plan or running the test plan in BlazeMeter or OctoPerf, in addition to unnecessary processing time and resource usage.  
+Remove such post processors when no longer needed (when debugging is finished). Leaving them would generate errors when loading generated JMX test plan or running the test plan in BlazeMeter, OctoPerf or Azure, in addition to unnecessary processing time and resource usage.  
 :::
 

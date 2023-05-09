@@ -41,7 +41,7 @@ jsr223PostProcessor(s -> {
 ```
 
 ::: warning
-Using this last approach is currently only supported when using an embedded JMeter engine (no support for saving to JMX and running it in JMeter GUI, or running it with BlazeMeter or OctoPerf).
+Using this last approach is currently only supported when using an embedded JMeter engine (no support for saving to JMX and running it in JMeter GUI, or running it with BlazeMeter, OctoPerf, Azure).
 :::
 
 Check [DslJsr223PostProcessor](/jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/postprocessors/DslJsr223PostProcessor.java) for more details and additional options.

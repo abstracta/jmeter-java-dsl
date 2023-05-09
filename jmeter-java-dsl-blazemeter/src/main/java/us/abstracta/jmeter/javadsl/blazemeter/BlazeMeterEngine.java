@@ -1,15 +1,12 @@
 package us.abstracta.jmeter.javadsl.blazemeter;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 import java.util.concurrent.TimeoutException;
 import org.apache.jorphan.collections.HashTree;
-import org.apache.jorphan.collections.ListedHashTree;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import us.abstracta.jmeter.javadsl.blazemeter.api.Project;
@@ -21,23 +18,21 @@ import us.abstracta.jmeter.javadsl.blazemeter.api.TestRunConfig;
 import us.abstracta.jmeter.javadsl.blazemeter.api.TestRunRequestStats;
 import us.abstracta.jmeter.javadsl.blazemeter.api.TestRunStatus;
 import us.abstracta.jmeter.javadsl.blazemeter.api.TestRunSummaryStats.TestRunLabeledSummary;
-import us.abstracta.jmeter.javadsl.core.BuildTreeContext;
 import us.abstracta.jmeter.javadsl.core.DslJmeterEngine;
-import us.abstracta.jmeter.javadsl.core.DslTestPlan;
-import us.abstracta.jmeter.javadsl.core.engines.JmeterEnvironment;
+import us.abstracta.jmeter.javadsl.engines.BaseRemoteEngine;
 
 /**
  * A {@link DslJmeterEngine} which allows running DslTestPlan in BlazeMeter.
  *
  * @since 0.2
  */
-public class BlazeMeterEngine implements DslJmeterEngine {
+public class BlazeMeterEngine extends BaseRemoteEngine<BlazeMeterClient, BlazeMeterTestPlanStats> {
 
   private static final Logger LOG = LoggerFactory.getLogger(BlazeMeterEngine.class);
-  private static final String BASE_URL = "https://a.blazemeter.com";
   private static final Duration STATUS_POLL_PERIOD = Duration.ofSeconds(5);
 
-  private final BlazeMeterClient client;
+  private final String username;
+  private final String password;
   private String testName = "jmeter-java-dsl";
   private Long projectId;
   private Duration testTimeout = Duration.ofHours(1);
@@ -59,7 +54,13 @@ public class BlazeMeterEngine implements DslJmeterEngine {
    *                  API keys</a> for instructions on how to generate them.
    */
   public BlazeMeterEngine(String authToken) {
-    client = new BlazeMeterClient(BASE_URL + "/api/v4/", authToken);
+    int tokenSeparatorIndex = authToken.indexOf(':');
+    if (tokenSeparatorIndex < 0) {
+      throw new IllegalArgumentException(
+          "BlazeMeter token does not match with expected format: <apikey>:<secretKey>");
+    }
+    username = authToken.substring(0, tokenSeparatorIndex);
+    password = authToken.substring(tokenSeparatorIndex + 1);
   }
 
   /**
@@ -292,62 +293,33 @@ public class BlazeMeterEngine implements DslJmeterEngine {
   }
 
   @Override
-  public BlazeMeterTestPlanStats run(DslTestPlan testPlan)
+  protected BlazeMeterTestPlanStats run(File jmxFile, HashTree tree)
       throws IOException, InterruptedException, TimeoutException {
     Project project = findProject();
-    /*
-     Create file within temporary directory instead of just temporary file, to control the name of
-     the file, which is later used by BlazeMeter test.
-     */
-    File jmxFile = Files.createTempDirectory("jmeter-dsl").resolve("test.jmx").toFile();
-    try {
-      JmeterEnvironment env = new JmeterEnvironment();
-      HashTree tree = buildTree(testPlan);
-      saveTestPlanTo(jmxFile, tree, env);
-      Test test = client.findTestByName(testName, project).orElse(null);
-      TestConfig testConfig = buildTestConfig(project, jmxFile, tree);
-      if (test != null) {
-        client.updateTest(test, testConfig);
-        LOG.info("Updated test {}", test.getUrl());
-      } else {
-        test = client.createTest(testConfig, project);
-        LOG.info("Created test {}", test.getUrl());
-      }
-      client.uploadTestFile(test, jmxFile);
-      TestRun testRun = client.startTest(test, buildTestRunConfig());
-      LOG.info("Started test run {}", testRun.getUrl());
-      awaitTestEnd(testRun);
-      return findTestPlanStats(testRun);
-    } finally {
-      if (jmxFile.delete()) {
-        jmxFile.getParentFile().delete();
-      }
+    Test test = apiClient.findTestByName(testName, project).orElse(null);
+    TestConfig testConfig = buildTestConfig(project, jmxFile, tree);
+    if (test != null) {
+      apiClient.updateTest(test, testConfig);
+      LOG.info("Updated test {}", test.getUrl());
+    } else {
+      test = apiClient.createTest(testConfig, project);
+      LOG.info("Created test {}", test.getUrl());
     }
+    apiClient.uploadTestFile(test, jmxFile);
+    TestRun testRun = apiClient.startTest(test, buildTestRunConfig());
+    LOG.info("Started test run {}", testRun.getUrl());
+    awaitTestEnd(testRun);
+    return findTestPlanStats(testRun);
+  }
+
+  @Override
+  protected BlazeMeterClient buildClient() {
+    return new BlazeMeterClient(username, password);
   }
 
   private Project findProject() throws IOException {
-    String appBaseUrl = BASE_URL + "/app/#";
-    return projectId == null ? client.findDefaultProject(appBaseUrl)
-        : client.findProjectById(this.projectId, appBaseUrl);
-  }
-
-  private HashTree buildTree(DslTestPlan testPlan) throws IOException {
-    HashTree ret = new ListedHashTree();
-    BuildTreeContext context = new BuildTreeContext();
-    context.buildTreeFor(testPlan, ret);
-    context.getVisualizers().forEach((v, e) ->
-        LOG.warn(
-            "BlazeMeterEngine does not currently support displaying visualizers. Ignoring {}.",
-            v.getClass().getSimpleName())
-    );
-    return ret;
-  }
-
-  private void saveTestPlanTo(File jmxFile, HashTree tree, JmeterEnvironment env)
-      throws IOException {
-    try (FileOutputStream output = new FileOutputStream(jmxFile.getPath())) {
-      env.saveTree(tree, output);
-    }
+    return projectId == null ? apiClient.findDefaultProject()
+        : apiClient.findProjectById(this.projectId);
   }
 
   private TestConfig buildTestConfig(Project project, File jmxFile, HashTree tree) {
@@ -380,7 +352,7 @@ public class BlazeMeterEngine implements DslJmeterEngine {
     Instant testStart = Instant.now();
     do {
       Thread.sleep(STATUS_POLL_PERIOD.toMillis());
-      TestRunStatus newStatus = client.findTestRunStatus(testRun);
+      TestRunStatus newStatus = apiClient.findTestRunStatus(testRun);
       if (!status.equals(newStatus)) {
         LOG.debug("Test run {} status changed to: {}", testRun.getUrl(), newStatus);
         status = newStatus;
@@ -410,7 +382,7 @@ public class BlazeMeterEngine implements DslJmeterEngine {
     Instant dataPollStart = Instant.now();
     do {
       Thread.sleep(STATUS_POLL_PERIOD.toMillis());
-      status = client.findTestRunStatus(testRun);
+      status = apiClient.findTestRunStatus(testRun);
     } while (!status.isDataAvailable() && !hasTimedOut(testStart, testTimeout) && !hasTimedOut(
         dataPollStart, availableDataTimeout));
     if (hasTimedOut(testStart, testTimeout)) {
@@ -426,8 +398,8 @@ public class BlazeMeterEngine implements DslJmeterEngine {
   }
 
   private BlazeMeterTestPlanStats findTestPlanStats(TestRun testRun) throws IOException {
-    TestRunLabeledSummary summary = client.findTestRunSummaryStats(testRun).getSummary().get(0);
-    List<TestRunRequestStats> labeledStats = client.findTestRunRequestStats(testRun);
+    TestRunLabeledSummary summary = apiClient.findTestRunSummaryStats(testRun).getSummary().get(0);
+    List<TestRunRequestStats> labeledStats = apiClient.findTestRunRequestStats(testRun);
     return new BlazeMeterTestPlanStats(summary, labeledStats);
   }
 

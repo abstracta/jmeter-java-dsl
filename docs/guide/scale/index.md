@@ -4,4 +4,5 @@ Running a load test from one machine is not always enough, since you are limited
 
 @include(blazemeter.md)
 @include(octoperf.md)
+@include(azure.md)
 @include(jmeter-remote-testing.md)

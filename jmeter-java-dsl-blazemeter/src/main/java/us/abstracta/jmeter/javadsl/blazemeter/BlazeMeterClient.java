@@ -1,11 +1,5 @@
 package us.abstracta.jmeter.javadsl.blazemeter;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
-import com.fasterxml.jackson.annotation.PropertyAccessor;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import devcsrj.okhttp3.logging.HttpLoggingInterceptor;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
@@ -13,16 +7,11 @@ import java.util.Optional;
 import okhttp3.Credentials;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
-import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
-import okhttp3.ResponseBody;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import retrofit2.Call;
-import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.jackson.JacksonConverterFactory;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.Multipart;
@@ -42,49 +31,35 @@ import us.abstracta.jmeter.javadsl.blazemeter.api.TestRunStatus;
 import us.abstracta.jmeter.javadsl.blazemeter.api.TestRunSummaryStats;
 import us.abstracta.jmeter.javadsl.blazemeter.api.User;
 import us.abstracta.jmeter.javadsl.blazemeter.api.Workspace;
+import us.abstracta.jmeter.javadsl.engines.BaseRemoteEngineApiClient;
+import us.abstracta.jmeter.javadsl.engines.RemoteEngineException;
 
-public class BlazeMeterClient {
+public class BlazeMeterClient extends BaseRemoteEngineApiClient {
 
   private static final Logger LOG = LoggerFactory.getLogger(BlazeMeterClient.class);
+  private static final String BASE_URL = "https://a.blazemeter.com";
+  public static final String BASE_APP_URL = BASE_URL + "/app/#";
   private static final int WARNING_EVENT_LEVEL = 300;
 
   private final BlazeMeterApi api;
+  private final String username;
+  private final String password;
 
-  public BlazeMeterClient(String apiUrl, String authToken) {
-    api = new Retrofit.Builder()
-        .baseUrl(apiUrl)
-        .addConverterFactory(buildConverterFactory())
-        .client(buildHttpClient(authToken))
-        .build()
-        .create(BlazeMeterApi.class);
+  public BlazeMeterClient(String username, String password) {
+    super(LOG);
+    this.username = username;
+    this.password = password;
+    api = buildApiFor(BASE_URL + "/api/v4/", BlazeMeterApi.class);
   }
 
-  private JacksonConverterFactory buildConverterFactory() {
-    return JacksonConverterFactory.create(new ObjectMapper()
-        .setVisibility(PropertyAccessor.FIELD, Visibility.ANY)
-        .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-        .registerModule(new JavaTimeModule()));
+  @Override
+  protected String buildAuthorizationHeaderValue(Request request) {
+    return Credentials.basic(username, password);
   }
 
-  private OkHttpClient buildHttpClient(String token) {
-    int tokenSeparatorIndex = token.indexOf(':');
-    if (tokenSeparatorIndex < 0) {
-      throw new IllegalArgumentException(
-          "BlazeMeter token does not match with expected format: <apikey>:<secretKey>");
-    }
-    OkHttpClient.Builder builder = new OkHttpClient.Builder()
-        .addInterceptor(chain -> {
-          Request request = chain.request()
-              .newBuilder()
-              .header("Authorization", Credentials.basic(token.substring(0, tokenSeparatorIndex),
-                  token.substring(tokenSeparatorIndex + 1)))
-              .build();
-          return chain.proceed(request);
-        });
-    if (LOG.isDebugEnabled()) {
-      builder.addInterceptor(new HttpLoggingInterceptor());
-    }
-    return builder.build();
+  @Override
+  protected RemoteEngineException buildRemoteEngineException(int code, String message) {
+    return new BlazeMeterException(code, message);
   }
 
   private interface BlazeMeterApi {
@@ -131,32 +106,25 @@ public class BlazeMeterClient {
 
   }
 
-  public Project findDefaultProject(String baseUrl) throws IOException {
-    Project ret = execApiCall(api.findUser()).getDefaultProject();
-    ret.setBaseUrl(baseUrl);
+  public Project findDefaultProject() throws IOException {
+    Project ret = execBmApiCall(api.findUser()).getDefaultProject();
+    ret.setBaseUrl(BASE_APP_URL);
     return ret;
   }
 
-  public Project findProjectById(Long projectId, String baseUrl) throws IOException {
-    Project ret = execApiCall(api.findProject(projectId));
-    ret.setAccountId(execApiCall(api.findWorkspace(ret.getWorkspaceId())).getAccountId());
-    ret.setBaseUrl(baseUrl);
+  public Project findProjectById(Long projectId) throws IOException {
+    Project ret = execBmApiCall(api.findProject(projectId));
+    ret.setAccountId(execBmApiCall(api.findWorkspace(ret.getWorkspaceId())).getAccountId());
+    ret.setBaseUrl(BASE_APP_URL);
     return ret;
   }
 
-  private <T> T execApiCall(Call<ApiResponse<T>> call) throws IOException {
-    Response<ApiResponse<T>> response = call.execute();
-    if (!response.isSuccessful()) {
-      try (ResponseBody errorBody = response.errorBody()) {
-        throw new BlazeMeterException(response.code(), errorBody.string());
-      }
-    }
-    return response.body().getResult();
-
+  private <T> T execBmApiCall(Call<ApiResponse<T>> call) throws IOException {
+    return execApiCall(call).getResult();
   }
 
   public Optional<Test> findTestByName(String testName, Project project) throws IOException {
-    List<Test> tests = execApiCall(api.findTests(project.getId(), testName));
+    List<Test> tests = execBmApiCall(api.findTests(project.getId(), testName));
     if (tests.isEmpty()) {
       return Optional.empty();
     }
@@ -167,7 +135,7 @@ public class BlazeMeterClient {
 
   public Test createTest(TestConfig testConfig, Project project)
       throws IOException {
-    Test ret = execApiCall(api.createTest(testConfig));
+    Test ret = execBmApiCall(api.createTest(testConfig));
     ret.setProject(project);
     return ret;
   }
@@ -185,22 +153,22 @@ public class BlazeMeterClient {
   }
 
   public TestRun startTest(Test test, TestRunConfig runConfig) throws IOException {
-    TestRun ret = execApiCall(api.startTest(test.getId(), runConfig));
+    TestRun ret = execBmApiCall(api.startTest(test.getId(), runConfig));
     ret.setTest(test);
     return ret;
   }
 
   public TestRunStatus findTestRunStatus(TestRun testRun)
       throws IOException {
-    return execApiCall(api.findTestRunStatus(testRun.getId(), WARNING_EVENT_LEVEL));
+    return execBmApiCall(api.findTestRunStatus(testRun.getId(), WARNING_EVENT_LEVEL));
   }
 
   public TestRunSummaryStats findTestRunSummaryStats(TestRun testRun) throws IOException {
-    return execApiCall(api.findTestRunSummaryStats(testRun.getId()));
+    return execBmApiCall(api.findTestRunSummaryStats(testRun.getId()));
   }
 
   public List<TestRunRequestStats> findTestRunRequestStats(TestRun testRun) throws IOException {
-    return execApiCall(api.findTestRunRequestStats(testRun.getId()));
+    return execBmApiCall(api.findTestRunRequestStats(testRun.getId()));
   }
 
 }

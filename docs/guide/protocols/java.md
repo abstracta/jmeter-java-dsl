@@ -70,7 +70,7 @@ jsr223Sampler(v -> {
 ```
 
 ::: warning
-Using java code (lambdas) will only work with embedded JMeter engine (no support for saving to JMX and running it in JMeter GUI, or running it with BlazeMeter or OctoPerf). Use the first option to avoid such limitations.
+Using java code (lambdas) will only work with embedded JMeter engine (no support for saving to JMX and running it in JMeter GUI, or running it with BlazeMeter, OctoPerf or Azure). Use the first option to avoid such limitations.
 :::
 
 `jsr223Sampler` is very powerful, but also makes code and test plans harder to maintain (as with any custom code) compared to using JMeter built-in samplers. So, in general, prefer using JMeter-provided samplers if they are enough for the task at hand, and use `jsr223Sampler` sparingly.
