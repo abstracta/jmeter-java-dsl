@@ -67,7 +67,7 @@ export default defineUserConfig({
   },
   plugins: [
     searchPlugin({ maxSuggestions: 10 }),
-    googleAnalyticsPlugin({ id: 'G-R8N6GMWK1H' }),
+    googleAnalyticsPlugin({ id: 'GTM-PHSGKLD' }),
     mdEnhancePlugin({
       include: {
         deep: true,
