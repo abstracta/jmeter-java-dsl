@@ -42,9 +42,10 @@ public abstract class BaseRemoteEngine<C extends BaseRemoteEngineApiClient, S ex
     try (C cli = buildClient()) {
       this.apiClient = cli;
       JmeterEnvironment env = new JmeterEnvironment();
-      HashTree tree = buildTree(testPlan);
+      BuildTreeContext context = BuildTreeContext.buildRemoteExecutionContext();
+      HashTree tree = buildTree(testPlan, context);
       saveTestPlanTo(jmxFile, tree, env);
-      return run(jmxFile, tree);
+      return run(jmxFile, tree, context);
     } finally {
       if (jmxFile.delete()) {
         jmxFile.getParentFile().delete();
@@ -64,6 +65,8 @@ public abstract class BaseRemoteEngine<C extends BaseRemoteEngineApiClient, S ex
    * @param tree    specifies the JMeter tree generated from the JMeter DSL test plan. This is
    *                usually helpful in case some analysis or inspection is required on the test plan
    *                for its remote execution.
+   * @param context specifies the build context which can be used to get additional information.
+   *                Like file assets used by the test plan to upload to the remote engine.
    * @return the test plan statistics collected by remote engine service.
    * @throws IOException          is thrown when there is some communication problem with the remote
    *                              engine service.
@@ -73,12 +76,18 @@ public abstract class BaseRemoteEngine<C extends BaseRemoteEngineApiClient, S ex
    *                              executing, or some intermediary phase (test plan validation,
    *                              upload, statistics retrieval, etc) takes more than expected.
    */
-  protected abstract S run(File jmxFile, HashTree tree)
+  protected abstract S run(File jmxFile, HashTree tree, BuildTreeContext context)
       throws IOException, InterruptedException, TimeoutException;
 
-  private HashTree buildTree(DslTestPlan testPlan) {
+  /**
+   * Builds the API client class that is required for interaction with the remote engine service.
+   *
+   * @return the API client instance for the remote engine usage.
+   */
+  protected abstract C buildClient();
+
+  private HashTree buildTree(DslTestPlan testPlan, BuildTreeContext context) {
     HashTree ret = new ListedHashTree();
-    BuildTreeContext context = new BuildTreeContext();
     context.buildTreeFor(testPlan, ret);
     context.getVisualizers().forEach((v, e) ->
         LOG.warn("This engine does not currently support displaying visualizers. Ignoring {}.",
@@ -93,13 +102,6 @@ public abstract class BaseRemoteEngine<C extends BaseRemoteEngineApiClient, S ex
       env.saveTree(tree, output);
     }
   }
-
-  /**
-   * Builds the API client class that is required for interaction with the remote engine service.
-   *
-   * @return the API client instance for the remote engine usage.
-   */
-  protected abstract C buildClient();
 
   protected ThreadGroup extractFirstThreadGroup(HashTree tree) {
     HashTree testPlanTree = tree.getTree(tree.list().iterator().next());
@@ -121,6 +123,19 @@ public abstract class BaseRemoteEngine<C extends BaseRemoteEngineApiClient, S ex
    */
   protected boolean hasTimedOut(Duration timeout, Instant start) {
     return Duration.between(start, Instant.now()).compareTo(timeout) >= 0;
+  }
+
+  /**
+   * Formats given duration into a more human friendly string format.
+   *
+   * @param duration specifies the duration to be formatted.
+   * @return the formatted duration string.
+   * @since 1.11
+   */
+  protected String prettyDuration(Duration duration) {
+    String ret = duration.toString().substring(2);
+    ret = ret.replaceAll("[HMS]", "$0 ").toLowerCase();
+    return ret.substring(0, ret.length() - 1);
   }
 
 }

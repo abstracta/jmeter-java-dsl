@@ -29,12 +29,16 @@ public class Project {
     return id;
   }
 
-  public long getWorkspaceId() {
-    return workspaceId;
+  public long getAccountId() {
+    return accountId;
   }
 
   public void setAccountId(long accountId) {
     this.accountId = accountId;
+  }
+
+  public long getWorkspaceId() {
+    return workspaceId;
   }
 
   public String getUrl() {

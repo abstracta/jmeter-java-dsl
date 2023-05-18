@@ -4,6 +4,9 @@ import java.io.File;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
 import org.apache.jmeter.control.LoopController;
 import org.apache.jmeter.threads.ThreadGroup;
 
@@ -56,6 +59,8 @@ public class TestConfig {
     private String rampUp;
     private Integer iterations;
     private String holdFor;
+    private Map<String, Integer> locations;
+    private Map<String, Integer> locationsPercents;
 
     public ExecutionConfig(Integer totalUsers, Duration rampUp, Integer iterations,
         Duration holdFor) {
@@ -79,6 +84,13 @@ public class TestConfig {
           Duration.ofSeconds(threadGroup.getRampUp()),
           loop.getLoops() != 0 ? loop.getLoops() : null,
           threadGroup.getDuration() != 0 ? Duration.ofSeconds(threadGroup.getDuration()) : null);
+    }
+
+    public void setLocationsPercents(Map<String, Integer> locationsPercents) {
+      this.locationsPercents = locationsPercents;
+      this.locations = locationsPercents.entrySet().stream()
+          .collect(Collectors.toMap(Entry::getKey,
+              e -> (int) Math.round(((double) e.getValue()) / 100 * concurrency)));
     }
 
   }

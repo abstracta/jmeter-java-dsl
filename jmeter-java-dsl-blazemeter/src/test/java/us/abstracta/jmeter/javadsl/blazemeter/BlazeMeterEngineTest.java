@@ -1,6 +1,7 @@
 package us.abstracta.jmeter.javadsl.blazemeter;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static us.abstracta.jmeter.javadsl.JmeterDsl.csvDataSet;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.httpSampler;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.testPlan;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.threadGroup;
@@ -10,6 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import us.abstracta.jmeter.javadsl.core.TestPlanStats;
+import us.abstracta.jmeter.javadsl.util.TestResource;
 
 public class BlazeMeterEngineTest {
 
@@ -21,7 +23,8 @@ public class BlazeMeterEngineTest {
   public void shouldRunTestInBlazeMeter() throws Exception {
     TestPlanStats stats = testPlan(
         threadGroup(1, 1,
-            httpSampler(SAMPLE_LABEL, "https://localhost")
+            csvDataSet(new TestResource("users.csv")),
+            httpSampler(SAMPLE_LABEL, "https://localhost/users/${USER}")
         )
     ).runIn(new BlazeMeterEngine(System.getenv("BZ_TOKEN"))
         .testName("DSL test")

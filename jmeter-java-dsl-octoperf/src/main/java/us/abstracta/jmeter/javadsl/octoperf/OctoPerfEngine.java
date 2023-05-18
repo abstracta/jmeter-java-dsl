@@ -15,6 +15,7 @@ import org.apache.jorphan.collections.HashTree;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import us.abstracta.jmeter.javadsl.core.BuildTreeContext;
 import us.abstracta.jmeter.javadsl.core.DslJmeterEngine;
 import us.abstracta.jmeter.javadsl.engines.BaseRemoteEngine;
 import us.abstracta.jmeter.javadsl.octoperf.api.BenchReport;
@@ -188,7 +189,7 @@ public class OctoPerfEngine extends BaseRemoteEngine<OctoPerfClient, OctoPerfTes
   }
 
   @Override
-  public OctoPerfTestPlanStats run(File jmxFile, HashTree tree)
+  public OctoPerfTestPlanStats run(File jmxFile, HashTree tree, BuildTreeContext context)
       throws IOException, InterruptedException, TimeoutException {
     User user = apiClient.findCurrentUser();
     Project project = findProject(user);

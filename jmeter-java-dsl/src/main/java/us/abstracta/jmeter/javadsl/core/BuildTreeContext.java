@@ -1,6 +1,7 @@
 package us.abstracta.jmeter.javadsl.core;
 
 import java.awt.Component;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -23,6 +24,7 @@ public class BuildTreeContext {
   private final Map<String, Object> entries = new HashMap<>();
   private final List<TreeContextEndListener> endListeners = new ArrayList<>();
   private final Map<DslVisualizer, Supplier<Component>> visualizers;
+  private final Map<String, File> assetFiles;
   /*
    check comment on buildTreeFor to understand why this field is not final and not initialized in
    constructor
@@ -30,13 +32,15 @@ public class BuildTreeContext {
   private DslTestElement element;
 
   public BuildTreeContext() {
-    this(null, new LinkedHashMap<>());
+    this(null, new LinkedHashMap<>(), null);
   }
 
   private BuildTreeContext(BuildTreeContext parent,
-      Map<DslVisualizer, Supplier<Component>> visualizers) {
+      Map<DslVisualizer, Supplier<Component>> visualizers,
+      Map<String, File> assetFiles) {
     this.parent = parent;
     this.visualizers = visualizers;
+    this.assetFiles = assetFiles;
   }
 
   public BuildTreeContext getParent() {
@@ -80,7 +84,8 @@ public class BuildTreeContext {
   }
 
   public HashTree buildChild(DslTestElement child, HashTree parentTree) {
-    return new BuildTreeContext(this, visualizers).buildTreeFor(child, parentTree);
+    return new BuildTreeContext(this, visualizers, assetFiles)
+        .buildTreeFor(child, parentTree);
   }
 
   /*
@@ -95,8 +100,31 @@ public class BuildTreeContext {
     return ret;
   }
 
+  public static BuildTreeContext buildRemoteExecutionContext() {
+    return new BuildTreeContext(null, new LinkedHashMap<>(), new HashMap<>());
+  }
+
+  public String processAssetFile(String assetPath) {
+    if (assetFiles == null) {
+      return assetPath;
+    } else {
+      File asset = new File(assetPath);
+      String fileName = asset.getName();
+      int index = 1;
+      while (assetFiles.containsKey(fileName) && !asset.equals(assetFiles.get(fileName))) {
+        fileName = (index++) + "-" + asset.getName();
+      }
+      assetFiles.put(fileName, asset);
+      return fileName;
+    }
+  }
+
+  public Map<String, File> getAssetFiles() {
+    return assetFiles;
+  }
+
   public interface TreeContextEndListener {
-    
+
     void execute(BuildTreeContext context, HashTree tree);
 
   }

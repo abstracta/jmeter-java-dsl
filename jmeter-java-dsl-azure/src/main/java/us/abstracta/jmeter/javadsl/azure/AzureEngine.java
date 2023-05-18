@@ -16,6 +16,7 @@ import us.abstracta.jmeter.javadsl.azure.api.Location;
 import us.abstracta.jmeter.javadsl.azure.api.ResourceGroup;
 import us.abstracta.jmeter.javadsl.azure.api.Subscription;
 import us.abstracta.jmeter.javadsl.azure.api.TestRun;
+import us.abstracta.jmeter.javadsl.core.BuildTreeContext;
 import us.abstracta.jmeter.javadsl.core.DslJmeterEngine;
 import us.abstracta.jmeter.javadsl.engines.BaseRemoteEngine;
 
@@ -234,7 +235,7 @@ public class AzureEngine extends BaseRemoteEngine<AzureClient, AzureTestPlanStat
   }
 
   @Override
-  protected AzureTestPlanStats run(File jmxFile, HashTree tree)
+  protected AzureTestPlanStats run(File jmxFile, HashTree tree, BuildTreeContext context)
       throws IOException, InterruptedException, TimeoutException {
     Subscription subscription = subscriptionId != null ? new Subscription(subscriptionId, tenantId)
         : apiClient.findSubscription();
@@ -378,12 +379,6 @@ public class AzureEngine extends BaseRemoteEngine<AzureClient, AzureTestPlanStat
       throw new TimeoutException("Test execution timed out after " + prettyTimeout);
     }
     return awaitVirtualUsers(testRun);
-  }
-
-  private String prettyDuration(Duration duration) {
-    String ret = duration.toString().substring(2);
-    ret = ret.replaceAll("[HMS]", "$0 ").toLowerCase();
-    return ret.substring(0, ret.length() - 1);
   }
 
   private TestRun awaitVirtualUsers(TestRun testRun) throws InterruptedException, IOException {

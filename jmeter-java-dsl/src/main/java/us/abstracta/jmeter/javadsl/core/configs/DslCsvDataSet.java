@@ -9,6 +9,7 @@ import java.util.List;
 import org.apache.jmeter.config.CSVDataSet;
 import org.apache.jmeter.testbeans.gui.TestBeanGUI;
 import org.apache.jmeter.testelement.TestElement;
+import org.apache.jorphan.collections.HashTree;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodCall;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodCallBuilder;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodCallContext;
@@ -18,6 +19,7 @@ import us.abstracta.jmeter.javadsl.codegeneration.params.BoolParam;
 import us.abstracta.jmeter.javadsl.codegeneration.params.EnumParam;
 import us.abstracta.jmeter.javadsl.codegeneration.params.EnumParam.EnumPropertyValue;
 import us.abstracta.jmeter.javadsl.codegeneration.params.StringArrayParam;
+import us.abstracta.jmeter.javadsl.core.BuildTreeContext;
 
 /**
  * Allows using a CSV file as input data for JMeter variables to use in test plan.
@@ -40,7 +42,7 @@ import us.abstracta.jmeter.javadsl.codegeneration.params.StringArrayParam;
  */
 public class DslCsvDataSet extends BaseConfigElement {
 
-  private final String file;
+  private String file;
   private String delimiter = ",";
   private String encoding = StandardCharsets.UTF_8.name();
   private String[] variableNames;
@@ -218,6 +220,12 @@ public class DslCsvDataSet extends BaseConfigElement {
   public DslCsvDataSet randomOrder(boolean enable) {
     this.randomOrder = enable;
     return this;
+  }
+
+  @Override
+  public HashTree buildTreeUnder(HashTree parent, BuildTreeContext context) {
+    file = context.processAssetFile(file);
+    return super.buildTreeUnder(parent, context);
   }
 
   @Override

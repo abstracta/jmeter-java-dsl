@@ -405,6 +405,7 @@ public class DslHttpSampler extends DslBaseHttpSampler<DslHttpSampler> {
 
   @Override
   public HashTree buildTreeUnder(HashTree parent, BuildTreeContext context) {
+    files.forEach(f -> f.setPath(context.processAssetFile(f.getPath())));
     HashTree ret = super.buildTreeUnder(parent, context);
     if (followRedirects == null) {
       /*

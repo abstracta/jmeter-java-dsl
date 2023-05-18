@@ -62,6 +62,42 @@ BlazeMeter will not only allow you to run the test at scale but also provides ad
 Check [BlazeMeterEngine](/jmeter-java-dsl-blazemeter/src/main/java/us/abstracta/jmeter/javadsl/blazemeter/BlazeMeterEngine.java) for details on usage and available settings when running tests in BlazeMeter.
 
 ::: tip
+`BlazeMeterEngine` will automatically upload to BlazeMeter files used in `csvDataSet` and `httpSampler` with `bodyFile` or `bodyFilePart` methods.
+
+For example this test plan works out of the box (no need for uploading referenced files or adapt test plan):
+
+```java
+testPlan(
+    threadGroup(100, Duration.ofMinutes(5),
+      csvDataSet(new TestResource("users.csv")),
+      httpSampler(SAMPLE_LABEL, "https://myservice/users/${USER}")
+    )
+).runIn(new BlazeMeterEngine(System.getenv("BZ_TOKEN"))
+    .testTimeout(Duration.ofMinutes(10)));
+```
+
+If you need additional files to be uploaded to BlazeMeter, you can easily specify them with `BlazemeterEngine.assets()` method.
+:::
+
+::: tip
+By default `BlazeMeterEngine` will run tests from default location (most of the times `us-east4-a`). But in some scenarios you might want to change the location, or even run the test from multiple locations.
+
+Here is an example how you can easily set this up:
+
+```java
+testPlan(
+    threadGroup(300, Duration.ofMinutes(5), // 300 total users for 5 minutes
+      httpSampler(SAMPLE_LABEL, "https://myservice")
+    )
+).runIn(new BlazeMeterEngine(System.getenv("BZ_TOKEN"))
+    .location(BlazeMeterLocation.GCP_SAO_PAULO, 30) // 30% = 90 users will run in Google Cloud Platform at Sao Paulo
+    .location("MyPrivateLocation", 70) // 70% = 210 users will run in MyPrivateLocation named private location
+    .testTimeout(Duration.ofMinutes(10)));
+```
+
+:::
+
+::: tip
 In case you want to get debug logs for HTTP calls to BlazeMeter API, you can include the following setting to an existing `log4j2.xml` configuration file:
 ```xml
 <Logger name="us.abstracta.jmeter.javadsl.blazemeter.BlazeMeterClient" level="DEBUG"/>
@@ -77,7 +113,8 @@ If you use JSR223 Pre- or Post- processors with Java code (lambdas) instead of s
 By default the engine is configured to timeout if test execution takes more than 1 hour. 
 This timeout exists to avoid any potential problem with BlazeMeter execution not detected by the 
 client, and avoid keeping the test indefinitely running until is interrupted by a user,
-which is specially annoying when running tests in automated fashion, for example in CI/CD.
+which may incur in unnecessary expenses in BlazeMeter and is specially annoying when running tests 
+in automated fashion, for example in CI/CD.
 It is strongly advised to **set this timeout properly in each run**, according to the expected test
 execution time plus some additional margin (to consider for additional delays in BlazeMeter
 test setup and teardown) to avoid unexpected test plan execution failure (due to timeout) or 

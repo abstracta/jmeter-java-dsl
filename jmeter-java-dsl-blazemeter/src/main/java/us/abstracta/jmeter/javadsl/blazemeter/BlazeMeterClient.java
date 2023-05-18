@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import okhttp3.Credentials;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -21,9 +22,12 @@ import retrofit2.http.Part;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
 import us.abstracta.jmeter.javadsl.blazemeter.api.ApiResponse;
+import us.abstracta.jmeter.javadsl.blazemeter.api.Location;
 import us.abstracta.jmeter.javadsl.blazemeter.api.Project;
 import us.abstracta.jmeter.javadsl.blazemeter.api.Test;
 import us.abstracta.jmeter.javadsl.blazemeter.api.TestConfig;
+import us.abstracta.jmeter.javadsl.blazemeter.api.TestFile;
+import us.abstracta.jmeter.javadsl.blazemeter.api.TestFileDeleteRequest;
 import us.abstracta.jmeter.javadsl.blazemeter.api.TestRun;
 import us.abstracta.jmeter.javadsl.blazemeter.api.TestRunConfig;
 import us.abstracta.jmeter.javadsl.blazemeter.api.TestRunRequestStats;
@@ -44,6 +48,7 @@ public class BlazeMeterClient extends BaseRemoteEngineApiClient {
   private final BlazeMeterApi api;
   private final String username;
   private final String password;
+  private List<Location> privateLocationsCache;
 
   public BlazeMeterClient(String username, String password) {
     super(LOG);
@@ -73,6 +78,10 @@ public class BlazeMeterClient extends BaseRemoteEngineApiClient {
     @GET("workspaces/{workspaceId}")
     Call<ApiResponse<Workspace>> findWorkspace(@Path("workspaceId") long workspaceId);
 
+    @GET("private-locations")
+    Call<ApiResponse<List<Location>>> findPrivateLocations(@Query("accountId") long accountId,
+        @Query("workspaceId") long workspaceId);
+
     @GET("tests")
     Call<ApiResponse<List<Test>>> findTests(@Query("projectId") long projectId,
         @Query("name") String name);
@@ -82,6 +91,13 @@ public class BlazeMeterClient extends BaseRemoteEngineApiClient {
 
     @POST("tests")
     Call<ApiResponse<Test>> createTest(@Body TestConfig test);
+
+    @GET("tests/{testId}/files")
+    Call<ApiResponse<List<TestFile>>> findTestFiles(@Path("testId") long testId);
+
+    @POST("tests/{testId}/delete-file")
+    Call<ApiResponse<Void>> deleteTestFile(@Path("testId") long testId,
+        @Body TestFileDeleteRequest req);
 
     @POST("tests/{testId}/files")
     @Multipart
@@ -96,6 +112,9 @@ public class BlazeMeterClient extends BaseRemoteEngineApiClient {
     Call<ApiResponse<TestRunStatus>> findTestRunStatus(@Path("testRunId") long testRunId,
         @Query("level") int level);
 
+    @GET("masters/{testRunId}?withMessages=true")
+    Call<ApiResponse<TestRun>> findTestRunById(@Path("testRunId") long testRunId);
+
     @GET("masters/{testRunId}/reports/default/summary")
     Call<ApiResponse<TestRunSummaryStats>> findTestRunSummaryStats(
         @Path("testRunId") long testRunId);
@@ -103,6 +122,9 @@ public class BlazeMeterClient extends BaseRemoteEngineApiClient {
     @GET("masters/{testRunId}/reports/aggregatereport/data")
     Call<ApiResponse<List<TestRunRequestStats>>> findTestRunRequestStats(
         @Path("testRunId") long testRunId);
+
+    @POST("masters/{testRunId}/stop")
+    Call<ApiResponse<Void>> stopTestRun(@Path("testRunId") long id);
 
   }
 
@@ -123,6 +145,17 @@ public class BlazeMeterClient extends BaseRemoteEngineApiClient {
     return execApiCall(call).getResult();
   }
 
+  public Location findPrivateLocationByName(String name, Project project) throws IOException {
+    if (privateLocationsCache == null) {
+      privateLocationsCache = execBmApiCall(
+          api.findPrivateLocations(project.getAccountId(), project.getWorkspaceId()));
+    }
+    return privateLocationsCache.stream()
+        .filter(l -> l.getName().equals(name))
+        .findAny()
+        .orElse(null);
+  }
+
   public Optional<Test> findTestByName(String testName, Project project) throws IOException {
     List<Test> tests = execBmApiCall(api.findTests(project.getId(), testName));
     if (tests.isEmpty()) {
@@ -131,6 +164,16 @@ public class BlazeMeterClient extends BaseRemoteEngineApiClient {
     Test test = tests.get(0);
     test.setProject(project);
     return Optional.of(test);
+  }
+
+  public List<String> findTestFiles(Test test) throws IOException {
+    return execBmApiCall(api.findTestFiles(test.getId())).stream()
+        .map(TestFile::getName)
+        .collect(Collectors.toList());
+  }
+
+  public void deleteTestFile(String name, Test test) throws IOException {
+    execApiCall(api.deleteTestFile(test.getId(), new TestFileDeleteRequest(name)));
   }
 
   public Test createTest(TestConfig testConfig, Project project)
@@ -144,11 +187,10 @@ public class BlazeMeterClient extends BaseRemoteEngineApiClient {
     execApiCall(api.updateTest(test.getId(), testConfig));
   }
 
-  public void uploadTestFile(Test test, File jmxFile) throws IOException {
+  public void uploadTestFile(File file, String fileName, Test test) throws IOException {
     RequestBody requestBody = RequestBody
-        .create(MediaType.get("application/octet-stream"), jmxFile);
-    MultipartBody.Part part = MultipartBody.Part
-        .createFormData("file", jmxFile.getName(), requestBody);
+        .create(MediaType.get("application/octet-stream"), file);
+    MultipartBody.Part part = MultipartBody.Part.createFormData("file", fileName, requestBody);
     execApiCall(api.uploadTestFile(test.getId(), part));
   }
 
@@ -163,12 +205,20 @@ public class BlazeMeterClient extends BaseRemoteEngineApiClient {
     return execBmApiCall(api.findTestRunStatus(testRun.getId(), WARNING_EVENT_LEVEL));
   }
 
+  public TestRun findTestRunById(long testRunId) throws IOException {
+    return execBmApiCall(api.findTestRunById(testRunId));
+  }
+
   public TestRunSummaryStats findTestRunSummaryStats(TestRun testRun) throws IOException {
     return execBmApiCall(api.findTestRunSummaryStats(testRun.getId()));
   }
 
   public List<TestRunRequestStats> findTestRunRequestStats(TestRun testRun) throws IOException {
     return execBmApiCall(api.findTestRunRequestStats(testRun.getId()));
+  }
+
+  public void stopTestRun(TestRun testRun) throws IOException {
+    execApiCall(api.stopTestRun(testRun.getId()));
   }
 
 }
