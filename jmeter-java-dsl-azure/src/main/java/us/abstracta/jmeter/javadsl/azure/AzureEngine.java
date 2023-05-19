@@ -382,7 +382,7 @@ public class AzureEngine extends BaseRemoteEngine<AzureClient, AzureTestPlanStat
 
   private String prettyDuration(Duration duration) {
     String ret = duration.toString().substring(2);
-    ret = ret.replaceAll("[HMS]", "$1 ").toLowerCase();
+    ret = ret.replaceAll("[HMS]", "$0 ").toLowerCase();
     return ret.substring(0, ret.length() - 1);
   }
 
