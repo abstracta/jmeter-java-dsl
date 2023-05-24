@@ -1,16 +1,52 @@
 :root {
     --c-brand: #00ace6;
     --c-brand-light: #54bdf9;
+
+    --c-shadow: rgba(0,0,0,0.2);
 }
 
 html.dark {
     // brand colors
     --c-brand: #54bdf9;
     --c-brand-light: #00ace6;
+
+    --c-shadow: rgba(255,255,255,0.2);
 }
 
 /* This is a fix to avoid, when building (does not happen with dev server),
 showing two external link icons for external links containing icons.*/
 a.external-link>svg~span:nth-child(2) {
   display: none;
+}
+
+.grid {
+  display: flex;
+}
+
+.grid-logo {
+  display: flex;
+  align-items: center;
+  width: 25%;
+  height: 100px;
+  margin-right: 10px;
+  padding: 10px;
+  border: 1px solid var(--c-border);
+  border-radius: 5px;
+  box-shadow: 0 4px 8px 0 var(--c-shadow);
+}
+
+.grid-logo a {
+  width: 100%;
+}
+
+.grid-logo img {
+  width: 100%;
+  -webkit-filter: drop-shadow(1px 0 0 white)
+                  drop-shadow(0 1px 0 white)
+                  drop-shadow(-1px 0 0 white)
+                  drop-shadow(0 -1px 0 white);
+  -filter: drop-shadow(1px 0 0 white)
+           drop-shadow(0 1px 0 white)
+           drop-shadow(-1px 0 0 white)
+           drop-shadow(0 -1px 0 white);
 }

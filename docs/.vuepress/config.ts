@@ -3,12 +3,12 @@ import { defaultTheme } from '@vuepress/theme-default'
 import { getDirname, path, fs } from '@vuepress/utils'
 import { searchPlugin } from '@vuepress/plugin-search'
 import { googleAnalyticsPlugin } from '@vuepress/plugin-google-analytics'
+import { mediumZoomPlugin } from '@vuepress/plugin-medium-zoom'
+import { containerPlugin } from '@vuepress/plugin-container'
 import { mdEnhancePlugin } from "vuepress-plugin-md-enhance"
 import { repoLinkSolverPlugin } from "./plugins/repoLinkSolverPlugin"
 import { includedRelativeLinkSolverPlugin } from "./plugins/includedRelativeLinkSolverPlugin"
 import { copyCodePlugin } from "vuepress-plugin-copy-code2"
-// import type { NavLink } from '@vuepress/theme-default/lib/shared/index.js'
-
 
 const __dirname = getDirname(import.meta.url)
 
@@ -43,6 +43,10 @@ export default defineUserConfig({
       {
         text: 'Guide',
         link: '/guide/',
+      },
+      {
+        text: 'Support',
+        link: '/support/',
       },
       {
         text: 'Motivation',
@@ -84,6 +88,17 @@ export default defineUserConfig({
     }),
     repoLinkSolverPlugin({ repoUrl: REPO_LINK }),
     includedRelativeLinkSolverPlugin({}),
-    copyCodePlugin({ pure: true })
+    copyCodePlugin({ pure: true }),
+    containerPlugin({
+      type: 'grid',
+      before: (info: string): string => `<div class="grid">\n`,
+      after: (): string => '</div>\n'
+    }),
+    containerPlugin({
+      type: 'grid-logo',
+      before: (info: string): string => `<div class="grid-logo"><a href="${info}">\n`,
+      after: (): string => '</a></div>\n'
+    }),
+    mediumZoomPlugin({selector: "*:is(img):not(.card img):not(a img)"}),
   ],
 })

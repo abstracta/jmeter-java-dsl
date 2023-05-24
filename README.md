@@ -71,6 +71,14 @@ More examples can be found in [tests](jmeter-java-dsl/src/test/java/us/abstracta
 
 Check more about the motivation and analysis of alternatives [here](https://abstracta.github.io/jmeter-java-dsl/motivation/)
 
+## Support
+
+Join our [Discord server](https://discord.gg/WNSn5hqmSd) to engage with fellow JMeter DSL enthusiasts, ask questions, and share experiences. Visit [GitHub Issues](https://github.com/abstracta/jmeter-java-dsl/issues) or [GitHub Discussions](https://github.com/abstracta/jmeter-java-dsl/discussions) for bug reports, feature requests and share ideas.
+
+[Abstracta](https://abstracta.us), the main supporter for JMeter DSL development, offers enterprise-level support. Get faster response times, personalized customizations and consulting.
+
+For detailed support information, visit our [Support](https://abstracta.github.io/jmeter-java-dsl/support) page.
+
 ## Articles & Talks
 
 * [Developer’s friendly tools for continuous performance testing](https://abstracta.us/blog/performance-testing/developers-friendly-tools-for-continuous-performance-testing/): Walk-through from Fiddler recording to JMeter DSL test plan by Belen Vignolo @ Abstracta. [Russian translation by Ksenia Moseenkova](https://habr.com/ru/company/otus/blog/653823/).
