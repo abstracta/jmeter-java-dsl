@@ -2,7 +2,6 @@ import { defineUserConfig } from '@vuepress/cli'
 import { defaultTheme } from '@vuepress/theme-default'
 import { getDirname, path, fs } from '@vuepress/utils'
 import { searchPlugin } from '@vuepress/plugin-search'
-import { googleAnalyticsPlugin } from '@vuepress/plugin-google-analytics'
 import { mediumZoomPlugin } from '@vuepress/plugin-medium-zoom'
 import { containerPlugin } from '@vuepress/plugin-container'
 import { mdEnhancePlugin } from "vuepress-plugin-md-enhance"
@@ -12,9 +11,6 @@ import { copyCodePlugin } from "vuepress-plugin-copy-code2"
 
 const __dirname = getDirname(import.meta.url)
 
-// interface NavLink { icon: [string] }
-// interface ExtendedThemeConfig extends DefaultThemeOptions { navbar: [IconNavLink] }
-// interface ExtendedUserConfig extends UserConfig {theme: ExtendedThemeConfig}
 const REPO_LINK = "https://github.com/abstracta/jmeter-java-dsl"
 
 
@@ -24,7 +20,14 @@ export default defineUserConfig({
   description: 'Simple JMeter performance tests API',
   base: '/jmeter-java-dsl/',
   head: [
-    ['link', { rel: 'shortcut icon', href: '/jmeter-java-dsl/favicon.ico'}]
+    ['link', { rel: 'shortcut icon', href: '/jmeter-java-dsl/favicon.ico'}],
+    // when changing this remember also changing components/NavbarBrand.vue
+    ['script', {}, `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+                    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+                    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+                    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+                    })(window,document,'script','dataLayer','GTM-PHSGKLD');
+                    `]
   ],
   // restrict pattern to avoid going into included pages
   pagePatterns: ["*.md", "*/index.md", "!.vuepress", "!node_modules"],
@@ -35,7 +38,6 @@ export default defineUserConfig({
   },
   theme: defaultTheme({
     logo: '/logo.svg',
-    // repo: 'abstracta/jmeter-java-dsl',
     editLink: false,
     lastUpdated: false,
     contributors: false,
@@ -71,7 +73,6 @@ export default defineUserConfig({
   },
   plugins: [
     searchPlugin({ maxSuggestions: 10 }),
-    googleAnalyticsPlugin({ id: 'GTM-PHSGKLD' }),
     mdEnhancePlugin({
       include: {
         deep: true,

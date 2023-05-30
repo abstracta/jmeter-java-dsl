@@ -940,15 +940,6 @@
     "@vuepress/utils" "2.0.0-beta.60"
     execa "^6.1.0"
 
-"@vuepress/plugin-google-analytics@^2.0.0-beta.60":
-  version "2.0.0-beta.60"
-  resolved "https://registry.yarnpkg.com/@vuepress/plugin-google-analytics/-/plugin-google-analytics-2.0.0-beta.60.tgz#63607c276de87634b72fc12af6ba4ea986befd32"
-  integrity sha512-Uq8UiYh2O3pGG7CR+Me6DldumcIA8xnr6hPqjFdqpi4heQifepxxSY1VQcjGrhu1F/8m16O5MryKMaNtg12BqA==
-  dependencies:
-    "@vuepress/client" "2.0.0-beta.60"
-    "@vuepress/core" "2.0.0-beta.60"
-    "@vuepress/utils" "2.0.0-beta.60"
-
 "@vuepress/plugin-medium-zoom@2.0.0-beta.60":
   version "2.0.0-beta.60"
   resolved "https://registry.yarnpkg.com/@vuepress/plugin-medium-zoom/-/plugin-medium-zoom-2.0.0-beta.60.tgz#2ffca0d31e2ef9a73443bd9f2aacbfbb466ab969"
@@ -988,7 +979,7 @@
     "@vuepress/core" "2.0.0-beta.60"
     prismjs "^1.29.0"
 
-"@vuepress/plugin-search@^2.0.0-beta.60":
+"@vuepress/plugin-search@next@^2.0.0-beta.60":
   version "2.0.0-beta.60"
   resolved "https://registry.yarnpkg.com/@vuepress/plugin-search/-/plugin-search-2.0.0-beta.60.tgz#e253e00bb8070093baa5f7f400df75c1c484b7b4"
   integrity sha512-9ENqni4H35/L6vab5DpQfy92DcKPL+36xxoOj1EqZfjU/IlIOFKz4TK8JwhaX+reswokF8NriPFcWol4xIa5IA==

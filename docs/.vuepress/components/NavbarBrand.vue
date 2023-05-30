@@ -9,6 +9,15 @@ import { computed, h } from 'vue'
 import type { FunctionalComponent } from 'vue'
 import { useDarkMode, useThemeLocaleData } from '@vuepress/theme-default/lib/client/composables/index.js'
 
+import { onBeforeMount } from 'vue'
+
+// changed from original to enable google tag manager
+onBeforeMount(() => {
+  let recaptchaScript = document.createElement('noscript');
+  recaptchaScript.innerHTML = '<iframe src="https://www.googletagmanager.com/ns.html?id=GTM-PHSGKLD" height="0" width="0" style="display:none;visibility:hidden"></iframe>'
+  document.body.appendChild(recaptchaScript)
+});
+
 const routeLocale = useRouteLocale()
 const siteLocale = useSiteLocaleData()
 const themeLocale = useThemeLocaleData()
