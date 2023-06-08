@@ -1,7 +1,6 @@
 package us.abstracta.jmeter.javadsl.jmx2dsl;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static us.abstracta.jmeter.javadsl.JmeterDsl.testResource;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -52,11 +51,11 @@ public class Jmx2DslIT {
   private static String buildConvertedTestClass()
       throws IOException {
     return new TestClassTemplate()
-        .dependencies(Collections.singleton("us.abstracta.jmeter:jmeter-java-dsl:"
-            + testResource("version.txt").rawContents()))
-        .imports(Collections.singleton(ContentType.class.getName()))
-        .testPlan(new TestResource("TestPlan.java").rawContents())
-        .solve() + "\n";
+        .dependencies(Collections.singleton(
+                "us.abstracta.jmeter:jmeter-java-dsl:" + System.getProperty("project.version")))
+            .imports(Collections.singleton(ContentType.class.getName()))
+            .testPlan(new TestResource("TestPlan.java").rawContents())
+            .solve() + "\n";
   }
 
 }

@@ -100,10 +100,9 @@ public class JmeterDsl {
    *                   termination condition).
    *                   <p>
    *                   <b>Setting this property to -1 is in general not advised</b>, since you
-   *                   might
-   *                   inadvertently end up running a test plan without limits consuming unnecessary
-   *                   computing power. Prefer specifying a big value as a safe limit for iterations
-   *                   or duration instead.
+   *                   might inadvertently end up running a test plan without limits consuming
+   *                   unnecessary computing power. Prefer specifying a big value as a safe limit
+   *                   for iterations or duration instead.
    * @param children   contains the test elements that each thread will execute in each iteration.
    * @return the thread group instance.
    * @see DslDefaultThreadGroup
