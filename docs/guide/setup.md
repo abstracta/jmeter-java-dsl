@@ -8,7 +8,7 @@ To use the DSL just include it in your project:
 <dependency>
   <groupId>us.abstracta.jmeter</groupId>
   <artifactId>jmeter-java-dsl</artifactId>
-  <version>1.11</version>
+  <version>1.12</version>
   <scope>test</scope>
 </dependency>
 ```
@@ -29,7 +29,7 @@ class JmeterRule implements ComponentMetadataRule {
 
 dependencies {
     ...
-    testImplementation 'us.abstracta.jmeter:jmeter-java-dsl:1.11'
+    testImplementation 'us.abstracta.jmeter:jmeter-java-dsl:1.12'
     components {
         withModule("org.apache.jmeter:ApacheJMeter_core", JmeterRule)
         withModule("org.apache.jmeter:ApacheJMeter_java", JmeterRule)
