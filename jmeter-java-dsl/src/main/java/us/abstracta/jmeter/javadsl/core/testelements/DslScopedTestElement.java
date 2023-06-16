@@ -129,6 +129,12 @@ public abstract class DslScopedTestElement<T extends DslScopedTestElement<T>> ex
     @Override
     protected MethodCall buildMethodCall(T testElement, MethodCallContext context) {
       MethodCall ret = buildScopedMethodCall(testElement);
+      chainScopeTo(ret, testElement, scopePrefix);
+      chainScopedElementAdditionalOptions(ret, testElement);
+      return ret;
+    }
+
+    public static void chainScopeTo(MethodCall ret, TestElement testElement, String scopePrefix) {
       TestElementParamBuilder paramBuilder = new TestElementParamBuilder(testElement);
       MethodParam scopeVar = paramBuilder.stringParam("Scope.variable");
       if (scopeVar.isDefault()) {
@@ -136,8 +142,6 @@ public abstract class DslScopedTestElement<T extends DslScopedTestElement<T>> ex
       } else {
         ret.chain("scopeVariable", scopeVar);
       }
-      chainScopedElementAdditionalOptions(ret, testElement);
-      return ret;
     }
 
     protected abstract MethodCall buildScopedMethodCall(T testElement);

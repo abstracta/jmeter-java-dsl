@@ -190,6 +190,8 @@
                   <include>org.yaml:snakeyaml</include>
                   <!-- required for log4j script -->
                   <include>org.apache-extras.beanshell:bsh</include>
+                  <!-- required for converting jsonpath -->
+                  <include>com.jayway.jsonpath:json-path</include>
                 </includes>
               </artifactSet>
               <filters>

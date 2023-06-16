@@ -32,6 +32,8 @@ public class PerformanceTest {
 }
 ```
 
-::: warning
-Be aware that this element uses the JMeter JSON JMESPath Extractor element, and not the JMeter JSON Extractor element. This means that it uses JMESPath instead of JSON Path.
+::: tip
+By default this element uses JMeter JSON JMESPath Extractor element, and in consequence JMESPath as query language.
+
+If you want to use JMeter JSON Extractor element, and in consequence JSONPath as query language, you can simply use `.queryLanguage(JsonQueryLanguage.JSON_PATH)` and a JSONPath query.
 :::

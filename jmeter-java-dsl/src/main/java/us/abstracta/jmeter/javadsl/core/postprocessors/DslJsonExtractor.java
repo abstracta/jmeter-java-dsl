@@ -1,29 +1,37 @@
 package us.abstracta.jmeter.javadsl.core.postprocessors;
 
 import java.lang.reflect.Method;
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import org.apache.jmeter.extractor.json.jmespath.JMESPathExtractor;
 import org.apache.jmeter.extractor.json.jmespath.gui.JMESPathExtractorGui;
+import org.apache.jmeter.extractor.json.jsonpath.JSONPostProcessor;
 import org.apache.jmeter.testelement.TestElement;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodCall;
+import us.abstracta.jmeter.javadsl.codegeneration.MethodCallBuilder;
+import us.abstracta.jmeter.javadsl.codegeneration.MethodCallContext;
 import us.abstracta.jmeter.javadsl.codegeneration.TestElementParamBuilder;
+import us.abstracta.jmeter.javadsl.codegeneration.params.FixedParam;
+import us.abstracta.jmeter.javadsl.core.testelements.DslScopedTestElement;
 
 /**
- * Allows extracting part of a JSON response using JMESPath to store into a variable.
+ * Allows extracting part of a JSON response using JMESPath or JSONPath to store into a variable.
  * <p>
- * By default, the JMESPath is configured to extract from the main sample (does not include sub
- * samples) response body the first match of the JMESPath. If no match is found, then variable will
- * be assigned empty string.
+ * By default, the extractor is configured to use JMESPath and to extract from the main sample (does
+ * not include sub samples) response body the first match of the JMESPath. If no match is found,
+ * then variable will be assigned empty string.
  *
  * @since 0.28
  */
 public class DslJsonExtractor extends DslVariableExtractor<DslJsonExtractor> {
 
-  protected String jmesPath;
+  protected String query;
+  protected JsonQueryLanguage queryLanguage = JsonQueryLanguage.JMES_PATH;
 
-  public DslJsonExtractor(String varName, String jmesPath) {
-    super("JSON JMESPath Extractor", JMESPathExtractorGui.class, varName);
-    this.jmesPath = jmesPath;
+  public DslJsonExtractor(String varName, String query) {
+    super(null, JMESPathExtractorGui.class, varName);
+    this.query = query;
   }
 
   /**
@@ -65,42 +73,126 @@ public class DslJsonExtractor extends DslVariableExtractor<DslJsonExtractor> {
     return this;
   }
 
+  /**
+   * Allows selecting the query language to use for extracting values from a given JSON.
+   *
+   * @param queryLanguage specifies the query language to use to extracting values. When no value is
+   *                      specified, JMESPath is used by default.
+   * @return the extractor for further configuration and usage.
+   * @see JsonQueryLanguage
+   * @since 1.12
+   */
+  public DslJsonExtractor queryLanguage(JsonQueryLanguage queryLanguage) {
+    this.queryLanguage = queryLanguage;
+    return this;
+  }
+
   @Override
   protected TestElement buildTestElement() {
+    return queryLanguage == JsonQueryLanguage.JSON_PATH ? buildJsonPathExtractor()
+        : buildJmesPathExtractor();
+  }
+
+  private TestElement buildJsonPathExtractor() {
+    this.name = "JSON Extractor";
+    JSONPostProcessor ret = new JSONPostProcessor();
+    setScopeTo(ret);
+    ret.setRefNames(varName);
+    ret.setJsonPathExpressions(query);
+    ret.setMatchNumbers(String.valueOf(matchNumber));
+    ret.setDefaultValues(defaultValue != null ? defaultValue : "");
+    return ret;
+  }
+
+  private TestElement buildJmesPathExtractor() {
+    this.name = "JSON JMESPath Extractor";
     JMESPathExtractor ret = new JMESPathExtractor();
     setScopeTo(ret);
     ret.setRefName(varName);
-    ret.setJmesPathExpression(jmesPath);
+    ret.setJmesPathExpression(query);
     ret.setMatchNumber(String.valueOf(matchNumber));
     ret.setDefaultValue(defaultValue);
     return ret;
   }
 
-  public static class CodeBuilder extends ScopedTestElementCallBuilder<JMESPathExtractor> {
+  public static class CodeBuilder extends MethodCallBuilder {
 
     public CodeBuilder(List<Method> builderMethods) {
-      super(JMESPathExtractor.class, builderMethods);
+      super(builderMethods);
     }
 
     @Override
-    protected MethodCall buildScopedMethodCall(JMESPathExtractor testElement) {
-      TestElementParamBuilder paramBuilder = buildParamBuilder(testElement);
-      return buildMethodCall(paramBuilder.stringParam("referenceName"),
+    public boolean matches(MethodCallContext context) {
+      TestElement testElement = context.getTestElement();
+      return testElement.getClass() == JMESPathExtractor.class
+          || testElement.getClass() == JSONPostProcessor.class;
+    }
+
+    @Override
+    protected MethodCall buildMethodCall(MethodCallContext context) {
+      return context.getTestElement().getClass() == JSONPostProcessor.class
+          ? buildJsonPathMethodCall(context)
+          : buildJmesPathMethodCall(context);
+    }
+
+    private MethodCall buildJsonPathMethodCall(MethodCallContext context) {
+      TestElement testElement = context.getTestElement();
+      TestElementParamBuilder paramBuilder = new TestElementParamBuilder(testElement,
+          "JSONPostProcessor");
+      MethodCall ret = buildMethodCall(paramBuilder.stringParam("referenceNames"),
+          paramBuilder.stringParam("jsonPathExprs"));
+      ret.chain("queryLanguage", new JsonPathQueryLanguageParam());
+      DslScopedTestElement.ScopedTestElementCallBuilder.chainScopeTo(ret, testElement, "Sample");
+      return ret.chain("matchNumber", paramBuilder.intParam("match_numbers", 1))
+          .chain("defaultValue", paramBuilder.stringParam("defaultValues"));
+    }
+
+    private MethodCall buildJmesPathMethodCall(MethodCallContext context) {
+      TestElement testElement = context.getTestElement();
+      TestElementParamBuilder paramBuilder = new TestElementParamBuilder(testElement,
+          "JMESExtractor");
+      MethodCall ret = buildMethodCall(paramBuilder.stringParam("referenceName"),
           paramBuilder.stringParam("jmesPathExpr"));
+      DslScopedTestElement.ScopedTestElementCallBuilder.chainScopeTo(ret, testElement, "Sample");
+      return ret.chain("matchNumber", paramBuilder.intParam("matchNumber", 1))
+          .chain("defaultValue", paramBuilder.stringParam("defaultValue"));
     }
 
-    private TestElementParamBuilder buildParamBuilder(JMESPathExtractor testElement) {
-      return new TestElementParamBuilder(testElement, "JMESExtractor");
-    }
+    private static class JsonPathQueryLanguageParam extends FixedParam<JsonQueryLanguage> {
 
-    @Override
-    protected void chainScopedElementAdditionalOptions(MethodCall ret,
-        JMESPathExtractor testElement) {
-      TestElementParamBuilder paramBuilder = buildParamBuilder(testElement);
-      ret.chain("matchNumber", paramBuilder.intParam("matchNumber", 1));
-      ret.chain("defaultValue", paramBuilder.stringParam("defaultValue"));
-    }
+      protected JsonPathQueryLanguageParam() {
+        super(JsonQueryLanguage.class, JsonQueryLanguage.JSON_PATH, null);
+      }
 
+      @Override
+      public Set<String> getImports() {
+        return Collections.singleton(paramType.getName());
+      }
+
+      @Override
+      public String buildCode(String indent) {
+        return paramType.getSimpleName() + "." + value.name();
+      }
+
+    }
+  }
+
+  /**
+   * Specifies the query language used to extract from JSON.
+   */
+  public enum JsonQueryLanguage {
+    /**
+     * Specifies to use JMESPath.
+     * <p>
+     * Check <a href="https://jmespath.org/">JMESPath site</a> for more details.
+     */
+    JMES_PATH,
+    /**
+     * Specifies to use JSONPath. You can check
+     * <a href="https://github.com/json-path/JsonPath">here</a> for documentation on JMeter
+     * implementation of JSON Path.
+     */
+    JSON_PATH
   }
 
 }
