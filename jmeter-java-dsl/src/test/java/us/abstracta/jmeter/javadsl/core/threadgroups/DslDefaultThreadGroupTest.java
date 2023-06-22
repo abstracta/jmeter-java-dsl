@@ -20,7 +20,6 @@ import org.apache.jmeter.testelement.TestElement;
 import org.apache.jmeter.testelement.property.JMeterProperty;
 import org.apache.jmeter.threads.ThreadGroup;
 import org.assertj.core.api.AbstractAssert;
-import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodCallBuilderTest;
@@ -63,7 +62,7 @@ public class DslDefaultThreadGroupTest {
     } else {
       setProperty(loopController, LoopController.LOOPS, iterations);
     }
-    if (!zero.equals(delaySecs)) {
+    if (delaySecs != null && !zero.equals(delaySecs)) {
       setProperty(ret, ThreadGroup.DELAY, delaySecs);
     }
     if (durationSecs != null && !zero.equals(durationSecs) || !zero.equals(delaySecs)) {
@@ -331,6 +330,33 @@ public class DslDefaultThreadGroupTest {
             delay));
   }
 
+  private String intProp2Groovy(String property) {
+    return intProp2Groovy(property, "#");
+  }
+
+  private String intProp2Groovy(String property, String altPlaceholder) {
+    return "(new org.apache.jmeter.engine.util.CompoundVariable('"
+        + property.replace("${", altPlaceholder + "{").replace("\\", "\\\\")
+        .replace(",", "\\,")
+        + "'.replace('" + altPlaceholder + "'\\,'$')).execute() as int)";
+  }
+
+  @Test
+  public void shouldBuildSimpleThreadGroupWhenRampAndComplexDuration() {
+    String threads = "${__P(THREADS, 1)}";
+    String ramp = "${__P(RAMP, 0)}";
+    String duration =
+        "${__groovy(" + intProp2Groovy("${__P(DURATION, 10)}") + " - " + intProp2Groovy(
+            "${__P(RAMP\\,0)}") + ")}";
+    assertThatThreadGroup(threadGroup()
+        .rampToAndHold(threads, ramp, duration)
+        .buildThreadGroup())
+        .isEqualTo(buildSimpleThreadGroup(threads, null,
+            "${__groovy(" + intProp2Groovy(duration.replace("\\", "\\\\").replace("'", "\\'"), "##")
+                + " + " + intProp2Groovy(ramp) + ")}",
+            ramp, null));
+  }
+
   @Test
   public void shouldBuildSimpleThreadGroupWhenHoldAndRampHoldIteratingWithJmeterExpressions() {
     String delay = "${__P(DELAY, 0)}";
@@ -343,13 +369,6 @@ public class DslDefaultThreadGroupTest {
         .holdIterating(iters)
         .buildThreadGroup())
         .isEqualTo(buildSimpleThreadGroup(threads, iters, null, ramp, delay));
-  }
-
-  @NotNull
-  private String intProp2Groovy(String property) {
-    return "(new org.apache.jmeter.engine.util.CompoundVariable('"
-        + property.replace("$", "#").replace(",", "\\,")
-        + "'.replace('#'\\,'$')).execute() as int)";
   }
 
   @Test

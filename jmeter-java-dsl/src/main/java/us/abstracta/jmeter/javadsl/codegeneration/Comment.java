@@ -22,7 +22,7 @@ public class Comment implements CodeSegment {
 
   @Override
   public String buildCode(String indent) {
-    return "//" + body;
+    return "// " + body;
   }
 
   @Override

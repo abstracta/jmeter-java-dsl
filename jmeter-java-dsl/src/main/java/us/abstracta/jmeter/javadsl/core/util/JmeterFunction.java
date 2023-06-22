@@ -15,7 +15,7 @@ public class JmeterFunction {
         */
         .map(a -> a instanceof Double || a instanceof Float
             ? String.format(Locale.US, "%f", a)
-            : a.toString().replace(",", "\\,"))
+            : a.toString().replace("\\", "\\\\").replace(",", "\\,"))
         .collect(Collectors.joining(",")) + ")"
         : "";
     return "${" + name + argsString + "}";

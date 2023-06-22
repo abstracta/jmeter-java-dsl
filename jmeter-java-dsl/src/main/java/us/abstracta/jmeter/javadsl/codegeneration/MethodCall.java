@@ -505,7 +505,7 @@ public class MethodCall implements CodeSegment {
   public String buildCode(String indent) {
     StringBuilder ret = new StringBuilder();
     if (headingComment != null) {
-      ret.append("//")
+      ret.append("// ")
           .append(headingComment)
           .append("\n")
           .append(indent);

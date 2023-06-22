@@ -87,7 +87,7 @@ public abstract class MethodCallBuilderTest {
   private String buildMethodBodyWith(String code) {
     // we reformat code to match MethodDeclaration.getBody reformatted code
     String ret = code
-        .replaceAll("(\n\\s*)//([^\n]+)\n\\s*(\\.)?", "$1$3// $2<EOC>")
+        .replaceAll("(\n\\s*)//([^\n]+)\n\\s*(\\.)?", "$1$3//$2<EOC>")
         .replaceAll("\n\\s+", " ")
         .replaceAll("\\(\\s*", "(")
         .replaceAll("\\s*\\)", ")")

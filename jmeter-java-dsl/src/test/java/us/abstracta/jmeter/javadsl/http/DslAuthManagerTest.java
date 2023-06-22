@@ -48,7 +48,7 @@ public class DslAuthManagerTest extends JmeterDslTest {
       return testPlan(
           threadGroup(1, 1,
               httpAuth()
-                  //TODO including passwords in code repositories may lead to security leaks. Review generated code and consider externalizing any credentials. Eg: System.getenv("AUTH_PASSWORD")
+                  // TODO including passwords in code repositories may lead to security leaks. Review generated code and consider externalizing any credentials. Eg: System.getenv("AUTH_PASSWORD")
                   .basicAuth("http://myservice", "user", "password"),
               httpSampler("http://myservice")
           )

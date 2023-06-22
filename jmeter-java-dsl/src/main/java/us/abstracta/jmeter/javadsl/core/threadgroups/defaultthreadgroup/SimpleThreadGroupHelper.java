@@ -86,8 +86,21 @@ public class SimpleThreadGroupHelper extends BaseThreadGroup<DslDefaultThreadGro
   }
 
   private static String buildGroovySolvingIntExpression(String expr) {
-    return "(new org.apache.jmeter.engine.util.CompoundVariable('" + expr.replace("$", "#")
-        + "'.replace('#','$')).execute() as int)";
+    /*
+     * Replacing $ with # (or alternative, depending on level of nesting of groovy expression)
+     * to avoid Jmeter to interpret this property, and delegate evaluation to CompoundVariable for
+     * proper calculation.
+     */
+    StringBuilder altPlaceHolder = new StringBuilder("#");
+    while (expr.contains(altPlaceHolder + "{")) {
+      altPlaceHolder.append("#");
+    }
+    return "(new org.apache.jmeter.engine.util.CompoundVariable('"
+        + expr.replace("${", altPlaceHolder + "{")
+        // Escape chars that are unescaped by groovy script
+        .replace("\\", "\\\\")
+        .replace("'", "\\'")
+        + "'.replace('" + altPlaceHolder + "','$')).execute() as int)";
   }
 
   private ThreadGroup buildSimpleThreadGroupFrom(Object threads, Object iterations,
@@ -165,7 +178,7 @@ public class SimpleThreadGroupHelper extends BaseThreadGroup<DslDefaultThreadGro
           ret.chain("holdFor", delay);
         }
         if (!isDefaultOrZeroDuration(duration)) {
-          duration = buildDurationParam(duration, rampTime);
+          duration = buildDurationParam(duration, rampTime, ret);
           if (!(threads instanceof IntParam) || !(rampTime instanceof DurationParam)
               || !(duration instanceof DurationParam)) {
             threads = new StringParam(threads.getExpression());
@@ -190,16 +203,18 @@ public class SimpleThreadGroupHelper extends BaseThreadGroup<DslDefaultThreadGro
           || duration instanceof DurationParam && ((DurationParam) duration).getValue().isZero();
     }
 
-    private MethodParam buildDurationParam(MethodParam duration, MethodParam rampTime) {
+    private MethodParam buildDurationParam(MethodParam duration, MethodParam rampTime,
+        MethodCall ret) {
       if (duration instanceof DurationParam && rampTime instanceof DurationParam) {
         return new DurationParam(rampTime.isDefault() ? ((DurationParam) duration).getValue()
             : ((DurationParam) duration).getValue().minus(((DurationParam) rampTime).getValue()));
       } else {
-        String expression = isDefaultOrZeroDuration(rampTime) ? duration.getExpression()
-            : JmeterFunction.groovy(
-                buildGroovySolvingIntExpression(duration.getExpression()) + " - "
-                    + buildGroovySolvingIntExpression(rampTime.getExpression()));
-        return new StringParam(expression, null);
+        if (!isDefaultOrZeroDuration(rampTime)) {
+          ret.chainComment("To keep generated DSL simple, the original duration is used as hold "
+              + "for time. But, you should use as hold for time the original duration - ramp up "
+              + "period.");
+        }
+        return duration;
       }
     }
 
