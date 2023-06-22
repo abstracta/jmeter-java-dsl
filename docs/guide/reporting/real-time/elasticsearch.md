@@ -10,7 +10,7 @@ To use the module, you will need to include the following dependency in your pro
 <dependency>
   <groupId>us.abstracta.jmeter</groupId>
   <artifactId>jmeter-java-dsl-elasticsearch-listener</artifactId>
-  <version>1.12</version>
+  <version>1.12.1</version>
   <scope>test</scope>
 </dependency>
 ```
@@ -23,7 +23,7 @@ maven { url 'https://jitpack.io' }
 
 And the dependency:
 ```groovy
-testImplementation 'us.abstracta.jmeter:jmeter-java-dsl-elasticsearch-listener:1.12'
+testImplementation 'us.abstracta.jmeter:jmeter-java-dsl-elasticsearch-listener:1.12.1'
 ```
 
 :::
