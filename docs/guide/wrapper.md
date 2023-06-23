@@ -10,7 +10,7 @@ For such cases, the preferred approach is implementing a builder class for the t
 import org.apache.jmeter.testelement.TestElement;
 import us.abstracta.jmeter.javadsl.core.samplers.BaseSampler;
 
-public class DslCustomSampler extends DslSampler<DslCustomSampler> {
+public class DslCustomSampler extends BaseSampler<DslCustomSampler> {
 
   private String myProp;
 
