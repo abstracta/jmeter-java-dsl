@@ -44,6 +44,8 @@ jobs:
           BZ_TOKEN: ${{ secrets.BZ_TOKEN }}
           OCTOPERF_API_KEY: ${{ secrets.OCTOPERF_API_KEY }}
           AZURE_CREDS: ${{ secrets.AZURE_CREDS }}
+          DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
+          DATADOG_APPLICATION_KEY: ${{ secrets.DATADOG_APPLICATION_KEY }}
       - name: publish to Nexus
         run: .github/maven-central-deploy.sh
         env:

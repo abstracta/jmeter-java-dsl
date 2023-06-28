@@ -6,6 +6,7 @@ import picocli.CommandLine.Command;
 import picocli.CommandLine.Parameters;
 import us.abstracta.jmeter.javadsl.JmeterDsl;
 import us.abstracta.jmeter.javadsl.codegeneration.DslCodeGenerator;
+import us.abstracta.jmeter.javadsl.datadog.DatadogBackendListener;
 import us.abstracta.jmeter.javadsl.elasticsearch.listener.ElasticsearchBackendListener;
 import us.abstracta.jmeter.javadsl.graphql.DslGraphqlSampler;
 import us.abstracta.jmeter.javadsl.jdbc.JdbcJmeterDsl;
@@ -46,6 +47,7 @@ public class Jmx2DslCommand implements Callable<Integer> {
     addBuildersFrom(WrapperJmeterDsl.class, "jmeter-java-dsl-wrapper", codeGenerator);
     addBuildersFrom(ElasticsearchBackendListener.class, "jmeter-java-dsl-elasticsearch-listener",
         codeGenerator);
+    addBuildersFrom(DatadogBackendListener.class, "jmeter-java-dsl-datadog", codeGenerator);
     System.out.println(codeGenerator.generateCodeFromJmx(jmxFile));
     return 0;
   }

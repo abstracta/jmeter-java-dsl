@@ -54,6 +54,11 @@
     </dependency>
     <dependency>
       <groupId>us.abstracta.jmeter</groupId>
+      <artifactId>jmeter-java-dsl-datadog</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>us.abstracta.jmeter</groupId>
       <artifactId>jmeter-java-dsl-recorder</artifactId>
       <version>${project.version}</version>
     </dependency>

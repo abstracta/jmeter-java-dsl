@@ -74,6 +74,7 @@
     <module>jmeter-java-dsl-octoperf</module>
     <module>jmeter-java-dsl-recorder</module>
     <module>jmeter-java-dsl-azure</module>
+    <module>jmeter-java-dsl-datadog</module>
   </modules>
 
   <dependencyManagement>
