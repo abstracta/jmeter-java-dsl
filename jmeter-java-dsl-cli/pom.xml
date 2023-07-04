@@ -193,6 +193,7 @@
                   <include>com.typesafe.netty:netty-reactive-streams</include>
                   <include>com.fasterxml.jackson.dataformat:jackson-dataformat-yaml</include>
                   <include>org.yaml:snakeyaml</include>
+                  <include>com.github.DataDog:jmeter-datadog-backend-listener</include>
                   <!-- required for log4j script -->
                   <include>org.apache-extras.beanshell:bsh</include>
                   <!-- required for converting jsonpath -->
