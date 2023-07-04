@@ -7,11 +7,11 @@ import static us.abstracta.jmeter.javadsl.JmeterDsl.testPlan;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.threadGroup;
 import static us.abstracta.jmeter.javadsl.datadog.DatadogBackendListener.datadogListener;
 
-import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodCallBuilderTest;
 import us.abstracta.jmeter.javadsl.core.DslTestPlan;
 import us.abstracta.jmeter.javadsl.datadog.DatadogBackendListener.DatadogSite;
@@ -23,6 +23,7 @@ public class DatadogBackendListenerTest {
   private static final int TIME_THRESHOLD_SECONDS = 10;
 
   @Test
+  @Timeout(10)
   public void shouldSendMetricsToDatadogWhenDataDogBackendListerInPlan() throws Exception {
     Instant start = Instant.now();
     testPlan(
@@ -36,11 +37,16 @@ public class DatadogBackendListenerTest {
     assertThat(findJmeterDatadogResponseCountSince(start)).isEqualTo(1);
   }
 
-  private int findJmeterDatadogResponseCountSince(Instant fromInstant) throws IOException {
+  private int findJmeterDatadogResponseCountSince(Instant fromInstant) throws Exception {
     try (DatadogApiClient cli = new DatadogApiClient(System.getenv(DATADOG_API_KEY_ENV_VAR),
         System.getenv("DATADOG_APPLICATION_KEY"))) {
-      return cli.getResponsesCount(fromInstant.plusSeconds(-TIME_THRESHOLD_SECONDS),
+      int responsesCount;
+      do {
+        Thread.sleep(1000);
+        responsesCount = cli.getResponsesCount(fromInstant.plusSeconds(-TIME_THRESHOLD_SECONDS),
             Instant.now().plusSeconds(TIME_THRESHOLD_SECONDS), TAG);
+      } while (responsesCount == 0);
+      return responsesCount;
     }
   }
 
