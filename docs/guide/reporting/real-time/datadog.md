@@ -18,16 +18,17 @@ To use the module, just include the dependency:
 ```
 :::
 ::: code-group-item Gradle
-Add this repository:
 ```groovy
-maven { url 'https://jitpack.io' }
-```
+repositories {
+    ...
+    maven { url 'https://jitpack.io' }
+}
 
-And the dependency:
-```groovy
-testImplementation 'us.abstracta.jmeter:jmeter-java-dsl-datadog:1.13'
+dependencies {
+    ...
+    testImplementation 'us.abstracta.jmeter:jmeter-java-dsl-datadog:1.13'
+}
 ```
-
 :::
 ::::
 

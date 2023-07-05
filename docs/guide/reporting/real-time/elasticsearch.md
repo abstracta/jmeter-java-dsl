@@ -16,16 +16,17 @@ To use the module, you will need to include the following dependency in your pro
 ```
 :::
 ::: code-group-item Gradle
-Add this repository:
 ```groovy
-maven { url 'https://jitpack.io' }
-```
+repositories {
+    ...
+    maven { url 'https://jitpack.io' }
+}
 
-And the dependency:
-```groovy
-testImplementation 'us.abstracta.jmeter:jmeter-java-dsl-elasticsearch-listener:1.13'
+dependencies {
+    ...
+    testImplementation 'us.abstracta.jmeter:jmeter-java-dsl-elasticsearch-listener:1.13'
+}
 ```
-
 :::
 ::::
 
