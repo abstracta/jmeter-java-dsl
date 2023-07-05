@@ -23,7 +23,7 @@ public class DatadogBackendListenerTest {
   private static final int TIME_THRESHOLD_SECONDS = 10;
 
   @Test
-  @Timeout(10)
+  @Timeout(30)
   public void shouldSendMetricsToDatadogWhenDataDogBackendListerInPlan() throws Exception {
     Instant start = Instant.now();
     testPlan(
