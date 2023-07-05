@@ -1,0 +1,16 @@
+!testPlanExecution
+engine: !embeddedJmeterEngine {}
+testPlan:
+  !testPlan
+  children:
+    - !threadGroup
+      threads: 1
+      iterations: 1
+      children:
+        - !httpSampler
+          method: POST
+          url: "http://localhost"
+          body: '{"prop": "val"}'
+          children:
+            !httpHeaders
+            Content-Type: application/json

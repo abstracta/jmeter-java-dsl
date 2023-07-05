@@ -258,7 +258,7 @@ public class DslHttpSamplerTest extends JmeterDslTest {
   /*
    need to set header for request header to match otherwise jmeter automatically adds this
    header while sending request and stores it in cache and when it checks in next request
-   it doesn't match since same header is not yet set at check time,
+   it doesn't match since same header is not yet set at check time.
    */
   private HttpHeaders buildHeadersToFixHttpCaching() {
     return httpHeaders().header("User-Agent", "jmeter-java-dsl");
@@ -291,9 +291,9 @@ public class DslHttpSamplerTest extends JmeterDslTest {
 
   @Test
   public void shouldNotUseCacheWhenDisabled() throws Exception {
-    stubFor(get(anyUrl())
-        .willReturn(aResponse().withHeader("Set-Cookie", "MyCookie=val")));
+    setupCacheableHttpResponse();
     testPlan(
+        buildHeadersToFixHttpCaching(),
         httpCache().disable(),
         threadGroup(1, 1,
             httpSampler(wiremockUri),

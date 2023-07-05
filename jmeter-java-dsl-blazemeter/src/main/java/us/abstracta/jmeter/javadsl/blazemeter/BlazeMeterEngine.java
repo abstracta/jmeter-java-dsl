@@ -30,6 +30,9 @@ import us.abstracta.jmeter.javadsl.engines.BaseRemoteEngine;
 
 /**
  * A {@link DslJmeterEngine} which allows running DslTestPlan in BlazeMeter.
+ * <p>
+ * <b>Note:</b> the engine always returns 0 as sentBytes statistics, since there is no efficient way
+ * to get it from BlazeMeter.
  *
  * @since 0.2
  */
@@ -254,7 +257,7 @@ public class BlazeMeterEngine extends BaseRemoteEngine<BlazeMeterClient, BlazeMe
    * instances/engines running might be saturating and not properly imposing the expected load upon
    * the system under test. Too many resources might lead to unnecessary expenses (wasted money).
    * <p>
-   * This setting, in conjunction with totalUsers, determine the number of engines BlazeMeter will
+   * This setting, in conjunction with totalUsers, determines the number of engines BlazeMeter will
    * use to run the test. For example, if you specify totalUsers to 500 and 100 threadsPerEngine,
    * then 5 engines will be used to run the test.
    * <p>

@@ -33,7 +33,7 @@ public abstract class BaseRemoteEngineStatsSummary implements StatsSummary {
         responseTimePerc99);
     this.receivedBytes.increment(perSecond2Total(receivedBytesPerSec, elapsedTimeMillis),
         elapsedTimeMillis);
-    this.receivedBytes.increment(perSecond2Total(sentBytesPerSec, elapsedTimeMillis),
+    this.sentBytes.increment(perSecond2Total(sentBytesPerSec, elapsedTimeMillis),
         elapsedTimeMillis);
   }
 

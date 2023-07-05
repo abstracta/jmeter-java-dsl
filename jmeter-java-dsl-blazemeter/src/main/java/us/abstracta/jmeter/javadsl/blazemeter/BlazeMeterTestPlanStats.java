@@ -4,7 +4,6 @@ import java.util.List;
 import us.abstracta.jmeter.javadsl.blazemeter.api.TestRunRequestStats;
 import us.abstracta.jmeter.javadsl.blazemeter.api.TestRunSummaryStats.TestRunLabeledSummary;
 import us.abstracta.jmeter.javadsl.core.TestPlanStats;
-import us.abstracta.jmeter.javadsl.core.stats.CountMetricSummary;
 import us.abstracta.jmeter.javadsl.engines.BaseRemoteEngineStatsSummary;
 import us.abstracta.jmeter.javadsl.engines.RemoteEngineTimeMetricSummary;
 
@@ -47,12 +46,6 @@ public class BlazeMeterTestPlanStats extends TestPlanStats {
           labeledStat.getPerc99(),
           labeledStat.getAvgBytes(),
           0.0);
-    }
-
-    @Override
-    public CountMetricSummary sentBytes() {
-      throw new UnsupportedOperationException(
-          "BlazeMeter API does not provide an efficient way to get this value.");
     }
 
   }

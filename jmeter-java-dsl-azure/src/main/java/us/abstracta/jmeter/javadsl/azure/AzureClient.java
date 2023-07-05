@@ -45,7 +45,7 @@ import us.abstracta.jmeter.javadsl.util.TestResource;
 public class AzureClient extends BaseRemoteEngineApiClient {
 
   private static final Logger LOG = LoggerFactory.getLogger(AzureClient.class);
-  private static final String JMETER_DSL_VERSION = getJmeterDslVersion();
+  private static final String USER_AGENT = getUserAgent();
 
   private final String tenantId;
   private final String clientId;
@@ -67,9 +67,14 @@ public class AzureClient extends BaseRemoteEngineApiClient {
     managementApi = buildApiFor("https://management.azure.com/", ManagementApi.class);
   }
 
-  private static String getJmeterDslVersion() {
+  private static String getUserAgent() {
     try {
-      return new TestResource("us/abstracta/jmeter/javadsl/version.txt").rawContents();
+      String userAgent = System.getProperty("us.abstracta.jmeterdsl.userAgent");
+      if (userAgent != null) {
+        return userAgent;
+      }
+      return "jmeter-java-dsl/" + new TestResource(
+          "us/abstracta/jmeter/javadsl/version.txt").rawContents();
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
@@ -77,14 +82,14 @@ public class AzureClient extends BaseRemoteEngineApiClient {
 
   @Override
   protected void configureHttpClient(OkHttpClient.Builder builder) {
-    super.configureHttpClient(builder);
     builder.addInterceptor(this::addAgentHeader);
+    super.configureHttpClient(builder);
   }
 
   private Response addAgentHeader(Chain chain) throws IOException {
     Request request = chain.request()
         .newBuilder()
-        .header("User-Agent", "jmeter-java-dsl/" + JMETER_DSL_VERSION)
+        .header("User-Agent", USER_AGENT)
         .build();
     return chain.proceed(request);
   }

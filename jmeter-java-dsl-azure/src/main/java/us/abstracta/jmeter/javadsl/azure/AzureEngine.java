@@ -86,7 +86,7 @@ public class AzureEngine extends BaseRemoteEngine<AzureClient, AzureTestPlanStat
    * This is a more explicit way to create AzureEngine than {@link #AzureEngine(String)}.
    * <p>
    * This is usually preferred when you already have each credential value separated, as is more
-   * explicit and don't require encoding into a string.
+   * explicit and doesn't require encoding into a string.
    *
    * @param tenantId     is the tenant id for your subscription. This can easily be retrieved
    *                     getting subscription info in Azure Portal
@@ -134,7 +134,7 @@ public class AzureEngine extends BaseRemoteEngine<AzureClient, AzureTestPlanStat
    *
    * @param resourceGroupName specifies the name of the resource group to use. If no name is
    *                          specified, then the test resource name
-   *                          ({@link #testResourceName(String)} plus "-rg" suffix is used. Eg:
+   *                          ({@link #testResourceName(String)}) plus "-rg" suffix is used. Eg:
    *                          jmeter-java-dsl-rg.
    * @return the engine for further configuration or usage.
    */

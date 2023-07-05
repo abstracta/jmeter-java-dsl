@@ -61,6 +61,22 @@ BlazeMeter will not only allow you to run the test at scale but also provides ad
 
 Check [BlazeMeterEngine](/jmeter-java-dsl-blazemeter/src/main/java/us/abstracta/jmeter/javadsl/blazemeter/BlazeMeterEngine.java) for details on usage and available settings when running tests in BlazeMeter.
 
+::: warning
+By default the engine is configured to timeout if test execution takes more than 1 hour.
+This timeout exists to avoid any potential problem with BlazeMeter execution not detected by the
+client, and avoid keeping the test indefinitely running until is interrupted by a user,
+which may incur in unnecessary expenses in BlazeMeter and is specially annoying when running tests
+in automated fashion, for example in CI/CD.
+It is strongly advised to **set this timeout properly in each run**, according to the expected test
+execution time plus some additional margin (to consider for additional delays in BlazeMeter
+test setup and teardown) to avoid unexpected test plan execution failure (due to timeout) or
+unnecessary waits when there is some unexpected issue with BlazeMeter execution.
+:::
+
+::: warning
+`BlazeMeterEngine` always returns 0 as `sentBytes` statistics since there is no efficient way to get it from BlazMeter.
+:::
+
 ::: tip
 `BlazeMeterEngine` will automatically upload to BlazeMeter files used in `csvDataSet` and `httpSampler` with `bodyFile` or `bodyFilePart` methods.
 
@@ -108,16 +124,3 @@ In case you want to get debug logs for HTTP calls to BlazeMeter API, you can inc
 ::: warning
 If you use JSR223 Pre- or Post- processors with Java code (lambdas) instead of strings ([here](../response-processing/jsr223-post-processor#change-sample-result-statuses-with-custom-logic) are some examples), or use one of the HTTP Sampler methods which receive a function as parameter (as in [here](../request-generation/jsr223-pre-processor#provide-request-parameters-programmatically-per-request)), then BlazeMeter execution won't work. You can migrate them to use `jsrPreProcessor` with string scripts instead. Check the associated method's documentation for more details.
 :::
-
-::: warning
-By default the engine is configured to timeout if test execution takes more than 1 hour. 
-This timeout exists to avoid any potential problem with BlazeMeter execution not detected by the 
-client, and avoid keeping the test indefinitely running until is interrupted by a user,
-which may incur in unnecessary expenses in BlazeMeter and is specially annoying when running tests 
-in automated fashion, for example in CI/CD.
-It is strongly advised to **set this timeout properly in each run**, according to the expected test
-execution time plus some additional margin (to consider for additional delays in BlazeMeter
-test setup and teardown) to avoid unexpected test plan execution failure (due to timeout) or 
-unnecessary waits when there is some unexpected issue with BlazeMeter execution.
-:::
-

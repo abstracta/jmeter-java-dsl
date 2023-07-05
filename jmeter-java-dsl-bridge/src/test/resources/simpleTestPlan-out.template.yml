@@ -1,0 +1,48 @@
+duration: PT{{\d+\.\d+}}S
+overall:
+  firstTime: '{{[0-9:.TZ-]+}}'
+  receivedBytes:
+    total: {{\d+}}
+    perSecond: {{\d+\.\d+}}
+  endTime: '{{[0-9:.TZ-]+}}'
+  sentBytes:
+    total: {{\d+}}
+    perSecond: {{\d+\.\d+}}
+  samples:
+    total: {{\d+}}
+    perSecond: {{\d+\.\d+}}
+  errors:
+    total: {{\d+}}
+    perSecond: {{\d+\.\d+}}
+  sampleTime:
+    perc95: PT{{\d+\.\d+}}S
+    min: PT{{\d+\.\d+}}S
+    median: PT{{\d+\.\d+}}S
+    max: PT{{\d+\.\d+}}S
+    perc99: PT{{\d+\.\d+}}S
+    mean: PT{{\d+\.\d+}}S
+    perc90: PT{{\d+\.\d+}}S
+labels:
+  HTTP Request:
+    firstTime: '{{[0-9:.TZ-]+}}'
+    receivedBytes:
+      total: {{\d+}}
+      perSecond: {{\d+\.\d+}}
+    endTime: '{{[0-9:.TZ-]+}}'
+    sentBytes:
+      total: {{\d+}}
+      perSecond: {{\d+\.\d+}}
+    samples:
+      total: {{\d+}}
+      perSecond: {{\d+\.\d+}}
+    errors:
+      total: {{\d+}}
+      perSecond: {{\d+\.\d+}}
+    sampleTime:
+      perc95: PT{{\d+\.\d+}}S
+      min: PT{{\d+\.\d+}}S
+      median: PT{{\d+\.\d+}}S
+      max: PT{{\d+\.\d+}}S
+      perc99: PT{{\d+\.\d+}}S
+      mean: PT{{\d+\.\d+}}S
+      perc90: PT{{\d+\.\d+}}S

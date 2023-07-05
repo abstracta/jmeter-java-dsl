@@ -98,8 +98,8 @@ public class DslDummySampler extends BaseSampler<DslDummySampler> {
    * This is useful when you want response time to be calculated dynamically. For example,
    * <pre>{@code ${__Random(50, 500)}}</pre>
    *
-   * @param responseTime specifies the JMeter expression to be used to calculate response times for
-   *                     the sampler.
+   * @param responseTime specifies the JMeter expression to be used to calculate response times,
+   *                     in milliseconds, for the sampler.
    * @return the sampler for further configuration or usage.
    * @see #responseTime(Duration)
    * @since 1.0
