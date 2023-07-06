@@ -27,6 +27,11 @@ const props = defineProps({
   },
 })
 
+defineSlots<{
+  before?: (props: Record<never, never>) => any
+  after?: (props: Record<never, never>) => any
+}>()
+
 const route = useRoute()
 const site = useSiteData()
 const { item } = toRefs(props)
@@ -108,6 +113,7 @@ const isActive = computed(() => {
     :rel="linkRel"
     :target="linkTarget"
     :aria-label="linkAriaLabel"
+    :style="item.style"
     v-bind="$attrs"
   >
     <slot name="before" />

@@ -6,7 +6,7 @@ set -e
 
 cd docs
 
-yarn && yarn build
+pnpm install && pnpm build
 
 cd .vuepress/dist
 

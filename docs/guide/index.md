@@ -14,18 +14,18 @@ If you like this project, **please give it a star ⭐ in [GitHub](https://github
 
 For an intro to JMeter concepts and components, you can check [JMeter official documentation](http://jmeter.apache.org/usermanual/get-started.html).
 
-@include(setup.md)
-@include(simple-test-plan.md)
-@include(recorder/index.md)
-@include(jmx2dsl.md)
-@include(scale/index.md)
-@include(thread-groups/index.md)
-@include(debugging/index.md)
-@include(reporting/index.md)
-@include(response-processing/index.md)
-@include(request-generation/index.md)
-@include(variables-and-properties/index.md)
-@include(test-resources.md)
-@include(protocols/index.md)
-@include(wrapper.md)
-@include(jmx.md)
+<!-- @include: setup.md -->
+<!-- @include: simple-test-plan.md -->
+<!-- @include: recorder/index.md -->
+<!-- @include: jmx2dsl.md -->
+<!-- @include: scale/index.md -->
+<!-- @include: thread-groups/index.md -->
+<!-- @include: debugging/index.md -->
+<!-- @include: reporting/index.md -->
+<!-- @include: response-processing/index.md -->
+<!-- @include: request-generation/index.md -->
+<!-- @include: variables-and-properties/index.md -->
+<!-- @include: test-resources.md -->
+<!-- @include: protocols/index.md -->
+<!-- @include: wrapper.md -->
+<!-- @include: jmx.md -->

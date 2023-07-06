@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import AutoLink from '@vuepress/theme-default/lib/client/components/AutoLink.vue'
+import AutoLink from '@theme/AutoLink.vue'
 import {
   ClientOnly,
   usePageFrontmatter,

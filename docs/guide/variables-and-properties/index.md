@@ -1,4 +1,4 @@
 ## JMeter variables & properties
 
-@include(variables.md)
-@include(properties.md)
+<!-- @include: variables.md -->
+<!-- @include: properties.md -->

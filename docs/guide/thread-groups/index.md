@@ -14,7 +14,7 @@ threadGroup(10, Duration.ofSeconds(20)) // 10 threads for 20 seconds each
 
 But these options are not good when working with many threads or when trying to configure some complex test scenarios (like when doing incremental or peak tests).
 
-@include(ramps-and-holds.md)
-@include(rps-thread-group.md)
-@include(setup-and-teardown.md)
-@include(order.md)
+<!-- @include: ramps-and-holds.md -->
+<!-- @include: rps-thread-group.md -->
+<!-- @include: setup-and-teardown.md -->
+<!-- @include: order.md -->
