@@ -7,6 +7,8 @@ Simple Java API to run performance tests, using [JMeter] as engine, in a Git and
 
 If you like this project, **please give it a star :star:!** This helps the project be more visible, gain relevance, and encourage us to invest more effort in new features.
 
+[Here](https://abstracta.github.io/jmeter-dotnet-dsl) you can find the .Net DSL.
+
 Please join [discord server](https://discord.gg/WNSn5hqmSd) or create GitHub [issues](https://github.com/abstracta/jmeter-java-dsl/issues) and [discussions](https://github.com/abstracta/jmeter-java-dsl/discussions) to be part of the community and clear out doubts, get the latest news, propose ideas, report issues, etc.
 
 ## Usage
@@ -94,6 +96,7 @@ For detailed support information, visit our [Support](https://abstracta.github.i
 * [Develop JMeter Scripts Using Java with Roger Abelenda](https://testguild.com/podcast/performance/p93-roger/): Short interview by Joe Colantonio from TestGuild to Roger Abelenda about JMeter DSL basics.
 * [PerfOps - faster and cheaper through a service approach](https://habr.com/ru/company/oleg-bunin/blog/682746/): A nice analysis on implementing a performance experts service while using JMeter DSL as basics for creating a framework on top of it by Kirill Yurkov. (In Russian, but you can use Chrome Translation ;))
 * [pymeter announcement](https://www.linkedin.com/feed/update/urn:li:activity:6987704015933304832/): Announcement of a python API, built on top JMeter DSL, which eases JMeter test plan creation and execution for python devs by Eldad Uzman. 
+* [Evolve Your Selenium Scripts Into Performance Scripts](https://www.youtube.com/watch?v=YZhCPXfMuqo): SeleniumConf 2023 talk showing generation of performance scripts from Selenium scripts, using JMeter DSL recorder. [Here](https://github.com/abstracta/selenium-jmeter-dsl-demo) is demo repository.
 
 ## Ecosystem
 
