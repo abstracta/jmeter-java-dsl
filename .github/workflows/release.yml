@@ -16,6 +16,7 @@ jobs:
         with:
           distribution: temurin
           java-version: 8
+          cache: maven
       - uses: actions/setup-node@v3
         with:
           node-version: '14'
