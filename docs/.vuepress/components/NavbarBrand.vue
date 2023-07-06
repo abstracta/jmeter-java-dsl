@@ -51,7 +51,7 @@ const NavbarBrandLogo: FunctionalComponent = () => {
 
 <template>
   <RouterLink :to="navbarBrandLink">
-    <NavbarBrandLogo />
+    <NavbarBrandLogo style="margin-right: 0"/><span style="font-size: 1.6rem"> .java</span><hr class="vertical-divider"/><a href="https://abstracta.github.io/jmeter-dotnet-dsl" style="font-size: 1.6rem; color: #a502ce">.net</a>
     <!-- Stripped site title from original theme -->
   </RouterLink>
 </template>

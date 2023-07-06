@@ -75,11 +75,11 @@ const HomeHeroImage: FunctionalComponent = () => {
 
 <template>
   <header class="hero">
-    <HomeHeroImage />
+    <div class="hero-logo"><HomeHeroImage style="margin: 0;"/><span> .java</span></div>
 
     <!-- changed from original template file to remove title and include JMeter link -->
     <p class="description">
-    Simple <AutoLink :item="{link : 'https://jmeter.apache.org/', text: 'JMeter'}"/> performance tests API
+    Simple <AutoLink :item="{link : 'https://jmeter.apache.org/', text: 'JMeter'}"/> performance tests Java API
     </p>
 
     <p v-if="actions.length" class="actions">

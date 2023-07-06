@@ -1,14 +1,14 @@
 :root {
-    --c-brand: #00ace6;
-    --c-brand-light: #54bdf9;
+    --c-brand: #5599ff;
+    --c-brand-light: #77adfd;
 
     --c-shadow: rgba(0,0,0,0.2);
 }
 
 html.dark {
     // brand colors
-    --c-brand: #54bdf9;
-    --c-brand-light: #00ace6;
+    --c-brand: #77adfd;
+    --c-brand-light: #5599ff;
 
     --c-shadow: rgba(255,255,255,0.2);
 }
@@ -17,6 +17,31 @@ html.dark {
 showing two external link icons for external links containing icons.*/
 a.external-link>svg~span:nth-child(2) {
   display: none;
+}
+
+.vertical-divider {
+  display: inline-flex;
+  width:0;
+  border: solid;
+  border-width: 0 thin 0 0;
+  border-color: var(--c-border);
+  min-height: 80%;
+  vertical-align: text-bottom;
+  margin: 0 0.5rem;
+}
+
+.hero-logo {
+  margin: 3rem auto 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hero-logo span {
+  font-weight:500;
+  font-size: 3rem;
+  color: var(--c-text-accent);
+  margin:  0 0 0 0.7rem;
 }
 
 .grid {
