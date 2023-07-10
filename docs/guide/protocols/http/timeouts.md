@@ -2,7 +2,7 @@
 
 By default, JMeter uses system default configurations for connection and response timeouts (maximum time for a connection to be established or a server response after a request, before it fails). This is might make the test behave different depending on the machine where it runs. To avoid this, it is recommended to always set these values. Here is an example:
 
-```
+```java
 testPlan(
     httpDefaults()
         .connectionTimeout(Duration.ofSeconds(10))
