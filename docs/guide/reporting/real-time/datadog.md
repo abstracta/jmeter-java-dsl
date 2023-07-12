@@ -1,6 +1,6 @@
 #### DataDog
 
-Another option is using `jmeter-java-dsl-datadog` module which uses existing [jmeter-datadog-backend-listener plugin](https://github.com/DataDog/jmeter-datadog-backend-listener) to upload metrics to datadog which you can easily visualize and analize with DataDog provided JMeter dashboard. Here is an example of what you get:
+Another option is using `jmeter-java-dsl-datadog` module which uses existing [jmeter-datadog-backend-listener plugin](https://github.com/DataDog/jmeter-datadog-backend-listener) to upload metrics to datadog which you can easily visualize and analize with [DataDog provided JMeter dashboard](https://app.datadoghq.com/integrations/jmeter?search=jmeter). Here is an example of what you get:
 
 ![datadog jmeter dashboard](./datadog.png)
 
