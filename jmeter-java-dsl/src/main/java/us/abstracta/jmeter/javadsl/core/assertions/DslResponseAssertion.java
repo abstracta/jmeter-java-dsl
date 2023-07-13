@@ -410,7 +410,7 @@ public class DslResponseAssertion extends DslScopedTestElement<DslResponseAssert
         return "matchesRegexes";
       }
       throw new UnsupportedOperationException(
-          String.format("The response assertion has a type (%d) which is not supported by de DSL.",
+          String.format("The response assertion has a type (%d) which is not supported by the DSL.",
               testElement.getTestType()));
     }
 
