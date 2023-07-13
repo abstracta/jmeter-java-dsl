@@ -1,6 +1,6 @@
 #### JSON extraction
 
-When the response of a request is JSON, then you can use `jsonExtractor` by using [JMESPath query](https://jmespath.org/) like in the following example:
+When the response of a request is JSON, then you can use `jsonExtractor` like in the following example:
 
 ```java
 import static org.assertj.core.api.Assertions.assertThat;
@@ -33,7 +33,7 @@ public class PerformanceTest {
 ```
 
 ::: tip
-By default this element uses JMeter JSON JMESPath Extractor element, and in consequence JMESPath as query language.
+By default this element uses JMeter JSON [JMESPath](https://jmespath.org/) Extractor element, and in consequence JMESPath as query language.
 
-If you want to use JMeter JSON Extractor element, and in consequence JSONPath as query language, you can simply use `.queryLanguage(JsonQueryLanguage.JSON_PATH)` and a JSONPath query.
+If you want to use JMeter JSON Extractor element, and in consequence [JSONPath](https://github.com/json-path/JsonPath) as query language, you can simply use `.queryLanguage(JsonQueryLanguage.JSON_PATH)` and a JSONPath query.
 :::

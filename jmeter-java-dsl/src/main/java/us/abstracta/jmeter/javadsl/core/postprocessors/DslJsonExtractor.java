@@ -7,6 +7,7 @@ import java.util.Set;
 import org.apache.jmeter.extractor.json.jmespath.JMESPathExtractor;
 import org.apache.jmeter.extractor.json.jmespath.gui.JMESPathExtractorGui;
 import org.apache.jmeter.extractor.json.jsonpath.JSONPostProcessor;
+import org.apache.jmeter.extractor.json.jsonpath.gui.JSONPostProcessorGui;
 import org.apache.jmeter.testelement.TestElement;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodCall;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodCallBuilder;
@@ -30,7 +31,7 @@ public class DslJsonExtractor extends DslVariableExtractor<DslJsonExtractor> {
   protected JsonQueryLanguage queryLanguage = JsonQueryLanguage.JMES_PATH;
 
   public DslJsonExtractor(String varName, String query) {
-    super(null, JMESPathExtractorGui.class, varName);
+    super(null, null, varName);
     this.query = query;
   }
 
@@ -94,7 +95,8 @@ public class DslJsonExtractor extends DslVariableExtractor<DslJsonExtractor> {
   }
 
   private TestElement buildJsonPathExtractor() {
-    this.name = "JSON Extractor";
+    name = "JSON Extractor";
+    guiClass = JSONPostProcessorGui.class;
     JSONPostProcessor ret = new JSONPostProcessor();
     setScopeTo(ret);
     ret.setRefNames(varName);
@@ -105,7 +107,8 @@ public class DslJsonExtractor extends DslVariableExtractor<DslJsonExtractor> {
   }
 
   private TestElement buildJmesPathExtractor() {
-    this.name = "JSON JMESPath Extractor";
+    name = "JSON JMESPath Extractor";
+    guiClass = JMESPathExtractorGui.class;
     JMESPathExtractor ret = new JMESPathExtractor();
     setScopeTo(ret);
     ret.setRefName(varName);
@@ -158,9 +161,9 @@ public class DslJsonExtractor extends DslVariableExtractor<DslJsonExtractor> {
           .chain("defaultValue", paramBuilder.stringParam("defaultValue"));
     }
 
-    private static class JsonPathQueryLanguageParam extends FixedParam<JsonQueryLanguage> {
+    public static class JsonPathQueryLanguageParam extends FixedParam<JsonQueryLanguage> {
 
-      protected JsonPathQueryLanguageParam() {
+      public JsonPathQueryLanguageParam() {
         super(JsonQueryLanguage.class, JsonQueryLanguage.JSON_PATH, null);
       }
 

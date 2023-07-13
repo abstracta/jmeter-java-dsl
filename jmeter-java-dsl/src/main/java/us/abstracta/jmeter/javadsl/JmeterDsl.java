@@ -7,6 +7,7 @@ import java.util.function.Function;
 import us.abstracta.jmeter.javadsl.core.DslTestElement;
 import us.abstracta.jmeter.javadsl.core.DslTestPlan;
 import us.abstracta.jmeter.javadsl.core.DslTestPlan.TestPlanChild;
+import us.abstracta.jmeter.javadsl.core.assertions.DslJsonAssertion;
 import us.abstracta.jmeter.javadsl.core.assertions.DslResponseAssertion;
 import us.abstracta.jmeter.javadsl.core.configs.DslCounter;
 import us.abstracta.jmeter.javadsl.core.configs.DslCsvDataSet;
@@ -1224,24 +1225,26 @@ public class JmeterDsl {
   }
 
   /**
-   * Builds a JSON JMESPath Extractor which allows using a JMESPath to extract part of a JSON
+   * Builds an Extractor which allows using JMESPath or JSONPath to extract part of a JSON
    * response.
    * <p>
    * This method provides a simple default implementation with required settings, but more settings
    * are provided by returned DslJsonExtractor.
    * <p>
-   * By default, when no match is found, no variable will be created or modified. On the other hand,
-   * when a match is found, it will by default store the first match.
+   * By default, uses JMESPath for queries and when no match is found, no variable will be created
+   * or modified. On the other hand, when a match is found, it will by default store the first
+   * match.
    *
    * @param variableName is the name of the variable to be used to store the extracted value to.
-   * @param jmesPath     specifies the JMESPath to extract the value.
-   * @return the JSON JMESPath Extractor which can be used to define additional settings to use when
+   * @param query        specifies JMESPath (or JSONPath, if queryLanguage specifies so) to extract
+   *                     the value.
+   * @return the JSON Extractor which can be used to define additional settings to use when
    * extracting (like defining match number, scope, etc.).
    * @see DslJsonExtractor
    * @since 0.28
    */
-  public static DslJsonExtractor jsonExtractor(String variableName, String jmesPath) {
-    return new DslJsonExtractor(variableName, jmesPath);
+  public static DslJsonExtractor jsonExtractor(String variableName, String query) {
+    return new DslJsonExtractor(variableName, query);
   }
 
   /**
@@ -1398,6 +1401,37 @@ public class JmeterDsl {
    */
   public static DslResponseAssertion responseAssertion(String name) {
     return new DslResponseAssertion(name);
+  }
+
+  /**
+   * Builds an Assertion element to check that obtained sampler result JSON is the expected one.
+   * <p>
+   * This method simplifies checking JSON responses over {@link #responseAssertion()} alternative.
+   * <p>
+   * By default, uses JMESPath for queries and just checks for existence of specified element. Check
+   * {@link DslJsonAssertion} for additional options.
+   *
+   * @param jsonQuery specifies JMESPath (or JSONPath, if queryLanguage specifies so) to check the
+   *                  existence of given element in sample result response. the value.
+   * @return the Assertion which can be used to configure further settings (like query Language,
+   * check if value in path matches regex, etc.) and used in a test plan.
+   * @see DslJsonAssertion
+   * @since 1.15
+   */
+  public static DslJsonAssertion jsonAssertion(String jsonQuery) {
+    return jsonAssertion(null, jsonQuery);
+  }
+
+  /**
+   * Same as {@link #jsonAssertion(String)} but allowing to set a name on the assertion, which can
+   * be later used to identify assertion results and differentiate it from other assertions.
+   *
+   * @see #jsonAssertion(String)
+   * @see DslJsonAssertion
+   * @since 1.15
+   */
+  public static DslJsonAssertion jsonAssertion(String name, String jsonQuery) {
+    return new DslJsonAssertion(name, jsonQuery);
   }
 
   /**
