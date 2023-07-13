@@ -1,55 +1,58 @@
 package us.abstracta.jmeter.javadsl.core.testelements;
 
 import java.lang.reflect.Method;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import org.apache.jmeter.samplers.SampleResult;
-import org.apache.jmeter.samplers.Sampler;
+import org.apache.jmeter.testbeans.TestBean;
 import org.apache.jmeter.testbeans.gui.TestBeanGUI;
+import org.apache.jmeter.testelement.AbstractTestElement;
 import org.apache.jmeter.testelement.TestElement;
 import org.apache.jmeter.threads.JMeterContext;
-import org.apache.jmeter.threads.JMeterVariables;
+import org.apache.jmeter.util.JMeterUtils;
 import org.apache.jmeter.util.JSR223TestElement;
-import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodCall;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodCallContext;
 import us.abstracta.jmeter.javadsl.codegeneration.SingleTestElementCallBuilder;
 import us.abstracta.jmeter.javadsl.codegeneration.TestElementParamBuilder;
-import us.abstracta.jmeter.javadsl.core.util.DslScriptBuilder;
-import us.abstracta.jmeter.javadsl.core.util.DslScriptBuilder.DslScript;
-import us.abstracta.jmeter.javadsl.core.util.DslScriptBuilder.DslScriptVars;
+import us.abstracta.jmeter.javadsl.core.testelements.DslJsr223TestElement.Jsr223ScriptVars;
+import us.abstracta.jmeter.javadsl.core.util.DslScript;
+import us.abstracta.jmeter.javadsl.core.util.DslScript.DslScriptRegistry;
+import us.abstracta.jmeter.javadsl.core.util.DslScript.DslScriptVars;
 
 /**
  * Abstracts common logic used by JSR223 test elements.
  *
  * @since 0.8
  */
-public abstract class DslJsr223TestElement<T extends DslJsr223TestElement<T>> extends
-    BaseTestElement {
+public abstract class DslJsr223TestElement<T extends DslJsr223TestElement<T, V>,
+    V extends Jsr223ScriptVars> extends BaseTestElement {
 
   protected static final String DEFAULT_LANGUAGE = "groovy";
 
-  protected DslScriptBuilder scriptBuilder;
+  protected final String scriptString;
+  protected final Jsr223Script<?> script;
+  protected final Class<? extends Jsr223Script<?>> scriptClass;
   protected String language = DEFAULT_LANGUAGE;
 
+  public DslJsr223TestElement(String name, String defaultName, Jsr223Script<?> script) {
+    this(name, defaultName, null, script, null);
+  }
+
+  private DslJsr223TestElement(String name, String defaultName, String scriptString,
+      Jsr223Script<?> script, Class<? extends Jsr223Script<?>> scriptClass) {
+    super(name != null ? name : defaultName, TestBeanGUI.class);
+    this.script = script;
+    this.scriptString = scriptString;
+    this.scriptClass = scriptClass;
+  }
+
   public DslJsr223TestElement(String name, String defaultName, String script) {
-    super(name != null ? name : defaultName, TestBeanGUI.class);
-    this.scriptBuilder = new DslScriptBuilder(script);
+    this(name, defaultName, script, null, null);
   }
 
-  public DslJsr223TestElement(String name, String defaultName, Jsr223Script<?> script,
-      Class<?> varsClass, Map<String, String> varsNameMapping) {
-    super(name != null ? name : defaultName, TestBeanGUI.class);
-    this.scriptBuilder = new DslScriptBuilder(script, varsClass,
-        mapWithEntry("label", "Label", varsNameMapping));
-  }
-
-  private static <K, V> Map<K, V> mapWithEntry(K key, V value, Map<K, V> map) {
-    HashMap<K, V> ret = new HashMap<>(map);
-    ret.put(key, value);
-    return ret;
+  public DslJsr223TestElement(String name, String defaultName,
+      Class<? extends Jsr223Script<?>> scriptClass) {
+    this(name, defaultName, null, null, scriptClass);
   }
 
   public T language(String language) {
@@ -59,38 +62,84 @@ public abstract class DslJsr223TestElement<T extends DslJsr223TestElement<T>> ex
 
   @Override
   protected TestElement buildTestElement() {
-    JSR223TestElement ret = buildJsr223TestElement();
-    ret.setScriptLanguage(language);
-    ret.setScript(scriptBuilder.build());
-    return ret;
+    if (scriptString != null) {
+      JSR223TestElement ret = buildJsr223TestElement();
+      ret.setScriptLanguage(language);
+      ret.setScript(scriptString);
+      return ret;
+    } else {
+      Jsr223DslLambdaTestElement<?> ret = buildLambdaTestElement();
+      ret.setScriptId(script != null ? DslScriptRegistry.register(script) : scriptClass.getName());
+      return ret;
+    }
   }
 
   protected abstract JSR223TestElement buildJsr223TestElement();
 
-  protected interface Jsr223Script<T extends Jsr223ScriptVars> extends DslScript<T, Void> {
+  protected abstract Jsr223DslLambdaTestElement<V> buildLambdaTestElement();
 
-    default Void run(T scriptVars) throws Exception {
-      runScript(scriptVars);
+  public abstract static class Jsr223DslLambdaTestElement<V extends Jsr223ScriptVars> extends
+      AbstractTestElement implements TestBean {
+
+    private static final String SCRIPT_ID_PROP = "SCRIPT_ID";
+    private Jsr223Script<V> script;
+
+    public Jsr223DslLambdaTestElement() {
+      setComment(
+          "Check https://abstracta.github.io/jmeter-java-dsl/guide/#lambdas for instructions on how to run this element in remote engines (like BlazeMeter) or in JMeter standalone GUI.");
+    }
+
+    public void setScriptId(String scriptId) {
+      setProperty(SCRIPT_ID_PROP, scriptId);
+    }
+
+    public String getScriptId() {
+      return getPropertyAsString(SCRIPT_ID_PROP);
+    }
+
+    public void run(V vars) throws Exception {
+      getScript().run(vars);
+    }
+
+    private Jsr223Script<V> getScript() throws ReflectiveOperationException {
+      if (script == null) {
+        String scriptId = getScriptId();
+        script = DslScriptRegistry.findLambdaScript(scriptId);
+        if (script == null) {
+          script = (Jsr223Script<V>) Class.forName(scriptId).newInstance();
+        }
+      }
+      return script;
+    }
+
+  }
+
+  protected interface Jsr223Script<V extends Jsr223ScriptVars> extends DslScript<V, Void> {
+
+    @Override
+    default Void run(V vars) throws Exception {
+      runScript(vars);
       return null;
     }
 
-    void runScript(T scriptVars) throws Exception;
+    void runScript(V vars) throws Exception;
 
   }
 
-  protected static class Jsr223ScriptVars extends DslScriptVars {
+  public static class Jsr223ScriptVars extends DslScriptVars {
 
     public final String label;
 
-    public Jsr223ScriptVars(String label, SampleResult prev, JMeterContext ctx,
-        JMeterVariables vars, Properties props, Sampler sampler, Logger log) {
-      super(prev, ctx, vars, props, sampler, log);
-      this.label = label;
+    public Jsr223ScriptVars(TestElement testElement, JMeterContext ctx) {
+      super(ctx.getPreviousResult(), ctx, ctx.getVariables(), JMeterUtils.getJMeterProperties(),
+          ctx.getCurrentSampler(),
+          LoggerFactory.getLogger(testElement.getClass().getName() + "." + testElement.getName()));
+      this.label = testElement.getName();
     }
 
   }
 
-  protected static class Jsr223TestElementCallBuilder<T extends TestElement> extends
+  public static class Jsr223TestElementCallBuilder<T extends TestElement> extends
       SingleTestElementCallBuilder<T> {
 
     private final String defaultName;

@@ -1,16 +1,15 @@
 package us.abstracta.jmeter.javadsl.core.preprocessors;
 
 import java.lang.reflect.Method;
-import java.util.Collections;
 import java.util.List;
-import java.util.Properties;
 import org.apache.jmeter.modifiers.JSR223PreProcessor;
-import org.apache.jmeter.samplers.SampleResult;
-import org.apache.jmeter.samplers.Sampler;
-import org.apache.jmeter.threads.JMeterContext;
-import org.apache.jmeter.threads.JMeterVariables;
+import org.apache.jmeter.processor.PreProcessor;
+import org.apache.jmeter.testelement.TestElement;
+import org.apache.jmeter.threads.JMeterContextService;
 import org.apache.jmeter.util.JSR223TestElement;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import us.abstracta.jmeter.javadsl.core.preprocessors.DslJsr223PreProcessor.PreProcessorVars;
 import us.abstracta.jmeter.javadsl.core.testelements.DslJsr223TestElement;
 
 /**
@@ -26,8 +25,8 @@ import us.abstracta.jmeter.javadsl.core.testelements.DslJsr223TestElement;
  *
  * @since 0.7
  */
-public class DslJsr223PreProcessor extends DslJsr223TestElement<DslJsr223PreProcessor> implements
-    DslPreProcessor {
+public class DslJsr223PreProcessor extends
+    DslJsr223TestElement<DslJsr223PreProcessor, PreProcessorVars> implements DslPreProcessor {
 
   private static final String DEFAULT_NAME = "JSR223 PreProcessor";
 
@@ -36,12 +35,38 @@ public class DslJsr223PreProcessor extends DslJsr223TestElement<DslJsr223PreProc
   }
 
   public DslJsr223PreProcessor(String name, PreProcessorScript script) {
-    super(name, DEFAULT_NAME, script, PreProcessorVars.class, Collections.emptyMap());
+    super(name, DEFAULT_NAME, script);
+  }
+
+  public DslJsr223PreProcessor(String name, Class<? extends PreProcessorScript> scriptClass) {
+    super(name, DEFAULT_NAME, scriptClass);
   }
 
   @Override
   protected JSR223TestElement buildJsr223TestElement() {
     return new JSR223PreProcessor();
+  }
+
+  @Override
+  protected DslLambdaPreProcessor buildLambdaTestElement() {
+    name = !DEFAULT_NAME.equals(name) ? name : "Lambda Pre Processor";
+    return new DslLambdaPreProcessor();
+  }
+
+  public static class DslLambdaPreProcessor extends
+      Jsr223DslLambdaTestElement<PreProcessorVars> implements PreProcessor {
+
+    private static final Logger LOG = LoggerFactory.getLogger(DslLambdaPreProcessor.class);
+
+    @Override
+    public void process() {
+      try {
+        run(new PreProcessorVars(this));
+      } catch (Exception e) {
+        LOG.error("Problem in lambda {}", getName(), e);
+      }
+    }
+
   }
 
   /**
@@ -50,15 +75,14 @@ public class DslJsr223PreProcessor extends DslJsr223TestElement<DslJsr223PreProc
    * @see PreProcessorVars for a list of provided variables in script execution
    * @since 0.10
    */
-  public interface PreProcessorScript extends Jsr223Script<PreProcessorVars> {
+  public interface PreProcessorScript extends DslJsr223TestElement.Jsr223Script<PreProcessorVars> {
 
   }
 
-  public static class PreProcessorVars extends Jsr223ScriptVars {
+  public static class PreProcessorVars extends DslJsr223TestElement.Jsr223ScriptVars {
 
-    public PreProcessorVars(String label, SampleResult prev, JMeterContext ctx,
-        JMeterVariables vars, Properties props, Sampler sampler, Logger log) {
-      super(label, prev, ctx, vars, props, sampler, log);
+    public PreProcessorVars(TestElement element) {
+      super(element, JMeterContextService.getContext());
     }
 
   }

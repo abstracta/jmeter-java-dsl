@@ -28,5 +28,5 @@ httpSampler(s -> buildRequestUrl(s.vars)) // buildRequestUrl is just an example 
 ```
 
 ::: warning
-As previously mentioned for other lambdas, using them will only work with the embedded JMeter engine. So, prefer using [JSR223 pre-processors](../../request-generation/jsr223-pre-processor#provide-request-parameters-programmatically-per-request) with a groovy script instead if you want to be able to run the test at scale or use generated JMX.
+As previously mentioned, even though using Java Lambdas has several benefits, they are also less portable. Check [this section](../../response-processing/lambdas.md#lambdas) for more details.
 :::

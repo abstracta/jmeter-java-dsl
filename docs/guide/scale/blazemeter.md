@@ -122,5 +122,5 @@ In case you want to get debug logs for HTTP calls to BlazeMeter API, you can inc
 :::
 
 ::: warning
-If you use JSR223 Pre- or Post- processors with Java code (lambdas) instead of strings ([here](../response-processing/jsr223-post-processor#change-sample-result-statuses-with-custom-logic) are some examples), or use one of the HTTP Sampler methods which receive a function as parameter (as in [here](../request-generation/jsr223-pre-processor#provide-request-parameters-programmatically-per-request)), then BlazeMeter execution won't work. You can migrate them to use `jsrPreProcessor` with string scripts instead. Check the associated method's documentation for more details.
+If you use test elements (JSR223 elements, `httpSamplers`, `ifController` or `whileController`) with Java lambdas instead of strings, check [this section of the user guide](../response-processing/lambdas.md#lambdas) to use them while running test plan in BlazeMeter.
 :::

@@ -1,7 +1,5 @@
 package us.abstracta.jmeter.javadsl.http;
 
-import static us.abstracta.jmeter.javadsl.JmeterDsl.jsr223PreProcessor;
-
 import java.lang.reflect.Method;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -23,7 +21,6 @@ import org.apache.jmeter.protocol.http.util.HTTPConstantsInterface;
 import org.apache.jmeter.protocol.http.util.HTTPFileArg;
 import org.apache.jmeter.testelement.property.JMeterProperty;
 import org.apache.jorphan.collections.HashTree;
-import us.abstracta.jmeter.javadsl.JmeterDsl;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodCall;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodCallContext;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodParam;
@@ -32,9 +29,9 @@ import us.abstracta.jmeter.javadsl.codegeneration.params.BoolParam;
 import us.abstracta.jmeter.javadsl.codegeneration.params.EnumParam.EnumPropertyValue;
 import us.abstracta.jmeter.javadsl.codegeneration.params.StringParam;
 import us.abstracta.jmeter.javadsl.core.BuildTreeContext;
-import us.abstracta.jmeter.javadsl.core.preprocessors.DslJsr223PreProcessor.PreProcessorScript;
 import us.abstracta.jmeter.javadsl.core.preprocessors.DslJsr223PreProcessor.PreProcessorVars;
-import us.abstracta.jmeter.javadsl.core.util.JmeterFunction;
+import us.abstracta.jmeter.javadsl.core.util.PropertyScriptBuilder;
+import us.abstracta.jmeter.javadsl.core.util.PropertyScriptBuilder.PropertyScript;
 
 /**
  * Allows to configure a JMeter HTTP sampler to make HTTP requests in a test plan.
@@ -45,9 +42,10 @@ public class DslHttpSampler extends DslBaseHttpSampler<DslHttpSampler> {
 
   private static final String DEFAULT_NAME = "HTTP Request";
 
+  protected final PropertyScriptBuilder<String> urlBuilder;
   protected String method = HTTPConstants.GET;
   protected final List<HTTPArgument> arguments = new ArrayList<>();
-  protected String body;
+  protected Object body;
   protected boolean multiPart;
   protected final List<HTTPFileArg> files = new ArrayList<>();
   protected Charset encoding;
@@ -59,16 +57,21 @@ public class DslHttpSampler extends DslBaseHttpSampler<DslHttpSampler> {
   protected HTTPSamplerProxy element;
 
   public DslHttpSampler(String name, String url) {
+    this(name, url, null);
+  }
+
+  private DslHttpSampler(String name, String url, PropertyScriptBuilder<String> urlBuilder) {
     super(name != null ? name : DEFAULT_NAME, url, HttpTestSampleGui.class);
+    this.urlBuilder = urlBuilder;
   }
 
   public DslHttpSampler(String name, Function<PreProcessorVars, String> urlSupplier) {
-    this(name, (String) null);
-    String variableName = "PRE_PROCESSOR_URL";
-    this.path = JmeterFunction.var(variableName);
-    children(
-        jsr223PreProcessor(s -> s.vars.put(variableName, urlSupplier.apply(s))
-        ));
+    this(name, null, new PropertyScriptBuilder<>(
+        scriptVars -> urlSupplier.apply(new PreProcessorVars(scriptVars.sampler))));
+  }
+
+  public DslHttpSampler(String name, Class<? extends PropertyScript<String>> urlSolverClass) {
+    this(name, null, new PropertyScriptBuilder<>(urlSolverClass));
   }
 
   /**
@@ -88,14 +91,11 @@ public class DslHttpSampler extends DslBaseHttpSampler<DslHttpSampler> {
   /**
    * Same as {@link #post(String, ContentType)} but allowing to use a dynamically calculated body.
    * <p>
-   * This method is just an abstraction that uses a JMeter variable as HTTP request body and
-   * calculates the variable with a jsr223PreProcessor.
+   * This method is just an abstraction that uses jexl2 function as HTTP request body.
    * <p>
-   * <b>WARNING:</b> As this method internally uses
-   * {@link JmeterDsl#jsr223PreProcessor(PreProcessorScript)}, same limitations and considerations
-   * apply. Check its documentation. To avoid such limitations you may use
-   * {@link #post(String, ContentType)} with a JMeter variable instead, and dynamically set the
-   * variable with {@link JmeterDsl#jsr223PreProcessor(String)}.
+   * <b>WARNING:</b> This only works when using embedded jmeter engine.
+   * Check <a href="https://abstracta.github.io/jmeter-java-dsl/guide/#lambdas">the user guide</a>
+   * for details on some alternative.
    *
    * @param bodySupplier function to calculate the body on each request.
    * @param contentType  to be sent as Content-Type header in HTTP POST request.
@@ -108,6 +108,23 @@ public class DslHttpSampler extends DslBaseHttpSampler<DslHttpSampler> {
     return method(HTTPConstants.POST)
         .contentType(contentType)
         .body(bodySupplier);
+  }
+
+  /**
+   * Same as {@link #post(Function, ContentType)} but with support for running at scale in a remote
+   * engine.
+   * <p>
+   * Check <a href="https://abstracta.github.io/jmeter-java-dsl/guide/#lambdas">the user guide</a>
+   * for details on additional steps required to run them at scale in a remote engine.
+   *
+   * @see #post(Function, ContentType)
+   * @since 1.14
+   */
+  public DslHttpSampler post(Class<? extends PropertyScript<String>> bodySolverClass,
+      ContentType contentType) {
+    return method(HTTPConstants.POST)
+        .contentType(contentType)
+        .body(bodySolverClass);
   }
 
   /**
@@ -136,23 +153,34 @@ public class DslHttpSampler extends DslBaseHttpSampler<DslHttpSampler> {
   /**
    * Same as {@link #body(String)} but allows using dynamically calculated HTTP request body.
    * <p>
-   * This method is just an abstraction that uses a JMeter variable as HTTP request body and
-   * calculates the variable with a jsr223PreProcessor.
+   * This method is just an abstraction that uses jexl2 function as HTTP request body.
    * <p>
-   * <b>WARNING:</b> As this method internally uses
-   * {@link JmeterDsl#jsr223PreProcessor(PreProcessorScript)}, same limitations and considerations
-   * apply. Check its documentation.  To avoid such limitations you may use {@link #body(String)}
-   * with a JMeter variable instead, and dynamically set the variable with
-   * {@link JmeterDsl#jsr223PreProcessor(String)}.
+   * <b>WARNING:</b> This only works when using embedded jmeter engine.
+   * Check <a href="https://abstracta.github.io/jmeter-java-dsl/guide/#lambdas">the user guide</a>
+   * for details on some alternative.
    *
    * @param bodySupplier function to calculate the body on each request.
    * @return the sampler for further configuration or usage.
    * @since 0.10
    */
   public DslHttpSampler body(Function<PreProcessorVars, String> bodySupplier) {
-    String variableName = "PRE_PROCESSOR_REQUEST_BODY";
-    return body(JmeterFunction.var(variableName))
-        .children(jsr223PreProcessor(s -> s.vars.put(variableName, bodySupplier.apply(s))));
+    this.body = new PropertyScriptBuilder<>(
+        scriptVars -> bodySupplier.apply(new PreProcessorVars(scriptVars.sampler)));
+    return this;
+  }
+
+  /**
+   * Same as {@link #body(Function)} but with support for running at scale in a remote engine.
+   * <p>
+   * Check <a href="https://abstracta.github.io/jmeter-java-dsl/guide/#lambdas">the user guide</a>
+   * for details on additional steps required to run them at scale in a remote engine.
+   *
+   * @see #body(Function)
+   * @since 1.14
+   */
+  public DslHttpSampler body(Class<? extends PropertyScript<String>> bodySolverClass) {
+    this.body = new PropertyScriptBuilder<>(bodySolverClass);
+    return this;
   }
 
   /**
@@ -406,6 +434,9 @@ public class DslHttpSampler extends DslBaseHttpSampler<DslHttpSampler> {
   @Override
   public HashTree buildTreeUnder(HashTree parent, BuildTreeContext context) {
     files.forEach(f -> f.setPath(context.processAssetFile(f.getPath())));
+    if (path == null && urlBuilder != null) {
+      path = urlBuilder.build();
+    }
     HashTree ret = super.buildTreeUnder(parent, context);
     if (followRedirects == null) {
       /*
@@ -420,7 +451,9 @@ public class DslHttpSampler extends DslBaseHttpSampler<DslHttpSampler> {
   private Arguments buildArguments() {
     Arguments args = new Arguments();
     if (body != null) {
-      HTTPArgument arg = new HTTPArgument("", body, false);
+      HTTPArgument arg = new HTTPArgument("", body instanceof PropertyScriptBuilder
+          ? ((PropertyScriptBuilder<String>) body).build()
+          : body.toString(), false);
       arg.setAlwaysEncoded(false);
       args.addArgument(arg);
     }

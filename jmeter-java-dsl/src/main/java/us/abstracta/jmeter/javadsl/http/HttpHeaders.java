@@ -17,6 +17,8 @@ import us.abstracta.jmeter.javadsl.codegeneration.MethodCallContext;
 import us.abstracta.jmeter.javadsl.codegeneration.SingleTestElementCallBuilder;
 import us.abstracta.jmeter.javadsl.codegeneration.params.StringParam;
 import us.abstracta.jmeter.javadsl.core.configs.BaseConfigElement;
+import us.abstracta.jmeter.javadsl.core.util.PropertyScriptBuilder;
+import us.abstracta.jmeter.javadsl.core.util.PropertyScriptBuilder.PropertyScript;
 
 /**
  * Allows specifying HTTP headers (through an underlying JMeter HttpHeaderManager) to be used by
@@ -34,7 +36,7 @@ import us.abstracta.jmeter.javadsl.core.configs.BaseConfigElement;
  */
 public class HttpHeaders extends BaseConfigElement {
 
-  protected final Map<String, String> headers = new LinkedHashMap<>();
+  protected final Map<String, Object> headers = new LinkedHashMap<>();
 
   public HttpHeaders() {
     super("HTTP Header Manager", HeaderPanel.class);
@@ -56,6 +58,43 @@ public class HttpHeaders extends BaseConfigElement {
   }
 
   /**
+   * Same as {@link #header(String, String)} but allows using dynamically calculated HTTP header
+   * value.
+   * <p>
+   * This method is just an abstraction that uses jexl2 function as HTTP header value.
+   * <p>
+   * <b>WARNING:</b> This only works when using embedded jmeter engine.
+   * Check <a href="https://abstracta.github.io/jmeter-java-dsl/guide/#lambdas">the user guide</a>
+   * for details on some alternative.
+   *
+   * @param name          of the HTTP header.
+   * @param valueSupplier builds the header value.
+   * @return the config element for further configuration or usage.
+   * @since 1.14
+   */
+  public HttpHeaders header(String name, PropertyScript<String> valueSupplier) {
+    headers.put(name, new PropertyScriptBuilder<>(valueSupplier));
+    return this;
+  }
+
+  /**
+   * Same as {@link #header(String, PropertyScript)} but with support for running at scale in a
+   * remote engine.
+   * <p>
+   * Check <a href="https://abstracta.github.io/jmeter-java-dsl/guide/#lambdas">the user guide</a>
+   * for details on additional steps required to run them at scale in a remote engine.
+   *
+   * @see PropertyScript
+   * @see #header(String, PropertyScript)
+   * @since 1.14
+   */
+  public HttpHeaders header(String name,
+      Class<? extends PropertyScript<String>> valueSupplierClass) {
+    headers.put(name, new PropertyScriptBuilder<>(valueSupplierClass));
+    return this;
+  }
+
+  /**
    * Allows to easily specify the Content-Type HTTP header.
    *
    * @param contentType value to use as Content-Type header.
@@ -73,7 +112,9 @@ public class HttpHeaders extends BaseConfigElement {
   @Override
   protected TestElement buildTestElement() {
     HeaderManager ret = new HeaderManager();
-    headers.forEach((name, value) -> ret.add(new Header(name, value)));
+    headers.forEach((name, value) -> ret.add(new Header(name, value instanceof PropertyScriptBuilder
+        ? ((PropertyScriptBuilder<String>) value).build()
+        : value.toString())));
     return ret;
   }
 

@@ -11,7 +11,6 @@ import us.abstracta.jmeter.javadsl.codegeneration.SingleTestElementCallBuilder;
 import us.abstracta.jmeter.javadsl.codegeneration.TestElementParamBuilder;
 import us.abstracta.jmeter.javadsl.codegeneration.params.ChildrenParam;
 import us.abstracta.jmeter.javadsl.core.threadgroups.BaseThreadGroup.ThreadGroupChild;
-import us.abstracta.jmeter.javadsl.core.util.DslScriptBuilder;
 import us.abstracta.jmeter.javadsl.core.util.PropertyScriptBuilder;
 import us.abstracta.jmeter.javadsl.core.util.PropertyScriptBuilder.PropertyScript;
 
@@ -28,20 +27,26 @@ import us.abstracta.jmeter.javadsl.core.util.PropertyScriptBuilder.PropertyScrip
  */
 public class DslWhileController extends BaseController<DslWhileController> {
 
-  protected DslScriptBuilder conditionBuilder;
+  protected PropertyScriptBuilder<Boolean> conditionBuilder;
 
   public DslWhileController(String name, String condition, List<ThreadGroupChild> children) {
-    this(name, new PropertyScriptBuilder(condition), children);
+    this(name, new PropertyScriptBuilder<Boolean>(condition), children);
   }
 
-  private DslWhileController(String name, DslScriptBuilder conditionBuilder,
+  private DslWhileController(String name, PropertyScriptBuilder<Boolean> conditionBuilder,
       List<ThreadGroupChild> children) {
     super(name != null ? name : "while", WhileControllerGui.class, children);
     this.conditionBuilder = conditionBuilder;
   }
 
-  public DslWhileController(String name, PropertyScript script, List<ThreadGroupChild> children) {
-    this(name, new PropertyScriptBuilder(script), children);
+  public DslWhileController(String name, PropertyScript<Boolean> script,
+      List<ThreadGroupChild> children) {
+    this(name, new PropertyScriptBuilder<>(script), children);
+  }
+
+  public DslWhileController(String name, Class<? extends PropertyScript<Boolean>> scriptClass,
+      List<ThreadGroupChild> children) {
+    this(name, new PropertyScriptBuilder<>(scriptClass), children);
   }
 
   @Override

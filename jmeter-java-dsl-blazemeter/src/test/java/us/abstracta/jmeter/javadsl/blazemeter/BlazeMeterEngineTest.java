@@ -9,6 +9,7 @@ import static us.abstracta.jmeter.javadsl.JmeterDsl.threadGroup;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import us.abstracta.jmeter.javadsl.core.TestPlanStats;
 import us.abstracta.jmeter.javadsl.util.TestResource;
@@ -20,6 +21,7 @@ public class BlazeMeterEngineTest {
   private static final String OVERALL_STATS_LABEL = "overall";
 
   @Test
+  @Disabled("Ignoring test since we have temporally ran out of credit")
   public void shouldRunTestInBlazeMeter() throws Exception {
     TestPlanStats stats = testPlan(
         threadGroup(1, 1,

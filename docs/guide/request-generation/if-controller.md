@@ -34,7 +34,7 @@ public class PerformanceTest {
 }
 ```
 
-You can also use a Java lambda instead of providing JMeter expression, which benefits from Java type safety & IDEs code auto-completion:
+You can also use a Java lambda instead of providing JMeter expression, which benefits from Java type safety & IDEs code auto-completion and consumes less CPU:
 
 ```java
 ifController(s -> s.vars.get("ACCOUNT_ID") != null,
@@ -43,7 +43,7 @@ ifController(s -> s.vars.get("ACCOUNT_ID") != null,
 ```
 
 ::: warning
-Using java code (lambdas) will only work with embedded JMeter engine (no support for saving to JMX and running it in JMeter GUI, or running it with BlazeMeter, OctoPerf or Azure). Use the first option to avoid such limitations.
+Even though using Java Lambdas has several benefits, they are also less portable. Check [this section](../response-processing/lambdas.md#lambdas) for more details.
 :::
 
 Check [DslIfController](/jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/controllers/DslIfController.java) and [JMeter Component documentation](https://jmeter.apache.org/usermanual/component_reference.html#If_Controller) for more details.

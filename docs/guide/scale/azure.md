@@ -70,7 +70,7 @@ As with BlazeMeter and OctoPerf cases, if you want to get debug logs for HTTP ca
 :::
 
 ::: warning
-Also like with BlazeMeter and OctoPerf, if you use JSR223 Pre- or Post- processors with Java code (lambdas) instead of strings ([here](../response-processing/jsr223-post-processor#change-sample-result-statuses-with-custom-logic) are some examples), or use one of the HTTP Sampler methods which receive a function as parameter (as in [here](../request-generation/jsr223-pre-processor#provide-request-parameters-programmatically-per-request)), then Azure Load Testing execution won't work. You can migrate them to use `jsrPreProcessor` with string scripts instead. Check the associated method's documentation for more details.
+There is currently no built-in support for test elements with Java lambdas in `AzureEngine` (as there is for `BlazeMeterEngine`). If you need it, please request it by creating a [GitHub issue](https://github.com/abstracta/jmeter-java-dsl/issues).
 :::
 
 ::: warning

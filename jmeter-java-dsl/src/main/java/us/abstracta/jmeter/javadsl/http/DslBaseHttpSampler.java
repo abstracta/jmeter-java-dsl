@@ -1,7 +1,5 @@
 package us.abstracta.jmeter.javadsl.http;
 
-import static us.abstracta.jmeter.javadsl.JmeterDsl.jsr223PreProcessor;
-
 import java.lang.reflect.Method;
 import java.time.Duration;
 import java.util.List;
@@ -16,7 +14,6 @@ import org.apache.jmeter.protocol.http.util.HTTPConstants;
 import org.apache.jmeter.testelement.TestElement;
 import org.apache.jmeter.util.JMeterUtils;
 import org.apache.jorphan.collections.HashTree;
-import us.abstracta.jmeter.javadsl.JmeterDsl;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodCall;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodCallContext;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodParam;
@@ -27,7 +24,7 @@ import us.abstracta.jmeter.javadsl.core.BuildTreeContext;
 import us.abstracta.jmeter.javadsl.core.preprocessors.DslJsr223PreProcessor.PreProcessorScript;
 import us.abstracta.jmeter.javadsl.core.preprocessors.DslJsr223PreProcessor.PreProcessorVars;
 import us.abstracta.jmeter.javadsl.core.samplers.BaseSampler;
-import us.abstracta.jmeter.javadsl.core.util.JmeterFunction;
+import us.abstracta.jmeter.javadsl.core.util.PropertyScriptBuilder.PropertyScript;
 
 /**
  * Abstracts common logic used by HTTP based samplers.
@@ -136,25 +133,36 @@ public abstract class DslBaseHttpSampler<T extends DslBaseHttpSampler<T>> extend
    * Same as {@link #header(String, String)} but allows using dynamically calculated HTTP header
    * value.
    * <p>
-   * This method is just an abstraction that uses a JMeter variable as HTTP header value and
-   * calculates the variable with a jsr223PreProcessor.
+   * This method is just an abstraction that uses jexl2 function as HTTP header value.
    * <p>
-   * <b>WARNING:</b> As this method internally uses
-   * {@link JmeterDsl#jsr223PreProcessor(PreProcessorScript)}, same limitations and considerations
-   * apply. Check its documentation. To avoid such limitations you may use
-   * {@link #header(String, String)} with a JMeter variable instead, and dynamically set the
-   * variable with {@link JmeterDsl#jsr223PreProcessor(String)}.
+   * <b>WARNING:</b> This only works when using embedded jmeter engine.
+   * Check <a href="https://abstracta.github.io/jmeter-java-dsl/guide/#lambdas">the user guide</a>
+   * for details on some alternative.
    *
    * @param name          of the HTTP header.
    * @param valueSupplier builds the header value.
    * @return the altered sampler to allow for fluent API usage.
    */
   public T header(String name, Function<PreProcessorVars, String> valueSupplier) {
-    String variableNamePrefix = "PRE_PROCESSOR_HEADER~";
-    return header(name, JmeterFunction.var(variableNamePrefix + name))
-        .children(
-            jsr223PreProcessor(s -> s.vars.put(variableNamePrefix + name, valueSupplier.apply(s)))
-        );
+    headers.header(name,
+        scriptVars -> valueSupplier.apply(new PreProcessorVars(scriptVars.sampler)));
+    return (T) this;
+  }
+
+  /**
+   * Same as {@link #header(String, Function)} but with support for running at scale in a remote
+   * engine.
+   * <p>
+   * Check <a href="https://abstracta.github.io/jmeter-java-dsl/guide/#lambdas">the user guide</a>
+   * for details on additional steps required to run them at scale in a remote engine.
+   *
+   * @see PreProcessorScript
+   * @see #header(String, Function)
+   * @since 1.14
+   */
+  public T header(String name, Class<? extends PropertyScript<String>> valueSupplierClass) {
+    headers.header(name, valueSupplierClass);
+    return (T) this;
   }
 
   /**

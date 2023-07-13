@@ -56,7 +56,7 @@ testImplementation 'redis.clients:jedis:3.6.0'
 ::::
 :::::
 
-You can also use Java lambdas instead of Groovy script to take advantage of IDEs auto-completion and Java type safety:
+You can also use Java lambdas instead of Groovy script to take advantage of IDEs auto-completion, Java type safety, and less CPU consumption:
 
 ```java
 jsr223Sampler(v -> {
@@ -70,7 +70,7 @@ jsr223Sampler(v -> {
 ```
 
 ::: warning
-Using java code (lambdas) will only work with embedded JMeter engine (no support for saving to JMX and running it in JMeter GUI, or running it with BlazeMeter, OctoPerf or Azure). Use the first option to avoid such limitations.
+As previously mentioned, even though using Java Lambdas has several benefits, they are also less portable. Check [this section](../response-processing/jsr223-post-processor.md#lambdas) for more details.
 :::
 
 `jsr223Sampler` is very powerful, but also makes code and test plans harder to maintain (as with any custom code) compared to using JMeter built-in samplers. So, in general, prefer using JMeter-provided samplers if they are enough for the task at hand, and use `jsr223Sampler` sparingly.

@@ -11,7 +11,6 @@ import us.abstracta.jmeter.javadsl.codegeneration.SingleTestElementCallBuilder;
 import us.abstracta.jmeter.javadsl.codegeneration.TestElementParamBuilder;
 import us.abstracta.jmeter.javadsl.codegeneration.params.ChildrenParam;
 import us.abstracta.jmeter.javadsl.core.threadgroups.BaseThreadGroup.ThreadGroupChild;
-import us.abstracta.jmeter.javadsl.core.util.DslScriptBuilder;
 import us.abstracta.jmeter.javadsl.core.util.PropertyScriptBuilder;
 import us.abstracta.jmeter.javadsl.core.util.PropertyScriptBuilder.PropertyScript;
 
@@ -22,19 +21,25 @@ import us.abstracta.jmeter.javadsl.core.util.PropertyScriptBuilder.PropertyScrip
  */
 public class DslIfController extends BaseController<DslIfController> {
 
-  protected DslScriptBuilder conditionBuilder;
+  protected PropertyScriptBuilder<Boolean> conditionBuilder;
 
   public DslIfController(String condition, List<ThreadGroupChild> children) {
-    this(new PropertyScriptBuilder(condition), children);
+    this(new PropertyScriptBuilder<>(condition), children);
   }
 
-  private DslIfController(DslScriptBuilder conditionBuilder, List<ThreadGroupChild> children) {
+  private DslIfController(PropertyScriptBuilder<Boolean> conditionBuilder,
+      List<ThreadGroupChild> children) {
     super("If Controller", IfControllerPanel.class, children);
     this.conditionBuilder = conditionBuilder;
   }
 
-  public DslIfController(PropertyScript script, List<ThreadGroupChild> children) {
-    this(new PropertyScriptBuilder(script), children);
+  public DslIfController(PropertyScript<Boolean> script, List<ThreadGroupChild> children) {
+    this(new PropertyScriptBuilder<>(script), children);
+  }
+
+  public DslIfController(Class<? extends PropertyScript<Boolean>> conditionClass,
+      List<ThreadGroupChild> children) {
+    this(new PropertyScriptBuilder<>(conditionClass), children);
   }
 
   @Override

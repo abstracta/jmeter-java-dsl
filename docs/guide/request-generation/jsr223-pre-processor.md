@@ -43,7 +43,7 @@ public class PerformanceTest {
 }
 ```
 
-You can also use a Java lambda instead of providing Groovy script, which benefits from Java type safety & IDEs code auto-completion:
+You can also use a Java lambda instead of providing Groovy script, which benefits from Java type safety & IDEs code auto-completion and consumes less CPU:
 
 ```java
 jsr223PreProcessor(s -> s.vars.put("REQUEST_BODY", buildRequestBody(s.vars)))
@@ -56,7 +56,7 @@ post(s -> buildRequestBody(s.vars), Type.TEXT_PLAIN)
 ```
 
 ::: warning
-Using java code (lambdas) will only work with embedded JMeter engine (no support for saving to JMX and running it in JMeter GUI, or running it with BlazeMeter, OctoPerf or Azure). Use the first option to avoid such limitations.
+Even though using Java Lambdas has several benefits, they are also less portable. Check [this section](../response-processing/lambdas.md#lambdas) for more details.
 :::
 
 ::: tip

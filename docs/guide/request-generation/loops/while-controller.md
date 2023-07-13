@@ -33,7 +33,7 @@ public class PerformanceTest {
 }
 ```
 
-As with `ifController`, you can also use Java lambdas to benefit from IDE auto-completion and type safety. Eg:
+As with `ifController`, you can also use Java lambdas to benefit from IDE auto-completion and type safety and less CPU consumption. Eg:
 
 ```java
 whileController(s -> s.vars.get("ACCOUNT_ID") == null,
@@ -46,7 +46,7 @@ whileController(s -> s.vars.get("ACCOUNT_ID") == null,
 ```
 
 ::: warning
-Using java code (lambdas) will only work with embedded JMeter engine (no support for saving to JMX and running it in JMeter GUI, or running it with BlazeMeter, OctoPerf or Azure). Use the first option to avoid such limitations.
+Even though using Java Lambdas has several benefits, they are also less portable. Check [this section](../../response-processing/lambdas.md#lambdas) for more details.
 :::
 
 ::: warning
