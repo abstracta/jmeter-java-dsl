@@ -38,7 +38,7 @@ Additionally, you can use the `not()` method to check for the inverse condition.
 :::
 
 ::: tip
-By default this element uses JMeter JSON [JMESPath](https://jmespath.org/) Assertiong element, and in consequence JMESPath as query language.
+By default this element uses JMeter JSON [JMESPath](https://jmespath.org/) Assertion element, and in consequence, JMESPath as query language.
 
-If you want to use JMeter JSON Assertion element, and in consequence [JSONPath](https://github.com/json-path/JsonPath) as query language, you can simply use `.queryLanguage(JsonQueryLanguage.JSON_PATH)` and a JSONPath query.
+If you want to use JMeter JSON Assertion element, and in consequence [JSONPath](https://github.com/json-path/JsonPath) as the query language, you can simply use `.queryLanguage(JsonQueryLanguage.JSON_PATH)` and a JSONPath query.
 :::
