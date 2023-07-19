@@ -2,10 +2,14 @@ package us.abstracta.jmeter.javadsl.core.testelements;
 
 import java.lang.reflect.Method;
 import java.util.List;
+import org.apache.jmeter.engine.event.LoopIterationEvent;
+import org.apache.jmeter.engine.event.LoopIterationListener;
 import org.apache.jmeter.testbeans.TestBean;
 import org.apache.jmeter.testbeans.gui.TestBeanGUI;
 import org.apache.jmeter.testelement.AbstractTestElement;
 import org.apache.jmeter.testelement.TestElement;
+import org.apache.jmeter.testelement.TestIterationListener;
+import org.apache.jmeter.testelement.ThreadListener;
 import org.apache.jmeter.threads.JMeterContext;
 import org.apache.jmeter.util.JMeterUtils;
 import org.apache.jmeter.util.JSR223TestElement;
@@ -79,7 +83,8 @@ public abstract class DslJsr223TestElement<T extends DslJsr223TestElement<T, V>,
   protected abstract Jsr223DslLambdaTestElement<V> buildLambdaTestElement();
 
   public abstract static class Jsr223DslLambdaTestElement<V extends Jsr223ScriptVars> extends
-      AbstractTestElement implements TestBean {
+      AbstractTestElement implements TestBean, ThreadListener, TestIterationListener,
+      LoopIterationListener {
 
     private static final String SCRIPT_ID_PROP = "SCRIPT_ID";
     private Jsr223Script<V> script;
@@ -97,19 +102,47 @@ public abstract class DslJsr223TestElement<T extends DslJsr223TestElement<T, V>,
       return getPropertyAsString(SCRIPT_ID_PROP);
     }
 
-    public void run(V vars) throws Exception {
-      getScript().run(vars);
+    @Override
+    public void threadStarted() {
+      script = getScript();
+      if (script instanceof ThreadListener) {
+        ((ThreadListener) script).threadStarted();
+      }
     }
 
-    private Jsr223Script<V> getScript() throws ReflectiveOperationException {
-      if (script == null) {
-        String scriptId = getScriptId();
-        script = DslScriptRegistry.findLambdaScript(scriptId);
-        if (script == null) {
-          script = (Jsr223Script<V>) Class.forName(scriptId).newInstance();
-        }
+    private Jsr223Script<V> getScript() {
+      String scriptId = getScriptId();
+      Jsr223Script<V> script = DslScriptRegistry.findLambdaScript(scriptId);
+      try {
+        return script != null ? script : (Jsr223Script<V>) Class.forName(scriptId).newInstance();
+      } catch (ReflectiveOperationException e) {
+        throw new RuntimeException(e);
       }
-      return script;
+    }
+
+    @Override
+    public void testIterationStart(LoopIterationEvent event) {
+      if (script instanceof TestIterationListener) {
+        ((TestIterationListener) script).testIterationStart(event);
+      }
+    }
+
+    @Override
+    public void iterationStart(LoopIterationEvent iterEvent) {
+      if (script instanceof LoopIterationListener) {
+        ((LoopIterationListener) script).iterationStart(iterEvent);
+      }
+    }
+
+    public void run(V vars) throws Exception {
+      script.run(vars);
+    }
+
+    @Override
+    public void threadFinished() {
+      if (script instanceof ThreadListener) {
+        ((ThreadListener) script).threadFinished();
+      }
     }
 
   }

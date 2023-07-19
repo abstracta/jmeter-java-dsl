@@ -73,6 +73,56 @@ jsr223Sampler(v -> {
 As previously mentioned, even though using Java Lambdas has several benefits, they are also less portable. Check [this section](../response-processing/jsr223-post-processor.md#lambdas) for more details.
 :::
 
-`jsr223Sampler` is very powerful, but also makes code and test plans harder to maintain (as with any custom code) compared to using JMeter built-in samplers. So, in general, prefer using JMeter-provided samplers if they are enough for the task at hand, and use `jsr223Sampler` sparingly.
+You may even use some custom logic that executes a particular logic when a thread group thread is created and finished. Here is an example:
+
+```java
+public class TestRedis {
+
+  public static class RedisSampler implements SamplerScript, ThreadListener {
+
+    private Jedis jedis;
+
+    @Override
+    public void threadStarted() {
+      jedis = new Jedis("localhost", 6379);
+      jedis.connect();
+    }
+
+    @Override
+    public void runScript(SamplerVars v) {
+      jedis.set("foo", "bar");
+      v.sampleResult.setResponseData(jedis.get("foo"), StandardCharsets.UTF_8.name());
+    }
+
+    @Override
+    public void threadFinished() {
+      jedis.close();
+    }
+
+  }
+
+  @Test
+  public void shouldGetExpectedSampleResultWhenJsr223SamplerWithLambdaAndCustomResponse()
+      throws IOException {
+    TestPlanStats stats = testPlan(
+        threadGroup(2, 10,
+            jsr223Sampler(RedisSampler.class)
+        )
+    ).run();
+    assertThat(stats.overall().sampleTimePercentile99()).isLessThan(Duration.ofMillis(500));
+  }
+
+}
+```
+
+::: tip
+You can also make your class implement `TestIterationListener` to execute custom logic on each thread group iteration start, or `LoopIterationListener` to execute some custom logic on each iteration start (for example, each iteration of a `forLoop`).
+:::
+
+::: tip
+When using public static classes in `jsr223Sampler` take into consideration that one instance of the class is created for each thread group thread and `jsr223Sampler` instance.
+:::
+
+**Note:** `jsr223Sampler` is very powerful, but also makes code and test plans harder to maintain (as with any custom code) compared to using JMeter built-in samplers. So, in general, prefer using JMeter-provided samplers if they are enough for the task at hand, and use `jsr223Sampler` sparingly.
 
 Check [DslJsr223Sampler](/jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/java/DslJsr223Sampler.java) for more details and additional options.
