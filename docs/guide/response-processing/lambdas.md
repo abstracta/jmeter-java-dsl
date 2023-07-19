@@ -73,57 +73,74 @@ Here are the steps to run test plans containing Java lambdas in `BlazeMeterEngin
    
    > Script interface to implement, depends on where you use the lambda code. Available interfaces are `PropertyScript`, `PreProcessorScript`, `PostProcessorScript`, and `SamplerScript`.
 
-2. Package your test code in a jar.
+2. Upload your test code and dependencies to BlazeMeter.
 
-   If you use maven, you use `maven-jar-plugin` `test-jar` goal, like this:
+   If you use maven, here is what you can add to your project to configure this:
 
    ```xml
-   <plugin>
-      <groupId>org.apache.maven.plugins</groupId>
-      <artifactId>maven-jar-plugin</artifactId>
-      <version>3.3.0</version>
-      <executions>
-         <execution>
+   <plugins>
+     ...
+     <!-- this generates a jar containing your test code (including the public static class previously mentioned) -->
+     <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <version>3.3.0</version>
+        <executions>
+          <execution>
             <goals>
-               <goal>test-jar</goal>
+              <goal>test-jar</goal>
             </goals>
+          </execution>
+        </executions>
+     </plugin>
+     <!-- this copies project dependencies to target/libs directory -->
+     <plugin>
+       <groupId>org.apache.maven.plugins</groupId>
+       <artifactId>maven-dependency-plugin</artifactId>
+       <version>3.6.0</version>
+       <executions>
+         <execution>
+           <id>copy-dependencies</id>
+           <phase>package</phase>
+           <goals>
+             <goal>copy-dependencies</goal>
+           </goals>
+           <configuration>
+             <outputDirectory>${project.build.directory}/libs</outputDirectory>
+             <!-- include here, separating by commas, any additional dependencies (just the artifacts ids) you need to upload to BlazeMeter -->
+             <includeArtifactIds>jmeter-java-dsl</includeArtifactIds>
+           </configuration>
          </execution>
-      </executions>
-   </plugin>
+       </executions>
+     </plugin>
+     <!-- this takes care of executing tests classes ending with IT after test jar is generated and dependencies are copied -->
+     <!-- additionally, it sets some system properties as to easily identify test jar file -->
+     <plugin>
+       <groupId>org.apache.maven.plugins</groupId>
+       <artifactId>maven-failsafe-plugin</artifactId>
+       <version>3.0.0-M7</version>
+       <configuration>
+         <systemPropertyVariables>
+           <testJar.path>${project.build.directory}/${project.artifactId}-${project.version}-tests.jar</testJar.path> 
+         </systemPropertyVariables>
+       </configuration>
+       <executions>
+         <execution>
+           <goals>
+             <goal>integration-test</goal>
+             <goal>verify</goal>
+           </goals>
+         </execution>
+       </executions>
+     </plugin>
+   </plugins>
    ```
 
-3. Copy all dependencies required by the lambda code in addition to `jmeter-java-dsl`.
-
-   This can be easily achieved with `maven-dependency-plugin`, like this:
-
-   ```xml
-   <plugin>
-     <groupId>org.apache.maven.plugins</groupId>
-     <artifactId>maven-dependency-plugin</artifactId>
-     <version>3.6.0</version>
-     <executions>
-       <execution>
-         <id>copy-dependencies</id>
-         <phase>package</phase>
-         <goals>
-           <goal>copy-dependencies</goal>
-         </goals>
-         <configuration>
-           <outputDirectory>${project.build.directory}/libs</outputDirectory>
-           <!-- include here, separating by commas, any additional dependencies (just the artifacts ids) you need to upload to BlazeMeter -->
-           <includeArtifactIds>jmeter-java-dsl</includeArtifactIds>
-         </configuration>
-       </execution>
-     </executions>
-   </plugin>
-   ```
-
-4. Add to `BlazeMeterEngine` jars required for the static classes execution.
-
-   You can change the previous example like this:
+   Additionally, rename your test class to use IT suffix (so it runs after test jar is created and dependencies are copied), and add to `BlazeMeterEngine` logic to upload the jars. For example:
 
    ```java
-   public class PerformanceTest {
+   // Here we renamed from PerformanceTest to PerformanceIT
+   public class PerformanceIT {
      
       ...
       
@@ -138,7 +155,7 @@ Here are the steps to run test plans containing Java lambdas in `BlazeMeterEngin
       private File[] findAssets() {
          File[] libsFiles = new File("target/libs").listFiles();
          File[] ret = new File[libsFiles.length + 1];
-         ret[0] = new File(String.format("target/myproject-%s-tests.jar", System.getProperty("project.version"))); // change name of project to match
+         ret[0] = new File(System.getProperty("testJar.path"));
          System.arraycopy(libsFiles, 0, ret, 1, libsFiles.length);
          return ret;
       }
@@ -150,37 +167,7 @@ Here are the steps to run test plans containing Java lambdas in `BlazeMeterEngin
    Currently only `BlazeMeterEngine` provides a way to upload assets. If you need support for other engines, please request it [in an issue](https://github.com/abstracta/issues).
    :::
 
-5. Execute your tests after the test jar package is built.
-   
-   For this, you can use `maven-failsafe-plugin`, or package your project and run the test individually.
-
-   To use `maven-failsafe-plugin`, add the plugin configuration, like this:
-
-   ```xml
-   <plugin>
-     <groupId>org.apache.maven.plugins</groupId>
-     <artifactId>maven-failsafe-plugin</artifactId>
-     <version>3.0.0-M7</version>
-     <configuration>
-       <!-- Setting this property and then using it code avoids to have to change the code every time version changes -->
-       <systemPropertyVariables>
-         <project.version>${project.version}</project.version> 
-       </systemPropertyVariables>
-     </configuration>
-     <executions>
-       <execution>
-         <goals>
-           <goal>integration-test</goal>
-           <goal>verify</goal>
-         </goals>
-       </execution>
-     </executions>
-   </plugin>
-   ```
-   
-   And rename the test class to end in IT (which is the default suffix used by the plugin for detecting tests). Eg.: from `PerformanceTest` to `PerformanceIT`.
-
-   Now you can just run your test with `mvn clean verify` or as part of `mvn clean install`.
+3. Execute your tests with maven (either with `mvn clean verify` or as part of `mvn clean install`) or IDE (by first packaging your project, and then executing `PerformanceIT` test).
 
 ##### Lambdas in standalone JMeter
 
@@ -197,3 +184,4 @@ If you save your test plan with the `saveAsJmx()` test plan method and then want
 3. Copy all dependencies, in addition to `jmeter-java-dsl`, required by the lambda code to JMeter `lib/ext` folder.
    
    You can also use `maven-dependency-plugin` and run `mvn package -DskipTests` to get the actual jars.
+   If the test plan requires any particular jmeter plugin, then you would need to copy those as well.
