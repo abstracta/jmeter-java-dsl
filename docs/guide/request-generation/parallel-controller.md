@@ -10,14 +10,14 @@ To use it, add the following dependency to your project:
 <dependency>
   <groupId>us.abstracta.jmeter</groupId>
   <artifactId>jmeter-java-dsl-parallel</artifactId>
-  <version>1.15</version>
+  <version>1.16</version>
   <scope>test</scope>
 </dependency>
 ```
 :::
 ::: code-group-item Gradle
 ```groovy
-testImplementation 'us.abstracta.jmeter:jmeter-java-dsl-dashboard:1.15'
+testImplementation 'us.abstracta.jmeter:jmeter-java-dsl-dashboard:1.16'
 ```
 :::
 ::::
