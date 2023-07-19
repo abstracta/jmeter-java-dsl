@@ -1,5 +1,7 @@
 package us.abstracta.jmeter.javadsl.core.assertions;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.lang.reflect.Method;
 import java.util.List;
 import org.apache.jmeter.assertions.JSONPathAssertion;
@@ -28,6 +30,7 @@ public class DslJsonAssertion extends BaseTestElement implements DslAssertion {
 
   private static final String DEFAULT_JMESPATH_NAME = "JSON JMESPath Assertion";
   private static final String DEFAULT_JSONPATH_NAME = "JSON Assertion";
+  private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
   protected String query;
   protected boolean isRegex;
@@ -57,15 +60,54 @@ public class DslJsonAssertion extends BaseTestElement implements DslAssertion {
 
   /**
    * Specifies to check the value extracted is the given value.
+   * <p>
+   * <b>Warning:</b> This method serializes the value with Jackson library and then configures
+   * JMeter element with such value. If you want to pass the raw JSON to compare with, use
+   * {@link #equalsToJson(String)} instead.
+   * <p>
+   * If you want to use a JMeter expression (Eg: {@code "${VAR}"}) for checking for some primitive
+   * type (like int or boolean), then use {@link #equalsToJson(String)} instead.
    *
-   * @param value specifies the value to check the extracted value against. You can specify null if
-   *              you want to check if extracted value is null.
+   * @param value specifies the value to check the extracted value against. Here you can pass
+   *              primitive types (like ints, booleans, etc), Strings, collections (lists, maps),
+   *              arrays, and even objects to be serialized with Jackson library. You can also
+   *              specify null if you want to check if extracted value is null.
    * @return the assertion element for further configuration or usage.
+   * @see #equalsToJson(String)
    */
-  public DslJsonAssertion equalsTo(String value) {
+  public DslJsonAssertion equalsTo(Object value) {
     validateValue = true;
     isRegex = false;
-    this.value = value;
+    try {
+      this.value = value != null ? OBJECT_MAPPER.writeValueAsString(value) : null;
+    } catch (JsonProcessingException e) {
+      throw new IllegalArgumentException(e);
+    }
+    return this;
+  }
+
+  /**
+   * Specifies the raw JSON value to check the extracted value is equals to.
+   * <p>
+   * When using this method you must provide the actual JSON representation of the value. For
+   * example, if you want to check the value is a given string, then you have to quote it like
+   * {@code "\"test string\""}.
+   * <p>
+   * In general prefer using {@link #equalsTo(Object)} which is simpler.
+   *
+   * @param json specifies the raw json to check the extracted value against. You can specify here
+   *             simple values like {@code "1"}, {@code "\"test string\""}, or more complex ones
+   *             like {@code "[1, 2, 3]"} or {@code "{\"prop\": 1}"}. If you want to use a JMeter
+   *             expression (eg: {@code "${VAR}"}) for checking for a string value, you should add
+   *             quotes to it (eg: {@code "\"${VAR}\""}).
+   * @return the assertion element for further configuration or usage.
+   * @see #equalsTo(Object)
+   * @since 1.16
+   */
+  public DslJsonAssertion equalsToJson(String json) {
+    validateValue = true;
+    isRegex = false;
+    this.value = json;
     return this;
   }
 
@@ -120,7 +162,7 @@ public class DslJsonAssertion extends BaseTestElement implements DslAssertion {
     ret.setJmesPath(query);
     ret.setJsonValidationBool(validateValue);
     ret.setIsRegex(isRegex);
-    ret.setExpectedValue(value);
+    ret.setExpectedValue(value != null ? value.toString() : null);
     ret.setExpectNull(validateValue && value == null);
     ret.setInvert(not);
     return ret;
@@ -133,7 +175,7 @@ public class DslJsonAssertion extends BaseTestElement implements DslAssertion {
     ret.setJsonPath(query);
     ret.setJsonValidationBool(validateValue);
     ret.setIsRegex(isRegex);
-    ret.setExpectedValue(value);
+    ret.setExpectedValue(value != null ? value.toString() : null);
     ret.setExpectNull(validateValue && value == null);
     ret.setInvert(not);
     return ret;
@@ -184,13 +226,17 @@ public class DslJsonAssertion extends BaseTestElement implements DslAssertion {
 
     private void chainValueMatch(MethodCall ret, String validationProp, String regexProp,
         String valueProp, String nullProp, TestElement element) {
-      if (element.getPropertyAsBoolean(validationProp)) {
-        if (element.getPropertyAsBoolean(regexProp)) {
-          ret.chain("matches",
-              new StringParam(element.getPropertyAsString(valueProp)));
+      if (!element.getPropertyAsBoolean(validationProp)) {
+        return;
+      }
+      if (element.getPropertyAsBoolean(regexProp)) {
+        ret.chain("matches",
+            new StringParam(element.getPropertyAsString(valueProp)));
+      } else {
+        if (element.getPropertyAsBoolean(nullProp)) {
+          ret.chain("equalsTo", new NullParam());
         } else {
-          ret.chain("equalsTo", element.getPropertyAsBoolean(nullProp) ? new NullParam()
-              : new StringParam(element.getPropertyAsString(valueProp)));
+          ret.chain("equalsToJson", new StringParam(element.getPropertyAsString(valueProp)));
         }
       }
     }
@@ -211,7 +257,7 @@ public class DslJsonAssertion extends BaseTestElement implements DslAssertion {
   private static class NullParam extends MethodParam {
 
     protected NullParam() {
-      super(String.class, null);
+      super(Object.class, null);
     }
 
     @Override

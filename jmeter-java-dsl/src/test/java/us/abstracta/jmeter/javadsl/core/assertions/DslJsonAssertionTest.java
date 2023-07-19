@@ -8,6 +8,8 @@ import static us.abstracta.jmeter.javadsl.JmeterDsl.testPlan;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.threadGroup;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collections;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodCallBuilderTest;
@@ -17,16 +19,24 @@ import us.abstracta.jmeter.javadsl.core.postprocessors.DslJsonExtractor.JsonQuer
 
 public class DslJsonAssertionTest {
 
-  private static final String PROPERTY_NAME = "prop";
-  private static final String JSON_BODY = "{\"prop\": \"val\", \"nullProp\": null}";
+  private static final String PROPERTY_NAME = "stringProp";
+  private static final String JSON_BODY = "{"
+      + "\"stringProp\": \"val\", "
+      + "\"nullProp\": null, "
+      + "\"intProp\": 1, "
+      + "\"listProp\": [1, 2], "
+      + "\"objProp\": {"
+      + "\"prop\": 1"
+      + "}}";
 
   @Test
   public void shouldGetFailureWhenJsonAssertionWithNotExistingPath() throws Exception {
-    TestPlanStats stats = runTestPlanWithAssertion(jsonAssertion("prop2"));
+    TestPlanStats stats = runTestPlanWithAssertion(jsonAssertion("prop"));
     isFailure(stats);
   }
 
-  private static TestPlanStats runTestPlanWithAssertion(DslJsonAssertion assertion) throws IOException {
+  private static TestPlanStats runTestPlanWithAssertion(DslJsonAssertion assertion)
+      throws IOException {
     return testPlan(
         threadGroup(1, 1,
             dummySampler(JSON_BODY),
@@ -75,9 +85,30 @@ public class DslJsonAssertionTest {
   }
 
   @Test
-  public void shouldGetSuccessWhenJsonAssertionWithEqualValue() throws Exception {
+  public void shouldGetSuccessWhenJsonAssertionWithEqualStringValue() throws Exception {
     TestPlanStats stats = runTestPlanWithAssertion(jsonAssertion(PROPERTY_NAME)
         .equalsTo("val"));
+    isSuccess(stats);
+  }
+
+  @Test
+  public void shouldGetSuccessWhenJsonAssertionWithEqualIntValue() throws Exception {
+    TestPlanStats stats = runTestPlanWithAssertion(jsonAssertion("intProp")
+        .equalsTo(1));
+    isSuccess(stats);
+  }
+
+  @Test
+  public void shouldGetSuccessWhenJsonAssertionWithEqualListValue() throws Exception {
+    TestPlanStats stats = runTestPlanWithAssertion(jsonAssertion("listProp")
+        .equalsTo(Arrays.asList(1, 2)));
+    isSuccess(stats);
+  }
+
+  @Test
+  public void shouldGetSuccessWhenJsonAssertionWithEqualMapValue() throws Exception {
+    TestPlanStats stats = runTestPlanWithAssertion(jsonAssertion("objProp")
+        .equalsTo(Collections.singletonMap("prop", 1)));
     isSuccess(stats);
   }
 
@@ -96,6 +127,27 @@ public class DslJsonAssertionTest {
   }
 
   @Test
+  public void shouldGetSuccessWhenJsonAssertionWithEqualJsonStringValue() throws Exception {
+    TestPlanStats stats = runTestPlanWithAssertion(jsonAssertion(PROPERTY_NAME)
+        .equalsToJson("\"val\""));
+    isSuccess(stats);
+  }
+
+  @Test
+  public void shouldGetSuccessWhenJsonAssertionWithEqualJsonIntValue() throws Exception {
+    TestPlanStats stats = runTestPlanWithAssertion(jsonAssertion("intProp")
+        .equalsToJson("1"));
+    isSuccess(stats);
+  }
+
+  @Test
+  public void shouldGetSuccessWhenJsonAssertionWithEqualJsonObjectValue() throws Exception {
+    TestPlanStats stats = runTestPlanWithAssertion(jsonAssertion("objProp")
+        .equalsToJson("{\"prop\": 1}"));
+    isSuccess(stats);
+  }
+
+  @Test
   public void shouldGetFailureWhenJsonAssertionWithNegatedExistingPath() throws Exception {
     TestPlanStats stats = runTestPlanWithAssertion(jsonAssertion(PROPERTY_NAME).not());
     isFailure(stats);
@@ -103,20 +155,20 @@ public class DslJsonAssertionTest {
 
   @Test
   public void shouldGetSuccessWhenJsonAssertionWithNegatedNonExistingPath() throws Exception {
-    TestPlanStats stats = runTestPlanWithAssertion(jsonAssertion("prop2").not());
+    TestPlanStats stats = runTestPlanWithAssertion(jsonAssertion("prop").not());
     isSuccess(stats);
   }
 
   @Test
   public void shouldGetFailureWhenJsonAssertionWithNonExistingJsonPath() throws Exception {
-    TestPlanStats stats = runTestPlanWithAssertion(jsonAssertion("$.prop2")
+    TestPlanStats stats = runTestPlanWithAssertion(jsonAssertion("$.prop")
         .queryLanguage(JsonQueryLanguage.JSON_PATH));
     isFailure(stats);
   }
 
   @Test
   public void shouldGetSuccessWhenJsonAssertionWithExistingJsonPath() throws Exception {
-    TestPlanStats stats = runTestPlanWithAssertion(jsonAssertion("$.prop")
+    TestPlanStats stats = runTestPlanWithAssertion(jsonAssertion("$.stringProp")
         .queryLanguage(JsonQueryLanguage.JSON_PATH));
     isSuccess(stats);
   }
@@ -147,13 +199,13 @@ public class DslJsonAssertionTest {
       );
     }
 
-    public DslTestPlan jsonAssertionWithEqualsTo() {
+    public DslTestPlan jsonAssertionWithEqualsToJson() {
       return testPlan(
           threadGroup(1, 1,
               httpSampler("http://localhost")
                   .children(
                       jsonAssertion("[].name")
-                          .equalsTo("val")
+                          .equalsToJson("\"val\"")
                   )
           )
       );

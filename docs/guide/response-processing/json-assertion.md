@@ -33,7 +33,7 @@ public class PerformanceTest {
 ```
 
 ::: tip
-Previous example just checks that sample result JSON contains an `id` field. You can use `matches(regex)` or `equalsTo(value)` methods to check `id` associated value.
+Previous example just checks that sample result JSON contains an `id` field. You can use `matches(regex)`, `equalsTo(value)` or even `equalsToJson(json)` methods to check `id` associated value.
 Additionally, you can use the `not()` method to check for the inverse condition. E.g.: does not contain `id` field, or field value does not match a given regular expression or is not equal to a given value.
 :::
 
