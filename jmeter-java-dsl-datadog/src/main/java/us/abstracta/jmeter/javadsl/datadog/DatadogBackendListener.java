@@ -1,8 +1,10 @@
 package us.abstracta.jmeter.javadsl.datadog;
 
 import java.lang.reflect.Method;
+import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Map;
+import org.apache.http.client.utils.URIBuilder;
 import org.apache.jmeter.config.Arguments;
 import org.datadog.jmeter.plugins.DatadogBackendClient;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodCall;
@@ -34,6 +36,7 @@ public class DatadogBackendListener extends DslBackendListener<DatadogBackendLis
   public DatadogBackendListener(String apiKey) {
     super(DatadogBackendClient.class, null);
     this.apiKey = apiKey;
+    site(DatadogSite.US1);
   }
 
   /**
@@ -113,16 +116,27 @@ public class DatadogBackendListener extends DslBackendListener<DatadogBackendLis
   protected Arguments buildListenerArguments() {
     Arguments ret = new Arguments();
     ret.addArgument(API_KEY_ARG, apiKey);
-    if (apiUrl != null) {
-      ret.addArgument(API_URL_ARG, apiUrl);
-      ret.addArgument(LOG_URL_ARG, logsUrl);
-    }
+    ret.addArgument(API_URL_ARG, apiUrl);
+    ret.addArgument(LOG_URL_ARG, buildLogsUrl());
     ret.addArgument(RESULT_LOGS_ARG, String.valueOf(resultsAsLogs));
     ret.addArgument(TAGS_ARG, tags != null ? String.join(",", tags) : "");
     return ret;
   }
 
-  public static class CodeBuilder  extends BackendListenerCodeBuilder {
+  private String buildLogsUrl() {
+    if (tags == null) {
+      return logsUrl;
+    }
+    try {
+      return new URIBuilder(logsUrl)
+          .addParameter("ddtags", String.join(",", tags))
+          .toString();
+    } catch (URISyntaxException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  public static class CodeBuilder extends BackendListenerCodeBuilder {
 
     public CodeBuilder(List<Method> builderMethods) {
       super(DatadogBackendClient.class, builderMethods);
