@@ -1,4 +1,4 @@
-### Emulate user delays between requests
+#### Emulate user delays between requests
 
 Sometimes, is necessary to replicate users' behavior on the test plan adding pauses between requests is one of the most used practices. For example, simulate the time it will take to complete a purchase form. JMeter (and the DSL) provide Constant & Uniform Random timers for this purpose. Here is an example that adds a delay of 3 seconds and another between 4 and 10 seconds:
 

@@ -42,6 +42,7 @@ import us.abstracta.jmeter.javadsl.core.threadgroups.DslSetupThreadGroup;
 import us.abstracta.jmeter.javadsl.core.threadgroups.DslTeardownThreadGroup;
 import us.abstracta.jmeter.javadsl.core.threadgroups.RpsThreadGroup;
 import us.abstracta.jmeter.javadsl.core.timers.DslConstantTimer;
+import us.abstracta.jmeter.javadsl.core.timers.DslSynchronizingTimer;
 import us.abstracta.jmeter.javadsl.core.timers.DslThroughputTimer;
 import us.abstracta.jmeter.javadsl.core.timers.DslUniformRandomTimer;
 import us.abstracta.jmeter.javadsl.core.util.PropertyScriptBuilder.PropertyScript;
@@ -1607,6 +1608,20 @@ public class JmeterDsl {
    */
   public static DslThroughputTimer throughputTimer(double throughputPerMinute) {
     return new DslThroughputTimer(throughputPerMinute);
+  }
+
+  /**
+   * Builds a Synchronizing Timer that allows synchronizing samples to be sent all at once.
+   * <p>
+   * This timer is useful when you need to send requests in simultaneous batches, as a way to asure
+   * the system under test gets the requests all at the same time.
+   *
+   * @return the timer for usage in a test plan.
+   * @see DslSynchronizingTimer
+   * @since 1.17
+   */
+  public static DslSynchronizingTimer synchronizingTimer() {
+    return new DslSynchronizingTimer();
   }
 
   /**

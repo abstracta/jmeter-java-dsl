@@ -1,4 +1,4 @@
-### Control throughput
+#### Control throughput
 
 To achieve a specific constant throughput for specific samplers or section of a test plan, you can use `throughputTimer`, which uses JMeter `ConstantThroughputTimer`.
 
