@@ -4,15 +4,21 @@ import { getDirname, path, fs } from '@vuepress/utils'
 import { searchPlugin } from '@vuepress/plugin-search'
 import { mediumZoomPlugin } from '@vuepress/plugin-medium-zoom'
 import { containerPlugin } from '@vuepress/plugin-container'
+import { registerComponentsPlugin } from '@vuepress/plugin-register-components'
 import { mdEnhancePlugin } from "vuepress-plugin-md-enhance"
 import { repoLinkSolverPlugin } from "./plugins/repoLinkSolverPlugin"
 import { includedRelativeLinkSolverPlugin } from "./plugins/includedRelativeLinkSolverPlugin"
 import { copyCodePlugin } from "vuepress-plugin-copy-code2"
+import {NavLink} from '@vuepress/theme-default/lib/shared/index.js'
+
 
 const __dirname = getDirname(import.meta.url)
 
 const REPO_LINK = "https://github.com/abstracta/jmeter-java-dsl"
 
+interface AutoNavLink extends NavLink {
+  icon?: string[]
+}
 
 export default defineUserConfig({
   lang: 'en-US',
@@ -20,7 +26,7 @@ export default defineUserConfig({
   description: 'Simple JMeter performance tests API',
   base: '/jmeter-java-dsl/',
   head: [
-    ['link', { rel: 'shortcut icon', href: '/jmeter-java-dsl/favicon.ico'}],
+    ['link', { rel: 'shortcut icon', href: '/jmeter-java-dsl/favicon.ico' }],
     // when changing this remember also changing components/NavbarBrand.vue
     ['script', {}, `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
                     new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
@@ -55,13 +61,15 @@ export default defineUserConfig({
         link: '/motivation/',
       },
       {
+        text: '',
         link: "https://discord.gg/WNSn5hqmSd",
         icon: ['fab', 'discord']
-      },
+      } as AutoNavLink,
       {
+        text: '',
         link: REPO_LINK,
-        icon: ['fab', 'github']
-      }
+        icon: ['fab', 'github'],
+      } as AutoNavLink
     ],
     sidebarDepth: 3
   }),
@@ -90,6 +98,7 @@ export default defineUserConfig({
     repoLinkSolverPlugin({ repoUrl: REPO_LINK }),
     includedRelativeLinkSolverPlugin({}),
     copyCodePlugin({ pure: true }),
+    registerComponentsPlugin({ componentsDir: path.resolve(__dirname, './components') }),
     containerPlugin({
       type: 'grid',
       before: (info: string): string => `<div class="grid">\n`,
@@ -100,6 +109,19 @@ export default defineUserConfig({
       before: (info: string): string => `<div class="grid-logo"><a href="${info}">\n`,
       after: (): string => '</a></div>\n'
     }),
-    mediumZoomPlugin({selector: "*:is(img):not(.card img):not(a img)"}),
+    containerPlugin({
+      type: 'testimonials',
+      before: (info: string): string => `<carousel>\n`,
+      after: (): string => '</carousel>\n'
+    }),
+    containerPlugin({
+      type: 'testimonial',
+      before: (info: string): string => {
+        let meta = info.split("|");
+        return `<testimonial :item="{source: '${meta[0]}', name: '${meta[1]}', position: '${meta[2]}'}">`;
+      },
+      after: (): string => '</testimonial>\n'
+    }),
+    mediumZoomPlugin({ selector: "*:is(img):not(.card img):not(a img)" }),
   ],
 })

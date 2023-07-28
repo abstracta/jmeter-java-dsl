@@ -13,16 +13,21 @@ export default defineComponent({
 </script>
 
 <script setup lang="ts">
-import { useSiteData } from '@vuepress/client'
+import { useSiteData, ClientOnly } from '@vuepress/client'
 import { isLinkHttp, isLinkMailto, isLinkTel } from '@vuepress/shared'
 import { computed, toRefs } from 'vue'
 import type { PropType } from 'vue'
 import { useRoute } from 'vue-router'
 import type { NavLink } from '@vuepress/theme-default/lib/shared/index.js'
 
+export interface AutoNavLink extends NavLink {
+    style?: string
+    icon?: string[]
+}
+
 const props = defineProps({
   item: {
-    type: Object as PropType<NavLink>,
+    type: Object as PropType<AutoNavLink>,
     required: true,
   },
 })
@@ -117,12 +122,14 @@ const isActive = computed(() => {
     v-bind="$attrs"
   >
     <slot name="before" />
+    <span>
     <template v-if="item.icon">
-      <font-awesome-icon :icon="item.icon" size="xl" @mouseover="hover=true" @mouseleave="hover=false" :class="{ 'fa-fade': hover }"/>
+      <ClientOnly>
+        <font-awesome-icon :icon="item.icon" size="xl" @mouseover="hover=true" @mouseleave="hover=false" :class="{ 'fa-fade': hover }"/>
+      </ClientOnly>
     </template>
-    <template v-else>
-      {{ item.text }}
-    </template>
+    {{ item.text }}
+    </span>
     <AutoLinkExternalIcon v-if="isBlankTarget" />
     <slot name="after" />
   </a>
