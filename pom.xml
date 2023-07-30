@@ -48,7 +48,7 @@
     <project.build.outputTimestamp>1689866082</project.build.outputTimestamp>
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
-    <jmeter.version>5.5</jmeter.version>
+    <jmeter.version>5.6</jmeter.version>
     <testcontainers.version>1.17.6</testcontainers.version>
     <wiremock.version>2.35.0</wiremock.version>
     <junit.version>5.9.1</junit.version>
