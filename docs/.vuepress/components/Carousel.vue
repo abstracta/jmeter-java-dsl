@@ -85,6 +85,7 @@ const onScroll = () => {
     box-sizing: border-box;
     touch-action: pan-y;
     overscroll-behavior: none;
+    margin: 10px 0px;
 }
 
 .carousel.is-dragging {
@@ -107,8 +108,7 @@ const onScroll = () => {
     flex-wrap: wrap;
     align-items: flex-start;
     gap: 20px;
-    padding: 10px 0px;
-    height: 600px;
+    height: 550px;
 }
 
 .carousel-control {
