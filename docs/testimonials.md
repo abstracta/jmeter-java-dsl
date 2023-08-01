@@ -71,4 +71,6 @@ I was looging for simplicity of test plan implementation, reusability of compone
 
 ::::
 
-<AutoLink :item="{link : 'https://forms.gle/h2A7zbHKRiSvCqBd7', text: 'Share your testimonial', icon: 'fa-solid fa-bullhorn'}"/>
+<div style="margin: 10px">
+    <AutoLink :item="{link : 'https://forms.gle/h2A7zbHKRiSvCqBd7', text: 'Share your testimonial', icon: 'fa-solid fa-bullhorn'}"/>
+</div>

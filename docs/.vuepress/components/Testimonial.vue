@@ -45,3 +45,46 @@ const icon = computed(() => {
         <div class="comment"><slot/></div>
     </div>
 </template>
+
+<style>
+.testimonial {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--c-bg-lighter);
+  border-radius: 15px;
+  padding: 15px;
+  width: 400px;
+  white-space: normal;
+
+  scroll-snap-stop: auto;
+  flex-shrink: 0;
+  justify-content: center;
+   /* Fix iOS scrolling */
+   transform: translateZ(0);
+}
+
+.testimonial .position {
+  margin-top: 5px;
+  color: var(--c-text-lighter);
+}
+
+.testimonial .comment p {
+  margin: 10px 0px 0px 0px;
+}
+
+.testimonial .fa-github {
+  color: var(--c-text);
+}
+
+.testimonial .fa-globe {
+  color: #aaaaaa;
+}
+
+.testimonial .fa-linkedin {
+  color: rgb(10, 102, 194);
+}
+
+.testimonial .fa-twitter {
+  color: rgb(29, 155, 240);
+}
+</style>

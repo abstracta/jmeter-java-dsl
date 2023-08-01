@@ -1,164 +1,152 @@
 <script setup lang="ts">
-// Most of this logic is based on https://github.com/ismail9k/vue3-carousel/blob/master/src/components/Carousel.ts
-import { ref, reactive, Ref, computed, onUnmounted, onMounted, nextTick } from 'vue';
+import { ref, Ref } from 'vue';
 import { ClientOnly } from '@vuepress/client'
 
-const track: Ref<Element | null> = ref(null)
-const root: Ref<Element | null> = ref(null)
-let isTouch = false
-const isSliding = ref(false)
-let startPosition = 0
+const viewport: Ref<HTMLElement | null> = ref(null)
 const isDragging = ref(false)
-const dragged = reactive({ val: 0 })
+let scrollX = ref(0)
+let startX = 0
 // this value must match the width assigned to testimonial in style and padding in track
-const columnWidth = 400 + 10 * 2
-const columnsPerWindow = ref(0)
-const transitionMillis = 300
-const throttleTime = 16
+const scrollSize = (400 + 10 * 2) * 2
 
-const currentColumnIndex = ref(0)
-
-let transitionTimer: ReturnType<typeof setTimeout> | null
-
-onMounted(() => {
-    nextTick(() => {
-        columnsPerWindow.value = Math.floor((root.value?.clientWidth ?? 0) / columnWidth)
-    })
-})
-
-onUnmounted(() => {
-    if (transitionTimer) {
-        clearTimeout(transitionTimer)
-    }
-})
-
-const prev = (): void => {
-    slideToColumn(currentColumnIndex.value - columnsPerWindow.value)
-}
-
-const next = (): void => {
-    slideToColumn(currentColumnIndex.value + columnsPerWindow.value)
-}
-
-const slideToColumn = (columnIndex: number): void => {
-    const currentVal = getNumberInRange(columnIndex, 0, columnsCount() - columnsPerWindow.value)
-    if (currentColumnIndex.value === currentVal || isSliding.value) {
-        return
-    }
-    isSliding.value = true
-    currentColumnIndex.value = currentVal
-    transitionTimer = setTimeout((): void => {
-        isSliding.value = false
-    }, transitionMillis)
-}
-
-function getNumberInRange(val: number, min: number, max: number): number {
-    return Math.min(Math.max(val, min), max)
-}
-
-const handleDragStart = (event: MouseEvent): void => {
+const startDrag = (event: MouseEvent | TouchEvent): void => {
     event.preventDefault()
-    if (event.button !== 0) {
-        return
-    }
-    isTouch = false
-    handleDragStartEvent(event.clientX, 'mousemove', 'mouseup')
+    startX = getX(event)
+    isDragging.value = true
+    scrollX.value = viewport.value!.scrollLeft
+    document.addEventListener('mousemove', drag)
+    document.addEventListener('touchmove', drag)
+    document.addEventListener('mouseup', stopDrag)
+    document.addEventListener('touchend', stopDrag)
 }
 
-function handleDragStartEvent(position: number, moveEvent: string, stopEvent: string): void {
-    if (isSliding.value) {
+const getX = (event: MouseEvent | TouchEvent): number => isMouseEvent(event) ? (event as MouseEvent).pageX : (event as TouchEvent).touches[0].pageX
+
+const isMouseEvent = (event: MouseEvent | TouchEvent): boolean => event.type.startsWith('mouse')
+
+const drag = (event: MouseEvent | TouchEvent): void => {
+    const dragX = getX(event) - startX
+    viewport.value!.scrollLeft = scrollX.value - dragX
+}
+
+const stopDrag = () => {
+    document.removeEventListener('mousemove', drag)
+    document.removeEventListener('touchmove', drag)
+    document.removeEventListener('mouseup', stopDrag)
+    document.removeEventListener('touchend', stopDrag)
+    scrollX.value = viewport.value!.scrollLeft
+    isDragging.value = false
+}
+
+const scrollLeft = () => scroll(-scrollSize)
+
+const scroll = (size: number) => viewport.value!.scroll({ top: 0, left: viewport.value!.scrollLeft + size, behavior: 'smooth' })
+
+const scrollRight = () => scroll(scrollSize)
+
+// scrollWidth is not yet properly solved in onMount, and using a method that depends con scrollX is the way we found to get the actual value
+const canScrollRight = (scrollX: number): boolean => {
+    if (!viewport.value) {
+        return true
+    }
+    let maxScroll = viewport.value!.scrollWidth - viewport.value!.offsetWidth
+    return maxScroll === 0 ? true : scrollX < maxScroll
+}
+
+const onScroll = () => {
+    if (isDragging.value) {
         return;
     }
-    startPosition = position
-    document.addEventListener(moveEvent, handleDragging, true)
-    document.addEventListener(stopEvent, handleDragEnd, true)
+    scrollX.value = viewport.value!.scrollLeft
 }
-
-const handleTouchStart = (event: TouchEvent): void => {
-    isTouch = true
-    handleDragStartEvent(event.touches[0].clientX, 'touchmove', 'touchend')
-}
-
-const handleDragging = throttle((event: MouseEvent & TouchEvent): void => {
-    isDragging.value = true
-    let endPosition = isTouch ? event.touches[0].clientX : event.clientX
-    dragged.val = endPosition - startPosition
-}, throttleTime)
-
-function throttle(fn: (...args: any[]) => unknown, limit: number): typeof fn {
-    let inThrottle: boolean
-    if (!limit) {
-        return fn;
-    }
-    return function (...args: any[]) {
-        const self = this
-        if (!inThrottle) {
-            fn.apply(self, args)
-            inThrottle = true
-            setTimeout(() => (inThrottle = false), limit)
-        }
-    }
-}
-
-const handleDragEnd = (): void => {
-    let tolerance = Math.sign(dragged.val) * 0.4
-    let draggedColumns = Math.round(dragged.val / columnWidth + tolerance)
-
-    // Prevent clicking if there are clicked columns
-    if (draggedColumns && !isTouch) {
-        let captureClick = (e: MouseEvent) => {
-            e.stopPropagation()
-            window.removeEventListener('click', captureClick, true)
-        }
-        window.addEventListener('click', captureClick, true)
-    }
-
-    slideToColumn(currentColumnIndex.value - draggedColumns)
-    dragged.val = 0
-    isDragging.value = false
-    document.removeEventListener(isTouch ? 'touchmove' : 'mousemove', handleDragging, true)
-    document.removeEventListener(isTouch ? 'touchend' : 'mouseup', handleDragEnd, true)
-}
-
-const columnsCount = (): number => {
-    if (track.value == null) {
-        return 1
-    }
-    // we add 20 since we are always considering each column with 20 of gap, but on margins carousel is 0
-    let trackWidth = track.value?.scrollWidth + 20;
-    return Math.max(trackWidth / columnWidth, 1)
-}
-
-const trackStyle = computed(() => {
-    let columnsToScroll = getNumberInRange(currentColumnIndex.value, 0, columnsCount() - columnsPerWindow.value)
-    const scroll = columnsToScroll * columnWidth
-    return {
-        transform: `translateX(${dragged.val - scroll}px)`,
-        transition: `${isSliding.value ? transitionMillis : 0}ms`,
-        margin: '',
-        width: `100%`,
-    }
-})
 </script>
 
 <template>
     <ClientOnly>
-        <section :class="['carousel', isDragging && 'is-dragging']" ref="root">
-            <div class="viewport" @mousedown="handleDragStart" @touchstart="handleTouchStart">
-                <div class="track" :style="trackStyle" ref="track">
+        <section :class="['carousel', isDragging && 'is-dragging']">
+            <div class="carousel-viewport" ref="viewport" @mousedown="startDrag" @touchstart="startDrag" @scroll="onScroll">
+                <div class="carousel-track">
                     <slot />
                 </div>
             </div>
-            <button type="button" title="previous testimonials"
-                :class="['carousel-control', 'prev-slide', currentColumnIndex <= 0 && 'carousel-control-disabled']"
-                @click="prev">
+            <button @click="scrollLeft" class="carousel-control carousel-prev" :disabled="scrollX <= 0">
                 <font-awesome-icon icon="fa-solid fa-chevron-left" />
             </button>
-            <button type="button" title="next testimonials"
-                :class="['carousel-control', 'next-slide', currentColumnIndex >= (columnsCount() - columnsPerWindow) && 'carousel-control-disabled']"
-                @click="next">
+            <button @click="scrollRight" class="carousel-control carousel-next" :disabled="!canScrollRight(scrollX)">
                 <font-awesome-icon icon="fa-solid fa-chevron-right" />
             </button>
         </section>
     </ClientOnly>
 </template>
+  
+<style>
+.carousel {
+    position: relative;
+    box-sizing: border-box;
+    touch-action: pan-y;
+    overscroll-behavior: none;
+}
+
+.carousel.is-dragging {
+    touch-action: none;
+}
+
+.carousel * {
+    box-sizing: border-box;
+}
+
+.carousel-viewport {
+    cursor: grab;
+    overflow: auto;
+}
+
+.carousel-track {
+    display: flex;
+    position: relative;
+    flex-direction: column;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 20px;
+    padding: 10px 0px;
+    height: 600px;
+}
+
+.carousel-control {
+    --control-size: 20px;
+    box-sizing: content-box;
+    background: transparent;
+    border-radius: 0;
+    width: var(--control-size);
+    height: var(--control-size);
+    text-align: center;
+    font-size: var(--control-size);
+    padding: 0;
+    color: var(--c-text);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    border: 0;
+    cursor: pointer;
+    margin: 0 10px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.carousel-control:hover {
+    color: var(--c-text-lighter);
+}
+
+.carousel-control:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+.carousel-prev {
+    left: 0;
+}
+
+.carousel-next {
+    right: 0;
+}
+</style>
