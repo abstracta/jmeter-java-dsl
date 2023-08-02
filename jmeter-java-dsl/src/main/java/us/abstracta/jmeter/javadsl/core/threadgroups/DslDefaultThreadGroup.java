@@ -140,8 +140,9 @@ public class DslDefaultThreadGroup extends BaseThreadGroup<DslDefaultThreadGroup
     if (isLastStageHoldingForIterations()) {
       throw new IllegalStateException(
           "Ramping up/down after holding for iterations is not supported. "
-              + "If you used constructor with iterations, consider using "
-              + "threadGroup().rampTo(X, Y).holdForIterations(Z) instead");
+              + "If you used constructor with iterations and some ramp "
+              + "(eg: threadGroup(X, Y, ...).rampTo(X, Z)), consider using "
+              + "threadGroup().rampTo(X, Z).holdIterating(Y) instead");
     }
   }
 
