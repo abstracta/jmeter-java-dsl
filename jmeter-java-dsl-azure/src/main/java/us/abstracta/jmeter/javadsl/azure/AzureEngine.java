@@ -2,10 +2,12 @@ package us.abstracta.jmeter.javadsl.azure;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -56,6 +58,7 @@ public class AzureEngine extends BaseRemoteEngine<AzureClient, AzureTestPlanStat
   private String location;
   private String testResourceName;
   private String testName = DEFAULT_NAME;
+  private String testRunName;
   private Duration testTimeout = Duration.ofHours(1);
   private int engines = 1;
   private final List<File> assets = new ArrayList<>();
@@ -197,6 +200,22 @@ public class AzureEngine extends BaseRemoteEngine<AzureClient, AzureTestPlanStat
   }
 
   /**
+   * Allows to specify the name for the individual test run.
+   * <p>
+   * This is helpful, for example, if you want to add info to correlate to other entities like CI/CD
+   * job id, product version, git tag, etc.
+   *
+   * @param testRunName specifies the name to be used in the test run. By default,
+   *                    TestRun_&lt;YYYY-MM-DD_HH:MM:SS&gt; is used.
+   * @return the engine for further configuration or usage.
+   * @since 1.18
+   */
+  public AzureEngine testRunName(String testRunName) {
+    this.testRunName = testRunName;
+    return this;
+  }
+
+  /**
    * Specifies a timeout for the entire test execution.
    * <p>
    * If the timeout is reached then the test run will throw a TimeoutException.
@@ -307,7 +326,8 @@ public class AzureEngine extends BaseRemoteEngine<AzureClient, AzureTestPlanStat
     }
     LOG.info("Validating test script");
     awaitValidatedTestFile(loadTest);
-    TestRun testRun = new TestRun(loadTest.getTestId());
+    TestRun testRun = new TestRun(loadTest.getTestId(),
+        testRunName != null ? testRunName : buildTestRunName());
     testRun = apiClient.createTestRun(testRun);
     if (!testRun.isAccepted()) {
       throw new IllegalStateException(
@@ -415,6 +435,11 @@ public class AzureEngine extends BaseRemoteEngine<AzureClient, AzureTestPlanStat
     EntityProvider<LoadTest> testProvider = () -> apiClient.findTestById(loadTest.getTestId());
     awaitStatus(testProvider.get(), testProvider, LoadTest::isPendingValidation,
         LoadTest::isSuccessValidation, VALIDATION_TIMEOUT, "test script validation", "test plan");
+  }
+
+  private static String buildTestRunName() {
+    return "TestRun_" + new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss").format(
+        Date.from(Instant.now()));
   }
 
   private TestRun awaitTestEnd(TestRun testRun)

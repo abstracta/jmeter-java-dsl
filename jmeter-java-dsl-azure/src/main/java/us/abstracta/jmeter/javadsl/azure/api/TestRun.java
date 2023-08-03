@@ -3,10 +3,8 @@ package us.abstracta.jmeter.javadsl.azure.api;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.Collections;
-import java.util.Date;
 import java.util.Map;
 import java.util.UUID;
 
@@ -22,9 +20,9 @@ public class TestRun {
   private final Map<String, TransactionStats> testRunStatistics;
   private final String portalUrl;
 
-  public TestRun(String testId) {
-    this(UUID.randomUUID().toString(), buildName(), testId, "ACCEPTED", null, null,
-        null, null, Collections.emptyMap());
+  public TestRun(String testId, String name) {
+    this(UUID.randomUUID().toString(), name, testId, "ACCEPTED", null, null, null, null,
+        Collections.emptyMap());
   }
 
   @JsonCreator
@@ -44,11 +42,6 @@ public class TestRun {
     this.endDateTime = endDateTime;
     this.portalUrl = portalUrl;
     this.testRunStatistics = testRunStatistics;
-  }
-
-  private static String buildName() {
-    return "TestRun_" + new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss").format(
-        Date.from(Instant.now()));
   }
 
   public String getId() {

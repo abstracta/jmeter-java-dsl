@@ -84,6 +84,10 @@ If you use a `csvDataSet` and multiple Azure engines (through the `engines()` me
 :::
 
 ::: tip
+If you want to correlate test runs to other entities (like a CI/CD job id, product version release, git commit, etc) you can add such information in the test run name by using the `testRunName()` method.
+:::
+
+::: tip
 As with BlazeMeter and OctoPerf cases, if you want to get debug logs for HTTP calls to Azure API, you can include the following setting to an existing `log4j2.xml` configuration file:
 ```xml
 <Logger name="us.abstracta.jmeter.javadsl.azure.AzureClient" level="DEBUG"/>
