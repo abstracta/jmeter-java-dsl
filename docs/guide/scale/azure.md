@@ -80,6 +80,10 @@ If you need additional files to be uploaded to Azure Load Testing, you can easil
 :::
 
 ::: tip
+If you use a `csvDataSet` and multiple Azure engines (through the `engines()` method) and want to split provided CSVs between the Azure engines, as to not generate same requests from each engine, then you can use `splitCsvsBetweenEngines`.
+:::
+
+::: tip
 As with BlazeMeter and OctoPerf cases, if you want to get debug logs for HTTP calls to Azure API, you can include the following setting to an existing `log4j2.xml` configuration file:
 ```xml
 <Logger name="us.abstracta.jmeter.javadsl.azure.AzureClient" level="DEBUG"/>

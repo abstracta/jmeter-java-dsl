@@ -28,14 +28,40 @@ public class LoadTest {
     this.inputArtifacts = inputArtifacts;
   }
 
-  public LoadTest(String displayName, int engineInstances, LoadTestResource testResource) {
-    this(UUID.randomUUID().toString(), displayName, new LoadTestConfiguration(engineInstances),
+  public LoadTest(String displayName, int engineInstances, boolean splitAllCsvs,
+      LoadTestResource testResource) {
+    this(UUID.randomUUID().toString(), displayName,
+        new LoadTestConfiguration(engineInstances, splitAllCsvs),
         new LoadTestInputArtifacts(null));
     this.testResource = testResource;
   }
 
   public String getTestId() {
     return testId;
+  }
+
+  @JsonIgnore
+  public int getEngineInstances() {
+    return loadTestConfiguration.engineInstances;
+  }
+
+  @JsonIgnore
+  public void setEngineInstances(int engineInstances) {
+    this.loadTestConfiguration.engineInstances = engineInstances;
+  }
+
+  @JsonIgnore
+  public boolean isSplitCsvs() {
+    return loadTestConfiguration.splitAllCSVs;
+  }
+
+  @JsonIgnore
+  public void setSplitCsvs(boolean splitCsvs) {
+    this.loadTestConfiguration.splitAllCSVs = splitCsvs;
+  }
+
+  public void clearInputArtifacts() {
+    inputArtifacts.testScriptFileInfo = null;
   }
 
   @JsonIgnore
@@ -80,11 +106,14 @@ public class LoadTest {
 
   public static class LoadTestConfiguration {
 
-    private final int engineInstances;
+    private int engineInstances;
+    private boolean splitAllCSVs;
 
     @JsonCreator
-    public LoadTestConfiguration(@JsonProperty("engineInstances") int engineInstances) {
+    public LoadTestConfiguration(@JsonProperty("engineInstances") int engineInstances,
+        @JsonProperty("splitAllCSVs") boolean splitAllCSVs) {
       this.engineInstances = engineInstances;
+      this.splitAllCSVs = splitAllCSVs;
     }
 
   }

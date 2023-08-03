@@ -59,6 +59,7 @@ public class AzureEngine extends BaseRemoteEngine<AzureClient, AzureTestPlanStat
   private Duration testTimeout = Duration.ofHours(1);
   private int engines = 1;
   private final List<File> assets = new ArrayList<>();
+  private boolean splitCsvs;
 
   /**
    * Builds a new AzureEngine from a given string containing tenant id, client id and client secrets
@@ -255,6 +256,21 @@ public class AzureEngine extends BaseRemoteEngine<AzureClient, AzureTestPlanStat
     return this;
   }
 
+  /**
+   * Allow to enable/disable splitting provided CSV files between test engines.
+   * <p>
+   * Enabling the split allows to use a separate set of records in each engine.
+   *
+   * @param enabled specifies to split or not CSV files between engines. By default, it is set to
+   *                false.
+   * @return the engine for further configuration or usage.
+   * @since 1.18
+   */
+  public AzureEngine splitCsvsBetweenEngines(boolean enabled) {
+    splitCsvs = enabled;
+    return this;
+  }
+
   @Override
   protected AzureClient buildClient() {
     return new AzureClient(tenantId, clientId, clientSecret);
@@ -279,7 +295,7 @@ public class AzureEngine extends BaseRemoteEngine<AzureClient, AzureTestPlanStat
     if (loadTest == null) {
       loadTest = createLoadTest(testResource);
     } else {
-      clearLoadTest(loadTest);
+      updateLoadTest(loadTest);
     }
     LOG.info("Uploading test script and asset files");
     context.processAssetFile(jmxFile.getPath());
@@ -374,16 +390,23 @@ public class AzureEngine extends BaseRemoteEngine<AzureClient, AzureTestPlanStat
   }
 
   private LoadTest createLoadTest(LoadTestResource testResource) throws IOException {
-    LoadTest ret = new LoadTest(testName, engines, testResource);
-    apiClient.createTest(ret);
+    LoadTest ret = new LoadTest(testName, engines, splitCsvs, testResource);
+    apiClient.updateTest(ret);
     LOG.info("Created test {}", ret.getUrl());
     return ret;
   }
 
-  private void clearLoadTest(LoadTest loadTest) throws IOException {
+  private void updateLoadTest(LoadTest loadTest) throws IOException {
     LOG.info("Updating test {}", loadTest.getUrl());
     for (String f : apiClient.findTestFiles(loadTest.getTestId())) {
       apiClient.deleteTestFile(f, loadTest.getTestId());
+    }
+    int prevEngines = loadTest.getEngineInstances();
+    boolean prevSplitCsvs = loadTest.isSplitCsvs();
+    loadTest.setEngineInstances(engines);
+    loadTest.setSplitCsvs(splitCsvs);
+    if (prevSplitCsvs != splitCsvs || prevEngines != engines) {
+      apiClient.updateTest(loadTest);
     }
   }
 

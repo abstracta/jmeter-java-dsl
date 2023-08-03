@@ -206,7 +206,7 @@ public class AzureClient extends BaseRemoteEngineApiClient {
 
     @PATCH("tests/{testId}" + API_VERSION)
     @Headers({MERGE_PATCH_CONTENT_TYPE_HEADER})
-    Call<Void> createTest(@Path("testId") String testId, @Body LoadTest loadTest);
+    Call<Void> updateTest(@Path("testId") String testId, @Body LoadTest loadTest);
 
     @GET("tests/{testId}/files" + API_VERSION)
     Call<ResponseList<FileInfo>> findTestFiles(@Path("testId") String testId);
@@ -315,8 +315,9 @@ public class AzureClient extends BaseRemoteEngineApiClient {
         .orElse(null);
   }
 
-  public void createTest(LoadTest loadTest) throws IOException {
-    execApiCall(loadTestApi.createTest(loadTest.getTestId(), loadTest));
+  public void updateTest(LoadTest loadTest) throws IOException {
+    loadTest.clearInputArtifacts();
+    execApiCall(loadTestApi.updateTest(loadTest.getTestId(), loadTest));
   }
 
   public List<String> findTestFiles(String testId) throws IOException {
