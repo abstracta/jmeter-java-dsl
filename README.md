@@ -59,7 +59,7 @@ public class PerformanceTest {
 
 More examples can be found in [tests](jmeter-java-dsl/src/test/java/us/abstracta/jmeter/javadsl)
 
-[Here](https://github.com/abstracta/jmeter-java-dsl-sample) is a sample project for reference or for starting new projects from scratch.
+You can use [this project](https://github.com/abstracta/jmeter-java-dsl-sample) as a starting point.
 
 > **Tip 1:** Check [the DSL recorder](https://abstracta.github.io/jmeter-java-dsl/guide/#dsl-recorder) and [jmx2dsl](https://abstracta.github.io/jmeter-java-dsl/guide/#dsl-code-generation-from-jmx-file) to ease test plan creation or migration from existing JMX files.
 >
