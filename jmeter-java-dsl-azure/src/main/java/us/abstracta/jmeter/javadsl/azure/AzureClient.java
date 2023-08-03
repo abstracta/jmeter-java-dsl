@@ -8,7 +8,9 @@ import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.Base64;
 import java.util.Base64.Decoder;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import okhttp3.Interceptor.Chain;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
@@ -31,6 +33,7 @@ import retrofit2.http.PUT;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
 import retrofit2.http.Tag;
+import us.abstracta.jmeter.javadsl.azure.api.FileInfo;
 import us.abstracta.jmeter.javadsl.azure.api.LoadTest;
 import us.abstracta.jmeter.javadsl.azure.api.LoadTestResource;
 import us.abstracta.jmeter.javadsl.azure.api.Location;
@@ -205,6 +208,9 @@ public class AzureClient extends BaseRemoteEngineApiClient {
     @Headers({MERGE_PATCH_CONTENT_TYPE_HEADER})
     Call<Void> createTest(@Path("testId") String testId, @Body LoadTest loadTest);
 
+    @GET("tests/{testId}/files" + API_VERSION)
+    Call<ResponseList<FileInfo>> findTestFiles(@Path("testId") String testId);
+
     @DELETE("tests/{testId}/files/{fileName}" + API_VERSION)
     Call<Void> deleteTestFile(@Path("testId") String testId, @Path("fileName") String fileName);
 
@@ -225,6 +231,7 @@ public class AzureClient extends BaseRemoteEngineApiClient {
 
     @POST("/test-runs/{testRunId}:stop" + API_VERSION)
     Call<Void> stopTestRun(@Path("testRunId") String id);
+
   }
 
   public Subscription findSubscription() throws IOException {
@@ -312,13 +319,19 @@ public class AzureClient extends BaseRemoteEngineApiClient {
     execApiCall(loadTestApi.createTest(loadTest.getTestId(), loadTest));
   }
 
-  public void deleteTestFile(String testId, String fileName) throws IOException {
+  public List<String> findTestFiles(String testId) throws IOException {
+    return execApiCall(loadTestApi.findTestFiles(testId)).stream()
+        .map(FileInfo::getFileName)
+        .collect(Collectors.toList());
+  }
+
+  public void deleteTestFile(String fileName, String testId) throws IOException {
     execApiCall(loadTestApi.deleteTestFile(testId, fileName));
   }
 
-  public void uploadTestFile(String testId, File scriptFile) throws IOException {
-    execApiCall(loadTestApi.uploadTestFile(testId, scriptFile.getName(),
-        RequestBody.create(MediaType.get("application/octet-stream"), scriptFile)));
+  public void uploadTestFile(File file, String fileName, String testId) throws IOException {
+    execApiCall(loadTestApi.uploadTestFile(testId, fileName,
+        RequestBody.create(MediaType.get("application/octet-stream"), file)));
   }
 
   public LoadTest findTestById(String testId) throws IOException {

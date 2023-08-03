@@ -92,7 +92,7 @@ testPlan(
     .testTimeout(Duration.ofMinutes(10)));
 ```
 
-If you need additional files to be uploaded to BlazeMeter, you can easily specify them with `BlazemeterEngine.assets()` method.
+If you need additional files to be uploaded to BlazeMeter, you can easily specify them with the `BlazemeterEngine.assets()` method.
 :::
 
 ::: tip

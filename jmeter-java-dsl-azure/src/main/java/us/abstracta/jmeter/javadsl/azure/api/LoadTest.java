@@ -39,12 +39,6 @@ public class LoadTest {
   }
 
   @JsonIgnore
-  public String getTestScriptFileName() {
-    return inputArtifacts.testScriptFileInfo != null ? inputArtifacts.testScriptFileInfo.fileName
-        : null;
-  }
-
-  @JsonIgnore
   public void setTestResource(LoadTestResource testResource) {
     this.testResource = testResource;
   }
@@ -75,7 +69,7 @@ public class LoadTest {
   @JsonIgnore
   private String getValidationStatus() {
     return inputArtifacts.testScriptFileInfo == null ? "VALIDATION_INITIATED"
-        : inputArtifacts.testScriptFileInfo.validationStatus;
+        : inputArtifacts.testScriptFileInfo.getValidationStatus();
   }
 
   @JsonIgnore
@@ -102,20 +96,6 @@ public class LoadTest {
     @JsonCreator
     public LoadTestInputArtifacts(@JsonProperty("testScriptUrl") FileInfo testScriptFileInfo) {
       this.testScriptFileInfo = testScriptFileInfo;
-    }
-
-  }
-
-  public static class FileInfo {
-
-    private final String fileName;
-    private final String validationStatus;
-
-    @JsonCreator
-    public FileInfo(@JsonProperty("fileName") String fileName,
-        @JsonProperty("validationStatus") String validationStatus) {
-      this.fileName = fileName;
-      this.validationStatus = validationStatus;
     }
 
   }

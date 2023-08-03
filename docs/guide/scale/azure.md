@@ -62,6 +62,24 @@ As with the BlazeMeter and OctoPerf, you can not only run the test at scale but 
 Check [AzureEngine](/jmeter-java-dsl-azure/src/main/java/us/abstracta/jmeter/javadsl/azure/AzureEngine.java) for details on usage and available settings when running tests in Azure Load Testing.
 
 ::: tip
+`AzureEngine` will automatically upload to Azure Load Testing files used in `csvDataSet` and `httpSampler` with `bodyFile` or `bodyFilePart` methods.
+
+For example this test plan works out of the box (no need for uploading referenced files or adapt test plan):
+
+```java
+testPlan(
+    threadGroup(100, Duration.ofMinutes(5),
+      csvDataSet(new TestResource("users.csv")),
+      httpSampler(SAMPLE_LABEL, "https://myservice/users/${USER}")
+    )
+).runIn(new AzureEngine(System.getenv("BZ_TOKEN"))
+    .testTimeout(Duration.ofMinutes(10)));
+```
+
+If you need additional files to be uploaded to Azure Load Testing, you can easily specify them with the `AzureEngine.assets()` method.
+:::
+
+::: tip
 As with BlazeMeter and OctoPerf cases, if you want to get debug logs for HTTP calls to Azure API, you can include the following setting to an existing `log4j2.xml` configuration file:
 ```xml
 <Logger name="us.abstracta.jmeter.javadsl.azure.AzureClient" level="DEBUG"/>

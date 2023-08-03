@@ -4,9 +4,14 @@ import java.io.File;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Predicate;
+import org.apache.http.entity.ContentType;
 import org.apache.jorphan.collections.HashTree;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,6 +58,7 @@ public class AzureEngine extends BaseRemoteEngine<AzureClient, AzureTestPlanStat
   private String testName = DEFAULT_NAME;
   private Duration testTimeout = Duration.ofHours(1);
   private int engines = 1;
+  private final List<File> assets = new ArrayList<>();
 
   /**
    * Builds a new AzureEngine from a given string containing tenant id, client id and client secrets
@@ -229,6 +235,26 @@ public class AzureEngine extends BaseRemoteEngine<AzureClient, AzureTestPlanStat
     return this;
   }
 
+  /**
+   * Allows specifying asset files that need to be uploaded to Azure Load Testing for proper test
+   * plan execution.
+   * <p>
+   * Take into consideration that JMeter DSL will automatically upload files used by
+   * {@link us.abstracta.jmeter.javadsl.core.configs.DslCsvDataSet},
+   * {@link us.abstracta.jmeter.javadsl.http.DslHttpSampler#bodyFile(String)} and
+   * {@link us.abstracta.jmeter.javadsl.http.DslHttpSampler#bodyFilePart(String, String,
+   * ContentType)}. So, use this method for any additional files that your test plan requires and is
+   * not one used in previously mentioned scenarios.
+   *
+   * @param files specifies files to upload to BlazeMeter.
+   * @return the engine for further configuration or usage.
+   * @since 1.18
+   */
+  public AzureEngine assets(File... files) {
+    assets.addAll(Arrays.asList(files));
+    return this;
+  }
+
   @Override
   protected AzureClient buildClient() {
     return new AzureClient(tenantId, clientId, clientSecret);
@@ -255,8 +281,14 @@ public class AzureEngine extends BaseRemoteEngine<AzureClient, AzureTestPlanStat
     } else {
       clearLoadTest(loadTest);
     }
-    LOG.info("Uploading test script");
-    apiClient.uploadTestFile(loadTest.getTestId(), jmxFile);
+    LOG.info("Uploading test script and asset files");
+    context.processAssetFile(jmxFile.getPath());
+    for (File f : assets) {
+      context.processAssetFile(f.getPath());
+    }
+    for (Map.Entry<String, File> asset : context.getAssetFiles().entrySet()) {
+      apiClient.uploadTestFile(asset.getValue(), asset.getKey(), loadTest.getTestId());
+    }
     LOG.info("Validating test script");
     awaitValidatedTestFile(loadTest);
     TestRun testRun = new TestRun(loadTest.getTestId());
@@ -350,10 +382,8 @@ public class AzureEngine extends BaseRemoteEngine<AzureClient, AzureTestPlanStat
 
   private void clearLoadTest(LoadTest loadTest) throws IOException {
     LOG.info("Updating test {}", loadTest.getUrl());
-    String previousScript = loadTest.getTestScriptFileName();
-    if (previousScript != null) {
-      apiClient.deleteTestFile(loadTest.getTestId(), previousScript);
-      loadTest.removeTestScriptFile();
+    for (String f : apiClient.findTestFiles(loadTest.getTestId())) {
+      apiClient.deleteTestFile(f, loadTest.getTestId());
     }
   }
 

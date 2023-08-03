@@ -396,6 +396,7 @@ public class BlazeMeterEngine extends BaseRemoteEngine<BlazeMeterClient, BlazeMe
       test = apiClient.createTest(testConfig, project);
       LOG.info("Created test {}", test.getUrl());
     }
+    LOG.info("Uploading test script and asset files");
     context.processAssetFile(jmxFile.getPath());
     for (File f : assets) {
       context.processAssetFile(f.getPath());
