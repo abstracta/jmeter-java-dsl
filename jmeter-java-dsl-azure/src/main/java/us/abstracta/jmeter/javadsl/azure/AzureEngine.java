@@ -357,11 +357,11 @@ public class AzureEngine extends BaseRemoteEngine<AzureClient, AzureTestPlanStat
     }
   }
 
-  private void awaitValidatedTestFile(final LoadTest loadTest)
+  private void awaitValidatedTestFile(LoadTest loadTest)
       throws TimeoutException, InterruptedException, IOException {
-    awaitStatus(loadTest, () -> apiClient.findTestById(loadTest.getTestId()),
-        LoadTest::isPendingValidation, LoadTest::isSuccessValidation, VALIDATION_TIMEOUT,
-        "test script validation", "test plan");
+    EntityProvider<LoadTest> testProvider = () -> apiClient.findTestById(loadTest.getTestId());
+    awaitStatus(testProvider.get(), testProvider, LoadTest::isPendingValidation,
+        LoadTest::isSuccessValidation, VALIDATION_TIMEOUT, "test script validation", "test plan");
   }
 
   private TestRun awaitTestEnd(TestRun testRun)
