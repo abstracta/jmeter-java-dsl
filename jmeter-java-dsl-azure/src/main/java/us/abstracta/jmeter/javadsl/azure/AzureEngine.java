@@ -17,6 +17,7 @@ import org.apache.http.entity.ContentType;
 import org.apache.jorphan.collections.HashTree;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import us.abstracta.jmeter.javadsl.azure.api.AppComponents;
 import us.abstracta.jmeter.javadsl.azure.api.LoadTest;
 import us.abstracta.jmeter.javadsl.azure.api.LoadTestResource;
 import us.abstracta.jmeter.javadsl.azure.api.Location;
@@ -63,6 +64,7 @@ public class AzureEngine extends BaseRemoteEngine<AzureClient, AzureTestPlanStat
   private int engines = 1;
   private final List<File> assets = new ArrayList<>();
   private boolean splitCsvs;
+  private final List<String> monitoredResources = new ArrayList<>();
 
   /**
    * Builds a new AzureEngine from a given string containing tenant id, client id and client secrets
@@ -290,6 +292,26 @@ public class AzureEngine extends BaseRemoteEngine<AzureClient, AzureTestPlanStat
     return this;
   }
 
+  /**
+   * Allows registering application components to monitor and collect statistics alongside the test
+   * collected statistics.
+   * <p>
+   * This is useful to get a full view of test execution results and analyze how the test affects
+   * the service under test components.
+   *
+   * @param resourceIds specifies the Azure resources ids of each of the application components to
+   *                    collect metrics from. To get the ids you can navigate in Azure portal to the
+   *                    resource and copy part of the URL from the browser. For example a resource
+   *                    id for a container app looks like
+   *                    <pre>/subscriptions/my-subscription-id/resourceGroups/my-resource-group/providers/Microsoft.App/containerapps/my-papp</pre>.
+   * @return the engine for further configuration or usage.
+   * @since 1.18
+   */
+  public AzureEngine monitoredResources(String... resourceIds) {
+    monitoredResources.addAll(Arrays.asList(resourceIds));
+    return this;
+  }
+
   @Override
   protected AzureClient buildClient() {
     return new AzureClient(tenantId, clientId, clientSecret);
@@ -313,21 +335,15 @@ public class AzureEngine extends BaseRemoteEngine<AzureClient, AzureTestPlanStat
     LoadTest loadTest = apiClient.findTestByName(testName, testResource);
     if (loadTest == null) {
       loadTest = createLoadTest(testResource);
+      apiClient.updateAppComponents(loadTest.getTestId(), new AppComponents(monitoredResources));
     } else {
       updateLoadTest(loadTest);
+      clearTestFiles(loadTest);
+      updateAppComponents(loadTest);
     }
-    LOG.info("Uploading test script and asset files");
-    context.processAssetFile(jmxFile.getPath());
-    for (File f : assets) {
-      context.processAssetFile(f.getPath());
-    }
-    for (Map.Entry<String, File> asset : context.getAssetFiles().entrySet()) {
-      apiClient.uploadTestFile(asset.getValue(), asset.getKey(), loadTest.getTestId());
-    }
-    LOG.info("Validating test script");
+    uploadTestFiles(loadTest, jmxFile, context);
     awaitValidatedTestFile(loadTest);
-    TestRun testRun = new TestRun(loadTest.getTestId(),
-        testRunName != null ? testRunName : buildTestRunName());
+    TestRun testRun = new TestRun(loadTest.getTestId(), solveTestRunName());
     testRun = apiClient.createTestRun(testRun);
     if (!testRun.isAccepted()) {
       throw new IllegalStateException(
@@ -418,9 +434,6 @@ public class AzureEngine extends BaseRemoteEngine<AzureClient, AzureTestPlanStat
 
   private void updateLoadTest(LoadTest loadTest) throws IOException {
     LOG.info("Updating test {}", loadTest.getUrl());
-    for (String f : apiClient.findTestFiles(loadTest.getTestId())) {
-      apiClient.deleteTestFile(f, loadTest.getTestId());
-    }
     int prevEngines = loadTest.getEngineInstances();
     boolean prevSplitCsvs = loadTest.isSplitCsvs();
     loadTest.setEngineInstances(engines);
@@ -430,16 +443,41 @@ public class AzureEngine extends BaseRemoteEngine<AzureClient, AzureTestPlanStat
     }
   }
 
+  private void clearTestFiles(LoadTest loadTest) throws IOException {
+    for (String f : apiClient.findTestFiles(loadTest.getTestId())) {
+      apiClient.deleteTestFile(f, loadTest.getTestId());
+    }
+  }
+
+  private void updateAppComponents(LoadTest loadTest) throws IOException {
+    AppComponents components = apiClient.findTestAppComponents(loadTest.getTestId());
+    components.updateWith(monitoredResources);
+    apiClient.updateAppComponents(loadTest.getTestId(), components);
+  }
+
+  private void uploadTestFiles(LoadTest loadTest, File jmxFile, BuildTreeContext context)
+      throws IOException {
+    LOG.info("Uploading test script and asset files");
+    context.processAssetFile(jmxFile.getPath());
+    for (File f : assets) {
+      context.processAssetFile(f.getPath());
+    }
+    for (Map.Entry<String, File> asset : context.getAssetFiles().entrySet()) {
+      apiClient.uploadTestFile(asset.getValue(), asset.getKey(), loadTest.getTestId());
+    }
+  }
+
   private void awaitValidatedTestFile(LoadTest loadTest)
       throws TimeoutException, InterruptedException, IOException {
+    LOG.info("Validating test script");
     EntityProvider<LoadTest> testProvider = () -> apiClient.findTestById(loadTest.getTestId());
     awaitStatus(testProvider.get(), testProvider, LoadTest::isPendingValidation,
         LoadTest::isSuccessValidation, VALIDATION_TIMEOUT, "test script validation", "test plan");
   }
 
-  private static String buildTestRunName() {
-    return "TestRun_" + new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss").format(
-        Date.from(Instant.now()));
+  private String solveTestRunName() {
+    return testRunName != null ? testRunName
+        : "TestRun_" + new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss").format(Date.from(Instant.now()));
   }
 
   private TestRun awaitTestEnd(TestRun testRun)

@@ -13,7 +13,7 @@
   <module name="LineLength">
     <property name="max" value="100"/>
     <property name="ignorePattern"
-      value="^package.*|^import.*|a href|href|http://|https://|ftp://"/>
+      value="^package.*|^import.*|a href|href|http://|https://|ftp://|&lt;pre&gt;"/>
   </module>
 
   <module name="TreeWalker">

@@ -33,6 +33,7 @@ import retrofit2.http.PUT;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
 import retrofit2.http.Tag;
+import us.abstracta.jmeter.javadsl.azure.api.AppComponents;
 import us.abstracta.jmeter.javadsl.azure.api.FileInfo;
 import us.abstracta.jmeter.javadsl.azure.api.LoadTest;
 import us.abstracta.jmeter.javadsl.azure.api.LoadTestResource;
@@ -208,6 +209,14 @@ public class AzureClient extends BaseRemoteEngineApiClient {
     @Headers({MERGE_PATCH_CONTENT_TYPE_HEADER})
     Call<Void> updateTest(@Path("testId") String testId, @Body LoadTest loadTest);
 
+    @PATCH("tests/{testId}/app-components" + API_VERSION)
+    @Headers({MERGE_PATCH_CONTENT_TYPE_HEADER})
+    Call<Void> updateAppComponents(@Path("testId") String testId,
+        @Body AppComponents appComponents);
+
+    @GET("tests/{testId}/app-components" + API_VERSION)
+    Call<AppComponents> findTestAppComponents(@Path("testId") String testId);
+
     @GET("tests/{testId}/files" + API_VERSION)
     Call<ResponseList<FileInfo>> findTestFiles(@Path("testId") String testId);
 
@@ -318,6 +327,15 @@ public class AzureClient extends BaseRemoteEngineApiClient {
   public void updateTest(LoadTest loadTest) throws IOException {
     loadTest.clearInputArtifacts();
     execApiCall(loadTestApi.updateTest(loadTest.getTestId(), loadTest));
+  }
+
+  public void updateAppComponents(String testId, AppComponents appComponents)
+      throws IOException {
+    execApiCall(loadTestApi.updateAppComponents(testId, appComponents));
+  }
+
+  public AppComponents findTestAppComponents(String testId) throws IOException {
+    return execApiCall(loadTestApi.findTestAppComponents(testId));
   }
 
   public List<String> findTestFiles(String testId) throws IOException {
