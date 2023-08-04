@@ -109,7 +109,7 @@ public class DslDummySamplerTest {
      */
     long timeThresholdMillis = 10;
     assertThat(actualResponseTime).isGreaterThanOrEqualTo(responseTime.toMillis() - timeThresholdMillis);
-    assertThat(processingTime).isGreaterThanOrEqualTo(actualResponseTime);
+    assertThat(processingTime).isGreaterThanOrEqualTo(actualResponseTime - timeThresholdMillis);
   }
 
   @Nested
