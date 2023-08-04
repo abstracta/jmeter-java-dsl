@@ -2,6 +2,7 @@ package us.abstracta.jmeter.javadsl.azure.api;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -23,13 +24,15 @@ public class AppComponents {
     this.components = components;
   }
 
-  public void updateWith(List<String> monitoredResources) {
+  public boolean updateWith(List<String> monitoredResources) {
+    HashMap<String, AppComponent> prevComponents = new HashMap<>(components);
     components.entrySet().stream()
         .filter(e -> !monitoredResources.contains(e.getKey()))
         .forEach(e -> e.setValue(null));
     monitoredResources.stream()
         .filter(s -> !components.containsKey(s))
         .forEach(s -> components.put(s, new AppComponent(s)));
+    return !prevComponents.equals(components);
   }
 
   private static class AppComponent {

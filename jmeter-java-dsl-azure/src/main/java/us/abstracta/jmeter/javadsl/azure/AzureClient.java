@@ -8,6 +8,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.Base64;
 import java.util.Base64.Decoder;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -335,7 +336,8 @@ public class AzureClient extends BaseRemoteEngineApiClient {
   }
 
   public AppComponents findTestAppComponents(String testId) throws IOException {
-    return execApiCall(loadTestApi.findTestAppComponents(testId));
+    return execOptionalApiCall(loadTestApi.findTestAppComponents(testId))
+        .orElse(new AppComponents(Collections.emptyList()));
   }
 
   public List<String> findTestFiles(String testId) throws IOException {

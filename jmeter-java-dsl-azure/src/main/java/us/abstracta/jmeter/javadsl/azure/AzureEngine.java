@@ -335,7 +335,9 @@ public class AzureEngine extends BaseRemoteEngine<AzureClient, AzureTestPlanStat
     LoadTest loadTest = apiClient.findTestByName(testName, testResource);
     if (loadTest == null) {
       loadTest = createLoadTest(testResource);
-      apiClient.updateAppComponents(loadTest.getTestId(), new AppComponents(monitoredResources));
+      if (!monitoredResources.isEmpty()) {
+        apiClient.updateAppComponents(loadTest.getTestId(), new AppComponents(monitoredResources));
+      }
     } else {
       updateLoadTest(loadTest);
       clearTestFiles(loadTest);
@@ -451,8 +453,9 @@ public class AzureEngine extends BaseRemoteEngine<AzureClient, AzureTestPlanStat
 
   private void updateAppComponents(LoadTest loadTest) throws IOException {
     AppComponents components = apiClient.findTestAppComponents(loadTest.getTestId());
-    components.updateWith(monitoredResources);
-    apiClient.updateAppComponents(loadTest.getTestId(), components);
+    if (components.updateWith(monitoredResources)) {
+      apiClient.updateAppComponents(loadTest.getTestId(), components);
+    }
   }
 
   private void uploadTestFiles(LoadTest loadTest, File jmxFile, BuildTreeContext context)
