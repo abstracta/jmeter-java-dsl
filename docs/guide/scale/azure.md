@@ -88,6 +88,12 @@ If you want to correlate test runs to other entities (like a CI/CD job id, produ
 :::
 
 ::: tip
+To get a full view in Azure Load Testing test run execution report not only of the performance test collected metrics, but also metrics from the application components under test, you can register all the application components using the `monitoredResources()` method.
+
+`monitoredResources()` requires a list of resources ids, which you can get by navigating in Azure portal to the correct resource, and then copy part of the url from the browser. For example, a resource id for a container app looks like `/subscriptions/my-subscription-id/resourceGroups/my-resource-group/providers/Microsoft.App/containerapps/my-papp`.
+:::
+
+::: tip
 As with BlazeMeter and OctoPerf cases, if you want to get debug logs for HTTP calls to Azure API, you can include the following setting to an existing `log4j2.xml` configuration file:
 ```xml
 <Logger name="us.abstracta.jmeter.javadsl.azure.AzureClient" level="DEBUG"/>
