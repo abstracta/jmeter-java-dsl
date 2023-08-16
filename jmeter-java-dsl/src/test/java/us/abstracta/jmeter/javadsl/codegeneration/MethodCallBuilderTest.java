@@ -14,7 +14,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.junit.jupiter.api.io.TempDir;
@@ -41,7 +40,6 @@ public abstract class MethodCallBuilderTest {
         .map(m -> Arguments.of(m.getKey(), m.getValue(), methodCodes.get(m.getKey())));
   }
 
-  @NotNull
   private Map<String, Method> extractBuilderTestMethods() {
     return Arrays.stream(getClass().getDeclaredMethods())
         .collect(Collectors.toMap(Method::getName, m -> m));

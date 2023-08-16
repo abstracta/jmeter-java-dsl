@@ -14,7 +14,6 @@ import org.influxdb.annotation.Measurement;
 import org.influxdb.dto.QueryResult;
 import org.influxdb.impl.InfluxDBResultMapper;
 import org.influxdb.querybuilder.BuiltQuery.QueryBuilder;
-import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -55,7 +54,6 @@ public class InfluxDbBackendListenerTest extends JmeterDslTest {
         .withLogConsumer(new Slf4jLogConsumer(LOG));
   }
 
-  @NotNull
   private Map<String, Long> getInfluxDbRecordedMetrics(InfluxDBContainer<?> influxDbContainer) {
     QueryResult result = influxDbContainer.getNewInfluxDB()
         .query(QueryBuilder.select().sum("count").as("count")

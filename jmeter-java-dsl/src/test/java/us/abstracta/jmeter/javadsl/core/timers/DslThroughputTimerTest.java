@@ -1,17 +1,21 @@
 package us.abstracta.jmeter.javadsl.core.timers;
 
-import org.jetbrains.annotations.NotNull;
-import org.junit.jupiter.api.*;
-import us.abstracta.jmeter.javadsl.*;
-import us.abstracta.jmeter.javadsl.codegeneration.*;
-import us.abstracta.jmeter.javadsl.core.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static us.abstracta.jmeter.javadsl.JmeterDsl.dummySampler;
+import static us.abstracta.jmeter.javadsl.JmeterDsl.httpSampler;
+import static us.abstracta.jmeter.javadsl.JmeterDsl.testPlan;
+import static us.abstracta.jmeter.javadsl.JmeterDsl.threadGroup;
+import static us.abstracta.jmeter.javadsl.JmeterDsl.throughputTimer;
 
-import java.time.*;
+import java.time.Duration;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import us.abstracta.jmeter.javadsl.JmeterDslTest;
+import us.abstracta.jmeter.javadsl.codegeneration.MethodCallBuilderTest;
+import us.abstracta.jmeter.javadsl.core.DslTestPlan;
+import us.abstracta.jmeter.javadsl.core.TestPlanStats;
 import us.abstracta.jmeter.javadsl.core.samplers.DslDummySampler;
 import us.abstracta.jmeter.javadsl.core.timers.DslThroughputTimer.ThroughputMode;
-
-import static org.assertj.core.api.Assertions.*;
-import static us.abstracta.jmeter.javadsl.JmeterDsl.*;
 
 public class DslThroughputTimerTest extends JmeterDslTest {
 
@@ -43,7 +47,6 @@ public class DslThroughputTimerTest extends JmeterDslTest {
         .isBetween(expected, expected + threads);
   }
 
-  @NotNull
   private static DslDummySampler sampler() {
     return dummySampler("OK");
   }
