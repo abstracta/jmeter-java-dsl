@@ -108,6 +108,8 @@ Here are the steps to run test plans containing Java lambdas in `BlazeMeterEngin
            <configuration>
              <outputDirectory>${project.build.directory}/libs</outputDirectory>
              <!-- include here, separating by commas, any additional dependencies (just the artifacts ids) you need to upload to BlazeMeter -->
+             <!-- AzureEngine automatically uploads JMeter dsl artifacts, so only transitive or custom dependencies would be required -->
+             <!-- if you would like for BlazeMeterEngine and OctoPerfEngine to automatically upload JMeter DSL artifacts, please create an issue in GitHub repository -->
              <includeArtifactIds>jmeter-java-dsl</includeArtifactIds>
            </configuration>
          </execution>

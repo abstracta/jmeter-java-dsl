@@ -92,7 +92,7 @@ public abstract class BaseTestElement implements DslTestElement {
           jprop.setName(prop.getName());
           bean.setProperty(jprop);
         } catch (IllegalAccessException | InvocationTargetException e) {
-          LOG.error("Could not set property {} for bean {}", prop.getName(), bean);
+          LOG.error("Could not set property {} for bean {}", prop.getName(), bean, e);
         }
       }
     } catch (IntrospectionException e) {

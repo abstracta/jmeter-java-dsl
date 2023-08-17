@@ -46,6 +46,7 @@ public class EmbeddedJmeterEngine implements DslJmeterEngine {
 
   private static final Logger LOG = LoggerFactory.getLogger(EmbeddedJmeterEngine.class);
   private final Map<String, Object> props = new HashMap<>();
+  private final StandardJMeterEngine engine = new StandardJMeterEngine();
   private String propsFile;
 
   /**
@@ -101,8 +102,10 @@ public class EmbeddedJmeterEngine implements DslJmeterEngine {
       }
     }
     jmeterProps.putAll(props);
-    HashTree rootTree = new ListedHashTree();
+    BaseTestStopper testStopper = buildTestStopper();
     BuildTreeContext buildContext = new BuildTreeContext();
+    buildContext.setTestStopper(testStopper);
+    HashTree rootTree = new ListedHashTree();
     HashTree testPlanTree = buildContext.buildTreeFor(testPlan, rootTree);
     env.updateSearchPath(testPlanTree);
 
@@ -111,7 +114,7 @@ public class EmbeddedJmeterEngine implements DslJmeterEngine {
     testPlanTree.add(new ResultCollector(new Summariser()));
 
     List<Future<Void>> closedVisualizers = Collections.emptyList();
-    TestRunner testRunner = buildTestRunner(testPlanTree, rootTree);
+    TestRunner testRunner = buildTestRunner(testPlanTree, rootTree, testStopper);
     Map<DslVisualizer, Supplier<Component>> visualizers = buildContext.getVisualizers();
     if (!visualizers.isEmpty()) {
       // this is required for proper visualization of labels and messages from resources bundle
@@ -129,7 +132,24 @@ public class EmbeddedJmeterEngine implements DslJmeterEngine {
     testRunner.run();
     stats.setEnd(Instant.now());
     awaitAllClosedVisualizers(closedVisualizers);
+    String stopMessage = testStopper.getStopMessage();
+    if (stopMessage != null) {
+      throw new AutoStoppedTestException(stopMessage);
+    }
     return stats;
+  }
+
+  public static class EmbeddedJMeterEngineStopper extends BaseTestStopper {
+
+    @Override
+    protected void stopTestExecution() {
+      StandardJMeterEngine.stopEngine();
+    }
+
+  }
+
+  protected BaseTestStopper buildTestStopper() {
+    return new EmbeddedJMeterEngineStopper();
   }
 
   protected void addStatsCollector(HashTree testPlanTree, TestPlanStats stats) {
@@ -152,8 +172,8 @@ public class EmbeddedJmeterEngine implements DslJmeterEngine {
     testPlanTree.add(statsVisualizer);
   }
 
-  protected TestRunner buildTestRunner(HashTree testPlanTree, HashTree rootTree) {
-    StandardJMeterEngine engine = new StandardJMeterEngine();
+  protected TestRunner buildTestRunner(HashTree testPlanTree, HashTree rootTree,
+      TestStopper testStopper) {
     engine.configure(rootTree);
     return new TestRunner() {
 
@@ -164,7 +184,7 @@ public class EmbeddedJmeterEngine implements DslJmeterEngine {
 
       @Override
       public void stop() {
-        engine.stopTest();
+        testStopper.stop(null);
       }
 
     };
@@ -172,23 +192,23 @@ public class EmbeddedJmeterEngine implements DslJmeterEngine {
 
   public abstract static class TestRunner {
 
-    private final List<Runnable> listeners = new ArrayList<>();
+    private final List<Runnable> endListeners = new ArrayList<>();
+
+    public void addEndListener(Runnable listener) {
+      endListeners.add(listener);
+    }
 
     public void run() {
       try {
         runTest();
       } finally {
-        listeners.forEach(Runnable::run);
+        endListeners.forEach(Runnable::run);
       }
     }
 
     protected abstract void runTest();
 
     public abstract void stop();
-
-    public void addEndListener(Runnable listener) {
-      listeners.add(listener);
-    }
 
   }
 

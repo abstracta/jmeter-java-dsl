@@ -26,6 +26,8 @@ import us.abstracta.jmeter.javadsl.azure.api.Subscription;
 import us.abstracta.jmeter.javadsl.azure.api.TestRun;
 import us.abstracta.jmeter.javadsl.core.BuildTreeContext;
 import us.abstracta.jmeter.javadsl.core.DslJmeterEngine;
+import us.abstracta.jmeter.javadsl.core.DslTestPlan;
+import us.abstracta.jmeter.javadsl.core.engines.TestStopper;
 import us.abstracta.jmeter.javadsl.engines.BaseRemoteEngine;
 
 /**
@@ -313,8 +315,22 @@ public class AzureEngine extends BaseRemoteEngine<AzureClient, AzureTestPlanStat
   }
 
   @Override
+  protected HashTree buildTree(DslTestPlan testPlan, BuildTreeContext context) {
+    HashTree ret = super.buildTree(testPlan, context);
+    if (isAutoStoppableTest(ret)) {
+      AzureTestStopper.addClientSecretVariableToTree(ret, context);
+    }
+    return ret;
+  }
+
+  @Override
   protected AzureClient buildClient() {
     return new AzureClient(tenantId, clientId, clientSecret);
+  }
+
+  @Override
+  protected TestStopper buildTestStopper() {
+    return new AzureTestStopper();
   }
 
   @Override
@@ -343,9 +359,13 @@ public class AzureEngine extends BaseRemoteEngine<AzureClient, AzureTestPlanStat
       clearTestFiles(loadTest);
       updateAppComponents(loadTest);
     }
-    uploadTestFiles(loadTest, jmxFile, context);
+    uploadTestFiles(jmxFile, tree, context, loadTest);
     awaitValidatedTestFile(loadTest);
     TestRun testRun = new TestRun(loadTest.getTestId(), solveTestRunName());
+    if (isAutoStoppableTest(tree)) {
+      AzureTestStopper.setupTestRun(testRun, tenantId, clientId, clientSecret,
+          apiClient.getDataPlaneUrl());
+    }
     testRun = apiClient.createTestRun(testRun);
     if (!testRun.isAccepted()) {
       throw new IllegalStateException(
@@ -458,11 +478,14 @@ public class AzureEngine extends BaseRemoteEngine<AzureClient, AzureTestPlanStat
     }
   }
 
-  private void uploadTestFiles(LoadTest loadTest, File jmxFile, BuildTreeContext context)
-      throws IOException {
+  private void uploadTestFiles(File jmxFile, HashTree tree, BuildTreeContext context,
+      LoadTest loadTest) throws IOException {
     LOG.info("Uploading test script and asset files");
     context.processAssetFile(jmxFile.getPath());
     for (File f : assets) {
+      context.processAssetFile(f.getPath());
+    }
+    for (File f : findDependencies(tree, context)) {
       context.processAssetFile(f.getPath());
     }
     for (Map.Entry<String, File> asset : context.getAssetFiles().entrySet()) {
@@ -497,6 +520,7 @@ public class AzureEngine extends BaseRemoteEngine<AzureClient, AzureTestPlanStat
       LOG.info("Test run stopped.");
       throw new TimeoutException("Test execution timed out after " + prettyTimeout);
     }
+    AzureTestStopper.handleTestEnd(testRun);
     return awaitVirtualUsers(testRun);
   }
 
@@ -507,7 +531,7 @@ public class AzureEngine extends BaseRemoteEngine<AzureClient, AzureTestPlanStat
       testRun = apiClient.findTestRunById(testRun.getId());
     }
     if (!testRun.isSuccess()) {
-      throw new IllegalStateException("Test has been " + testRun.getStatus().toLowerCase());
+      throw new IllegalStateException("Test " + testRun.getStatus().toLowerCase());
     }
     return testRun;
   }

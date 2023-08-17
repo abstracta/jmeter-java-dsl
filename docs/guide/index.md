@@ -19,6 +19,7 @@ For an intro to JMeter concepts and components, you can check [JMeter official d
 <!-- @include: recorder/index.md -->
 <!-- @include: jmx2dsl.md -->
 <!-- @include: scale/index.md -->
+<!-- @include: autostop.md -->
 <!-- @include: thread-groups/index.md -->
 <!-- @include: debugging/index.md -->
 <!-- @include: reporting/index.md -->

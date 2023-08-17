@@ -25,6 +25,7 @@ import us.abstracta.jmeter.javadsl.codegeneration.TestElementParamBuilder;
 import us.abstracta.jmeter.javadsl.codegeneration.params.ChildrenParam;
 import us.abstracta.jmeter.javadsl.core.DslTestPlan.TestPlanChild;
 import us.abstracta.jmeter.javadsl.core.engines.EmbeddedJmeterEngine;
+import us.abstracta.jmeter.javadsl.core.engines.EmbeddedJmeterEngine.EmbeddedJMeterEngineStopper;
 import us.abstracta.jmeter.javadsl.core.engines.JmeterEnvironment;
 import us.abstracta.jmeter.javadsl.core.engines.JmeterGui;
 import us.abstracta.jmeter.javadsl.core.testelements.TestElementContainer;
@@ -179,7 +180,9 @@ public class DslTestPlan extends TestElementContainer<DslTestPlan, TestPlanChild
     JmeterEnvironment env = new JmeterEnvironment();
     try (FileOutputStream output = new FileOutputStream(filePath)) {
       HashTree tree = new ListedHashTree();
-      new BuildTreeContext().buildTreeFor(this, tree);
+      BuildTreeContext context = new BuildTreeContext();
+      context.setTestStopper(new EmbeddedJMeterEngineStopper());
+      context.buildTreeFor(this, tree);
       env.saveTree(tree, output);
     }
   }

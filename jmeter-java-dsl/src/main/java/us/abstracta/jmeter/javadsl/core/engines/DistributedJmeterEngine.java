@@ -29,12 +29,16 @@ import us.abstracta.jmeter.javadsl.core.TestPlanStats;
 public class DistributedJmeterEngine extends EmbeddedJmeterEngine {
 
   private final List<String> hosts;
+  private final DistributedRunner distributedRunner;
   private int basePort;
   private boolean stopEngines;
   private JmeterEnvironment jmeterEnv;
 
   public DistributedJmeterEngine(String... hosts) {
     this.hosts = Arrays.asList(hosts);
+    distributedRunner = new DistributedRunner();
+    distributedRunner.setStdout(System.out);
+    distributedRunner.setStdErr(System.err);
   }
 
   /**
@@ -120,14 +124,23 @@ public class DistributedJmeterEngine extends EmbeddedJmeterEngine {
   }
 
   @Override
+  protected BaseTestStopper buildTestStopper() {
+    return new BaseTestStopper() {
+
+      @Override
+      protected void stopTestExecution() {
+        distributedRunner.stop();
+      }
+
+    };
+  }
+
+  @Override
   protected TestRunner buildTestRunner(HashTree testPlanTree,
-      HashTree rootTree) {
+      HashTree rootTree, TestStopper testStopper) {
     JMeterUtils.setProperty("client.rmi.localport", String.valueOf(basePort));
     EnginesEndListener endListener = new EnginesEndListener(stopEngines);
     testPlanTree.add(endListener);
-    DistributedRunner distributedRunner = new DistributedRunner();
-    distributedRunner.setStdout(System.out);
-    distributedRunner.setStdErr(System.err);
     distributedRunner.init(hosts, rootTree);
     endListener.setStartedRemoteEngines(new ArrayList<>(distributedRunner.getEngines()));
     return new TestRunner() {
@@ -144,7 +157,7 @@ public class DistributedJmeterEngine extends EmbeddedJmeterEngine {
 
       @Override
       public void stop() {
-        distributedRunner.stop();
+        testStopper.stop(null);
       }
 
     };

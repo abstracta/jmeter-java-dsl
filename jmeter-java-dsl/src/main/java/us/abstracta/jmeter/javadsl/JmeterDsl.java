@@ -21,6 +21,8 @@ import us.abstracta.jmeter.javadsl.core.controllers.DslWeightedSwitchController;
 import us.abstracta.jmeter.javadsl.core.controllers.DslWhileController;
 import us.abstracta.jmeter.javadsl.core.controllers.ForLoopController;
 import us.abstracta.jmeter.javadsl.core.controllers.PercentController;
+import us.abstracta.jmeter.javadsl.core.engines.AutoStoppedTestException;
+import us.abstracta.jmeter.javadsl.core.listeners.AutoStopListener;
 import us.abstracta.jmeter.javadsl.core.listeners.DslViewResultsTree;
 import us.abstracta.jmeter.javadsl.core.listeners.HtmlReporter;
 import us.abstracta.jmeter.javadsl.core.listeners.InfluxDbBackendListener;
@@ -1039,7 +1041,7 @@ public class JmeterDsl {
    **/
   public static DslJsr223Sampler jsr223Sampler(String name,
       Class<? extends SamplerScript> scriptClass) {
-    return new DslJsr223Sampler(null, scriptClass);
+    return new DslJsr223Sampler(name, scriptClass);
   }
 
   /**
@@ -1433,6 +1435,52 @@ public class JmeterDsl {
    */
   public static DslJsonAssertion jsonAssertion(String name, String jsonQuery) {
     return new DslJsonAssertion(name, jsonQuery);
+  }
+
+  /**
+   * Builds an AutoStopListener that allows to stop a test plan execution if some condition over
+   * collected metrics is met.
+   * <p>
+   * This element is useful to avoid waisting resources  (for instance execution costs associated to
+   * remote engine execution time) and time when a test plan execution is not getting an expected
+   * behavior.
+   * <p>
+   * When a condition is met, the test plan is stopped and a {@link AutoStoppedTestException} is
+   * thrown, containing as message an indicator for the auto stop listener name and the condition
+   * that triggered the stop.
+   * <p>
+   * As with other listeners, the location of the listener within the plan determines which samples
+   * will be taken into consideration by the listener (eg: if listener is placed as a child of a
+   * sampler, then only that sampler will be evaluated).
+   * <p>
+   * Note: This element does not use AutoStop listener plugin, but is inspired on it. One important
+   * difference is that this element by default evaluates conditions on every sample and does not
+   * reset aggregations for every second. If you need to configure similar behavior as AutoStop
+   * listener plugin, then you can use
+   * {@link
+   * us.abstracta.jmeter.javadsl.core.listeners.AutoStopListener.AggregatedConditionBuilder#every}
+   * and
+   * {@link us.abstracta.jmeter.javadsl.core.listeners.AutoStopListener.AutoStopCondition#holdsFor}
+   *
+   * @return the listener for further configuration or usage in test plan.
+   * @throws AutoStoppedTestException when test plan is stopped by a met condition.
+   * @see AutoStopListener
+   * @since 1.19
+   */
+  public static AutoStopListener autoStop() {
+    return autoStop(null);
+  }
+
+  /**
+   * Same as {@link #autoStop()} but allowing to set a name on the listener, which can help identify
+   * which autoStop listener stopped a test plan if multiple ones are configured.
+   *
+   * @see #autoStop()
+   * @see AutoStopListener
+   * @since 1.19
+   */
+  public static AutoStopListener autoStop(String name) {
+    return new AutoStopListener(name);
   }
 
   /**

@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 import org.apache.jorphan.collections.HashTree;
+import us.abstracta.jmeter.javadsl.core.engines.TestStopper;
 import us.abstracta.jmeter.javadsl.core.listeners.DslVisualizer;
 
 /**
@@ -30,6 +31,7 @@ public class BuildTreeContext {
    constructor
    */
   private DslTestElement element;
+  private TestStopper testStopper;
 
   public BuildTreeContext() {
     this(null, new LinkedHashMap<>(), null);
@@ -69,6 +71,14 @@ public class BuildTreeContext {
 
   public void setEntry(String key, Object value) {
     entries.put(key, value);
+  }
+
+  public void setTestStopper(TestStopper testStopper) {
+    this.testStopper = testStopper;
+  }
+
+  public TestStopper getTestStopper() {
+    return getRoot().testStopper;
   }
 
   public void addEndListener(TreeContextEndListener endListener) {

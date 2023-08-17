@@ -60,6 +60,7 @@ public class AzureClient extends BaseRemoteEngineApiClient {
   private String managementToken;
   private String loadTestToken;
   private LoadTestApi loadTestApi;
+  private String dataPlaneUrl;
 
   public AzureClient(String tenantId, String clientId, String clientSecret) {
     super(LOG);
@@ -231,15 +232,15 @@ public class AzureClient extends BaseRemoteEngineApiClient {
     @GET("tests/{testId}" + API_VERSION)
     Call<LoadTest> findTestById(@Path("testId") String testId);
 
-    @PATCH("/test-runs/{testRunId}" + API_VERSION)
+    @PATCH("test-runs/{testRunId}" + API_VERSION)
     @Headers(MERGE_PATCH_CONTENT_TYPE_HEADER)
     Call<TestRun> createTestRun(@Path("testRunId") String testRunId,
         @Query("tenantId") String tenantId, @Body TestRun testRun);
 
-    @GET("/test-runs/{testRunId}" + API_VERSION)
+    @GET("test-runs/{testRunId}" + API_VERSION)
     Call<TestRun> findTestRunById(@Path("testRunId") String id);
 
-    @POST("/test-runs/{testRunId}:stop" + API_VERSION)
+    @POST("test-runs/{testRunId}:stop" + API_VERSION)
     Call<Void> stopTestRun(@Path("testRunId") String id);
 
   }
@@ -271,7 +272,7 @@ public class AzureClient extends BaseRemoteEngineApiClient {
         throw buildRemoteEngineException(response.code(), errorBody.string());
       }
     }
-    return Optional.of(response.body());
+    return Optional.ofNullable(response.body());
   }
 
   public Location findLocation(Subscription subscription) throws IOException {
@@ -294,15 +295,19 @@ public class AzureClient extends BaseRemoteEngineApiClient {
             resourceGroup.getName(), name, RequestOrigin.MANAGEMENT))
         .map(r -> {
           r.setResourceGroup(resourceGroup);
-          initLoadTestApi(r);
+          setLoadTestResource(r);
           return r;
         })
         .orElse(null);
   }
 
-  private void initLoadTestApi(LoadTestResource r) {
-    loadTestApi = buildApiFor(String.format("https://%s/", r.getDataPlaneUri()),
-        LoadTestApi.class);
+  private void setLoadTestResource(LoadTestResource r) {
+    dataPlaneUrl = String.format("https://%s", r.getDataPlaneUri());
+    loadTestApi = buildApiFor(dataPlaneUrl + "/", LoadTestApi.class);
+  }
+
+  public String getDataPlaneUrl() {
+    return dataPlaneUrl;
   }
 
   public void createTestResource(LoadTestResource testResource) throws IOException {
@@ -312,16 +317,19 @@ public class AzureClient extends BaseRemoteEngineApiClient {
         RequestOrigin.MANAGEMENT));
     testResource.setId(created.getId());
     testResource.setProvisioningState(created.getProvisioningState());
-    initLoadTestApi(created);
+    setLoadTestResource(created);
   }
 
   public LoadTest findTestByName(String testName, LoadTestResource testResource)
       throws IOException {
-    return execApiCall(loadTestApi.findTestByName(testName)).getFirstElement()
-        .map(t -> {
-          t.setTestResource(testResource);
-          return t;
-        })
+    return execApiCall(loadTestApi.findTestByName(testName)).stream()
+        /*
+         this is necessary because API returns all tests elements with name starting with the given
+         string
+         */
+        .filter(t -> testName.equals(t.getDisplayName()))
+        .peek(t -> t.setTestResource(testResource))
+        .findAny()
         .orElse(null);
   }
 

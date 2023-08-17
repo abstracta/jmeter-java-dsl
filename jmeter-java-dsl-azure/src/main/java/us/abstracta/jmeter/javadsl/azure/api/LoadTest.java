@@ -40,6 +40,10 @@ public class LoadTest {
     return testId;
   }
 
+  public String getDisplayName() {
+    return displayName;
+  }
+
   @JsonIgnore
   public int getEngineInstances() {
     return loadTestConfiguration.engineInstances;

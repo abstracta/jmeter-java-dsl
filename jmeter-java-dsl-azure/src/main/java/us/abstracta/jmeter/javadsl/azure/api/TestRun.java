@@ -13,6 +13,8 @@ public class TestRun {
   private final String testRunId;
   private final String displayName;
   private final String testId;
+  private Map<String, String> environmentVariables;
+  private Map<String, Secret> secrets;
   private final String status;
   private final Integer virtualUsers;
   private final Instant startDateTime;
@@ -46,6 +48,10 @@ public class TestRun {
 
   public String getId() {
     return testRunId;
+  }
+
+  public String getTestId() {
+    return testId;
   }
 
   @JsonIgnore
@@ -85,6 +91,18 @@ public class TestRun {
 
   public String getUrl() {
     return portalUrl;
+  }
+
+  public Map<String, String> getEnvironmentVariables() {
+    return environmentVariables;
+  }
+
+  public void setEnvironmentVariables(Map<String, String> vars) {
+    this.environmentVariables = vars;
+  }
+
+  public void setSecrets(Map<String, Secret> secrets) {
+    this.secrets = secrets;
   }
 
 }

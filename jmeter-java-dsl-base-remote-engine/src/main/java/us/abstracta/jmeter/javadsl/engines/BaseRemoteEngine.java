@@ -3,20 +3,28 @@ package us.abstracta.jmeter.javadsl.engines;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeoutException;
 import org.apache.jmeter.threads.ThreadGroup;
 import org.apache.jorphan.collections.HashTree;
 import org.apache.jorphan.collections.ListedHashTree;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import us.abstracta.jmeter.javadsl.JmeterDsl;
 import us.abstracta.jmeter.javadsl.core.BuildTreeContext;
 import us.abstracta.jmeter.javadsl.core.DslJmeterEngine;
 import us.abstracta.jmeter.javadsl.core.DslTestPlan;
 import us.abstracta.jmeter.javadsl.core.TestPlanStats;
 import us.abstracta.jmeter.javadsl.core.engines.JmeterEnvironment;
+import us.abstracta.jmeter.javadsl.core.engines.TestStopper;
+import us.abstracta.jmeter.javadsl.core.listeners.autostop.AutoStopTestBean;
 
 /**
  * Contains common logic to ease creation of remote engines (like BlazeMeter).
@@ -43,6 +51,7 @@ public abstract class BaseRemoteEngine<C extends BaseRemoteEngineApiClient, S ex
       this.apiClient = cli;
       JmeterEnvironment env = new JmeterEnvironment();
       BuildTreeContext context = BuildTreeContext.buildRemoteExecutionContext();
+      context.setTestStopper(buildTestStopper());
       HashTree tree = buildTree(testPlan, context);
       saveTestPlanTo(jmxFile, tree, env);
       return run(jmxFile, tree, context);
@@ -86,7 +95,11 @@ public abstract class BaseRemoteEngine<C extends BaseRemoteEngineApiClient, S ex
    */
   protected abstract C buildClient();
 
-  private HashTree buildTree(DslTestPlan testPlan, BuildTreeContext context) {
+  protected TestStopper buildTestStopper() {
+    return null;
+  }
+
+  protected HashTree buildTree(DslTestPlan testPlan, BuildTreeContext context) {
     HashTree ret = new ListedHashTree();
     context.buildTreeFor(testPlan, ret);
     context.getVisualizers().forEach((v, e) ->
@@ -101,6 +114,56 @@ public abstract class BaseRemoteEngine<C extends BaseRemoteEngineApiClient, S ex
     try (FileOutputStream output = new FileOutputStream(jmxFile.getPath())) {
       env.saveTree(tree, output);
     }
+  }
+
+  protected List<File> findDependencies(HashTree tree, BuildTreeContext ctx) {
+    Map<Class<?>, File> ret = new HashMap<>();
+    findDependencies(tree, ctx, ret);
+    return new ArrayList<>(ret.values());
+  }
+
+  private void findDependencies(HashTree tree, BuildTreeContext ctx, Map<Class<?>, File> deps) {
+    for (Object elem : tree.list()) {
+      if (deps.containsKey(elem.getClass())) {
+        break;
+      }
+      if (elem instanceof AutoStopTestBean) {
+        addDependency(elem, deps);
+        if (ctx.getTestStopper() != null) {
+          addDependency(ctx.getTestStopper(), deps);
+        }
+      } else if (elem.getClass().getPackage().getName()
+          .startsWith(JmeterDsl.class.getPackage().getName())) {
+        addDependency(elem, deps);
+      } else {
+        findDependencies(tree.get(elem), ctx, deps);
+      }
+    }
+  }
+
+  private void addDependency(Object elem, Map<Class<?>, File> deps) {
+    deps.put(elem.getClass(), getClassJarPath(elem.getClass()));
+  }
+
+  private File getClassJarPath(Class<?> theClass) {
+    try {
+      return new File(theClass.getProtectionDomain().getCodeSource().getLocation().toURI());
+    } catch (URISyntaxException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  protected boolean isAutoStoppableTest(HashTree tree) {
+    for (Object elem : tree.list()) {
+      if (elem instanceof AutoStopTestBean) {
+        return true;
+      } else {
+        if (isAutoStoppableTest(tree.get(elem))) {
+          return true;
+        }
+      }
+    }
+    return false;
   }
 
   protected ThreadGroup extractFirstThreadGroup(HashTree tree) {
