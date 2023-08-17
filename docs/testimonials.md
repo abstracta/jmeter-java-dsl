@@ -42,7 +42,7 @@ That, with addition to the highly engaging attitude of Abstracta, has inspired m
 :::
 
 ::: testimonial https://www.linkedin.com/in/tamasbojte/ | Tamás Bőjte | Senior Automation Engineer
-java-jmeter-dsl is a great tool because it can help you reuse your REST-assured tests in order to create some performance test cases. It's very useful because you can generate JTL files to create JMTER reports and even use InfluxDB and Grafana to generate very nice graphics
+java-jmeter-dsl is a great tool because it can help you reuse your REST-assured tests in order to create some performance test cases. It's very useful because you can generate JTL files to create JMeter reports and even use InfluxDB and Grafana to generate very nice graphics.
 :::
 
 ::: testimonial https://www.linkedin.com/in/uddipan-halder-b5241b84/ | Uddipan Halder | Lead Performance Test Engineer
@@ -54,11 +54,11 @@ I just started exploring JMeter DSL. It is pretty cool. I will post an article a
 :::
 
 ::: testimonial https://www.linkedin.com/posts/microsoft-developers_write-concise-readable-code-thats-easier-activity-7079873611678814208-qXl7 | Microsoft Developer |  
-Write concise, readable code that's easier to maintain and update using JMeter DSL from Abstracta
+Write concise, readable code that's easier to maintain and update using JMeter DSL from Abstracta.
 :::
 
 ::: testimonial https://twitter.com/abhaybharti/status/1552149409802354688 | Abhay Bharti | Principal Engineer
-I tried using JMeter-Java-DSL. Its awesome, I can combine Selenium & JMeter library code in single script from comfort of my IDE.
+I tried using JMeter-Java-DSL. It's awesome, I can combine Selenium & JMeter library code in single script from comfort of my IDE.
 :::
 
 ::: testimonial https://www.linkedin.com/posts/pablo-herrera-ec_java-maven-web-activity-6982698450366648320-3rvZ | Pablo Herrera | QA Automation Engineer
@@ -70,9 +70,11 @@ JMeter Java DSL is a really useful avatar of the load testing tool. This is spec
 :::
 
 ::: testimonial https://www.linkedin.com/in/rados%C5%82aw-siatka-62a5a66/ | Radoslaw Siatka | Test Lead @ GFT Poland
-I was looging for simplicity of test plan implementation, reusability of components, assertion on metrics, html report per test, ease of debugging and maintenance, great support and documentation with tons of examples - and i found them here. JMeter DSL covers JMeter's missing functionality and does it great.
+I was looking for simplicity of test plan implementation, reusability of components, assertion on metrics, html report per test, ease of debugging and maintenance, great support and documentation with tons of examples - and I found them here. JMeter DSL covers JMeter's missing functionality and does it great.
 :::
 
+::: testimonial https://www.linkedin.com/in/premraj-murugaraj/ | Premraj Murugaraj | Senior Engineer, Testing @ Singtel
+I always wished to have easy DSL for jmeter when other tools were supporting such as gatling. I was delighted when jmeter dsl was introduced and tried in my work project. It works so good in simple projects. Establishing CI pipeline is also smooth and easy now in organisation. Thank you for your valuable effort.
 ::::
 
 <div style="margin: 10px">
