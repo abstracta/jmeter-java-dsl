@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.TimeoutException;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import org.apache.http.entity.ContentType;
 import org.apache.jorphan.collections.HashTree;
@@ -392,31 +393,32 @@ public class AzureEngine extends BaseRemoteEngine<AzureClient, AzureTestPlanStat
       throws IOException, InterruptedException, TimeoutException {
     awaitStatus(group, () -> apiClient.findResourceGroup(group.getName(), group.getSubscription()),
         ResourceGroup::isPendingProvisioning, ResourceGroup::isProvisioned, PROVISIONING_TIMEOUT,
-        "resource group provisioning", "Azure usage");
+        "resource group provisioning", "Azure usage", null);
   }
 
   private <T> void awaitStatus(T entity, EntityProvider<T> entityProvider,
       Predicate<T> checkIntermediateStatus, Predicate<T> checkSuccessStatus, Duration timeout,
-      String waitName, String detailsName)
+      String waitName, String detailsName, Function<T, String> failureDetailExtractor)
       throws InterruptedException, TimeoutException, IOException {
     if (checkSuccessStatus.test(entity)) {
       return;
     }
-    LOG.info("Waiting for " + waitName + "... ");
+    LOG.info("Waiting for {}... ", waitName);
     Instant start = Instant.now();
     while (!hasTimedOut(timeout, start) && checkIntermediateStatus.test(entity)) {
       Thread.sleep(STATUS_POLL_PERIOD.toMillis());
       entity = entityProvider.get();
     }
     if (checkIntermediateStatus.test(entity)) {
-      throw new TimeoutException(
-          "Timeout while waiting for " + waitName + " after " + prettyDuration(timeout)
-              + ". You may try executing again, or create an issue in jmeter-java-dsl GitHub "
-              + "repository with " + detailsName + " details.");
+      throw new TimeoutException(String.format("Timeout while waiting for %s after %s. "
+          + "You may try executing again, or create an issue in jmeter-java-dsl GitHub repository "
+          + "with %s details.", waitName, prettyDuration(timeout), detailsName));
     } else if (!checkSuccessStatus.test(entity)) {
-      throw new IllegalArgumentException(
-          firstLetterToUpper(waitName) + " failed. Create an issue in jmeter-java-dsl GitHub "
-              + "repository with " + detailsName + " details.");
+      throw new IllegalArgumentException(String.format("%s failed%s. "
+              + "Create an issue in jmeter-java-dsl GitHub repository with %s details.",
+          firstLetterToUpper(waitName),
+          failureDetailExtractor != null ? " due to: " + failureDetailExtractor.apply(entity) : "",
+          detailsName));
     }
   }
 
@@ -444,7 +446,7 @@ public class AzureEngine extends BaseRemoteEngine<AzureClient, AzureTestPlanStat
     awaitStatus(testResource,
         () -> apiClient.findTestResource(testResource.getName(), testResource.getResourceGroup()),
         LoadTestResource::isPendingProvisioning, LoadTestResource::isProvisioned,
-        PROVISIONING_TIMEOUT, "test resource provisioning", "Azure usage");
+        PROVISIONING_TIMEOUT, "test resource provisioning", "Azure usage", null);
   }
 
   private LoadTest createLoadTest(LoadTestResource testResource) throws IOException {
@@ -498,7 +500,8 @@ public class AzureEngine extends BaseRemoteEngine<AzureClient, AzureTestPlanStat
     LOG.info("Validating test script");
     EntityProvider<LoadTest> testProvider = () -> apiClient.findTestById(loadTest.getTestId());
     awaitStatus(testProvider.get(), testProvider, LoadTest::isPendingValidation,
-        LoadTest::isSuccessValidation, VALIDATION_TIMEOUT, "test script validation", "test plan");
+        LoadTest::isSuccessValidation, VALIDATION_TIMEOUT, "test script validation", "test plan",
+        LoadTest::getValidationFailureDetails);
   }
 
   private String solveTestRunName() {

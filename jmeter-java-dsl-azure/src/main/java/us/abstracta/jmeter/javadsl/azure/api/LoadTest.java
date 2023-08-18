@@ -85,10 +85,6 @@ public class LoadTest {
     }
   }
 
-  public void removeTestScriptFile() {
-    inputArtifacts.testScriptFileInfo = null;
-  }
-
   @JsonIgnore
   public boolean isPendingValidation() {
     String validationStatus = getValidationStatus();
@@ -106,6 +102,10 @@ public class LoadTest {
   public boolean isSuccessValidation() {
     String validationStatus = getValidationStatus();
     return validationStatus == null || "VALIDATION_SUCCESS".equals(validationStatus);
+  }
+
+  public String getValidationFailureDetails() {
+    return inputArtifacts.testScriptFileInfo.getValidationFailureDetails();
   }
 
   public static class LoadTestConfiguration {

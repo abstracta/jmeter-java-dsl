@@ -78,8 +78,8 @@ public class AzureTestStopper extends BaseTestStopper {
       try (CloseableHttpClient httpClient = HttpClientBuilder.create().build()) {
         String auth = "Bearer " + getAccessToken(tenantId, clientId, clientSecret, httpClient);
         try {
-          stopTestRun(testRunUrl, auth, httpClient);
           setTestRunStopMessage(getStopMessage(), testRunUrl, testId, tenantId, auth, httpClient);
+          stopTestRun(testRunUrl, auth, httpClient);
         } catch (AzureApiException e) {
           if (e.statusCode != 400 || !"TestRunAlreadyFinished".equals(e.getErrorCode())) {
             throw e;
