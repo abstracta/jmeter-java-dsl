@@ -483,7 +483,6 @@ public class AzureEngine extends BaseRemoteEngine<AzureClient, AzureTestPlanStat
 
   private void uploadTestFiles(File jmxFile, HashTree tree, BuildTreeContext context,
       LoadTest loadTest) throws IOException, InterruptedException, TimeoutException {
-    LOG.info("Uploading test script and asset files");
     for (File f : assets) {
       context.processAssetFile(f.getPath());
     }
@@ -492,17 +491,17 @@ public class AzureEngine extends BaseRemoteEngine<AzureClient, AzureTestPlanStat
     }
     context.processAssetFile(jmxFile.getPath());
     for (Map.Entry<String, File> asset : context.getAssetFiles().entrySet()) {
-      apiClient.uploadTestFile(asset.getValue(), asset.getKey(), loadTest.getTestId());
-      awaitValidatedTestFile(asset.getKey(), loadTest.getTestId());
+      FileInfo testFile = apiClient.uploadTestFile(asset.getValue(), asset.getKey(),
+          loadTest.getTestId());
+      awaitValidatedTestFile(testFile, loadTest.getTestId());
     }
   }
 
-  private void awaitValidatedTestFile(String fileName, String testId)
+  private void awaitValidatedTestFile(FileInfo testFile, String testId)
       throws IOException, InterruptedException, TimeoutException {
-    LOG.info("Validating test script");
-    EntityProvider<FileInfo> fileProvider = () -> apiClient.findTestFile(fileName, testId);
-    awaitStatus(fileProvider.get(), fileProvider, FileInfo::isPendingValidation,
-        FileInfo::isSuccessValidation, VALIDATION_TIMEOUT,
+    String fileName = testFile.getFileName();
+    awaitStatus(testFile, () -> apiClient.findTestFile(fileName, testId),
+        FileInfo::isPendingValidation, FileInfo::isSuccessValidation, VALIDATION_TIMEOUT,
         "test file '" + fileName + "' validation", "test plan",
         FileInfo::getValidationFailureDetails);
   }

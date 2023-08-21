@@ -111,7 +111,7 @@ public class BuildTreeContext {
   }
 
   public static BuildTreeContext buildRemoteExecutionContext() {
-    return new BuildTreeContext(null, new LinkedHashMap<>(), new HashMap<>());
+    return new BuildTreeContext(null, new LinkedHashMap<>(), new LinkedHashMap<>());
   }
 
   public String processAssetFile(String assetPath) {

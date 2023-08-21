@@ -43,7 +43,7 @@ jobs:
           branch: master
           file_pattern: 'pom.xml */pom.xml README.md docs/index.md docs/guide/**'
       - name: package release
-        run: mvn --batch-mode --no-transfer-progress clean install -Dfailsafe.skipAfterFailureCount=1 --settings .github/settings.xml
+        run: mvn --batch-mode --no-transfer-progress clean install --settings .github/settings.xml
         env:
           BZ_TOKEN: ${{ secrets.BZ_TOKEN }}
           OCTOPERF_API_KEY: ${{ secrets.OCTOPERF_API_KEY }}

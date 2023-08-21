@@ -226,7 +226,7 @@ public class AzureClient extends BaseRemoteEngineApiClient {
     Call<Void> deleteTestFile(@Path("testId") String testId, @Path("fileName") String fileName);
 
     @PUT("tests/{testId}/files/{fileName}" + API_VERSION)
-    Call<Void> uploadTestFile(@Path("testId") String testId, @Path("fileName") String fileName,
+    Call<FileInfo> uploadTestFile(@Path("testId") String testId, @Path("fileName") String fileName,
         @Body RequestBody testFile);
 
     @GET("tests/{testId}/files/{fileName}" + API_VERSION)
@@ -357,8 +357,8 @@ public class AzureClient extends BaseRemoteEngineApiClient {
     execApiCall(loadTestApi.deleteTestFile(testId, fileName));
   }
 
-  public void uploadTestFile(File file, String fileName, String testId) throws IOException {
-    execApiCall(loadTestApi.uploadTestFile(testId, fileName,
+  public FileInfo uploadTestFile(File file, String fileName, String testId) throws IOException {
+    return execApiCall(loadTestApi.uploadTestFile(testId, fileName,
         RequestBody.create(MediaType.get("application/octet-stream"), file)));
   }
 
