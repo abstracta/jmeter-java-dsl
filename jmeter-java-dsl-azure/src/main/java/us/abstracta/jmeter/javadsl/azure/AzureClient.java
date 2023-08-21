@@ -229,8 +229,8 @@ public class AzureClient extends BaseRemoteEngineApiClient {
     Call<Void> uploadTestFile(@Path("testId") String testId, @Path("fileName") String fileName,
         @Body RequestBody testFile);
 
-    @GET("tests/{testId}" + API_VERSION)
-    Call<LoadTest> findTestById(@Path("testId") String testId);
+    @GET("tests/{testId}/files/{fileName}" + API_VERSION)
+    Call<FileInfo> findTestFile(@Path("testId") String testId, @Path("fileName") String fileName);
 
     @PATCH("test-runs/{testRunId}" + API_VERSION)
     @Headers(MERGE_PATCH_CONTENT_TYPE_HEADER)
@@ -334,7 +334,6 @@ public class AzureClient extends BaseRemoteEngineApiClient {
   }
 
   public void updateTest(LoadTest loadTest) throws IOException {
-    loadTest.clearInputArtifacts();
     execApiCall(loadTestApi.updateTest(loadTest.getTestId(), loadTest));
   }
 
@@ -363,8 +362,8 @@ public class AzureClient extends BaseRemoteEngineApiClient {
         RequestBody.create(MediaType.get("application/octet-stream"), file)));
   }
 
-  public LoadTest findTestById(String testId) throws IOException {
-    return execApiCall(loadTestApi.findTestById(testId));
+  public FileInfo findTestFile(String fileName, String testId) throws IOException {
+    return execApiCall(loadTestApi.findTestFile(testId, fileName));
   }
 
   public TestRun createTestRun(TestRun testRun) throws IOException {

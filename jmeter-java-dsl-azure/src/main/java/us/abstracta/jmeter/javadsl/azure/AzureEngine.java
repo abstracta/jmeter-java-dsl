@@ -19,6 +19,7 @@ import org.apache.jorphan.collections.HashTree;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import us.abstracta.jmeter.javadsl.azure.api.AppComponents;
+import us.abstracta.jmeter.javadsl.azure.api.FileInfo;
 import us.abstracta.jmeter.javadsl.azure.api.LoadTest;
 import us.abstracta.jmeter.javadsl.azure.api.LoadTestResource;
 import us.abstracta.jmeter.javadsl.azure.api.Location;
@@ -361,7 +362,6 @@ public class AzureEngine extends BaseRemoteEngine<AzureClient, AzureTestPlanStat
       updateAppComponents(loadTest);
     }
     uploadTestFiles(jmxFile, tree, context, loadTest);
-    awaitValidatedTestFile(loadTest);
     TestRun testRun = new TestRun(loadTest.getTestId(), solveTestRunName());
     if (isAutoStoppableTest(tree)) {
       AzureTestStopper.setupTestRun(testRun, tenantId, clientId, clientSecret,
@@ -414,10 +414,11 @@ public class AzureEngine extends BaseRemoteEngine<AzureClient, AzureTestPlanStat
           + "You may try executing again, or create an issue in jmeter-java-dsl GitHub repository "
           + "with %s details.", waitName, prettyDuration(timeout), detailsName));
     } else if (!checkSuccessStatus.test(entity)) {
+      String failureDetails =
+          failureDetailExtractor != null ? failureDetailExtractor.apply(entity) : null;
       throw new IllegalArgumentException(String.format("%s failed%s. "
               + "Create an issue in jmeter-java-dsl GitHub repository with %s details.",
-          firstLetterToUpper(waitName),
-          failureDetailExtractor != null ? " due to: " + failureDetailExtractor.apply(entity) : "",
+          firstLetterToUpper(waitName), failureDetails != null ? " due to: " + failureDetails : "",
           detailsName));
     }
   }
@@ -481,7 +482,7 @@ public class AzureEngine extends BaseRemoteEngine<AzureClient, AzureTestPlanStat
   }
 
   private void uploadTestFiles(File jmxFile, HashTree tree, BuildTreeContext context,
-      LoadTest loadTest) throws IOException {
+      LoadTest loadTest) throws IOException, InterruptedException, TimeoutException {
     LOG.info("Uploading test script and asset files");
     for (File f : assets) {
       context.processAssetFile(f.getPath());
@@ -492,16 +493,18 @@ public class AzureEngine extends BaseRemoteEngine<AzureClient, AzureTestPlanStat
     context.processAssetFile(jmxFile.getPath());
     for (Map.Entry<String, File> asset : context.getAssetFiles().entrySet()) {
       apiClient.uploadTestFile(asset.getValue(), asset.getKey(), loadTest.getTestId());
+      awaitValidatedTestFile(asset.getKey(), loadTest.getTestId());
     }
   }
 
-  private void awaitValidatedTestFile(LoadTest loadTest)
-      throws TimeoutException, InterruptedException, IOException {
+  private void awaitValidatedTestFile(String fileName, String testId)
+      throws IOException, InterruptedException, TimeoutException {
     LOG.info("Validating test script");
-    EntityProvider<LoadTest> testProvider = () -> apiClient.findTestById(loadTest.getTestId());
-    awaitStatus(testProvider.get(), testProvider, LoadTest::isPendingValidation,
-        LoadTest::isSuccessValidation, VALIDATION_TIMEOUT, "test script validation", "test plan",
-        LoadTest::getValidationFailureDetails);
+    EntityProvider<FileInfo> fileProvider = () -> apiClient.findTestFile(fileName, testId);
+    awaitStatus(fileProvider.get(), fileProvider, FileInfo::isPendingValidation,
+        FileInfo::isSuccessValidation, VALIDATION_TIMEOUT,
+        "test file '" + fileName + "' validation", "test plan",
+        FileInfo::getValidationFailureDetails);
   }
 
   private String solveTestRunName() {

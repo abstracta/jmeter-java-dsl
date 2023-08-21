@@ -13,26 +13,22 @@ public class LoadTest {
   private final String testId;
   private final String displayName;
   private final LoadTestConfiguration loadTestConfiguration;
-  private final LoadTestInputArtifacts inputArtifacts;
   @JsonIgnore
   private LoadTestResource testResource;
 
   @JsonCreator
   public LoadTest(@JsonProperty("testId") String testId,
       @JsonProperty("displayName") String displayName,
-      @JsonProperty("loadTestConfiguration") LoadTestConfiguration loadTestConfiguration,
-      @JsonProperty("inputArtifacts") LoadTestInputArtifacts inputArtifacts) {
+      @JsonProperty("loadTestConfiguration") LoadTestConfiguration loadTestConfiguration) {
     this.testId = testId;
     this.displayName = displayName;
     this.loadTestConfiguration = loadTestConfiguration;
-    this.inputArtifacts = inputArtifacts;
   }
 
   public LoadTest(String displayName, int engineInstances, boolean splitAllCsvs,
       LoadTestResource testResource) {
     this(UUID.randomUUID().toString(), displayName,
-        new LoadTestConfiguration(engineInstances, splitAllCsvs),
-        new LoadTestInputArtifacts(null));
+        new LoadTestConfiguration(engineInstances, splitAllCsvs));
     this.testResource = testResource;
   }
 
@@ -64,10 +60,6 @@ public class LoadTest {
     this.loadTestConfiguration.splitAllCSVs = splitCsvs;
   }
 
-  public void clearInputArtifacts() {
-    inputArtifacts.testScriptFileInfo = null;
-  }
-
   @JsonIgnore
   public void setTestResource(LoadTestResource testResource) {
     this.testResource = testResource;
@@ -85,29 +77,6 @@ public class LoadTest {
     }
   }
 
-  @JsonIgnore
-  public boolean isPendingValidation() {
-    String validationStatus = getValidationStatus();
-    return "VALIDATION_INITIATED".equals(validationStatus) || "NOT_VALIDATED".equals(
-        validationStatus);
-  }
-
-  @JsonIgnore
-  private String getValidationStatus() {
-    return inputArtifacts.testScriptFileInfo == null ? "VALIDATION_INITIATED"
-        : inputArtifacts.testScriptFileInfo.getValidationStatus();
-  }
-
-  @JsonIgnore
-  public boolean isSuccessValidation() {
-    String validationStatus = getValidationStatus();
-    return validationStatus == null || "VALIDATION_SUCCESS".equals(validationStatus);
-  }
-
-  public String getValidationFailureDetails() {
-    return inputArtifacts.testScriptFileInfo.getValidationFailureDetails();
-  }
-
   public static class LoadTestConfiguration {
 
     private int engineInstances;
@@ -118,17 +87,6 @@ public class LoadTest {
         @JsonProperty("splitAllCSVs") boolean splitAllCSVs) {
       this.engineInstances = engineInstances;
       this.splitAllCSVs = splitAllCSVs;
-    }
-
-  }
-
-  public static class LoadTestInputArtifacts {
-
-    private FileInfo testScriptFileInfo;
-
-    @JsonCreator
-    public LoadTestInputArtifacts(@JsonProperty("testScriptUrl") FileInfo testScriptFileInfo) {
-      this.testScriptFileInfo = testScriptFileInfo;
     }
 
   }
