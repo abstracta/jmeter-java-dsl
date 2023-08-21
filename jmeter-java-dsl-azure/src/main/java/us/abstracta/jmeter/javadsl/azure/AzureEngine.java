@@ -483,13 +483,13 @@ public class AzureEngine extends BaseRemoteEngine<AzureClient, AzureTestPlanStat
   private void uploadTestFiles(File jmxFile, HashTree tree, BuildTreeContext context,
       LoadTest loadTest) throws IOException {
     LOG.info("Uploading test script and asset files");
-    context.processAssetFile(jmxFile.getPath());
     for (File f : assets) {
       context.processAssetFile(f.getPath());
     }
     for (File f : findDependencies(tree, context)) {
       context.processAssetFile(f.getPath());
     }
+    context.processAssetFile(jmxFile.getPath());
     for (Map.Entry<String, File> asset : context.getAssetFiles().entrySet()) {
       apiClient.uploadTestFile(asset.getValue(), asset.getKey(), loadTest.getTestId());
     }
