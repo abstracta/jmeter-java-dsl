@@ -122,6 +122,8 @@ public class BridgedObjectConstruct extends BaseBridgedObjectConstruct {
     Function<String, Object> parser = PARSERS.get(paramType);
     if (parser != null && node instanceof ScalarNode) {
       return parser.apply(((ScalarNode) node).getValue());
+    } else if (paramType.isEnum() && node instanceof ScalarNode) {
+      return Enum.valueOf((Class) paramType, ((ScalarNode) node).getValue());
     } else {
       Object ret = constructor.constructObject(node);
       if (paramType.isAssignableFrom(ret.getClass())) {

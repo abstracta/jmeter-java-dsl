@@ -67,7 +67,7 @@ public class DslRegexExtractor extends DslVariableExtractor<DslRegexExtractor> {
    * And you use {@code user=([^&]+)} as regular expression. Then {@code $1$-$2$} will result in
    * storing in the specified JMeter variable the value {@code tester-abstracta}.
    * <p>
-   * When not specified {@code $1$ will be used}.
+   * When not specified {@code $1$} will be used.
    *
    * @param template specifies template to use for storing in the JMeter variable.
    * @return the extractor for further configuration or usage.

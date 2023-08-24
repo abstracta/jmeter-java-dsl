@@ -12,7 +12,7 @@ import us.abstracta.jmeter.javadsl.core.DslTestPlan;
 /**
  * Abstracts logic for {@link DslTestElement} that can nest other test elements.
  *
- * @param <T> is type of test elements that can be nested by this class.
+ * @param <C> is type of test elements that can be nested by this class.
  *            <p>
  *            Check {@link DslTestPlan} for an example.
  * @since 0.1
