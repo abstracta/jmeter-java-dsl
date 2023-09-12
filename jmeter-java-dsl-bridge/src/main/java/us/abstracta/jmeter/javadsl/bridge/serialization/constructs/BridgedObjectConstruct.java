@@ -14,8 +14,10 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.yaml.snakeyaml.nodes.MappingNode;
 import org.yaml.snakeyaml.nodes.Node;
 import org.yaml.snakeyaml.nodes.ScalarNode;
+import org.yaml.snakeyaml.nodes.SequenceNode;
 import us.abstracta.jmeter.javadsl.bridge.serialization.BridgedObjectConstructor;
 import us.abstracta.jmeter.javadsl.bridge.serialization.BuilderMethod;
 import us.abstracta.jmeter.javadsl.bridge.serialization.TestElementConstructorException;
@@ -52,35 +54,9 @@ public class BridgedObjectConstruct extends BaseBridgedObjectConstruct {
   public Object construct(Node node) {
     Map<String, Node> nodeProperties = getNodeProperties(node, tag);
     Object ret = buildTestElement(nodeProperties, node);
-    nodeProperties.forEach((propName, propNode) -> {
-      Method propMethod = findPropertyMethod(propName, propNode, ret);
-      try {
-        Object[] args = propMethod.getParameters().length == 1
-            ? new Object[]{constructParameter(propNode, propMethod.getParameters()[0])}
-            : new Object[]{};
-        propMethod.invoke(ret, args);
-      } catch (ReflectiveOperationException ex) {
-        throw new RuntimeException(ex);
-      }
-    });
+    buildPropertiesFromList(nodeProperties.remove("_propsList"), ret);
+    nodeProperties.forEach((propName, propNode) -> callPropertyMethod(propName, propNode, ret));
     return ret;
-  }
-
-  private Method findPropertyMethod(String propName, Node propNode, Object testElement) {
-    List<Method> candidates = Stream.of(testElement.getClass().getMethods())
-        .filter(m -> propName.equals(m.getName()))
-        .collect(Collectors.toList());
-    if (candidates.isEmpty()) {
-      throw new TestElementConstructorException(tag, propNode,
-          "could not find a method for setting property " + propName);
-    }
-    return candidates.stream()
-        // prefer the method accepting strings which is more generic (accepts Jmeter expressions).
-        .filter(m -> m.getParameters().length == 1
-            && String.class.isAssignableFrom(m.getParameters()[0].getType()))
-        .findAny()
-        // otherwise just get any of the candidates
-        .orElseGet(() -> candidates.get(0));
   }
 
   private Object buildTestElement(Map<String, Node> nodeProperties, Node node) {
@@ -147,6 +123,80 @@ public class BridgedObjectConstruct extends BaseBridgedObjectConstruct {
                 ret.getClass().getName()));
       }
     }
+  }
+
+  private void buildPropertiesFromList(Node props, Object ret) {
+    if (props == null) {
+      return;
+    }
+    SequenceNode propsList = castNode(props, SequenceNode.class, "list", tag);
+    propsList.getValue().forEach(s -> {
+      // remove first character that is the tag marker (!)
+      String propertyName = s.getTag().getValue().substring(1);
+      callPropertyMethod(propertyName, s, ret);
+    });
+  }
+
+  private void callPropertyMethod(String propName, Node propNode, Object ret) {
+    Method propMethod = findPropertyMethod(propName, propNode, ret);
+    try {
+      Object[] args = buildArgs(propMethod, propNode);
+      propMethod.invoke(ret, args);
+    } catch (ReflectiveOperationException ex) {
+      throw new RuntimeException(ex);
+    }
+  }
+
+  private Method findPropertyMethod(String propName, Node propNode, Object testElement) {
+    List<Method> candidates = Stream.of(testElement.getClass().getMethods())
+        .filter(m -> propName.equals(m.getName()))
+        // sorted to get the most specific ones in the class hierarchy first
+        .sorted((m1, m2) -> {
+          Class<?> m1Class = m1.getReturnType();
+          Class<?> m2Class = m2.getReturnType();
+          return m1Class == m2Class ? 0 : m1Class.isAssignableFrom(m2Class) ? 1 : -1;
+        })
+        .collect(Collectors.toList());
+    if (candidates.isEmpty()) {
+      throw new TestElementConstructorException(tag, propNode,
+          "could not find a method for setting property " + propName);
+    }
+    return candidates.stream()
+        // prefer the method accepting strings which is more generic (accepts Jmeter expressions).
+        .filter(m -> m.getParameters().length >= 1
+            && Arrays.stream(m.getParameters())
+            .allMatch(p -> String.class.isAssignableFrom(p.getType())))
+        .findFirst()
+        /*
+         otherwise just get the first one (which is the most specific one when multiple
+         implementations are available in class hierarchy)
+         */
+        .orElseGet(() -> candidates.get(0));
+  }
+
+  private Object[] buildArgs(Method propMethod, Node propNode) {
+    Parameter[] params = propMethod.getParameters();
+    if (params.length == 0) {
+      return new Object[0];
+    } else if (params.length == 1) {
+      return new Object[]{constructParameter(extractSingleArgNode(propNode, params[0]), params[0])};
+    } else {
+      Map<String, Node> props = getNodeProperties(propNode, propNode.getTag().getValue());
+      return Arrays.stream(propMethod.getParameters())
+          .map(p -> constructParameter(props.get(p.getName()), p))
+          .toArray();
+    }
+  }
+
+  private Node extractSingleArgNode(Node propNode, Parameter param) {
+    if (propNode instanceof MappingNode) {
+      MappingNode mappingNode = (MappingNode) propNode;
+      if (mappingNode.getValue().size() == 1 && ((ScalarNode) mappingNode.getValue().get(0)
+          .getKeyNode()).getValue().equals(param.getName())) {
+        return mappingNode.getValue().get(0).getValueNode();
+      }
+    }
+    return propNode;
   }
 
 }

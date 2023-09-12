@@ -13,13 +13,19 @@ import us.abstracta.jmeter.javadsl.bridge.serialization.TestElementConstructorEx
 public abstract class BaseBridgedObjectConstruct extends AbstractConstruct {
 
   protected static Map<String, Node> getNodeProperties(Node node, String tag) {
-    if (!(node instanceof MappingNode)) {
-      throw new TestElementConstructorException(tag, node,
-          String.format("found a %s while expecting a map", node.getClass()));
-    }
-    return ((MappingNode) node).getValue().stream()
+    MappingNode mappingNode = castNode(node, MappingNode.class, "map", tag);
+    return mappingNode.getValue().stream()
         .collect(Collectors.toMap(n -> ((ScalarNode) n.getKeyNode()).getValue(),
             NodeTuple::getValueNode, (u, v) -> u, LinkedHashMap::new));
+  }
+
+  protected static <T extends Node> T castNode(Node node, Class<T> nodeType, String name,
+      String tag) {
+    if (!nodeType.isInstance(node)) {
+      throw new TestElementConstructorException(tag, node,
+          String.format("found a %s while expecting a %s", node.getClass(), name));
+    }
+    return nodeType.cast(node);
   }
 
 }
