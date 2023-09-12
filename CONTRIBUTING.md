@@ -55,7 +55,7 @@ You can check more complete and complex diagrams [here](docs/diagrams).
 
 Here we will detail the main steps and things to take into consideration when implementing a new test element, or extending an existing one.
 
-Before doing any coding, consider that the project uses Java 8, maven 3.5, and docker as main dependencies, so make sure that you install them beforehand.
+Before doing any coding, consider that the project uses Java 8, maven 3.5, nodejs 18+, pnpm 8+, and docker as main dependencies, so make sure that you install them beforehand. You might also install [devbox](https://www.jetpack.io/devbox/docs/) and [direnv](https://direnv.net/) and then use existing devbox configuration to setup the development environment.
 
 Additionally, the project uses checkstyle for enforcing code consistency and conventions. You can get IDEs settings from [here](https://github.com/google/styleguide), which already matches the code style rules. Using IDEs autoformatting with such configurations should automatically fix most styling issues.
 
@@ -129,7 +129,7 @@ Additionally, the project uses checkstyle for enforcing code consistency and con
       * In MethodCallBuilderTest defined tests you should not use methods for abstracting duplicate logic between tests (nor variables or constants for literals). Code duplication in this case is acceptable and expected.
       * Check [DslTestPlanTest](jmeter-java-dsl/src/test/java/us/abstracta/jmeter/javadsl/core/DslTestPlanTest.java) for some tests examples.
 8. Run `mvn clean package` and fix any potential code styling issues or failing tests.
-9. Add a new section [user guide](docs/guide), by adding a new md file and proper `@include` in parent section, describing the new feature. Consider running in the `docs` directory `yarn install` and `yarn dev` (this requires node 14 and yarn installed on your machine) to run a local server for docs, where you can review that new changes are properly showing.
+9. Add a new section [user guide](docs/guide), by adding a new md file and proper `@include` in parent section, describing the new feature. Consider running in the `docs` directory `pnpm install` and `pnpm dev` (this requires node 18+ and pnpm installed on your machine) to run a local server for docs, where you can review that new changes are properly showing. If you use devbox then you can use `devbox run setup` and `devbox run docs`.
 10. Commit changes to git, using as a comment a subject line that describes general changes, and if necessary, some additional details describing the reason why the change is necessary.
 11. Submit a pull request to the repository including a meaningful name.
 12. Check GitHub Actions execution to verify that no test fails on the CI pipeline.

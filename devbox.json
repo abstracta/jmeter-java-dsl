@@ -1,0 +1,24 @@
+{
+  "packages": [
+    "maven@latest",
+    "nodejs@latest",
+    "nodePackages.pnpm@latest",
+    "temurin-bin-8@latest"
+  ],
+  "shell": {
+    "init_hook": [
+      "echo 'Welcome to devbox!' > /dev/null"
+    ],
+    "scripts": {
+      "docs": [
+        "pnpm --dir docs dev"
+      ],
+      "install": [
+        "mvn clean install"
+      ],
+      "setup": [
+        "pnpm --dir docs install"
+      ]
+    }
+  }
+}
