@@ -8,8 +8,8 @@ jmeter-java-dsl provides two simple ways of creating thread groups which are use
 This is how they look in code:
 
 ```java
-threadGroup(10, 20) // 10 threads for 20 iterations each
-threadGroup(10, Duration.ofSeconds(20)) // 10 threads for 20 seconds each
+threadGroup(10, 20, ...) // 10 threads for 20 iterations each
+threadGroup(10, Duration.ofSeconds(20), ...) // 10 threads for 20 seconds each
 ```
 
 But these options are not good when working with many threads or when trying to configure some complex test scenarios (like when doing incremental or peak tests).

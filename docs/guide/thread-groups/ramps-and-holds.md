@@ -27,7 +27,7 @@ Which would translate into the following threads' timeline:
 
 ![Thread Group Timeline](./images/ultimate-thread-group-timeline.png)
 
-Check [DslThreadGroup](/jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/threadgroups/DslThreadGroup.java) for more details.
+Check [DslDefaultThreadGroup](/jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/threadgroups/DslDefaultThreadGroup.java) for more details.
 
 ::: tip
 To visualize the threads timeline, for complex thread group configurations like the previous one, you can get a chart like the previous one by using provided `DslThreadGroup.showTimeline()` method.
@@ -42,5 +42,5 @@ For example, for the above test plan you would get a window like the following o
 :::
 
 ::: tip
-When using multiple thread groups in a test plan, consider setting a name (eg: `threadGroup("main", 1, 1, ...)`)on them to properly identify associated requests in statistics & jtl results.
+When using multiple thread groups in a test plan, consider setting a name (eg: `threadGroup("main", 1, 1, ...)`) on them to properly identify associated requests in statistics & jtl results.
 :::
