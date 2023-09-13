@@ -147,7 +147,20 @@ public abstract class BaseRemoteEngine<C extends BaseRemoteEngineApiClient, S ex
 
   private File getClassJarPath(Class<?> theClass) {
     try {
-      return new File(theClass.getProtectionDomain().getCodeSource().getLocation().toURI());
+      File ret = new File(theClass.getProtectionDomain().getCodeSource().getLocation().toURI());
+      /*
+       when using IDE, it may solve to the directory of another module, which is no good for
+       uploading to remote engine
+       */
+      if (ret.isDirectory() && ret.getPath().matches(".*[/\\\\]target[/\\\\](test-)?classes$")) {
+        File[] jars = new File(ret.getParent())
+            .listFiles((dir, name) -> name.endsWith(".jar")
+                && !name.endsWith("-tests.jar") && !name.endsWith("-javadoc.jar"));
+        if (jars.length >= 1) {
+          ret = jars[0];
+        }
+      }
+      return ret;
     } catch (URISyntaxException e) {
       throw new RuntimeException(e);
     }
