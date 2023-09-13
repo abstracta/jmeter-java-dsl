@@ -16,6 +16,7 @@ import us.abstracta.jmeter.javadsl.core.controllers.DslForEachController;
 import us.abstracta.jmeter.javadsl.core.controllers.DslIfController;
 import us.abstracta.jmeter.javadsl.core.controllers.DslOnceOnlyController;
 import us.abstracta.jmeter.javadsl.core.controllers.DslRuntimeController;
+import us.abstracta.jmeter.javadsl.core.controllers.DslSimpleController;
 import us.abstracta.jmeter.javadsl.core.controllers.DslTransactionController;
 import us.abstracta.jmeter.javadsl.core.controllers.DslWeightedSwitchController;
 import us.abstracta.jmeter.javadsl.core.controllers.DslWhileController;
@@ -365,6 +366,19 @@ public class JmeterDsl {
    */
   public static DslTransactionController transaction(String name, ThreadGroupChild... children) {
     return new DslTransactionController(name, Arrays.asList(children));
+  }
+
+  /**
+   * Builds a new simple controller with the given name.
+   *
+   * @param name     specifies the name to identify the controller.
+   * @param children contains the test elements that will be contained within the controller.
+   * @return the controller instance.
+   * @see DslSimpleController
+   * @since 1.21
+   */
+  public static DslSimpleController simpleController(String name, ThreadGroupChild... children) {
+    return new DslSimpleController(name, Arrays.asList(children));
   }
 
   /**
