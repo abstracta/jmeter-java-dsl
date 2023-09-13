@@ -370,12 +370,31 @@ public class JmeterDsl {
 
   /**
    * Builds a new simple controller with the given name.
+   * <p>
+   * Simple controllers are good for defining test plan scopes, without having to create a
+   * transaction (which generates a sample result). For example, to apply configs, assertions,
+   * timers, listeners, post- and pre-processors to only part of the test plan (certain samplers).
+   * <p>
+   * Additionally, they are a handy way of creating methods that return certain part of a test plan
+   * (inside a simple controller) and then directly inject the method returned controller in an
+   * existing test plan.
    *
-   * @param name     specifies the name to identify the controller.
    * @param children contains the test elements that will be contained within the controller.
    * @return the controller instance.
    * @see DslSimpleController
    * @since 1.21
+   */
+  public static DslSimpleController simpleController(ThreadGroupChild... children) {
+    return simpleController(null, children);
+  }
+
+  /**
+   * Same as {@link #simpleController(ThreadGroupChild...)} but allowing to set a name.
+   * <p>
+   * In this scenario, the name has no functional usage during test plan execution, but it can ease
+   * JMX test plan review as to keep sections of the test plan well identified.
+   *
+   * @see #simpleController(ThreadGroupChild...)
    */
   public static DslSimpleController simpleController(String name, ThreadGroupChild... children) {
     return new DslSimpleController(name, Arrays.asList(children));
