@@ -21,6 +21,9 @@ public class DslCounter extends BaseConfigElement {
 
   private final String varName;
   private String start = "0";
+  private long increment = 1;
+  private long max = Long.MAX_VALUE;
+  private boolean perThread = false;
 
   public DslCounter(String varName) {
     super(varName, CounterConfigGui.class);
@@ -54,12 +57,55 @@ public class DslCounter extends BaseConfigElement {
     return this;
   }
 
+  /**
+   * Specifies how much the counter will increase in each iteration.
+   *
+   * @param inc specifies how much to increase the counter in each iteration. By default, 1.
+   * @return the counter for further configuration and usage.
+   * @since 1.22
+   */
+  public DslCounter increment(long inc) {
+    this.increment = inc;
+    return this;
+  }
+
+  /**
+   * Specifies the maximum value of the counter.
+   * <p>
+   * When the value exceeds this value, the counter is reset to its starting value.
+   *
+   * @param max specifies the maximum value to use. When not specified, {@link Long#MAX_VALUE} is
+   *            used.
+   * @return the counter for further configuration and usage.
+   * @since 1.22
+   */
+  public DslCounter maximumValue(long max) {
+    this.max = max;
+    return this;
+  }
+
+  /**
+   * Specifies to use a separate counter for each thread.
+   *
+   * @param perThread specifies to use a separate counter for each thread. When not specified, then
+   *                  the counter is shared, and incremented, by all thread group threads. By
+   *                  default, it is set to false.
+   * @return the counter for further configuration and usage.
+   * @since 1.22
+   */
+  public DslCounter perThread(boolean perThread) {
+    this.perThread = perThread;
+    return this;
+  }
+
   @Override
   protected TestElement buildTestElement() {
     CounterConfig ret = new CounterConfig();
     ret.setVarName(varName);
     ret.setStart(start);
-    ret.setIncrement(1);
+    ret.setIncrement(increment);
+    ret.setEnd(max);
+    ret.setIsPerUser(perThread);
     return ret;
   }
 
@@ -75,6 +121,9 @@ public class DslCounter extends BaseConfigElement {
           "CounterConfig");
       MethodCall ret = buildMethodCall(paramBuilder.stringParam("name"));
       ret.chain("startingValue", paramBuilder.longParam("start", 0L));
+      ret.chain("increment", paramBuilder.longParam("incr", 1L));
+      ret.chain("maximumValue", paramBuilder.longParam("end", Long.MAX_VALUE));
+      ret.chain("perThread", paramBuilder.boolParam("per_user", false));
       return ret;
     }
 
