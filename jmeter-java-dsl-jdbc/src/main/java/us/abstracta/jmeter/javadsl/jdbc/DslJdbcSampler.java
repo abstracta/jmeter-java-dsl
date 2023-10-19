@@ -396,7 +396,7 @@ public class DslJdbcSampler extends BaseSampler<DslJdbcSampler> {
   private static QueryType solveQueryType(String query,
       boolean hasParams) {
     String queryType = query.trim();
-    if (query.isEmpty()) {
+    if (query.isEmpty() || query.matches("\\$\\{.*}")) {
       return null;
     }
     queryType = queryType.substring(0, queryType.indexOf(" ")).toLowerCase(Locale.US);
