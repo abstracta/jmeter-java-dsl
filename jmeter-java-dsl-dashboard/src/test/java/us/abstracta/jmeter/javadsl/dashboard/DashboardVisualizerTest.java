@@ -5,11 +5,22 @@ import static us.abstracta.jmeter.javadsl.JmeterDsl.testPlan;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.threadGroup;
 
 import kg.apc.charting.GraphPanelChart;
+import kg.apc.jmeter.graphs.AbstractOverTimeVisualizer;
+import org.apache.jmeter.visualizers.SummaryReport;
+import org.apache.jorphan.collections.HashTree;
 import org.assertj.core.api.SoftAssertions;
 import org.assertj.swing.data.TableCell;
+import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
+import us.abstracta.jmeter.javadsl.core.BuildTreeContext;
 import us.abstracta.jmeter.javadsl.core.listeners.DslVisualizerTest;
+
+import javax.swing.*;
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DashboardVisualizerTest extends DslVisualizerTest {
 
@@ -34,5 +45,21 @@ public class DashboardVisualizerTest extends DslVisualizerTest {
         testInfo
     );
   }
+    @Test
+    public void testShowTestElementGui() {
+        DashboardVisualizer dashboardVisualizer = new DashboardVisualizer();
+        JPanel panel = new JPanel();
+        Runnable closeListener = () -> System.out.println("Closing");
+        dashboardVisualizer.showTestElementGui(panel, closeListener);
+    }
+    @Test
+    public void testShowInGui() {
+        DashboardVisualizer dashboardVisualizer = new DashboardVisualizer();
+        try {
+            dashboardVisualizer.showInGui();
+        } catch (UnsupportedOperationException e) {
+            System.out.println("Expected exception thrown: " + e.getMessage());
+        }
+    }
 
 }

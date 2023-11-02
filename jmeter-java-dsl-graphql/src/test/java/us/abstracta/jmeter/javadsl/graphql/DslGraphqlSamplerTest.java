@@ -6,6 +6,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.equalToJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.getRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.verify;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.testPlan;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.threadGroup;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.vars;
@@ -137,6 +138,41 @@ public class DslGraphqlSamplerTest extends JmeterDslTest {
     ).run();
     verify(getRequestedFor(anyUrl()).withQueryParam("query", equalTo(QUERY)));
   }
+  @Test
+  public void shouldThrowExceptionForInvalidVariable() {
+    DslGraphqlSampler sampler = graphqlSampler("http://localhost", "{ user(id: 1){ name } }");
+    assertThrows(IllegalArgumentException.class, () -> sampler.variable("invalidVar", new Object()));
+  }
+
+  @Test
+  public void shouldHandleLongOperationName() throws Exception {
+    String longOperationName = "a".repeat(300);
+    testPlan(
+            threadGroup(1, 1,
+                    graphqlSampler(wiremockUri, QUERY)
+                            .operationName(longOperationName)
+            )
+    ).run();
+    verify(postRequestedFor(anyUrl())
+            .withRequestBody(equalToJson(buildRequestBody(longOperationName, null))));
+  }
+  @Test
+  public void shouldSendGraphqlQueryToServerWhenGraphqlSamplerWithHttpPut() throws Exception {
+    testPlan(
+            threadGroup(1, 1,
+                    graphqlSampler(wiremockUri, QUERY)
+                            .httpGet()
+            )
+    ).run();
+    verify(getRequestedFor(anyUrl()).withQueryParam("query", equalTo(QUERY)));
+  }
+  @Test
+  public void shouldHandleInvalidJsonInput() {
+    DslGraphqlSampler sampler = graphqlSampler("http://localhost", "{ user(id: 1){ name } }");
+    sampler.variablesJson("invalidJson");
+  }
+
+
 
   @Nested
   public class CodeBuilderTest extends MethodCallBuilderTest {
