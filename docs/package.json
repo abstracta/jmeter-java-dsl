@@ -6,9 +6,9 @@
   "repository": "https://github.com/abstracta/jmeter-java-dsl",
   "license": "Apache-2.0",
   "devDependencies": {
-    "@fortawesome/fontawesome-svg-core": "^6.4.0",
-    "@fortawesome/free-brands-svg-icons": "^6.4.0",
-    "@fortawesome/free-solid-svg-icons": "^6.4.0",
+    "@fortawesome/fontawesome-svg-core": "^6.4.2",
+    "@fortawesome/free-brands-svg-icons": "^6.4.2",
+    "@fortawesome/free-solid-svg-icons": "^6.4.2",
     "@fortawesome/vue-fontawesome": "^3.0.3",
     "@vuepress/cli": "2.0.0-beta.64",
     "@vuepress/client": "2.0.0-beta.64",
@@ -20,8 +20,8 @@
     "@vuepress/theme-default": "2.0.0-beta.64",
     "@vuepress/utils": "2.0.0-beta.64",
     "markdown-it-replace-link": "^1.2.0",
-    "vue": "^3.3.4",
-    "vue-router": "^4.2.4",
+    "vue": "^3.3.7",
+    "vue-router": "^4.2.5",
     "vuepress": "2.0.0-beta.64",
     "vuepress-plugin-copy-code2": "2.0.0-beta.230",
     "vuepress-plugin-md-enhance": "2.0.0-beta.230"
