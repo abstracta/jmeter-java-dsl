@@ -4,17 +4,14 @@ import static us.abstracta.jmeter.javadsl.JmeterDsl.testResource;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.apache.http.entity.ContentType;
 import org.apache.jmeter.protocol.http.util.HTTPConstants;
-import org.junit.BeforeClass;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.chrome.ChromeOptions;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 import us.abstracta.jmeter.javadsl.codegeneration.TestClassTemplate;
 import us.abstracta.jmeter.javadsl.core.StringTemplateAssert;
@@ -23,7 +20,7 @@ import us.abstracta.jmeter.javadsl.util.TestResource;
 
 public class JmeterDslRecorderIT {
 
-  @BeforeClass
+  @BeforeAll
   public static void setupClass() {
     SLF4JBridgeHandler.removeHandlersForRootLogger();
     SLF4JBridgeHandler.install();

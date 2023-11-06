@@ -46,7 +46,6 @@ public class EmbeddedJmeterEngine implements DslJmeterEngine {
 
   private static final Logger LOG = LoggerFactory.getLogger(EmbeddedJmeterEngine.class);
   private final Map<String, Object> props = new HashMap<>();
-  private final StandardJMeterEngine engine = new StandardJMeterEngine();
   private String propsFile;
 
   /**
@@ -174,6 +173,7 @@ public class EmbeddedJmeterEngine implements DslJmeterEngine {
 
   protected TestRunner buildTestRunner(HashTree testPlanTree, HashTree rootTree,
       TestStopper testStopper) {
+    StandardJMeterEngine engine = new StandardJMeterEngine();
     engine.configure(rootTree);
     return new TestRunner() {
 
