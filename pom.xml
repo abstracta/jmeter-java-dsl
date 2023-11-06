@@ -7,7 +7,7 @@
   <groupId>us.abstracta.jmeter</groupId>
   <artifactId>jmeter-java-dsl-parent</artifactId>
   <packaging>pom</packaging>
-  <version>1.24-SNAPSHOT</version>
+  <version>1.23.1</version>
 
   <name>${project.artifactId}</name>
   <description>Parent project for all jmeter-java-dsl modules</description>
@@ -45,7 +45,7 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-    <project.build.outputTimestamp>1697723457</project.build.outputTimestamp>
+    <project.build.outputTimestamp>1699313671</project.build.outputTimestamp>
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
     <jmeter.version>5.5</jmeter.version>
