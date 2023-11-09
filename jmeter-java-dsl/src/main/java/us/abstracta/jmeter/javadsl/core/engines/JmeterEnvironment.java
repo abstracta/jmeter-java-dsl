@@ -18,6 +18,7 @@ import kg.apc.jmeter.timers.functions.TSTFeedback;
 import org.apache.jmeter.functions.EvalFunction;
 import org.apache.jmeter.save.SaveService;
 import org.apache.jmeter.util.JMeterUtils;
+import org.apache.jmeter.visualizers.backend.BackendListener;
 import org.apache.jmeter.visualizers.backend.BackendListenerClient;
 import org.apache.jorphan.collections.HashTree;
 
@@ -73,10 +74,20 @@ public class JmeterEnvironment {
   private Set<Class<?>> findTestElementClasses(HashTree tree) {
     Set<Class<?>> ret = new HashSet<>();
     for (Object elem : tree.list()) {
-      ret.add(elem.getClass());
+      ret.add(getTestElementClass(elem));
       ret.addAll(findTestElementClasses(tree.getTree(elem)));
     }
     return ret;
+  }
+
+  private Class<?> getTestElementClass(Object elem) {
+    try {
+      return elem instanceof BackendListener
+          ? Class.forName(((BackendListener) elem).getClassname())
+          : elem.getClass();
+    } catch (ClassNotFoundException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   private String getClassJarPath(Class<?> theClass) {
