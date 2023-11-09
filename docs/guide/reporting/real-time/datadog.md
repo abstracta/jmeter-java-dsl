@@ -12,7 +12,7 @@ To use the module, just include the dependency:
 <dependency>
   <groupId>us.abstracta.jmeter</groupId>
   <artifactId>jmeter-java-dsl-datadog</artifactId>
-  <version>1.23.1</version>
+  <version>1.23.2</version>
   <scope>test</scope>
 </dependency>
 ```
@@ -26,7 +26,7 @@ repositories {
 
 dependencies {
     ...
-    testImplementation 'us.abstracta.jmeter:jmeter-java-dsl-datadog:1.23.1'
+    testImplementation 'us.abstracta.jmeter:jmeter-java-dsl-datadog:1.23.2'
 }
 ```
 :::
