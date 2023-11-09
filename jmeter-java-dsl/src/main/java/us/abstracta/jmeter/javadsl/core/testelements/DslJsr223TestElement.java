@@ -2,8 +2,11 @@ package us.abstracta.jmeter.javadsl.core.testelements;
 
 import java.lang.reflect.Method;
 import java.util.List;
+import org.apache.jmeter.config.ConfigTestElement;
+import org.apache.jmeter.config.gui.SimpleConfigGui;
 import org.apache.jmeter.engine.event.LoopIterationEvent;
 import org.apache.jmeter.engine.event.LoopIterationListener;
+import org.apache.jmeter.engine.util.ConfigMergabilityIndicator;
 import org.apache.jmeter.testbeans.TestBean;
 import org.apache.jmeter.testbeans.gui.TestBeanGUI;
 import org.apache.jmeter.testelement.AbstractTestElement;
@@ -84,7 +87,7 @@ public abstract class DslJsr223TestElement<T extends DslJsr223TestElement<T, V>,
 
   public abstract static class Jsr223DslLambdaTestElement<V extends Jsr223ScriptVars> extends
       AbstractTestElement implements TestBean, ThreadListener, TestIterationListener,
-      LoopIterationListener {
+      LoopIterationListener, ConfigMergabilityIndicator {
 
     private static final String SCRIPT_ID_PROP = "SCRIPT_ID";
     private Jsr223Script<V> script;
@@ -143,6 +146,13 @@ public abstract class DslJsr223TestElement<T extends DslJsr223TestElement<T, V>,
       if (script instanceof ThreadListener) {
         ((ThreadListener) script).threadFinished();
       }
+    }
+
+    // This is required to avoid the issue https://github.com/abstracta/jmeter-java-dsl/issues/240
+    @Override
+    public boolean applies(ConfigTestElement configElement) {
+      return SimpleConfigGui.class.getName()
+          .equals(configElement.getProperty(TestElement.GUI_CLASS).getStringValue());
     }
 
   }

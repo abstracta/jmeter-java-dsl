@@ -1,12 +1,19 @@
 package us.abstracta.jmeter.javadsl.java;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
+import static com.github.tomakehurst.wiremock.client.WireMock.getRequestedFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
+import static com.github.tomakehurst.wiremock.client.WireMock.verify;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.forLoopController;
+import static us.abstracta.jmeter.javadsl.JmeterDsl.httpHeaders;
+import static us.abstracta.jmeter.javadsl.JmeterDsl.httpSampler;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.jsr223Sampler;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.jtlWriter;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.testPlan;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.testResource;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.threadGroup;
+import static us.abstracta.jmeter.javadsl.JmeterDsl.transaction;
 
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
@@ -21,13 +28,14 @@ import org.apache.jmeter.testelement.ThreadListener;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import us.abstracta.jmeter.javadsl.JmeterDslTest;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodCallBuilderTest;
 import us.abstracta.jmeter.javadsl.core.DslTestPlan;
 import us.abstracta.jmeter.javadsl.core.listeners.JtlWriter;
 import us.abstracta.jmeter.javadsl.java.DslJsr223Sampler.SamplerScript;
 import us.abstracta.jmeter.javadsl.java.DslJsr223Sampler.SamplerVars;
 
-public class DslJsr223SamplerTest {
+public class DslJsr223SamplerTest extends JmeterDslTest {
 
   private static final String RESULTS_JTL = "results.jtl";
 
@@ -129,6 +137,25 @@ public class DslJsr223SamplerTest {
       ret.put("Thread Group 1-" + (i + 1), 1 + iterations + iterations * loops * 2);
     }
     return ret;
+  }
+
+  @Test
+  public void shouldNotAlterHttpHeadersWhenSamplerAndHttpHeadersAndSampler() throws Exception {
+    String headerNamePrefix = "HEADER";
+    String header1Name = headerNamePrefix + "1";
+    String header2Name = headerNamePrefix + "2";
+    String headerValue = "VALUE";
+    testPlan(threadGroup(1, 1,
+            httpHeaders().header(header1Name, headerValue),
+            transaction("test",
+                httpHeaders().header(header2Name, headerValue),
+                jsr223Sampler(MySampler.class),
+                httpSampler(wiremockUri))
+        )
+    ).run();
+    verify(getRequestedFor(urlEqualTo("/"))
+        .withHeader(header1Name, equalTo(headerValue))
+        .withHeader(header2Name, equalTo(headerValue)));
   }
 
   @Nested
