@@ -6,6 +6,7 @@ import java.time.temporal.TemporalUnit;
 import java.util.Collections;
 import java.util.Set;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodCall;
+import us.abstracta.jmeter.javadsl.codegeneration.params.timeconverter.*;
 
 /**
  * Is a parameter with a Duration value.
@@ -36,24 +37,21 @@ public class DurationParam extends FixedParam<Duration> {
     if (value.isZero()) {
       return Duration.class.getSimpleName() + ".ZERO";
     }
-    TemporalUnit outputUnit;
-    long outputValue;
+
+    TimeConverter timeConverter;
     if (value.getNano() != 0) {
-      outputUnit = ChronoUnit.MILLIS;
-      outputValue = value.toMillis();
+      timeConverter = new MillisConverter();
     } else if (value.toMinutes() * 60 != value.getSeconds()) {
-      outputUnit = ChronoUnit.SECONDS;
-      outputValue = value.getSeconds();
+      timeConverter = new SecondsConverter();
     } else if (value.toHours() * 60 != value.toMinutes()) {
-      outputUnit = ChronoUnit.MINUTES;
-      outputValue = value.toMinutes();
+      timeConverter = new MinutesConverter();
     } else if (value.toDays() * 24 != value.toHours()) {
-      outputUnit = ChronoUnit.HOURS;
-      outputValue = value.toHours();
+      timeConverter = new HoursConverter();
     } else {
-      outputUnit = ChronoUnit.DAYS;
-      outputValue = value.toDays();
+      timeConverter = new DaysConverter();
     }
+    ChronoUnit outputUnit = timeConverter.getOutputUnit();
+    long outputValue = timeConverter.convert(value);
     return MethodCall.forStaticMethod(Duration.class, "of" + outputUnit, new LongParam(outputValue))
         .buildCode();
   }
