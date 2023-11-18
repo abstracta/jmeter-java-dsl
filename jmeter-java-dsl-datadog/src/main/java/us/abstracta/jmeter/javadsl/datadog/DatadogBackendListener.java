@@ -36,7 +36,7 @@ public class DatadogBackendListener extends DslBackendListener<DatadogBackendLis
   public DatadogBackendListener(String apiKey) {
     super(DatadogBackendClient.class, null);
     this.apiKey = apiKey;
-    site(DatadogSite.US1);
+    setDatadogSite(DatadogSite.US1);
   }
 
   /**
@@ -58,7 +58,7 @@ public class DatadogBackendListener extends DslBackendListener<DatadogBackendLis
    * @param site specifies the site to use. When no site is specified, US1 is used by default.
    * @return the listener for further configuration and usage.
    */
-  public DatadogBackendListener site(DatadogSite site) {
+  public DatadogBackendListener setDatadogSite(DatadogSite site) {
     apiUrl = site.propertyValue();
     logsUrl = String.format("https://http-intake.logs.%s/v1/input", site.domain);
     return this;

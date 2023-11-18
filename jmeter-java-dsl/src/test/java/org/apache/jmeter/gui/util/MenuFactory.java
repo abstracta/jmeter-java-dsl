@@ -44,6 +44,7 @@ import org.apache.jmeter.util.JMeterUtils;
 import org.apache.jmeter.visualizers.Printable;
 import org.apache.jorphan.gui.GuiUtils;
 import org.apache.jorphan.reflect.ClassFinder;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -105,80 +106,95 @@ public final class MenuFactory {
 
   private static Set<String> classesToSkip() {
     return Arrays.stream(JMeterUtils.getPropDefault("not_in_menu", "").split(","))
-        .map(String::trim)
-        .collect(Collectors.toSet());
+            .map(String::trim)
+            .collect(Collectors.toSet());
   }
 
   private static void initializeMenus(
-      Map<String, List<MenuInfo>> menus, Set<String> elementsToSkip) {
+          Map<String, List<MenuInfo>> menus, Set<String> elementsToSkip) {
     try {
-      List<String> guiClasses = ClassFinder
-          .findClassesThatExtend(
-              JMeterUtils.getSearchPaths(),
-              new Class[]{JMeterGUIComponent.class, TestBean.class})
-          .stream()
-          // JMeterTreeNode and TestBeanGUI are special GUI classes,
-          // and aren't intended to be added to menus
-          .filter(name -> !name.endsWith("JMeterTreeNode"))
-          .filter(name -> !name.endsWith("TestBeanGUI"))
-          .filter(name -> !name.equals("org.apache.jmeter.gui.menu.StaticJMeterGUIComponent"))
-          .filter(name -> !elementsToSkip.contains(name))
-          .distinct()
-          .map(String::trim)
-          .collect(Collectors.toList());
+      List<String> guiClasses = getModifiedStrings(elementsToSkip);
 
       boolean debugTimings = log.isDebugEnabled();
       Map<String, Long> times = debugTimings ? new HashMap<>() : null;
       Map<String, JMeterGUIComponent> comps = debugTimings ? new HashMap<>() : null;
       long a0 = System.currentTimeMillis();
       for (String className : guiClasses) {
-        long t0 = 0;
-        if (debugTimings) {
-          t0 = System.currentTimeMillis();
-        }
-        JMeterGUIComponent item = getGUIComponent(className, elementsToSkip);
-        if (debugTimings) {
-          long t1 = System.currentTimeMillis();
-          times.put(className, t1 - t0);
-          comps.put(className, item);
-        }
-        if (item == null) {
-          continue;
-        }
 
-        Collection<String> categories = item.getMenuCategories();
-        if (categories == null) {
-          log.debug("{} participates in no menus.", className);
-          continue;
-        }
-        for (Map.Entry<String, List<MenuInfo>> entry : menus.entrySet()) {
-          if (categories.contains(entry.getKey())) {
-            entry.getValue().add(new MenuInfo(item, className));
-          }
-        }
+        guiOperations(menus, elementsToSkip, className, debugTimings, times, comps);
       }
       if (debugTimings) {
-        long a1 = System.currentTimeMillis();
-        times.entrySet().stream()
-            .sorted(Comparator.comparingLong(Map.Entry::getValue))
-            .forEachOrdered(e -> {
-              String res = "";
-              JMeterGUIComponent comp = comps.get(e.getKey());
-              if (comp != null && comp.getLabelResource() != null) {
-                res = " @TestElementMetadata(labelResource = \""
-                    + comp.getLabelResource() + "\")";
-              }
-              log.debug("{}ms {} {}", e.getValue(), e.getKey(), res);
-            });
-        log.debug("{}ms total menu initialization time", a1 - a0);
+        onDebugTimings(times, comps, a0);
       }
     } catch (IOException e) {
       log.error("IO Exception while initializing menus.", e);
     }
   }
 
+  private static void guiOperations(Map<String, List<MenuInfo>> menus, Set<String> elementsToSkip, String className, boolean debugTimings, Map<String, Long> times, Map<String, JMeterGUIComponent> comps) {
+    long t0 = 0;
+    if (debugTimings) {
+      t0 = System.currentTimeMillis();
+    }
+    JMeterGUIComponent item = getGUIComponent(className, elementsToSkip);
+    if (debugTimings) {
+      long t1 = System.currentTimeMillis();
+      times.put(className, t1 - t0);
+      comps.put(className, item);
+    }
+    if (item == null) {
+      return;
+    }
+
+    Collection<String> categories = item.getMenuCategories();
+    if (categories == null) {
+      log.debug("{} participates in no menus.", className);
+      return;
+    }
+    for (Map.Entry<String, List<MenuInfo>> entry : menus.entrySet()) {
+      if (categories.contains(entry.getKey())) {
+        entry.getValue().add(new MenuInfo(item, className));
+      }
+    }
+  }
+
+  @NotNull
+  private static List<String> getModifiedStrings(Set<String> elementsToSkip) throws IOException {
+    List<String> guiClasses = ClassFinder
+            .findClassesThatExtend(
+                    JMeterUtils.getSearchPaths(),
+                    new Class[]{JMeterGUIComponent.class, TestBean.class})
+            .stream()
+            // JMeterTreeNode and TestBeanGUI are special GUI classes,
+            // and aren't intended to be added to menus
+            .filter(name -> !name.endsWith("JMeterTreeNode"))
+            .filter(name -> !name.endsWith("TestBeanGUI"))
+            .filter(name -> !name.equals("org.apache.jmeter.gui.menu.StaticJMeterGUIComponent"))
+            .filter(name -> !elementsToSkip.contains(name))
+            .distinct()
+            .map(String::trim)
+            .collect(Collectors.toList());
+    return guiClasses;
+  }
+
+  private static void onDebugTimings(Map<String, Long> times, Map<String, JMeterGUIComponent> comps, long a0) {
+    long a1 = System.currentTimeMillis();
+    times.entrySet().stream()
+            .sorted(Comparator.comparingLong(Map.Entry::getValue))
+            .forEachOrdered(e -> {
+              String res = "";
+              JMeterGUIComponent comp = comps.get(e.getKey());
+              if (comp != null && comp.getLabelResource() != null) {
+                res = " @TestElementMetadata(labelResource = \""
+                        + comp.getLabelResource() + "\")";
+              }
+              log.debug("{}ms {} {}", e.getValue(), e.getKey(), res);
+            });
+    log.debug("{}ms total menu initialization time", a1 - a0);
+  }
+
   private static JMeterGUIComponent getGUIComponent(
-      String name, Set<String> elementsToSkip) {
+          String name, Set<String> elementsToSkip) {
     JMeterGUIComponent item = null;
     boolean hideBean = false; // Should the TestBean be hidden?
     try {
@@ -189,15 +205,15 @@ public final class MenuFactory {
       } else if (TestBean.class.isAssignableFrom(c)) {
         TestBeanGUI testBeanGUI = new TestBeanGUI(c);
         hideBean = testBeanGUI.isHidden()
-            || (testBeanGUI.isExpert() && !JMeterUtils.isExpertMode());
+                || (testBeanGUI.isExpert() && !JMeterUtils.isExpertMode());
         item = testBeanGUI;
       } else {
         item = (JMeterGUIComponent) c.getDeclaredConstructor().newInstance();
       }
     } catch (NoClassDefFoundError e) {
       log.warn(
-          "Configuration error, probably corrupt or missing third party library(jar)? Could not create class: {}.",
-          name, e);
+              "Configuration error, probably corrupt or missing third party library(jar)? Could not create class: {}.",
+              name, e);
     } catch (HeadlessException e) {
       log.warn("Could not instantiate class: {}", name, e);
     } catch (RuntimeException e) {
@@ -224,12 +240,12 @@ public final class MenuFactory {
       List<MenuInfo> menu = entry.getValue();
       if (log.isDebugEnabled()) {
         log.debug("Creating menu for {}: {}", entry.getKey(), menu.stream()
-            .map(MenuInfo::getClassName)
-            .collect(Collectors.joining(",")));
+                .map(MenuInfo::getClassName)
+                .collect(Collectors.joining(",")));
       }
       Optional<MenuInfo> firstDefaultSortItem = menu.stream()
-          .filter(info -> info.getSortOrder() == MenuInfo.SORT_ORDER_DEFAULT)
-          .findFirst();
+              .filter(info -> info.getSortOrder() == MenuInfo.SORT_ORDER_DEFAULT)
+              .findFirst();
       int index = menu.indexOf(firstDefaultSortItem.orElseThrow(IllegalStateException::new));
       if (index > 0) {
         menu.add(index, new MenuSeparatorInfo());
@@ -251,7 +267,7 @@ public final class MenuFactory {
     menu.add(makeMenuItemRes("copy", ActionNames.COPY, KeyStrokes.COPY));  //$NON-NLS-1$
     menu.add(makeMenuItemRes("paste", ActionNames.PASTE, KeyStrokes.PASTE)); //$NON-NLS-1$
     menu.add(
-        makeMenuItemRes("duplicate", ActionNames.DUPLICATE, KeyStrokes.DUPLICATE));  //$NON-NLS-1$
+            makeMenuItemRes("duplicate", ActionNames.DUPLICATE, KeyStrokes.DUPLICATE));  //$NON-NLS-1$
     if (removable) {
       menu.add(makeMenuItemRes("remove", ActionNames.REMOVE, KeyStrokes.REMOVE)); //$NON-NLS-1$
     }
@@ -282,20 +298,20 @@ public final class MenuFactory {
     menu.add(makeMenuItemRes("save_as", ActionNames.SAVE_AS));// $NON-NLS-1$
     if (addSaveTestFragmentMenu) {
       menu.add(makeMenuItemRes("save_as_test_fragment", // $NON-NLS-1$
-          ActionNames.SAVE_AS_TEST_FRAGMENT));
+              ActionNames.SAVE_AS_TEST_FRAGMENT));
     }
     addSeparator(menu);
     JMenuItem savePicture = makeMenuItemRes("save_as_image",// $NON-NLS-1$
-        ActionNames.SAVE_GRAPHICS,
-        KeyStrokes.SAVE_GRAPHICS);
+            ActionNames.SAVE_GRAPHICS,
+            KeyStrokes.SAVE_GRAPHICS);
     menu.add(savePicture);
     if (!(GuiPackage.getInstance().getCurrentGui() instanceof Printable)) {
       savePicture.setEnabled(false);
     }
 
     JMenuItem savePictureAll = makeMenuItemRes("save_as_image_all",// $NON-NLS-1$
-        ActionNames.SAVE_GRAPHICS_ALL,
-        KeyStrokes.SAVE_GRAPHICS_ALL);
+            ActionNames.SAVE_GRAPHICS_ALL,
+            KeyStrokes.SAVE_GRAPHICS_ALL);
     menu.add(savePictureAll);
 
     addSeparator(menu);
@@ -308,7 +324,7 @@ public final class MenuFactory {
     menu.add(enabled);
     menu.add(disabled);
     JMenuItem toggle = makeMenuItemRes("toggle", ActionNames.TOGGLE,
-        KeyStrokes.TOGGLE);// $NON-NLS-1$
+            KeyStrokes.TOGGLE);// $NON-NLS-1$
     menu.add(toggle);
     addSeparator(menu);
     menu.add(makeMenuItemRes("help", ActionNames.HELP));// $NON-NLS-1$
@@ -337,8 +353,8 @@ public final class MenuFactory {
   public static JMenu makeMenus(String[] categories, String label, String actionCommand) {
     JMenu addMenu = new JMenu(label);
     Arrays.stream(categories)
-        .map(category -> makeMenu(category, actionCommand))
-        .forEach(addMenu::add);
+            .map(category -> makeMenu(category, actionCommand))
+            .forEach(addMenu::add);
     GuiUtils.makeScrollableMenu(addMenu);
     return addMenu;
   }
@@ -353,18 +369,18 @@ public final class MenuFactory {
     addMenu.addSeparator();
     pop.add(addDefaultAddMenuToMenu(addMenu, addAction));
     pop.add(MenuFactory.makeMenuItemRes("add_think_times",// $NON-NLS-1$
-        ActionNames.ADD_THINK_TIME_BETWEEN_EACH_STEP));
+            ActionNames.ADD_THINK_TIME_BETWEEN_EACH_STEP));
 
     pop.add(MenuFactory.makeMenuItemRes("apply_naming",// $NON-NLS-1$
-        ActionNames.APPLY_NAMING_CONVENTION));
+            ActionNames.APPLY_NAMING_CONVENTION));
 
     pop.add(makeMenus(new String[]{CONTROLLERS},
-        JMeterUtils.getResString("change_parent"),// $NON-NLS-1$
-        ActionNames.CHANGE_PARENT));
+            JMeterUtils.getResString("change_parent"),// $NON-NLS-1$
+            ActionNames.CHANGE_PARENT));
 
     pop.add(makeMenus(new String[]{CONTROLLERS},
-        JMeterUtils.getResString("insert_parent"),// $NON-NLS-1$
-        ActionNames.ADD_PARENT));
+            JMeterUtils.getResString("insert_parent"),// $NON-NLS-1$
+            ActionNames.ADD_PARENT));
     MenuFactory.addEditMenu(pop, true);
     MenuFactory.addFileMenu(pop);
     return pop;
@@ -394,8 +410,8 @@ public final class MenuFactory {
     JPopupMenu pop = new JPopupMenu();
     pop.add(createDefaultAddMenu());
     pop.add(makeMenus(new String[]{CONTROLLERS},
-        JMeterUtils.getResString("insert_parent"),// $NON-NLS-1$
-        ActionNames.ADD_PARENT));
+            JMeterUtils.getResString("insert_parent"),// $NON-NLS-1$
+            ActionNames.ADD_PARENT));
     MenuFactory.addEditMenu(pop, true);
     MenuFactory.addFileMenu(pop);
     return pop;
@@ -408,7 +424,7 @@ public final class MenuFactory {
   public static JPopupMenu getDefaultVisualizerMenu() {
     JPopupMenu pop = new JPopupMenu();
     pop.add(MenuFactory.makeMenuItemRes(
-        "clear", ActionNames.CLEAR)); //$NON-NLS-1$
+            "clear", ActionNames.CLEAR)); //$NON-NLS-1$
     MenuFactory.addEditMenu(pop, true);
     MenuFactory.addFileMenu(pop);
     return pop;
@@ -447,9 +463,9 @@ public final class MenuFactory {
    */
   public static JMenu makeMenu(String category, String actionCommand) {
     return makeMenu(
-        menuMap.get(category),
-        actionCommand,
-        JMeterUtils.getResString(category));
+            menuMap.get(category),
+            actionCommand,
+            JMeterUtils.getResString(category));
   }
 
   /**
@@ -461,12 +477,12 @@ public final class MenuFactory {
    * @return the menu
    */
   private static JMenu makeMenu(
-      Collection<MenuInfo> menuInfo, String actionCommand, String menuName) {
+          Collection<MenuInfo> menuInfo, String actionCommand, String menuName) {
 
     JMenu menu = new JMenu(menuName);
     menuInfo.stream()
-        .map(info -> makeMenuItem(info, actionCommand))
-        .forEach(menu::add);
+            .map(info -> makeMenuItem(info, actionCommand))
+            .forEach(menu::add);
     GuiUtils.makeScrollableMenu(menu);
     return menu;
   }
@@ -546,7 +562,7 @@ public final class MenuFactory {
   private static void addSeparator(JPopupMenu menu) {
     MenuElement[] elements = menu.getSubElements();
     if ((elements.length > 0)
-        && !(elements[elements.length - 1] instanceof JPopupMenu.Separator)) {
+            && !(elements[elements.length - 1] instanceof JPopupMenu.Separator)) {
       menu.addSeparator();
     }
   }
@@ -577,7 +593,7 @@ public final class MenuFactory {
    */
   public static boolean canAddTo(JMeterTreeNode parentNode, JMeterTreeNode[] nodes) {
     if (parentNode == null
-        || foundClass(nodes, new Class[]{TestPlan.class})) {
+            || foundClass(nodes, new Class[]{TestPlan.class})) {
       return false;
     }
     TestElement parent = parentNode.getTestElement();
@@ -589,7 +605,7 @@ public final class MenuFactory {
 
     // Cannot move Non-Test Elements from root of Test Plan or Test Fragment
     if (foundMenuCategories(nodes, NON_TEST_ELEMENTS)
-        && !(parent instanceof TestPlan || parent instanceof TestFragmentController)) {
+            && !(parent instanceof TestPlan || parent instanceof TestFragmentController)) {
       return false;
     }
 
@@ -644,8 +660,8 @@ public final class MenuFactory {
    */
   private static boolean foundMenuCategories(JMeterTreeNode[] nodes, String category) {
     return Arrays.stream(nodes)
-        .flatMap(node -> node.getMenuCategories().stream())
-        .anyMatch(category::equals);
+            .flatMap(node -> node.getMenuCategories().stream())
+            .anyMatch(category::equals);
   }
 
   /**
@@ -657,10 +673,10 @@ public final class MenuFactory {
    * @return boolean
    */
   private static boolean foundClass(
-      JMeterTreeNode[] nodes, List<Class<?>> classes, List<Class<?>> exceptions) {
+          JMeterTreeNode[] nodes, List<Class<?>> classes, List<Class<?>> exceptions) {
     return Arrays.stream(nodes)
-        .map(DefaultMutableTreeNode::getUserObject)
-        .filter(userObj -> exceptions.stream().noneMatch(c -> c.isInstance(userObj)))
-        .anyMatch(userObj -> classes.stream().anyMatch(c -> c.isInstance(userObj)));
+            .map(DefaultMutableTreeNode::getUserObject)
+            .filter(userObj -> exceptions.stream().noneMatch(c -> c.isInstance(userObj)))
+            .anyMatch(userObj -> classes.stream().anyMatch(c -> c.isInstance(userObj)));
   }
 }

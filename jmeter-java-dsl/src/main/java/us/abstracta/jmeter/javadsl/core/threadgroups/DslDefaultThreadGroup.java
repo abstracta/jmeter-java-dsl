@@ -283,18 +283,34 @@ public class DslDefaultThreadGroup extends BaseThreadGroup<DslDefaultThreadGroup
     addStage(new Stage(getLastStage().threadCount(), null, iterations));
     return this;
   }
-
   private void checkIterationsPreConditions() {
-    if (!(stages.size() == 1 && !ZERO.equals(stages.get(0).threadCount())
-        || stages.size() == 2 && ZERO.equals(stages.get(0).threadCount())
-        && !ZERO.equals(stages.get(1).threadCount()))) {
+    boolean isSingleStageHold = stages.size() == 1 && !ZERO.equals(stages.get(0).threadCount());
+    boolean isTwoStageHold = stages.size() == 2 && ZERO.equals(stages.get(0).threadCount())
+            && !ZERO.equals(stages.get(1).threadCount());
+
+    boolean isInvalidHoldCondition = !(isSingleStageHold || isTwoStageHold);
+    if (isInvalidHoldCondition) {
       throw new IllegalStateException(
-          "Holding for iterations is only supported after initial hold and ramp, or ramp.");
+              "Holding for iterations is only supported after initial hold and ramp, or ramp.");
     }
-    if (ZERO.equals(getLastStage().threadCount())) {
+
+    boolean isLastStageThreadCountZero = ZERO.equals(getLastStage().threadCount());
+    if (isLastStageThreadCountZero) {
       throw new IllegalStateException("Can't hold for iterations with no threads.");
     }
   }
+
+//  private void checkIterationsPreConditions() {
+//    if (!(stages.size() == 1 && !ZERO.equals(stages.get(0).threadCount())
+//        || stages.size() == 2 && ZERO.equals(stages.get(0).threadCount())
+//        && !ZERO.equals(stages.get(1).threadCount()))) {
+//      throw new IllegalStateException(
+//          "Holding for iterations is only supported after initial hold and ramp, or ramp.");
+//    }
+//    if (ZERO.equals(getLastStage().threadCount())) {
+//      throw new IllegalStateException("Can't hold for iterations with no threads.");
+//    }
+//  }
 
   /**
    * simply combines {@link #rampTo(int, Duration)} and {@link #holdFor(Duration)} which are usually

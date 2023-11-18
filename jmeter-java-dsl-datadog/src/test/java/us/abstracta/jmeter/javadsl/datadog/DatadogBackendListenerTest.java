@@ -71,7 +71,7 @@ public class DatadogBackendListenerTest {
           threadGroup(1, 1,
               httpSampler("http://localhost"),
               datadogListener("test")
-                  .site(DatadogSite.EU)
+                  .setDatadogSite(DatadogSite.EU)
                   .resultsLogs(true)
                   .tags("jmeter-dsl", "test")
                   .queueSize(5)
