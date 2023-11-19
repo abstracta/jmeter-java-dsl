@@ -22,6 +22,11 @@ import us.abstracta.jmeter.javadsl.core.listeners.DslBackendListener;
  */
 public class DatadogBackendListener extends DslBackendListener<DatadogBackendListener> {
 
+  public static final String API_KEY_ARG = "apiKey";
+  public static final String API_URL_ARG = "datadogUrl";
+  public static final String LOG_URL_ARG = "logIntakeUrl";
+  public static final String RESULT_LOGS_ARG = "sendResultsAsLogs";
+  public static final String TAGS_ARG = "customTags";
   protected final String apiKey;
   protected String apiUrl;
   protected String logsUrl;
