@@ -24,6 +24,11 @@ import us.abstracta.jmeter.javadsl.codegeneration.params.StringParam;
  */
 public abstract class DslBackendListener<T extends DslBackendListener<T>> extends BaseListener {
 
+  public static final String API_KEY_ARG = "apiKey";
+  public static final String API_URL_ARG = "datadogUrl";
+  public static final String LOG_URL_ARG = "logIntakeUrl";
+  public static final String RESULT_LOGS_ARG = "sendResultsAsLogs";
+  public static final String TAGS_ARG = "customTags";
   protected final String url;
   protected final Class<? extends BackendListenerClient> listenerClass;
   protected int queueSize = 5000;
