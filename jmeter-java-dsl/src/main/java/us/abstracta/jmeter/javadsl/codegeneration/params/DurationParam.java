@@ -56,6 +56,6 @@ public class DurationParam extends FixedParam<Duration> {
     }
     return MethodCall.forStaticMethod(Duration.class, "of" + outputUnit, new LongParam(outputValue))
         .buildCode();
-}
+  }
 
 }
