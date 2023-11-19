@@ -300,18 +300,6 @@ public class DslDefaultThreadGroup extends BaseThreadGroup<DslDefaultThreadGroup
     }
   }
 
-//  private void checkIterationsPreConditions() {
-//    if (!(stages.size() == 1 && !ZERO.equals(stages.get(0).threadCount())
-//        || stages.size() == 2 && ZERO.equals(stages.get(0).threadCount())
-//        && !ZERO.equals(stages.get(1).threadCount()))) {
-//      throw new IllegalStateException(
-//          "Holding for iterations is only supported after initial hold and ramp, or ramp.");
-//    }
-//    if (ZERO.equals(getLastStage().threadCount())) {
-//      throw new IllegalStateException("Can't hold for iterations with no threads.");
-//    }
-//  }
-
   /**
    * simply combines {@link #rampTo(int, Duration)} and {@link #holdFor(Duration)} which are usually
    * used in combination.
