@@ -105,8 +105,9 @@ public class AzureClient extends BaseRemoteEngineApiClient {
     if (request.tag(RequestOrigin.class) == RequestOrigin.LOGIN) {
       return null;
     }
-    return "Bearer " + (request.tag(RequestOrigin.class) == RequestOrigin.MANAGEMENT
-        ? getFreshManagementToken() : getFreshLoadTestToken());
+    String bearerToken = (request.tag(RequestOrigin.class) == RequestOrigin.MANAGEMENT
+            ? getFreshManagementToken() : getFreshLoadTestToken());
+    return "Bearer " + bearerToken;
   }
 
   private enum RequestOrigin {
