@@ -1,5 +1,6 @@
 package us.abstracta.jmeter.javadsl.dashboard;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.httpSampler;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.testPlan;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.threadGroup;
@@ -34,5 +35,12 @@ public class DashboardVisualizerTest extends DslVisualizerTest {
         testInfo
     );
   }
+
+    @Test
+    public void shouldThrowUnsupportedOperationWhenShowInGuiOnDashboardVisualizer() {
+        DashboardVisualizer dashboardVisualizer = new DashboardVisualizer();
+
+        assertThrows(UnsupportedOperationException.class, dashboardVisualizer::showInGui);
+    }
 
 }

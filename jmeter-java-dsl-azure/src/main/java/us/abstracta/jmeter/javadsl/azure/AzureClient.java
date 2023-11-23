@@ -51,6 +51,7 @@ public class AzureClient extends BaseRemoteEngineApiClient {
 
   private static final Logger LOG = LoggerFactory.getLogger(AzureClient.class);
   private static final String USER_AGENT = getUserAgent();
+  private static final int HTTP_NOT_FOUND = 404;
 
   private final String tenantId;
   private final String clientId;
@@ -105,8 +106,9 @@ public class AzureClient extends BaseRemoteEngineApiClient {
     if (request.tag(RequestOrigin.class) == RequestOrigin.LOGIN) {
       return null;
     }
-    return "Bearer " + (request.tag(RequestOrigin.class) == RequestOrigin.MANAGEMENT
-        ? getFreshManagementToken() : getFreshLoadTestToken());
+    String bearerToken = (request.tag(RequestOrigin.class) == RequestOrigin.MANAGEMENT
+            ? getFreshManagementToken() : getFreshLoadTestToken());
+    return "Bearer " + bearerToken;
   }
 
   private enum RequestOrigin {
@@ -265,7 +267,7 @@ public class AzureClient extends BaseRemoteEngineApiClient {
   private <T> Optional<T> execOptionalApiCall(Call<T> call) throws IOException {
     retrofit2.Response<T> response = call.execute();
     if (!response.isSuccessful()) {
-      if (response.code() == 404) {
+      if (response.code() == HTTP_NOT_FOUND) {
         return Optional.empty();
       }
       try (ResponseBody errorBody = response.errorBody()) {
