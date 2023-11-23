@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.File;
 import java.io.IOException;
+import java.net.HttpURLConnection;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.Base64;
@@ -51,7 +52,6 @@ public class AzureClient extends BaseRemoteEngineApiClient {
 
   private static final Logger LOG = LoggerFactory.getLogger(AzureClient.class);
   private static final String USER_AGENT = getUserAgent();
-  private static final int HTTP_NOT_FOUND = 404;
 
   private final String tenantId;
   private final String clientId;
@@ -267,7 +267,7 @@ public class AzureClient extends BaseRemoteEngineApiClient {
   private <T> Optional<T> execOptionalApiCall(Call<T> call) throws IOException {
     retrofit2.Response<T> response = call.execute();
     if (!response.isSuccessful()) {
-      if (response.code() == HTTP_NOT_FOUND) {
+      if (response.code() == HttpURLConnection.HTTP_NOT_FOUND) {
         return Optional.empty();
       }
       try (ResponseBody errorBody = response.errorBody()) {

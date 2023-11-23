@@ -167,12 +167,10 @@ public class DslDefaultThreadGroup extends BaseThreadGroup<DslDefaultThreadGroup
 
   private boolean isSimpleThreadGroup() {
     return stages.size() <= 1
-        || stages.size() == 2 && (
-        ZERO.equals(stages.get(0).threadCount())
-            || stages.get(0).threadCount().equals(stages.get(1).threadCount()))
-        || stages.size() == 3 && (
-        ZERO.equals(stages.get(0).threadCount())
-            && stages.get(1).threadCount().equals(stages.get(2).threadCount()));
+        || stages.size() == 2 && (ZERO.equals(stages.get(0).threadCount()) || stages.get(0)
+        .threadCount().equals(stages.get(1).threadCount()))
+        || stages.size() == 3 && (ZERO.equals(stages.get(0).threadCount()) && stages.get(1)
+        .threadCount().equals(stages.get(2).threadCount()));
   }
 
   /**
@@ -246,10 +244,9 @@ public class DslDefaultThreadGroup extends BaseThreadGroup<DslDefaultThreadGroup
    *                   termination condition).
    *                   <p>
    *                   <b>Setting this property to -1 is in general not advised</b>, since you
-   *                   might
-   *                   inadvertently end up running a test plan without limits consuming unnecessary
-   *                   computing power. Prefer specifying a big value as a safe limit for iterations
-   *                   or duration instead.
+   *                   might inadvertently end up running a test plan without limits consuming
+   *                   unnecessary computing power. Prefer specifying a big value as a safe limit
+   *                   for iterations or duration instead.
    * @return the thread group for further configuration or usage.
    * @throws IllegalStateException when adding iterations would result in not supported JMeter
    *                               thread group.
@@ -286,10 +283,12 @@ public class DslDefaultThreadGroup extends BaseThreadGroup<DslDefaultThreadGroup
 
   private void checkIterationsPreConditions() {
     boolean isJustRamp = stages.size() == 1 && !ZERO.equals(stages.get(0).threadCount());
-    boolean isJustDelayAndRamp = stages.size() == 2 && ZERO.equals(stages.get(0).threadCount()) && !ZERO.equals(stages.get(1).threadCount());
-
+    boolean isJustDelayAndRamp =
+        stages.size() == 2 && ZERO.equals(stages.get(0).threadCount()) && !ZERO.equals(
+            stages.get(1).threadCount());
     if (!(isJustRamp || isJustDelayAndRamp)) {
-      throw new IllegalStateException("Holding for iterations is only supported after initial hold and ramp, or ramp.");
+      throw new IllegalStateException(
+          "Holding for iterations is only supported after initial hold and ramp, or ramp.");
     }
     if (ZERO.equals(getLastStage().threadCount())) {
       throw new IllegalStateException("Can't hold for iterations with no threads.");

@@ -36,11 +36,9 @@ public class DashboardVisualizerTest extends DslVisualizerTest {
     );
   }
 
-    @Test
-    public void shouldThrowUnsupportedOperationWhenShowInGuiOnDashboardVisualizer() {
-        DashboardVisualizer dashboardVisualizer = new DashboardVisualizer();
-
-        assertThrows(UnsupportedOperationException.class, dashboardVisualizer::showInGui);
-    }
+  @Test
+  public void shouldThrowUnsupportedOperationWhenShowInGuiOnDashboardVisualizer() {
+    assertThrows(UnsupportedOperationException.class, () -> new DashboardVisualizer().showInGui());
+  }
 
 }

@@ -138,19 +138,12 @@ public class DslGraphqlSamplerTest extends JmeterDslTest {
     ).run();
     verify(getRequestedFor(anyUrl()).withQueryParam("query", equalTo(QUERY)));
   }
+
   @Test
   public void shouldThrowIllegalArgumentWhenGraphqlSamplerWithInvalidVariable() {
     DslGraphqlSampler sampler = graphqlSampler("http://localhost", "{ user(id: 1){ name } }");
     assertThrows(IllegalArgumentException.class, () -> sampler.variable("invalidVar", new Object()));
   }
-
-  @Test
-  public void shouldHandleInvalidJsonInput() {
-    DslGraphqlSampler sampler = graphqlSampler("http://localhost", "{ user(id: 1){ name } }");
-    sampler.variablesJson("invalidJson");
-  }
-
-
 
   @Nested
   public class CodeBuilderTest extends MethodCallBuilderTest {
