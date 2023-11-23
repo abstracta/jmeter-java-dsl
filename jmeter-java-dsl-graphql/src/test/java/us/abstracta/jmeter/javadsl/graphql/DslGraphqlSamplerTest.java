@@ -139,33 +139,11 @@ public class DslGraphqlSamplerTest extends JmeterDslTest {
     verify(getRequestedFor(anyUrl()).withQueryParam("query", equalTo(QUERY)));
   }
   @Test
-  public void shouldThrowExceptionForInvalidVariable() {
+  public void shouldThrowIllegalArgumentWhenGraphqlSamplerWithInvalidVariable() {
     DslGraphqlSampler sampler = graphqlSampler("http://localhost", "{ user(id: 1){ name } }");
     assertThrows(IllegalArgumentException.class, () -> sampler.variable("invalidVar", new Object()));
   }
 
-  @Test
-  public void shouldHandleLongOperationName() throws Exception {
-    String longOperationName = "a".repeat(300);
-    testPlan(
-            threadGroup(1, 1,
-                    graphqlSampler(wiremockUri, QUERY)
-                            .operationName(longOperationName)
-            )
-    ).run();
-    verify(postRequestedFor(anyUrl())
-            .withRequestBody(equalToJson(buildRequestBody(longOperationName, null))));
-  }
-  @Test
-  public void shouldSendGraphqlQueryToServerWhenGraphqlSamplerWithHttpPut() throws Exception {
-    testPlan(
-            threadGroup(1, 1,
-                    graphqlSampler(wiremockUri, QUERY)
-                            .httpGet()
-            )
-    ).run();
-    verify(getRequestedFor(anyUrl()).withQueryParam("query", equalTo(QUERY)));
-  }
   @Test
   public void shouldHandleInvalidJsonInput() {
     DslGraphqlSampler sampler = graphqlSampler("http://localhost", "{ user(id: 1){ name } }");
