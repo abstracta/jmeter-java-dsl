@@ -44,10 +44,14 @@ public class SimpleThreadGroupHelper extends BaseThreadGroup<DslDefaultThreadGro
       if (ZERO.equals(firstStage.threadCount())) {
         delay = firstStage.duration();
       } else {
-        rampUpPeriod = firstStage.duration();
         threads = firstStage.threadCount();
+        iterations = firstStage.iterations();
+        if (firstStage.iterations() == null) {
+          rampUpPeriod = firstStage.duration();
+        } else {
+          duration = firstStage.duration();
+        }
       }
-      iterations = firstStage.iterations();
       if (stages.size() > 1) {
         Stage secondStage = stages.get(1);
         threads = secondStage.threadCount();
@@ -110,11 +114,13 @@ public class SimpleThreadGroupHelper extends BaseThreadGroup<DslDefaultThreadGro
     setIntProperty(ret, ThreadGroup.RAMP_TIME, rampUpPeriod == null ? Duration.ZERO : rampUpPeriod);
     LoopController loopController = new LoopController();
     ret.setSamplerController(loopController);
-    if (duration != null) {
+    if (iterations == null) {
       loopController.setLoops(-1);
-      setLongProperty(ret, ThreadGroup.DURATION, duration);
     } else {
       setIntProperty(loopController, LoopController.LOOPS, iterations);
+    }
+    if (duration != null) {
+      setLongProperty(ret, ThreadGroup.DURATION, duration);
     }
     if (delay != null) {
       setLongProperty(ret, ThreadGroup.DELAY, delay);
@@ -165,34 +171,35 @@ public class SimpleThreadGroupHelper extends BaseThreadGroup<DslDefaultThreadGro
       MethodParam duration = testElement.durationParam(ThreadGroup.DURATION);
       MethodParam delay = testElement.durationParam(ThreadGroup.DELAY);
       MethodParam iterations = testElement.intParam(
-          ThreadGroup.MAIN_CONTROLLER + "/" + LoopController.LOOPS);
+          ThreadGroup.MAIN_CONTROLLER + "/" + LoopController.LOOPS, -1);
       if (threads instanceof IntParam && duration instanceof DurationParam
           && iterations instanceof IntParam && isDefaultOrZeroDuration(rampTime)
-          && isDefaultOrZeroDuration(delay)) {
+          && isDefaultOrZeroDuration(delay) && (isDefaultOrZeroDuration(duration)
+          || iterations.isDefault())) {
         return buildMethodCall(name, threads,
             isDefaultOrZeroDuration(duration) ? iterations : duration,
             new ChildrenParam<>(ThreadGroupChild[].class));
       } else {
+        if (!(threads instanceof IntParam) || !(rampTime instanceof DurationParam)
+            || !(duration instanceof DurationParam)) {
+          threads = new StringParam(threads.getExpression());
+          rampTime = new StringParam(rampTime.getExpression());
+          duration = new StringParam(duration.getExpression());
+        }
         MethodCall ret = buildMethodCall(name);
-        if (!delay.isDefault()) {
+        if (!isDefaultOrZeroDuration(delay)) {
           ret.chain("holdFor", delay);
         }
-        if (!isDefaultOrZeroDuration(duration)) {
-          duration = buildDurationParam(duration, rampTime, ret);
-          if (!(threads instanceof IntParam) || !(rampTime instanceof DurationParam)
-              || !(duration instanceof DurationParam)) {
-            threads = new StringParam(threads.getExpression());
-            rampTime = new StringParam(rampTime.getExpression());
-            duration = new StringParam(duration.getExpression());
-          }
-          ret.chain("rampToAndHold", threads, rampTime, duration);
-        } else {
-          if (!(threads instanceof IntParam) || !(rampTime instanceof DurationParam)) {
-            threads = new StringParam(threads.getExpression());
-            rampTime = new StringParam(rampTime.getExpression());
-          }
+        if (!iterations.isDefault() || isDefaultOrZeroDuration(duration)) {
           ret.chain("rampTo", threads, rampTime)
-              .chain("holdIterating", iterations);
+              .chain("holdIterating", !iterations.isDefault() ? iterations : new IntParam(-1));
+          if (!isDefaultOrZeroDuration(duration)) {
+            duration = buildDurationParam(duration, rampTime, ret);
+            ret.chain("upTo", duration);
+          }
+        } else {
+          duration = buildDurationParam(duration, rampTime, ret);
+          ret.chain("rampToAndHold", threads, rampTime, duration);
         }
         return ret;
       }

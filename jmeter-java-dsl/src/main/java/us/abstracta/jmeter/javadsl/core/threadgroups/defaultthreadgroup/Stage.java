@@ -11,7 +11,7 @@ public class Stage {
   private static final Pattern INT_PATTERN = Pattern.compile("^\\d+$");
 
   private final Object threadCount;
-  private final Object duration;
+  private Object duration;
   private final Object iterations;
 
   public Stage(Object threadCount, Object duration, Object iterations) {
@@ -23,6 +23,10 @@ public class Stage {
 
   public Object threadCount() {
     return threadCount;
+  }
+
+  public void duration(Duration val) {
+    this.duration = val;
   }
 
   public Object duration() {

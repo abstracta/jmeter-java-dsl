@@ -147,7 +147,7 @@ public class DslDefaultThreadGroup extends BaseThreadGroup<DslDefaultThreadGroup
   }
 
   private boolean isLastStageHoldingForIterations() {
-    return !stages.isEmpty() && getLastStage().duration() == null;
+    return !stages.isEmpty() && getLastStage().iterations() != null;
   }
 
   private Stage getLastStage() {
@@ -293,6 +293,24 @@ public class DslDefaultThreadGroup extends BaseThreadGroup<DslDefaultThreadGroup
     if (ZERO.equals(getLastStage().threadCount())) {
       throw new IllegalStateException("Can't hold for iterations with no threads.");
     }
+  }
+
+  /**
+   * Specifies to stop thread group if iterations take more than specified duration.
+   * <p>
+   * <b>Note:</b> This method should only be used after specifying iterations.
+   *
+   * @param duration specifies a maximum duration for thread execution when threads are iterating.
+   * @return the thread group for further configuration or usage.
+   * @since 1.24
+   */
+  public DslDefaultThreadGroup upTo(Duration duration) {
+    if (stages.isEmpty() || getLastStage().iterations() == null) {
+      throw new IllegalStateException("Configuring an upTo duration is only supported after "
+          + "configuring a hold for iterations.");
+    }
+    getLastStage().duration(duration);
+    return this;
   }
 
   /**
