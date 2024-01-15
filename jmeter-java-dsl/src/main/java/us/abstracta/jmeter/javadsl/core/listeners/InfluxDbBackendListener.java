@@ -24,6 +24,7 @@ public class InfluxDbBackendListener extends DslBackendListener<InfluxDbBackendL
   private static final String TOKEN_ARG = "influxdbToken";
   private static final String SAMPLERS_REGEX_ARG = "samplersRegex";
   private static final String TAG_ARGS_PREFIX = "TAG_";
+  private static final String PCT_ARG = "percentiles";
 
   protected String title = "Test jmeter-java-dsl " + Instant.now().toString();
   protected String token;
@@ -31,6 +32,7 @@ public class InfluxDbBackendListener extends DslBackendListener<InfluxDbBackendL
   protected String samplersRegex;
   protected String measurement;
   protected String applicationName;
+  protected String percentiles;
 
   public InfluxDbBackendListener(String url) {
     super(InfluxdbBackendListenerClient.class, url);
@@ -125,6 +127,18 @@ public class InfluxDbBackendListener extends DslBackendListener<InfluxDbBackendL
     return this;
   }
 
+  /**
+   * Allows specifying a list of percentiles that will be calculated and sent to InfluxDb.
+   * For example "50;95" - will send pct50.0 and pct95.0.
+   *
+   * @param percentiles specifies a list of percentiles separated by ';'.
+   * @return the listener for further configuration or usage.
+   */
+  public InfluxDbBackendListener percentiles(String percentiles) {
+    this.percentiles = percentiles;
+    return this;
+  }
+
   @Override
   protected Arguments buildListenerArguments() {
     Arguments ret = new Arguments();
@@ -143,6 +157,9 @@ public class InfluxDbBackendListener extends DslBackendListener<InfluxDbBackendL
     if (samplersRegex != null) {
       ret.addArgument(SAMPLERS_REGEX_ARG, samplersRegex);
     }
+    if (percentiles != null) {
+      ret.addArgument(PCT_ARG, percentiles);
+    }
     tags.forEach((name, value) -> ret.addArgument(TAG_ARGS_PREFIX + name, value));
     return ret;
   }
@@ -160,7 +177,8 @@ public class InfluxDbBackendListener extends DslBackendListener<InfluxDbBackendL
           .chain("title", buildArgParam(TITLE_ARG, args, defaultValues))
           .chain("application", buildArgParam(APPLICATION_ARG, args, defaultValues))
           .chain("measurement", buildArgParam(MEASUREMENT_ARG, args, defaultValues))
-          .chain("samplersRegex", buildArgParam(SAMPLERS_REGEX_ARG, args, defaultValues));
+          .chain("samplersRegex", buildArgParam(SAMPLERS_REGEX_ARG, args, defaultValues))
+          .chain("percentiles", buildArgParam(PCT_ARG, args, defaultValues));
       args.entrySet().stream()
           .filter(e -> e.getKey().startsWith(TAG_ARGS_PREFIX))
           .forEach(
