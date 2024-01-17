@@ -1,5 +1,8 @@
 package us.abstracta.jmeter.javadsl.core.listeners;
 
+import static java.util.stream.Collectors.joining;
+import static java.util.stream.IntStream.range;
+
 import java.lang.reflect.Method;
 import java.time.Instant;
 import java.util.HashMap;
@@ -129,13 +132,14 @@ public class InfluxDbBackendListener extends DslBackendListener<InfluxDbBackendL
 
   /**
    * Allows specifying a list of percentiles that will be calculated and sent to InfluxDb.
-   * For example "50;95" - will send pct50.0 and pct95.0.
    *
-   * @param percentiles specifies a list of percentiles separated by ';'.
+   * @param percentiles specifies a list of percentiles as float values.
    * @return the listener for further configuration or usage.
    */
-  public InfluxDbBackendListener percentiles(String percentiles) {
-    this.percentiles = percentiles;
+  public InfluxDbBackendListener percentiles(float... percentiles) {
+    this.percentiles = range(0, percentiles.length)
+            .mapToObj(i -> Float.toString(percentiles[i]))
+            .collect(joining(";"));
     return this;
   }
 
