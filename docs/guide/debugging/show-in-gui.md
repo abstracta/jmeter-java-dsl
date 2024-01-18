@@ -1,4 +1,4 @@
-### Test plan review un JMeter GUI
+### Test plan review in JMeter GUI
 
 A usual requirement for new DSL users that are used to Jmeter GUI, is to be able to review Jmeter DSL generated test plan in the familiar JMeter GUI. For this, you can use `showInGui()` method in a test plan to open JMeter GUI with the preloaded test plan.
 

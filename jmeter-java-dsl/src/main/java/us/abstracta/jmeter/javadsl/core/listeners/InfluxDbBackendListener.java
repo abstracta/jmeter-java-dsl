@@ -135,6 +135,7 @@ public class InfluxDbBackendListener extends DslBackendListener<InfluxDbBackendL
    *
    * @param percentiles specifies a list of percentiles as float values.
    * @return the listener for further configuration or usage.
+   * @since 1.24
    */
   public InfluxDbBackendListener percentiles(float... percentiles) {
     this.percentiles = range(0, percentiles.length)
