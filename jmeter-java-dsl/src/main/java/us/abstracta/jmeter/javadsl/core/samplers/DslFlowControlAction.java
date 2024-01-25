@@ -13,7 +13,7 @@ import us.abstracta.jmeter.javadsl.codegeneration.TestElementParamBuilder;
 import us.abstracta.jmeter.javadsl.codegeneration.params.IntParam;
 
 /**
- * Uses JMeter Flow Control Action to allow taking different actions (stop, pause, interrupt)
+ * Uses JMeter Flow Control Action to allow taking different actions (stop, pause, interrupt).
  *
  * @since 1.25
  */
