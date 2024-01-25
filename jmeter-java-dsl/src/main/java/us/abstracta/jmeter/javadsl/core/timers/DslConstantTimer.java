@@ -29,17 +29,22 @@ import us.abstracta.jmeter.javadsl.codegeneration.params.DurationParam;
  */
 public class DslConstantTimer extends BaseTimer {
 
-  protected Duration duration;
+  protected String duration;
 
-  public DslConstantTimer(Duration duration) {
+  public DslConstantTimer(String duration) {
     super("Constant Timer", ConstantTimerGui.class);
     this.duration = duration;
+  }
+
+  @Deprecated
+  public DslConstantTimer(Duration duration) {
+    this(String.valueOf(duration.toMillis()));
   }
 
   @Override
   protected TestElement buildTestElement() {
     ConstantTimer ret = new ConstantTimer();
-    ret.setDelay(String.valueOf(duration.toMillis()));
+    ret.setDelay(duration);
     return ret;
   }
 
@@ -53,12 +58,8 @@ public class DslConstantTimer extends BaseTimer {
     protected MethodCall buildMethodCall(ConstantTimer testElement, MethodCallContext context) {
       TestElementParamBuilder paramBuilder = new TestElementParamBuilder(testElement);
       MethodParam delay = paramBuilder.durationParamMillis(RandomTimer.DELAY, null);
-      if (!(delay instanceof DurationParam)) {
-        throw new UnsupportedOperationException("Using JMeter expressions in timer properties is "
-            + "still not supported. Request it in the GitHub repository as an issue and we will "
-            + "add support for it.");
-      }
-      return ((DurationParam) delay).getValue().isZero() ? MethodCall.emptyCall()
+      return delay instanceof DurationParam && ((DurationParam) delay).getValue().isZero()
+          ? MethodCall.emptyCall()
           : buildMethodCall(delay);
     }
 

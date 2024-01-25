@@ -1643,8 +1643,22 @@ public class JmeterDsl {
    * @return the timer for usage in test plan.
    * @since 1.0
    */
-
   public static DslConstantTimer constantTimer(Duration duration) {
+    return new DslConstantTimer(String.valueOf(duration.toMillis()));
+  }
+
+  /**
+   * Sames as {@link #constantTimer(Duration)} but allowing tu use a JMeter expression.
+   * <p>
+   * For example, you can set a delay depending on the amount of time taken in last sample with
+   * something like <pre>{@code ${__groovy(5000 - prev.time)}}</pre>.
+   *
+   * @param duration specifies a JMeter expression that evaluates to the number of milliseconds to
+   *                 pause the thread.
+   * @return the timer for usage in test plan.
+   * @since 1.25
+   */
+  public static DslConstantTimer constantTimer(String duration) {
     return new DslConstantTimer(duration);
   }
 

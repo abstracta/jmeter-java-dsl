@@ -31,10 +31,19 @@ public class DslConstantTimerTest extends JmeterDslTest {
   @Nested
   public class CodeBuilderTest extends MethodCallBuilderTest {
 
-    public DslTestPlan testPlanWithConstantTimer() {
+    public DslTestPlan testPlanWithConstantTimerAndDurationParam() {
       return testPlan(
           threadGroup(1, 1,
               constantTimer(Duration.ofSeconds(1)),
+              httpSampler("http://localhost")
+          )
+      );
+    }
+
+    public DslTestPlan testPlanWithConstantTimerAndJMeterExpressionParam() {
+      return testPlan(
+          threadGroup(1, 1,
+              constantTimer("${TIMER}"),
               httpSampler("http://localhost")
           )
       );
