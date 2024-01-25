@@ -39,6 +39,7 @@ import us.abstracta.jmeter.javadsl.core.preprocessors.DslJsr223PreProcessor;
 import us.abstracta.jmeter.javadsl.core.preprocessors.DslJsr223PreProcessor.PreProcessorScript;
 import us.abstracta.jmeter.javadsl.core.preprocessors.DslJsr223PreProcessor.PreProcessorVars;
 import us.abstracta.jmeter.javadsl.core.samplers.DslDummySampler;
+import us.abstracta.jmeter.javadsl.core.samplers.DslFlowControlAction;
 import us.abstracta.jmeter.javadsl.core.threadgroups.BaseThreadGroup.ThreadGroupChild;
 import us.abstracta.jmeter.javadsl.core.threadgroups.DslDefaultThreadGroup;
 import us.abstracta.jmeter.javadsl.core.threadgroups.DslSetupThreadGroup;
@@ -1637,6 +1638,36 @@ public class JmeterDsl {
   }
 
   /**
+   * Builds a Flow Control Action that pauses the current thread for the given duration.
+   * <p>
+   * This is an alternative to timers, which eases adding just one pause instead of applying a pause
+   * to all elements in the scope of a timer.
+   *
+   * @param duration specifies the duration for the pause.
+   * @return the test element for usage in a test plan
+   * @since 1.25
+   */
+  public static DslFlowControlAction threadPause(Duration duration) {
+    return threadPause(String.valueOf(duration.toMillis()));
+  }
+
+  /**
+   * Sames as {@link #threadPause(Duration)} but allowing to use JMeter expressions for the
+   * duration.
+   * <p>
+   * For example, you can set a delay depending on the amount of time taken in last sample with
+   * something like <pre>{@code ${__groovy(5000 - prev.time)}}</pre>.
+   *
+   * @param duration specifies a JMeter expression that evaluates to the number of milliseconds to
+   *                 pause the thread.
+   * @return the test element for usage in a test plan
+   * @since 1.25
+   */
+  public static DslFlowControlAction threadPause(String duration) {
+    return DslFlowControlAction.pauseThread(duration);
+  }
+
+  /**
    * Builds a Constant Timer which pauses the thread with for a given duration.
    *
    * @param duration specifies the duration for the timer to wait.
@@ -1644,7 +1675,7 @@ public class JmeterDsl {
    * @since 1.0
    */
   public static DslConstantTimer constantTimer(Duration duration) {
-    return new DslConstantTimer(String.valueOf(duration.toMillis()));
+    return constantTimer(String.valueOf(duration.toMillis()));
   }
 
   /**
