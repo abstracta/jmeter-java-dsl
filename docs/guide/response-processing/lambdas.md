@@ -166,7 +166,7 @@ Here are the steps to run test plans containing Java lambdas in `BlazeMeterEngin
    ```
       
    ::: tip
-   Currently only `BlazeMeterEngine` provides a way to upload assets. If you need support for other engines, please request it [in an issue](https://github.com/abstracta/issues).
+   Currently only `BlazeMeterEngine` and `AzureEngine` provide a way to upload assets. If you need support for other engines, please request it [in an issue](https://github.com/abstracta/issues).
    :::
 
 3. Execute your tests with maven (either with `mvn clean verify` or as part of `mvn clean install`) or IDE (by first packaging your project, and then executing `PerformanceIT` test).
