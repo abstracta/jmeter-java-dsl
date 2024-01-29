@@ -25,6 +25,7 @@ import us.abstracta.jmeter.javadsl.core.controllers.PercentController;
 import us.abstracta.jmeter.javadsl.core.engines.AutoStoppedTestException;
 import us.abstracta.jmeter.javadsl.core.listeners.AutoStopListener;
 import us.abstracta.jmeter.javadsl.core.listeners.DslViewResultsTree;
+import us.abstracta.jmeter.javadsl.core.listeners.GraphiteBackendListener;
 import us.abstracta.jmeter.javadsl.core.listeners.HtmlReporter;
 import us.abstracta.jmeter.javadsl.core.listeners.InfluxDbBackendListener;
 import us.abstracta.jmeter.javadsl.core.listeners.JtlWriter;
@@ -1581,6 +1582,25 @@ public class JmeterDsl {
    */
   public static InfluxDbBackendListener influxDbListener(String influxDbUrl) {
     return new InfluxDbBackendListener(influxDbUrl);
+  }
+
+  /**
+   * Builds a Backend Listener configured to use Graphite to send all results for easy tracing,
+   * historic, comparison, and live test results.
+   * <p>
+   * <b>Warning:</b> DSL graphite listener uses Pickle sender, and port 2004, by default since it
+   * is more performant. This behavior differs from the one provided by the JMeter element which
+   * uses text plain instead by default.
+   *
+   * @param graphiteUrl is the URL to connect to the Graphite instance where test results should be
+   *                    sent. You can specify the host (eg: mygraphite) or the host + port (eg:
+   *                    mygraphite:2004).
+   * @return the Backend Listener instance which can be used to set additional settings like title,
+   * token &amp; queueSize.
+   * @since 1.25
+   */
+  public static GraphiteBackendListener graphiteListener(String graphiteUrl) {
+    return new GraphiteBackendListener(graphiteUrl);
   }
 
   /**

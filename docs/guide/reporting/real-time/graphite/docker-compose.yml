@@ -1,0 +1,28 @@
+version: '3'
+services:
+  graphite:
+    image: graphiteapp/graphite-statsd:1.1.10-5
+    ports:
+      - '2003:2003'
+      - '2004:2004'
+      - '8080:80'
+    volumes:
+      - ./graphite-conf/carbon.conf:/opt/graphite/conf/carbon.conf
+      - ./graphite-conf/storage-schemas.conf:/opt/graphite/conf/storage-schemas.conf
+      - graphite-data:/opt/graphite/storage/whisper
+  grafana:
+    image: grafana/grafana:8.1.1
+    ports:
+      - '3000:3000'
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./grafana-provisioning/:/etc/grafana/provisioning
+    depends_on:
+      - graphite
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=1234
+      - GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH=/etc/grafana/provisioning/dashboards/jmeter.json
+volumes:
+  graphite-data:
+  grafana-data:

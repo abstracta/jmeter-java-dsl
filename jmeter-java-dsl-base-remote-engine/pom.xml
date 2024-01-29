@@ -16,10 +16,6 @@
     engines for remote execution (eg: BlazeMeter)
   </description>
 
-  <properties>
-    <retrofit.version>2.9.0</retrofit.version>
-  </properties>
-
   <dependencies>
     <dependency>
       <groupId>us.abstracta.jmeter</groupId>
@@ -39,7 +35,7 @@
     <dependency>
       <groupId>com.github.devcsrj</groupId>
       <artifactId>slf4j-okhttp3-logging-interceptor</artifactId>
-      <version>1.0.1</version>
+      <version>${slf4j-okhttp3.version}</version>
     </dependency>
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>

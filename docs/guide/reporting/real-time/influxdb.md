@@ -33,10 +33,10 @@ public class PerformanceTest {
 }
 ```
 
-If you want to try it locally, you can run `docker-compose up` (previously [installing Docker](https://docs.docker.com/get-docker/) in you machine) inside [this directory](/docs/guide/reporting/real-time/influxdb). After containers are started, you can open Grafana at [http://localhost:3000](http://localhost:3000). Finally, run a performance test using the `influxDbListener` and you will be able to see the live results, and keep historic data. Cool, isn't it?!
+If you want to try it locally, you can run `docker-compose up` (previously [installing Docker](https://docs.docker.com/get-docker/) in your machine) inside [this directory](/docs/guide/reporting/real-time/influxdb). After containers are started, you can open Grafana at [http://localhost:3000](http://localhost:3000). Finally, run a performance test using the `influxDbListener` and you will be able to see the live results, and keep historic data. Cool, isn't it?!
 
 ::: warning
-Use provided `docker-compose` settings for local tests only. It uses weak credentials and is not properly configured for production purposes.
+Use the provided `docker-compose` settings for local tests only. It uses weak credentials and is not properly configured for production purposes.
 :::
 
 Check [InfluxDbBackendListener](/jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/listeners/InfluxDbBackendListener.java) for additional details and settings.

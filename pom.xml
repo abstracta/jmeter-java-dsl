@@ -58,6 +58,8 @@
     <selenium.version>4.8.1</selenium.version>
     <!-- same version as JMeter dependency -->
     <slf4j.version>1.7.36</slf4j.version>
+    <retrofit.version>2.9.0</retrofit.version>
+    <slf4j-okhttp3.version>1.0.1</slf4j-okhttp3.version>
   </properties>
 
   <modules>
