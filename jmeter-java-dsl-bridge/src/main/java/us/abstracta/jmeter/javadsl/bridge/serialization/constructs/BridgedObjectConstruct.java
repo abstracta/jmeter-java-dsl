@@ -149,10 +149,7 @@ public class BridgedObjectConstruct extends BaseBridgedObjectConstruct {
 
   private Method findPropertyMethod(String propName, Node propNode, Object testElement) {
     List<Method> candidates = Stream.of(testElement.getClass().getMethods())
-        /* avoid zero parameters methods since otherwise we might select a method without parameters
-        to set a false boolean property (which is usually incorrect, since such methods are used
-        to set the property to true).*/
-        .filter(m -> propName.equals(m.getName()) && m.getParameters().length > 0)
+        .filter(m -> propName.equals(m.getName()))
         // sorted to get the most specific ones in the class hierarchy first
         .sorted((m1, m2) -> {
           Class<?> m1Class = m1.getReturnType();
@@ -170,11 +167,20 @@ public class BridgedObjectConstruct extends BaseBridgedObjectConstruct {
             && Arrays.stream(m.getParameters())
             .allMatch(p -> String.class.isAssignableFrom(p.getType())))
         .findFirst()
-        /*
-         otherwise just get the first one (which is the most specific one when multiple
-         implementations are available in class hierarchy)
-         */
-        .orElseGet(() -> candidates.get(0));
+        .orElseGet(() -> candidates.stream()
+            /*
+            if there is a method receiving just a boolean, then use it, over the one without
+            parameters, to avoid improper resolution when parameter is false and method without
+            parameters sets the boolean to true
+             */
+            .filter(m -> m.getParameters().length == 1 && boolean.class.isAssignableFrom(
+                m.getParameters()[0].getType()))
+            .findFirst()
+            /*
+             otherwise just get the first one (which is the most specific one when multiple
+             implementations are available in class hierarchy)
+             */
+            .orElseGet(() -> candidates.get(0)));
   }
 
   private Object[] buildArgs(Method propMethod, Node propNode) {
