@@ -24,7 +24,7 @@ public class CountMetricSummary {
    * Provides the average count per second for the given metric.
    */
   public double perSecond() {
-    return val / ((double) elapsedTimeMillis / 1000);
+    return elapsedTimeMillis != 0 ? val / ((double) elapsedTimeMillis / 1000) : 0;
   }
 
   /**
