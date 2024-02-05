@@ -17,7 +17,7 @@ public class PerformanceTest {
     testPlan(
         threadGroup(2, 10,
             httpSampler("http://my.service/items"),
-            uniformRandomTimer(Duration.ofSeconds(4), Duration.ofSeconds(10)),
+            threadPause(Duration.ofSeconds(4)),
             httpSampler("http://my.service/cart/selected-items")
                 .post("{\"id\": 1}", ContentType.APPLICATION_JSON)
         )
