@@ -6,7 +6,7 @@
   <parent>
     <groupId>us.abstracta.jmeter</groupId>
     <artifactId>jmeter-java-dsl-parent</artifactId>
-    <version>1.26-SNAPSHOT</version>
+    <version>1.25.3</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <artifactId>jmeter-java-dsl-recorder</artifactId>
