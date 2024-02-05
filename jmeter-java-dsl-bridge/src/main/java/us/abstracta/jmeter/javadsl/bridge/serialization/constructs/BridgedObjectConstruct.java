@@ -149,7 +149,10 @@ public class BridgedObjectConstruct extends BaseBridgedObjectConstruct {
 
   private Method findPropertyMethod(String propName, Node propNode, Object testElement) {
     List<Method> candidates = Stream.of(testElement.getClass().getMethods())
-        .filter(m -> propName.equals(m.getName()))
+        /* avoid zero parameters methods since otherwise we might select a method without parameters
+        to set a false boolean property (which is usually incorrect, since such methods are used
+        to set the property to true).*/
+        .filter(m -> propName.equals(m.getName()) && m.getParameters().length > 0)
         // sorted to get the most specific ones in the class hierarchy first
         .sorted((m1, m2) -> {
           Class<?> m1Class = m1.getReturnType();
