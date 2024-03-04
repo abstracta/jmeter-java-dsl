@@ -1,0 +1,160 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=GBK"> 
+  <title>Coverage Report > BaseSampler</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">us.abstracta.jmeter.javadsl.core.samplers</a>
+</div>
+
+<h1>Coverage Summary for Class: BaseSampler (us.abstracta.jmeter.javadsl.core.samplers)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">BaseSampler</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">BaseSampler$SamplerChild</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package us.abstracta.jmeter.javadsl.core.samplers;
+&nbsp;
+&nbsp;import java.util.Collections;
+&nbsp;import org.apache.jmeter.gui.JMeterGUIComponent;
+&nbsp;import us.abstracta.jmeter.javadsl.core.DslTestElement;
+&nbsp;import us.abstracta.jmeter.javadsl.core.testelements.TestElementContainer;
+&nbsp;import us.abstracta.jmeter.javadsl.core.threadgroups.BaseThreadGroup.ThreadGroupChild;
+&nbsp;import us.abstracta.jmeter.javadsl.http.DslHttpSampler;
+&nbsp;
+&nbsp;/**
+&nbsp; * Hosts common logic to all samplers.
+&nbsp; * &lt;p&gt;
+&nbsp; * In particular, it specifies that samplers are {@link ThreadGroupChild} and {@link
+&nbsp; * TestElementContainer} containing {@link SamplerChild}.
+&nbsp; * &lt;p&gt;
+&nbsp; * For an example of an implementation of a sampler check {@link DslHttpSampler}.
+&nbsp; *
+&nbsp; * @since 0.1
+&nbsp; */
+&nbsp;public abstract class BaseSampler&lt;T extends BaseSampler&lt;T&gt;&gt; extends
+&nbsp;    TestElementContainer&lt;T, BaseSampler.SamplerChild&gt; implements DslSampler {
+&nbsp;
+&nbsp;  protected BaseSampler(String name, Class&lt;? extends JMeterGUIComponent&gt; guiClass) {
+<b class="fc">&nbsp;    super(name, guiClass, Collections.emptyList());</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Allows specifying children test elements for the sampler, which allow for example extracting
+&nbsp;   * information from response, alter request, assert response contents, etc.
+&nbsp;   *
+&nbsp;   * @param children list of test elements to add as children of this sampler.
+&nbsp;   * @return the altered sampler to allow for fluent API usage.
+&nbsp;   */
+&nbsp;  public T children(SamplerChild... children) {
+<b class="fc">&nbsp;    return super.children(children);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Test elements which can be nested as children of a sampler in JMeter, should implement this
+&nbsp;   * interface.
+&nbsp;   */
+&nbsp;  public interface SamplerChild extends DslTestElement {
+&nbsp;
+&nbsp;  }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-03 22:39</div>
+</div>
+</body>
+</html>

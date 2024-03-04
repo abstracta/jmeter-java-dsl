@@ -1,0 +1,312 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=GBK"> 
+  <title>Coverage Report > DslDebugPostProcessor</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">us.abstracta.jmeter.javadsl.core.postprocessors</a>
+</div>
+
+<h1>Coverage Summary for Class: DslDebugPostProcessor (us.abstracta.jmeter.javadsl.core.postprocessors)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DslDebugPostProcessor</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (9/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (22/22)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">DslDebugPostProcessor$CodeBuilder</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (7/7)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (11/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (29/29)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package us.abstracta.jmeter.javadsl.core.postprocessors;
+&nbsp;
+&nbsp;import java.lang.reflect.Method;
+&nbsp;import java.util.List;
+&nbsp;import org.apache.jmeter.extractor.DebugPostProcessor;
+&nbsp;import org.apache.jmeter.testbeans.gui.TestBeanGUI;
+&nbsp;import org.apache.jmeter.testelement.TestElement;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.MethodCall;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.MethodCallContext;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.SingleTestElementCallBuilder;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.TestElementParamBuilder;
+&nbsp;import us.abstracta.jmeter.javadsl.core.testelements.BaseTestElement;
+&nbsp;
+&nbsp;/**
+&nbsp; * Adds a sub result to a given sampler result, including jmeter variables, jmeter properties, etc.,
+&nbsp; * which are handy when debugging test plans.
+&nbsp; * &lt;p&gt;
+&nbsp; * This element is particularly helpful when debugging extractors, since it allows checking
+&nbsp; * generated JMeter variables.
+&nbsp; * &lt;p&gt;
+&nbsp; * This element by default will only include JMeter variables in sub sample response body, which
+&nbsp; * differs from JMeter default configuration, since is the most used scenario and avoids unnecessary
+&nbsp; * memory or disk usage.
+&nbsp; * &lt;p&gt;
+&nbsp; * In general use IDE debugger in first steps of debugging a test plan using a thread group
+&nbsp; * configuration with only 1 thread. If you need to get more information on a test plan with
+&nbsp; * multiple threads during or after test plan execution, then use this element, in combination with
+&nbsp; * &lt;pre&gt;resultsTreeVisualizer&lt;/pre&gt; or &lt;pre&gt;jtlWriter&lt;/pre&gt; saving sub results and response bodies
+&nbsp; * in xml format, avoiding stopping in each thread break point and avoid affecting the performance
+&nbsp; * test metrics.
+&nbsp; *
+&nbsp; * @since 0.47
+&nbsp; */
+&nbsp;public class DslDebugPostProcessor extends BaseTestElement implements DslPostProcessor {
+&nbsp;
+<b class="fc">&nbsp;  protected boolean includeSamplerProperties = false;</b>
+<b class="fc">&nbsp;  protected boolean includeVariables = true;</b>
+<b class="fc">&nbsp;  protected boolean includeJmeterProperties = false;</b>
+<b class="fc">&nbsp;  protected boolean includeSystemProperties = false;</b>
+&nbsp;
+&nbsp;  public DslDebugPostProcessor() {
+<b class="fc">&nbsp;    super(&quot;Debug PostProcessor&quot;, TestBeanGUI.class);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Specifies if JMeter variables should or not be included in sub sample response body.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * This method is useful when you want to disable inclusion of JMeter variables and enable some
+&nbsp;   * other info instead (like JMeter properties) and keep memory and disk usage to the minimum.
+&nbsp;   * Another scenario might be to dynamically include them or not according to some test plan
+&nbsp;   * parameter.
+&nbsp;   *
+&nbsp;   * @param include if true, JMeter variables will be included in sub sample response body,
+&nbsp;   *                otherwise they won&#39;t. By default, jmeter variables are included.
+&nbsp;   * @return the debug post processor for further configuration or usage.
+&nbsp;   */
+&nbsp;  public DslDebugPostProcessor jmeterVariables(boolean include) {
+<b class="fc">&nbsp;    includeVariables = include;</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Specifies to include parent sampler properties (parameters of the sampler) in sub sample
+&nbsp;   * response body.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * This is just a shorter way to enable {@link #samplerProperties(boolean)}.
+&nbsp;   *
+&nbsp;   * @return the post processor for further configuration or usage.
+&nbsp;   * @see #samplerProperties(boolean)
+&nbsp;   * @since 1.0
+&nbsp;   */
+&nbsp;  public DslDebugPostProcessor samplerProperties() {
+<b class="fc">&nbsp;    return samplerProperties(true);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Specifies if parent sampler properties (parameters of the sampler) should or not be included in
+&nbsp;   * sub sample response body.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * This method is useful when you want to review some dynamic sampler property.
+&nbsp;   *
+&nbsp;   * @param include if true, sampler properties will be included in sub sample response body,
+&nbsp;   *                otherwise they won&#39;t. By default, sampler properties are not included.
+&nbsp;   * @return the post processor for further configuration or usage.
+&nbsp;   */
+&nbsp;  public DslDebugPostProcessor samplerProperties(boolean include) {
+<b class="fc">&nbsp;    includeSamplerProperties = include;</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Specifies to include JMeter properties (test plan parameters, or info shared by threads) in sub
+&nbsp;   * sample response body.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * This is just a shorter way to enable {@link #jmeterProperties(boolean)}.
+&nbsp;   *
+&nbsp;   * @return the post processor for further configuration or usage.
+&nbsp;   * @see #jmeterProperties(boolean)
+&nbsp;   * @since 1.0
+&nbsp;   */
+&nbsp;  public DslDebugPostProcessor jmeterProperties() {
+<b class="fc">&nbsp;    return jmeterProperties(true);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Specifies if JMeter properties (test plan parameters, or info shared by threads) should or not
+&nbsp;   * be included in sub sample response body.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * This method is useful when you want to review some test plan parameter provided through JMeter
+&nbsp;   * property, or when you want to review some property shared and modified by test plan threads.
+&nbsp;   *
+&nbsp;   * @param include if true, JMeter properties will be included in sub sample response body,
+&nbsp;   *                otherwise they won&#39;t. By default, JMeter properties are not included.
+&nbsp;   * @return the post processor for further configuration or usage.
+&nbsp;   */
+&nbsp;  public DslDebugPostProcessor jmeterProperties(boolean include) {
+<b class="fc">&nbsp;    includeJmeterProperties = include;</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Specifies to include system properties (JVM parameters and properties) in sub sample response
+&nbsp;   * body.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * This is just a shorter way to enable {@link #systemProperties(boolean)}.
+&nbsp;   *
+&nbsp;   * @return the post processor for further configuration or usage.
+&nbsp;   * @see #systemProperties(boolean)
+&nbsp;   * @since 1.0
+&nbsp;   */
+&nbsp;  public DslDebugPostProcessor systemProperties() {
+<b class="fc">&nbsp;    return systemProperties(true);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Specifies if system properties (JVM parameters and properties) should or not be included in sub
+&nbsp;   * sample response body.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * This method is useful when you want to review some JVM parameter or property while executing
+&nbsp;   * the test plan. In general, since system properties are not usually modified on runtime, it is
+&nbsp;   * recommended to only enable this in a sampler that only runs once in a test plan (not inside
+&nbsp;   * thread groups with multiple iterations), to avoid unnecessary memory or disk usage
+&nbsp;   *
+&nbsp;   * @param include if true, system properties will be included in sub sample response body,
+&nbsp;   *                otherwise they won&#39;t. By default, system properties are not included.
+&nbsp;   * @return the post processor for further configuration or usage.
+&nbsp;   */
+&nbsp;  public DslDebugPostProcessor systemProperties(boolean include) {
+<b class="fc">&nbsp;    includeSystemProperties = include;</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  protected TestElement buildTestElement() {
+<b class="fc">&nbsp;    DebugPostProcessor ret = new DebugPostProcessor();</b>
+<b class="fc">&nbsp;    ret.setDisplayJMeterVariables(includeVariables);</b>
+<b class="fc">&nbsp;    ret.setDisplaySamplerProperties(includeSamplerProperties);</b>
+<b class="fc">&nbsp;    ret.setDisplayJMeterProperties(includeJmeterProperties);</b>
+<b class="fc">&nbsp;    ret.setDisplaySystemProperties(includeSystemProperties);</b>
+<b class="fc">&nbsp;    return ret;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  public static class CodeBuilder extends SingleTestElementCallBuilder&lt;DebugPostProcessor&gt; {
+&nbsp;
+&nbsp;    public CodeBuilder(List&lt;Method&gt; builderMethods) {
+<b class="fc">&nbsp;      super(DebugPostProcessor.class, builderMethods);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected MethodCall buildMethodCall(DebugPostProcessor testElement,
+&nbsp;        MethodCallContext context) {
+<b class="fc">&nbsp;      TestElementParamBuilder paramBuilder = new TestElementParamBuilder(testElement);</b>
+<b class="fc">&nbsp;      return buildMethodCall()</b>
+<b class="fc">&nbsp;          .chain(&quot;jmeterVariables&quot;, paramBuilder.boolParam(&quot;displayJMeterVariables&quot;, true))</b>
+<b class="fc">&nbsp;          .chain(&quot;samplerProperties&quot;, paramBuilder.boolParam(&quot;displaySamplerProperties&quot;, false))</b>
+<b class="fc">&nbsp;          .chain(&quot;jmeterProperties&quot;, paramBuilder.boolParam(&quot;displayJMeterProperties&quot;, false))</b>
+<b class="fc">&nbsp;          .chain(&quot;systemProperties&quot;, paramBuilder.boolParam(&quot;displaySystemProperties&quot;, false));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;  }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-03 20:57</div>
+</div>
+</body>
+</html>

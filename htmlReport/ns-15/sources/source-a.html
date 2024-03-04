@@ -1,0 +1,275 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=GBK"> 
+  <title>Coverage Report > HttpHeaders</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">us.abstracta.jmeter.javadsl.http</a>
+</div>
+
+<h1>Coverage Summary for Class: HttpHeaders (us.abstracta.jmeter.javadsl.http)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">HttpHeaders</td>
+<td class="coverageStat">
+  <span class="percent">
+    87.5%
+  </span>
+  <span class="absValue">
+    (7/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    86.7%
+  </span>
+  <span class="absValue">
+    (13/15)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">HttpHeaders$CodeBuilder</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (10/10)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    90%
+  </span>
+  <span class="absValue">
+    (9/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    92%
+  </span>
+  <span class="absValue">
+    (23/25)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package us.abstracta.jmeter.javadsl.http;
+&nbsp;
+&nbsp;import java.lang.reflect.Method;
+&nbsp;import java.util.LinkedHashMap;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import org.apache.http.entity.ContentType;
+&nbsp;import org.apache.jmeter.protocol.http.control.Header;
+&nbsp;import org.apache.jmeter.protocol.http.control.HeaderManager;
+&nbsp;import org.apache.jmeter.protocol.http.gui.HeaderPanel;
+&nbsp;import org.apache.jmeter.protocol.http.util.HTTPConstants;
+&nbsp;import org.apache.jmeter.testelement.TestElement;
+&nbsp;import org.apache.jmeter.testelement.property.CollectionProperty;
+&nbsp;import org.apache.jmeter.testelement.property.JMeterProperty;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.MethodCall;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.MethodCallContext;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.SingleTestElementCallBuilder;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.params.StringParam;
+&nbsp;import us.abstracta.jmeter.javadsl.core.configs.BaseConfigElement;
+&nbsp;import us.abstracta.jmeter.javadsl.core.util.PropertyScriptBuilder;
+&nbsp;import us.abstracta.jmeter.javadsl.core.util.PropertyScriptBuilder.PropertyScript;
+&nbsp;
+&nbsp;/**
+&nbsp; * Allows specifying HTTP headers (through an underlying JMeter HttpHeaderManager) to be used by
+&nbsp; * HTTP samplers.
+&nbsp; * &lt;p&gt;
+&nbsp; * This test element can be added at different levels (in the same way as HTTPHeaderManager) of a
+&nbsp; * test plan affecting all samplers in the scope were is added. For example if httpHeaders is
+&nbsp; * specified at test plan, then all headers will apply to http samplers; if it is specified on
+&nbsp; * thread group, then only samplers on that thread group would be affected; if specified as a child
+&nbsp; * of a sampler, only the particular sampler will include such headers. Also take into consideration
+&nbsp; * that headers specified at lower scope will overwrite ones specified at higher scope (eg: sampler
+&nbsp; * child headers will overwrite test plan headers).
+&nbsp; *
+&nbsp; * @since 0.1
+&nbsp; */
+&nbsp;public class HttpHeaders extends BaseConfigElement {
+&nbsp;
+<b class="fc">&nbsp;  protected final Map&lt;String, Object&gt; headers = new LinkedHashMap&lt;&gt;();</b>
+&nbsp;
+&nbsp;  public HttpHeaders() {
+<b class="fc">&nbsp;    super(&quot;HTTP Header Manager&quot;, HeaderPanel.class);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Allows to set an HTTP header to be used by HTTP samplers.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * To specify multiple headers just invoke this method several times with the different header
+&nbsp;   * names and values.
+&nbsp;   *
+&nbsp;   * @param name  of the HTTP header.
+&nbsp;   * @param value of the HTTP header.
+&nbsp;   * @return the config element for further configuration or usage.
+&nbsp;   */
+&nbsp;  public HttpHeaders header(String name, String value) {
+<b class="fc">&nbsp;    headers.put(name, value);</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Same as {@link #header(String, String)} but allows using dynamically calculated HTTP header
+&nbsp;   * value.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * This method is just an abstraction that uses jexl2 function as HTTP header value.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * &lt;b&gt;WARNING:&lt;/b&gt; This only works when using embedded jmeter engine.
+&nbsp;   * Check &lt;a href=&quot;https://abstracta.github.io/jmeter-java-dsl/guide/#lambdas&quot;&gt;the user guide&lt;/a&gt;
+&nbsp;   * for details on some alternative.
+&nbsp;   *
+&nbsp;   * @param name          of the HTTP header.
+&nbsp;   * @param valueSupplier builds the header value.
+&nbsp;   * @return the config element for further configuration or usage.
+&nbsp;   * @since 1.14
+&nbsp;   */
+&nbsp;  public HttpHeaders header(String name, PropertyScript&lt;String&gt; valueSupplier) {
+<b class="fc">&nbsp;    headers.put(name, new PropertyScriptBuilder&lt;&gt;(valueSupplier));</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Same as {@link #header(String, PropertyScript)} but with support for running at scale in a
+&nbsp;   * remote engine.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * Check &lt;a href=&quot;https://abstracta.github.io/jmeter-java-dsl/guide/#lambdas&quot;&gt;the user guide&lt;/a&gt;
+&nbsp;   * for details on additional steps required to run them at scale in a remote engine.
+&nbsp;   *
+&nbsp;   * @see PropertyScript
+&nbsp;   * @see #header(String, PropertyScript)
+&nbsp;   * @since 1.14
+&nbsp;   */
+&nbsp;  public HttpHeaders header(String name,
+&nbsp;      Class&lt;? extends PropertyScript&lt;String&gt;&gt; valueSupplierClass) {
+<b class="nc">&nbsp;    headers.put(name, new PropertyScriptBuilder&lt;&gt;(valueSupplierClass));</b>
+<b class="nc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Allows to easily specify the Content-Type HTTP header.
+&nbsp;   *
+&nbsp;   * @param contentType value to use as Content-Type header.
+&nbsp;   * @return the config element for further configuration or usage.
+&nbsp;   * @since 0.42
+&nbsp;   */
+&nbsp;  public HttpHeaders contentType(ContentType contentType) {
+<b class="fc">&nbsp;    return header(HTTPConstants.HEADER_CONTENT_TYPE, contentType.toString());</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  public boolean isEmpty() {
+<b class="fc">&nbsp;    return headers.isEmpty();</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  protected TestElement buildTestElement() {
+<b class="fc">&nbsp;    HeaderManager ret = new HeaderManager();</b>
+<b class="fc">&nbsp;    headers.forEach((name, value) -&gt; ret.add(new Header(name, value instanceof PropertyScriptBuilder</b>
+<b class="fc">&nbsp;        ? ((PropertyScriptBuilder&lt;String&gt;) value).build()</b>
+<b class="fc">&nbsp;        : value.toString())));</b>
+<b class="fc">&nbsp;    return ret;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  public static class CodeBuilder extends SingleTestElementCallBuilder&lt;HeaderManager&gt; {
+&nbsp;
+&nbsp;    public CodeBuilder(List&lt;Method&gt; builderMethods) {
+<b class="fc">&nbsp;      super(HeaderManager.class, builderMethods);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected MethodCall buildMethodCall(HeaderManager testElement, MethodCallContext context) {
+<b class="fc">&nbsp;      MethodCall ret = buildMethodCall();</b>
+<b class="fc">&nbsp;      for (JMeterProperty prop : (CollectionProperty) testElement.getProperty(</b>
+&nbsp;          HeaderManager.HEADERS)) {
+<b class="fc">&nbsp;        Header header = (Header) prop.getObjectValue();</b>
+<b class="fc">&nbsp;        if (HTTPConstants.HEADER_CONTENT_TYPE.equals(header.getName())) {</b>
+<b class="fc">&nbsp;          ret.chain(&quot;contentType&quot;, new ContentTypeParam(header.getValue()));</b>
+&nbsp;        } else {
+<b class="fc">&nbsp;          ret.chain(&quot;header&quot;, new StringParam(header.getName()),</b>
+<b class="fc">&nbsp;              new StringParam(header.getValue()));</b>
+&nbsp;        }
+<b class="fc">&nbsp;      }</b>
+<b class="fc">&nbsp;      return ret;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;  }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-03 20:57</div>
+</div>
+</body>
+</html>

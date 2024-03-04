@@ -1,0 +1,269 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=GBK"> 
+  <title>Coverage Report > EmbeddedStatsSummary</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">us.abstracta.jmeter.javadsl.core.engines</a>
+</div>
+
+<h1>Coverage Summary for Class: EmbeddedStatsSummary (us.abstracta.jmeter.javadsl.core.engines)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">EmbeddedStatsSummary</td>
+<td class="coverageStat">
+  <span class="percent">
+    55.6%
+  </span>
+  <span class="absValue">
+    (5/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    83.3%
+  </span>
+  <span class="absValue">
+    (20/24)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">EmbeddedStatsSummary$EmbeddedTimeMetricSummary</td>
+<td class="coverageStat">
+  <span class="percent">
+    30%
+  </span>
+  <span class="absValue">
+    (3/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    69.6%
+  </span>
+  <span class="absValue">
+    (16/23)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    42.1%
+  </span>
+  <span class="absValue">
+    (8/19)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    76.6%
+  </span>
+  <span class="absValue">
+    (36/47)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package us.abstracta.jmeter.javadsl.core.engines;
+&nbsp;
+&nbsp;import java.time.Duration;
+&nbsp;import java.time.Instant;
+&nbsp;import org.apache.commons.math3.stat.descriptive.moment.Mean;
+&nbsp;import org.apache.commons.math3.stat.descriptive.rank.PSquarePercentile;
+&nbsp;import org.apache.jmeter.samplers.SampleResult;
+&nbsp;import us.abstracta.jmeter.javadsl.core.stats.CountMetricSummary;
+&nbsp;import us.abstracta.jmeter.javadsl.core.stats.StatsSummary;
+&nbsp;import us.abstracta.jmeter.javadsl.core.stats.TimeMetricSummary;
+&nbsp;
+&nbsp;/**
+&nbsp; * Contains statistics collected by {@link EmbeddedJmeterEngine}.
+&nbsp; * &lt;p&gt;
+&nbsp; * You can use this class to collect additional statistics by extending it and using it with {@link
+&nbsp; * us.abstracta.jmeter.javadsl.core.postprocessors.DslJsr223PostProcessor}.
+&nbsp; *
+&nbsp; * @since 0.37
+&nbsp; */
+<b class="fc">&nbsp;public class EmbeddedStatsSummary implements StatsSummary {</b>
+&nbsp;
+<b class="fc">&nbsp;  private long firstTime = Long.MAX_VALUE;</b>
+<b class="fc">&nbsp;  private long endTime = Long.MIN_VALUE;</b>
+<b class="fc">&nbsp;  private final CountMetricSummary samples = new CountMetricSummary();</b>
+<b class="fc">&nbsp;  private final CountMetricSummary errors = new CountMetricSummary();</b>
+<b class="fc">&nbsp;  private final CountMetricSummary receivedBytes = new CountMetricSummary();</b>
+<b class="fc">&nbsp;  private final CountMetricSummary sentBytes = new CountMetricSummary();</b>
+<b class="fc">&nbsp;  private final EmbeddedTimeMetricSummary sampleTime = new EmbeddedTimeMetricSummary();</b>
+&nbsp;
+&nbsp;  public void add(SampleResult result) {
+<b class="fc">&nbsp;    firstTime = Math.min(firstTime, result.getStartTime());</b>
+<b class="fc">&nbsp;    endTime = Math.max(endTime, result.getEndTime());</b>
+<b class="fc">&nbsp;    long elapsedTimeMillis = endTime - firstTime;</b>
+<b class="fc">&nbsp;    samples.increment(1, elapsedTimeMillis);</b>
+<b class="fc">&nbsp;    if (!result.isSuccessful()) {</b>
+<b class="fc">&nbsp;      errors.increment(1, elapsedTimeMillis);</b>
+&nbsp;    }
+<b class="fc">&nbsp;    receivedBytes.increment(result.getBytesAsLong(), elapsedTimeMillis);</b>
+<b class="fc">&nbsp;    sentBytes.increment(result.getSentBytes(), elapsedTimeMillis);</b>
+<b class="fc">&nbsp;    sampleTime.add(result.getTime());</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public Instant firstTime() {
+<b class="nc">&nbsp;    return Instant.ofEpochMilli(firstTime);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public Instant endTime() {
+<b class="nc">&nbsp;    return Instant.ofEpochMilli(endTime);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public CountMetricSummary samples() {
+<b class="fc">&nbsp;    return samples;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public CountMetricSummary errors() {
+<b class="fc">&nbsp;    return errors;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public TimeMetricSummary sampleTime() {
+<b class="fc">&nbsp;    return sampleTime;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public CountMetricSummary receivedBytes() {
+<b class="nc">&nbsp;    return receivedBytes;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public CountMetricSummary sentBytes() {
+<b class="nc">&nbsp;    return sentBytes;</b>
+&nbsp;  }
+&nbsp;
+<b class="fc">&nbsp;  public static class EmbeddedTimeMetricSummary implements TimeMetricSummary {</b>
+&nbsp;
+<b class="fc">&nbsp;    private final PSquarePercentile median = new PSquarePercentile(50);</b>
+<b class="fc">&nbsp;    private final PSquarePercentile percentile90 = new PSquarePercentile(90);</b>
+<b class="fc">&nbsp;    private final PSquarePercentile percentile95 = new PSquarePercentile(95);</b>
+<b class="fc">&nbsp;    private final PSquarePercentile percentile99 = new PSquarePercentile(99);</b>
+<b class="fc">&nbsp;    private long min = Long.MAX_VALUE;</b>
+<b class="fc">&nbsp;    private long max = Long.MIN_VALUE;</b>
+<b class="fc">&nbsp;    private final Mean mean = new Mean();</b>
+&nbsp;
+&nbsp;    public void add(long val) {
+<b class="fc">&nbsp;      min = Math.min(min, val);</b>
+<b class="fc">&nbsp;      max = Math.max(max, val);</b>
+<b class="fc">&nbsp;      median.increment(val);</b>
+<b class="fc">&nbsp;      percentile90.increment(val);</b>
+<b class="fc">&nbsp;      percentile95.increment(val);</b>
+<b class="fc">&nbsp;      percentile99.increment(val);</b>
+<b class="fc">&nbsp;      mean.increment(val);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Duration min() {
+<b class="nc">&nbsp;      return Duration.ofMillis(min);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Duration max() {
+<b class="fc">&nbsp;      return Duration.ofMillis(max);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Duration mean() {
+<b class="nc">&nbsp;      return double2Duration(mean.getResult());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private Duration double2Duration(double millis) {
+<b class="nc">&nbsp;      return Duration.ofMillis(Math.round(millis));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Duration median() {
+<b class="nc">&nbsp;      return double2Duration(median.getResult());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Duration perc90() {
+<b class="nc">&nbsp;      return double2Duration(percentile90.getResult());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Duration perc95() {
+<b class="nc">&nbsp;      return double2Duration(percentile95.getResult());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Duration perc99() {
+<b class="nc">&nbsp;      return double2Duration(percentile99.getResult());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;  }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-03 22:39</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,914 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=GBK"> 
+  <title>Coverage Report > DslHttpDefaults</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">us.abstracta.jmeter.javadsl.http</a>
+</div>
+
+<h1>Coverage Summary for Class: DslHttpDefaults (us.abstracta.jmeter.javadsl.http)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DslHttpDefaults</td>
+<td class="coverageStat">
+  <span class="percent">
+    88.9%
+  </span>
+  <span class="absValue">
+    (24/27)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    91.3%
+  </span>
+  <span class="absValue">
+    (63/69)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">DslHttpDefaults$1</td>
+  </tr>
+  <tr>
+    <td class="name">DslHttpDefaults$CodeBuilder</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (30/30)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">DslHttpDefaults$CodeBuilder$DefaultsMethodContextEndListener</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (12/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    87%
+  </span>
+  <span class="absValue">
+    (60/69)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">DslHttpDefaults$DefaultsTreeContextEndListener</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (5/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (16/16)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">DslHttpDefaults$EncodedCall</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (9/9)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">DslHttpDefaults$RedirectableCall</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (2/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    55.6%
+  </span>
+  <span class="absValue">
+    (5/9)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    91.1%
+  </span>
+  <span class="absValue">
+    (51/56)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    90.6%
+  </span>
+  <span class="absValue">
+    (183/202)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package us.abstracta.jmeter.javadsl.http;
+&nbsp;
+&nbsp;import java.lang.reflect.Method;
+&nbsp;import java.nio.charset.Charset;
+&nbsp;import java.time.Duration;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;import org.apache.jmeter.config.Arguments;
+&nbsp;import org.apache.jmeter.config.ConfigTestElement;
+&nbsp;import org.apache.jmeter.protocol.http.config.gui.HttpDefaultsGui;
+&nbsp;import org.apache.jmeter.protocol.http.sampler.HTTPSamplerBase;
+&nbsp;import org.apache.jmeter.protocol.http.sampler.HTTPSamplerProxy;
+&nbsp;import org.apache.jmeter.testelement.TestElement;
+&nbsp;import org.apache.jmeter.testelement.property.TestElementProperty;
+&nbsp;import org.apache.jorphan.collections.HashTree;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.MethodCall;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.MethodCallContext;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.MethodCallContext.MethodCallContextEndListener;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.MethodParam;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.SingleGuiClassCallBuilder;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.TestElementParamBuilder;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.params.BoolParam;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.params.EncodingParam;
+&nbsp;import us.abstracta.jmeter.javadsl.core.BuildTreeContext;
+&nbsp;import us.abstracta.jmeter.javadsl.core.BuildTreeContext.TreeContextEndListener;
+&nbsp;import us.abstracta.jmeter.javadsl.core.configs.BaseConfigElement;
+&nbsp;import us.abstracta.jmeter.javadsl.http.DslBaseHttpSampler.BaseHttpSamplerCodeBuilder;
+&nbsp;import us.abstracta.jmeter.javadsl.http.DslHttpSampler.HttpClientImpl;
+&nbsp;
+&nbsp;/**
+&nbsp; * Allows configuring default values for common properties of HTTP samplers.
+&nbsp; * &lt;p&gt;
+&nbsp; * This is mainly a way to avoid duplication and an alternative to using java variables or builder
+&nbsp; * method. When in doubt, prefer using java variables or custom defined builder methods since they
+&nbsp; * are easier to write (in some cases), read and identify their scope.
+&nbsp; *
+&nbsp; * @see DslHttpSampler
+&nbsp; * @since 0.39
+&nbsp; */
+<b class="fc">&nbsp;public class DslHttpDefaults extends BaseConfigElement {</b>
+&nbsp;
+&nbsp;  protected String protocol;
+&nbsp;  protected String host;
+&nbsp;  protected String port;
+&nbsp;  protected String path;
+&nbsp;  protected Charset encoding;
+&nbsp;  protected boolean downloadEmbeddedResources;
+&nbsp;  protected String embeddedResourcesMatchRegex;
+&nbsp;  protected String embeddedResourcesNotMatchRegex;
+&nbsp;  protected Duration connectionTimeout;
+&nbsp;  protected Duration responseTimeout;
+&nbsp;  protected String proxyUrl;
+&nbsp;  protected String proxyUser;
+&nbsp;  protected String proxyPassword;
+&nbsp;  protected HttpClientImpl clientImpl;
+&nbsp;  protected Boolean followRedirects;
+&nbsp;
+&nbsp;  public DslHttpDefaults() {
+<b class="fc">&nbsp;    super(&quot;HTTP Request Defaults&quot;, HttpDefaultsGui.class);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Specifies the default URL for HTTP samplers.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * The DSL will parse the URL and properly set each of HTTP Request Defaults properties (protocol,
+&nbsp;   * host, port and path).
+&nbsp;   * &lt;p&gt;
+&nbsp;   * You can later on overwrite in a sampler the path (by specifying only the path as url), or the
+&nbsp;   * entire url (by specifying the full url as url).
+&nbsp;   *
+&nbsp;   * @param url specifies the default URL to be used by HTTP samplers. It might contain the path or
+&nbsp;   *            not.
+&nbsp;   * @return the config element for further configuration or usage.
+&nbsp;   */
+&nbsp;  public DslHttpDefaults url(String url) {
+&nbsp;    /*
+&nbsp;    url is decomposed and not just set on path, to allow in samplers to override just path and
+&nbsp;    reuse other default settings
+&nbsp;    */
+<b class="fc">&nbsp;    JmeterUrl parsedUrl = JmeterUrl.valueOf(url);</b>
+<b class="fc">&nbsp;    protocol = parsedUrl.protocol();</b>
+<b class="fc">&nbsp;    host = parsedUrl.host();</b>
+<b class="fc">&nbsp;    port = parsedUrl.port();</b>
+<b class="fc">&nbsp;    path = parsedUrl.path();</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Specifies the default protocol (eg: HTTP, HTTPS) to be used in the HTTP samplers.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * You can specify entire url through {@link #url(String)}, but this method allows you to only
+&nbsp;   * specify protocol when you need to override some other default, or just want that all samplers
+&nbsp;   * use same default protocol.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * In general prefer using java variables and methods, to get shorter and more maintainable code,
+&nbsp;   * and use this method sparingly.
+&nbsp;   *
+&nbsp;   * @param protocol contains protocol value to be used (e.g.: http, https, etc).
+&nbsp;   * @return the config element for further configuration or usage.
+&nbsp;   * @since 0.49
+&nbsp;   */
+&nbsp;  public DslHttpDefaults protocol(String protocol) {
+<b class="fc">&nbsp;    this.protocol = protocol;</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Specifies the default server host (domain) to be used in the HTTP samplers.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * You can specify entire url through {@link #url(String)}, but this method allows you to only
+&nbsp;   * specify host (and not protocol) when you need to override some other default, or just want that
+&nbsp;   * all samplers use same default host.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * In general prefer using java variables and methods, to get shorter and more maintainable code,
+&nbsp;   * and use this method sparingly.
+&nbsp;   *
+&nbsp;   * @param host contains server name without protocol (no http/https) and path.
+&nbsp;   * @return the config element for further configuration or usage.
+&nbsp;   * @since 0.49
+&nbsp;   */
+&nbsp;  public DslHttpDefaults host(String host) {
+<b class="fc">&nbsp;    this.host = host;</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Specifies the default port to be used in the HTTP samplers.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * You can specify entire url through {@link #url(String)}, but this method allows you to only
+&nbsp;   * specify port (and not protocol or host) when you need to override some other default, or just
+&nbsp;   * want that all samplers use same default port.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * In general prefer using java variables and methods, to get shorter and more maintainable code,
+&nbsp;   * and use this method sparingly.
+&nbsp;   *
+&nbsp;   * @param port contains port value to be used.
+&nbsp;   * @return the config element for further configuration or usage.
+&nbsp;   * @since 0.49
+&nbsp;   */
+&nbsp;  public DslHttpDefaults port(int port) {
+<b class="fc">&nbsp;    this.port = String.valueOf(port);</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Specifies the default URL path to be used in the HTTP samplers.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * You can specify entire url through {@link #url(String)}, but this method allows you to only
+&nbsp;   * specify path (and not protocol, host or port) when you need to override some other default, or
+&nbsp;   * just want that all samplers use same path.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * In general prefer using java variables and methods, to get shorter and more maintainable code,
+&nbsp;   * and use this method sparingly.
+&nbsp;   *
+&nbsp;   * @param path contains URL path to be used by samplers.
+&nbsp;   * @return the config element for further configuration or usage.
+&nbsp;   * @since 0.49
+&nbsp;   */
+&nbsp;  public DslHttpDefaults path(String path) {
+<b class="fc">&nbsp;    this.path = path;</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Specifies the default charset to be used for encoding URLs and requests contents.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * This can be overwritten by {@link DslHttpSampler#encoding(Charset)}.
+&nbsp;   *
+&nbsp;   * @param encoding specifies the charset to be used by default.
+&nbsp;   * @return the config element for further configuration or usage.
+&nbsp;   * @see DslHttpSampler#encoding(Charset)
+&nbsp;   */
+&nbsp;  public DslHttpDefaults encoding(Charset encoding) {
+<b class="fc">&nbsp;    this.encoding = encoding;</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Specifies if by default HTTP redirects should be automatically followed (a new request
+&nbsp;   * automatically created) when detected, or not.
+&nbsp;   *
+&nbsp;   * @param enable specifies whether to enable or disable automatic redirections by defaults. When
+&nbsp;   *               not set then the default is true.
+&nbsp;   * @return the config element for further configuration or usage.
+&nbsp;   * @since 1.9
+&nbsp;   */
+&nbsp;  public DslHttpDefaults followRedirects(boolean enable) {
+<b class="fc">&nbsp;    this.followRedirects = enable;</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Allows enabling automatic download of HTML embedded resources (images, iframes, etc) by
+&nbsp;   * default.
+&nbsp;   *
+&nbsp;   * @return the config element for further configuration or usage.
+&nbsp;   * @see DslHttpSampler#downloadEmbeddedResources()
+&nbsp;   */
+&nbsp;  public DslHttpDefaults downloadEmbeddedResources() {
+<b class="fc">&nbsp;    return downloadEmbeddedResources(true);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Same as {@link #downloadEmbeddedResources()} but allowing to enable and disable the setting.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * This is helpful when the resolution is taken at runtime.
+&nbsp;   *
+&nbsp;   * @param enable specifies to enable or disable the setting. By default, it is set to false.
+&nbsp;   * @return the config element for further configuration or usage.
+&nbsp;   * @see #downloadEmbeddedResources()
+&nbsp;   * @since 1.0
+&nbsp;   */
+&nbsp;  public DslHttpDefaults downloadEmbeddedResources(boolean enable) {
+<b class="fc">&nbsp;    this.downloadEmbeddedResources = enable;</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Same as {@link #downloadEmbeddedResources()} but allowing to specify which embedded resources
+&nbsp;   * to actually download.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * This is helpful when only some particular requests need to be downloaded and the rest should be
+&nbsp;   * ignored. Eg: to only make requests to the site under test, and no other external services.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * An alternative is using {@link #downloadEmbeddedResourcesNotMatching(String)}. If a resources
+&nbsp;   * matches this regex and also one specified in
+&nbsp;   * {@link #downloadEmbeddedResourcesNotMatching(String)}, then it will be ignored.
+&nbsp;   *
+&nbsp;   * @param urlRegex specifies the regular expression which will be used to ignore embedded
+&nbsp;   *                 resources that have a URL matching with it.
+&nbsp;   * @return the sampler for further configuration or usage.
+&nbsp;   * @see #downloadEmbeddedResources()
+&nbsp;   * @see #downloadEmbeddedResourcesNotMatching(String)
+&nbsp;   * @since 1.3
+&nbsp;   */
+&nbsp;  public DslHttpDefaults downloadEmbeddedResourcesMatching(String urlRegex) {
+<b class="fc">&nbsp;    this.downloadEmbeddedResources = true;</b>
+<b class="fc">&nbsp;    this.embeddedResourcesMatchRegex = urlRegex;</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Same as {@link #downloadEmbeddedResources()} but allowing to ignore embedded resources with URL
+&nbsp;   * matching a given regular expression.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * This is helpful when some particular requests (for example to other external services) don&#39;t
+&nbsp;   * want to be included in the test execution.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * An alternative is using {@link #downloadEmbeddedResourcesMatching(String)}. If a resources
+&nbsp;   * matches this regex and also one specified in
+&nbsp;   * {@link #downloadEmbeddedResourcesMatching(String)}, then it will be ignored.
+&nbsp;   *
+&nbsp;   * @param urlRegex specifies the regular expression which will be used to ignore embedded
+&nbsp;   *                 resources that have a URL matching with it.
+&nbsp;   * @return the sampler for further configuration or usage.
+&nbsp;   * @see #downloadEmbeddedResources()
+&nbsp;   * @see #downloadEmbeddedResourcesMatching(String)
+&nbsp;   * @since 1.3
+&nbsp;   */
+&nbsp;  public DslHttpDefaults downloadEmbeddedResourcesNotMatching(String urlRegex) {
+<b class="fc">&nbsp;    this.downloadEmbeddedResources = true;</b>
+<b class="fc">&nbsp;    this.embeddedResourcesNotMatchRegex = urlRegex;</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Allows to set the default maximum amount of time to wait for an HTTP connection to be
+&nbsp;   * established.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * This can be overwritten by {@link DslHttpSampler#connectionTimeout(Duration)}.
+&nbsp;   *
+&nbsp;   * @param timeout specifies the duration to be used as connection timeout. When set to 0 it
+&nbsp;   *                specifies to not timeout (wait indefinitely), which is not recommended. When set
+&nbsp;   *                to a negative number the operating system default is used.
+&nbsp;   * @return the sampler for further configuration or usage.
+&nbsp;   * @see DslHttpSampler#connectionTimeout(Duration)
+&nbsp;   * @since 1.4
+&nbsp;   */
+&nbsp;  public DslHttpDefaults connectionTimeout(Duration timeout) {
+<b class="fc">&nbsp;    connectionTimeout = timeout;</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Allows to set the maximum amount of time to wait for a response to an HTTP request.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * This can be overwritten by {@link DslHttpSampler#responseTimeout(Duration)}.
+&nbsp;   *
+&nbsp;   * @param timeout specifies the duration to be used as response timeout. When set to 0 it
+&nbsp;   *                specifies to not timeout (wait indefinitely), which is not recommended. When set
+&nbsp;   *                to a negative number the operating system default is used.
+&nbsp;   * @return the sampler for further configuration or usage.
+&nbsp;   * @see DslHttpSampler#responseTimeout(Duration)
+&nbsp;   * @since 1.4
+&nbsp;   */
+&nbsp;  public DslHttpDefaults responseTimeout(Duration timeout) {
+<b class="fc">&nbsp;    responseTimeout = timeout;</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Allows specifying a proxy through which all http requests will be sent to their final
+&nbsp;   * destination.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * This is usually helpful when you need to use a proxy to access the internet when all access is
+&nbsp;   * behind and enterprise proxy (due to security measures) or when you want to intercept requests
+&nbsp;   * for further analysis or modification by other tools like fiddler or mitmproxy.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * If your proxy requires authentication check {@link #proxy(String, String, String)}.
+&nbsp;   *
+&nbsp;   * @param url specifies the proxy url. For example http://myproxy:8181.
+&nbsp;   * @return the config element for further configuration or usage.
+&nbsp;   */
+&nbsp;  public DslHttpDefaults proxy(String url) {
+<b class="fc">&nbsp;    this.proxyUrl = url;</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Same as {@link #proxy(String)} but allowing also to specify proxy credentials.
+&nbsp;   *
+&nbsp;   * @param url      specifies the proxy url. For example http://myproxy:8181.
+&nbsp;   * @param username specifies the username used to authenticate with the proxy.
+&nbsp;   * @param password specifies the password used to authenticate with the proxy.
+&nbsp;   * @return the config element for further configuration or usage.
+&nbsp;   * @see #proxy(String)
+&nbsp;   */
+&nbsp;  public DslHttpDefaults proxy(String url, String username, String password) {
+<b class="fc">&nbsp;    this.proxyUrl = url;</b>
+<b class="fc">&nbsp;    this.proxyUser = username;</b>
+<b class="fc">&nbsp;    this.proxyPassword = password;</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Allows specifying which http client implementation to use by default for HTTP samplers.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * This can be overwritten by {@link DslHttpSampler#clientImpl(HttpClientImpl)}.
+&nbsp;   *
+&nbsp;   * @param clientImpl the HTTP client implementation to use. If none is specified, then
+&nbsp;   *                   {@link DslHttpSampler.HttpClientImpl#HTTP_CLIENT} is used.
+&nbsp;   * @return the config element for further configuration or usage.
+&nbsp;   * @see DslHttpSampler.HttpClientImpl
+&nbsp;   * @see DslHttpSampler#clientImpl(HttpClientImpl)
+&nbsp;   */
+&nbsp;  public DslHttpDefaults clientImpl(HttpClientImpl clientImpl) {
+<b class="fc">&nbsp;    this.clientImpl = clientImpl;</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Specifies to reset (drop and recreate) connections on each thread group iteration.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * By default, connections will be reused to avoid common issues of port and file descriptors
+&nbsp;   * exhaustion requiring OS tuning, even though this means that generated load is not realistic
+&nbsp;   * enough for emulating as if each iteration were a different user. If you need to proper
+&nbsp;   * generation of connections and disconnections between iterations, then consider using this
+&nbsp;   * method.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * When using reset connection for each thread consider tuning OS like explained in &quot;Configure
+&nbsp;   * your environment&quot; section of
+&nbsp;   * &lt;a href=&quot;https://medium.com/@chientranthien/how-to-generate-high-load-benchmark-with-jmeter-80e828a67592&quot;&gt;this
+&nbsp;   * article&lt;/a&gt;.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * &lt;b&gt;Warning:&lt;/b&gt; This setting is applied at JVM level, which means that it will affect the
+&nbsp;   * entire test plan and potentially other test plans running in the same JVM instance.
+&nbsp;   *
+&nbsp;   * @return the config element for further configuration or usage.
+&nbsp;   * @since 1.0
+&nbsp;   */
+&nbsp;  public DslHttpDefaults resetConnectionsBetweenIterations() {
+<b class="nc">&nbsp;    return resetConnectionsBetweenIterations(true);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Same as {@link #resetConnectionsBetweenIterations()} but allowing to enable or disable
+&nbsp;   * setting.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * This is helpful when the resolution is taken at runtime.
+&nbsp;   *
+&nbsp;   * @param enable specifies to reset connections on each thread group iteration when true,
+&nbsp;   *               otherwise reuse connections. By default, connections are reused.
+&nbsp;   * @return the config element for further configuration or usage.
+&nbsp;   * @since 0.65
+&nbsp;   */
+&nbsp;  public DslHttpDefaults resetConnectionsBetweenIterations(boolean enable) {
+<b class="nc">&nbsp;    System.setProperty(DslBaseHttpSampler.RESET_CONNECTIONS_BETWEEN_ITERATIONS_PROP,</b>
+<b class="nc">&nbsp;        String.valueOf(enable));</b>
+<b class="nc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Allows specifying the connections ttl (time-to-live) used to determine how much time a
+&nbsp;   * connection can be kept open.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * This setting allows tuning connections handling avoiding unnecessary resources usage depending
+&nbsp;   * on the use case and server under test settings.
+&nbsp;   *
+&nbsp;   * @param ttl specifies the duration for connections to keep open before they are closed. By
+&nbsp;   *            default, this is set to 1 minute.
+&nbsp;   * @return the config element for further configuration or usage.
+&nbsp;   * @since 0.65
+&nbsp;   */
+&nbsp;  public DslHttpDefaults connectionsTtl(Duration ttl) {
+<b class="nc">&nbsp;    System.setProperty(&quot;httpclient4.time_to_live&quot;, String.valueOf(ttl.toMillis()));</b>
+<b class="nc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  protected TestElement buildTestElement() {
+<b class="fc">&nbsp;    ConfigTestElement ret = new ConfigTestElement();</b>
+<b class="fc">&nbsp;    HttpElementHelper.modifyTestElementUrl(ret, protocol, host, port, path);</b>
+<b class="fc">&nbsp;    if (encoding != null) {</b>
+<b class="fc">&nbsp;      ret.setProperty(HTTPSamplerBase.CONTENT_ENCODING, encoding.toString());</b>
+&nbsp;    }
+<b class="fc">&nbsp;    ret.setProperty(new TestElementProperty(HTTPSamplerBase.ARGUMENTS, new Arguments()));</b>
+<b class="fc">&nbsp;    HttpElementHelper.modifyTestElementEmbeddedResources(ret, downloadEmbeddedResources,</b>
+&nbsp;        embeddedResourcesMatchRegex, embeddedResourcesNotMatchRegex);
+<b class="fc">&nbsp;    HttpElementHelper.modifyTestElementTimeouts(ret, connectionTimeout, responseTimeout);</b>
+<b class="fc">&nbsp;    HttpElementHelper.modifyTestElementProxy(ret, proxyUrl, proxyUser, proxyPassword);</b>
+<b class="fc">&nbsp;    if (clientImpl != null) {</b>
+<b class="fc">&nbsp;      ret.setProperty(HTTPSamplerBase.IMPLEMENTATION, clientImpl.propertyValue);</b>
+&nbsp;    }
+<b class="fc">&nbsp;    return ret;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public HashTree buildTreeUnder(HashTree parent, BuildTreeContext context) {
+<b class="fc">&nbsp;    HashTree ret = super.buildTreeUnder(parent, context);</b>
+<b class="fc">&nbsp;    if (followRedirects != null) {</b>
+<b class="fc">&nbsp;      buildEndListener(context.getParent()).followRedirects = followRedirects;</b>
+&nbsp;    }
+<b class="fc">&nbsp;    return ret;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private static DefaultsTreeContextEndListener buildEndListener(BuildTreeContext parentCtx) {
+<b class="fc">&nbsp;    return parentCtx.getOrCreateEntry(DslHttpDefaults.class.getName(),</b>
+<b class="fc">&nbsp;        () -&gt; new DefaultsTreeContextEndListener(parentCtx));</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /* Set as protected to avoid this method to appear to users while creating a test plan,
+&nbsp;  but still be visible for DslHttpSampler */
+&nbsp;  protected static void addPendingFollowRedirectsElement(HTTPSamplerProxy element,
+&nbsp;      BuildTreeContext context) {
+<b class="fc">&nbsp;    buildEndListener(context.getRoot()).pendingFollowRedirectsElements.add(element);</b>
+&nbsp;  }
+&nbsp;
+<b class="fc">&nbsp;  private static class DefaultsTreeContextEndListener implements TreeContextEndListener {</b>
+&nbsp;
+&nbsp;    private Boolean followRedirects;
+<b class="fc">&nbsp;    private final List&lt;HTTPSamplerProxy&gt; pendingFollowRedirectsElements = new ArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="fc">&nbsp;    private DefaultsTreeContextEndListener(BuildTreeContext context) {</b>
+<b class="fc">&nbsp;      context.addEndListener(this);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void execute(BuildTreeContext context, HashTree tree) {
+<b class="fc">&nbsp;      if (followRedirects != null) {</b>
+<b class="fc">&nbsp;        setChildrenToFollowRedirects(tree);</b>
+&nbsp;      } else {
+<b class="fc">&nbsp;        pendingFollowRedirectsElements.stream()</b>
+<b class="fc">&nbsp;            .filter(e -&gt; e.getPropertyAsString(HTTPSamplerBase.FOLLOW_REDIRECTS).isEmpty())</b>
+<b class="fc">&nbsp;            .forEach(e -&gt; e.setFollowRedirects(true));</b>
+&nbsp;      }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void setChildrenToFollowRedirects(HashTree tree) {
+<b class="fc">&nbsp;      tree.forEach((key, value) -&gt; {</b>
+<b class="fc">&nbsp;        if (key instanceof HTTPSamplerProxy) {</b>
+<b class="fc">&nbsp;          HTTPSamplerProxy sampler = (HTTPSamplerProxy) key;</b>
+<b class="fc">&nbsp;          if (sampler.getPropertyAsString(HTTPSamplerBase.FOLLOW_REDIRECTS).isEmpty()) {</b>
+<b class="fc">&nbsp;            sampler.setFollowRedirects(followRedirects);</b>
+&nbsp;          }
+<b class="fc">&nbsp;        } else {</b>
+<b class="fc">&nbsp;          setChildrenToFollowRedirects(value);</b>
+&nbsp;        }
+&nbsp;      });
+&nbsp;    }
+&nbsp;
+&nbsp;  }
+&nbsp;
+&nbsp;  public static class CodeBuilder extends SingleGuiClassCallBuilder {
+&nbsp;
+&nbsp;    public CodeBuilder(List&lt;Method&gt; builderMethods) {
+<b class="fc">&nbsp;      super(HttpDefaultsGui.class, builderMethods);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected MethodCall buildMethodCall(MethodCallContext context) {
+<b class="fc">&nbsp;      MethodCall ret = buildMethodCall();</b>
+<b class="fc">&nbsp;      TestElementParamBuilder paramBuilder = new TestElementParamBuilder(context.getTestElement());</b>
+<b class="fc">&nbsp;      MethodParam protocol = paramBuilder.stringParam(HTTPSamplerBase.PROTOCOL);</b>
+<b class="fc">&nbsp;      MethodParam host = paramBuilder.stringParam(HTTPSamplerBase.DOMAIN);</b>
+<b class="fc">&nbsp;      MethodParam port = paramBuilder.intParam(HTTPSamplerBase.PORT);</b>
+<b class="fc">&nbsp;      MethodParam path = paramBuilder.stringParam(HTTPSamplerBase.PATH, &quot;/&quot;);</b>
+&nbsp;
+<b class="fc">&nbsp;      if (!protocol.isDefault() &amp;&amp; !host.isDefault()) {</b>
+<b class="fc">&nbsp;        ret.chain(&quot;url&quot;, BaseHttpSamplerCodeBuilder.buildUrlParam(protocol,</b>
+&nbsp;            host, port, path));
+&nbsp;      } else {
+<b class="fc">&nbsp;        ret.chain(&quot;protocol&quot;, protocol)</b>
+<b class="fc">&nbsp;            .chain(&quot;host&quot;, host)</b>
+<b class="fc">&nbsp;            .chain(&quot;port&quot;, port)</b>
+<b class="fc">&nbsp;            .chain(&quot;path&quot;, path);</b>
+&nbsp;      }
+<b class="fc">&nbsp;      HttpElementHelper.chainEncodingToMethodCall(ret, paramBuilder);</b>
+<b class="fc">&nbsp;      HttpElementHelper.chainEmbeddedResourcesOptionsToMethodCall(ret, paramBuilder);</b>
+<b class="fc">&nbsp;      HttpElementHelper.chainConnectionOptionsToMethodCall(ret, paramBuilder);</b>
+<b class="fc">&nbsp;      HttpElementHelper.chainClientImplToMethodCall(ret, paramBuilder);</b>
+<b class="fc">&nbsp;      registerDependency(context);</b>
+<b class="fc">&nbsp;      return ret;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void registerDependency(MethodCallContext context) {
+<b class="fc">&nbsp;      MethodCallContext parentCtx = context.getParent();</b>
+<b class="fc">&nbsp;      DefaultsMethodContextEndListener endListener = parentCtx.computeEntryIfAbsent(</b>
+<b class="fc">&nbsp;          DslHttpDefaults.class, () -&gt; new DefaultsMethodContextEndListener(parentCtx));</b>
+<b class="fc">&nbsp;      TestElement testElement = context.getTestElement();</b>
+<b class="fc">&nbsp;      String encoding = testElement.getPropertyAsString(HTTPSamplerBase.CONTENT_ENCODING);</b>
+<b class="fc">&nbsp;      boolean isDefaultCandidate = testElement.getPropertyAsString(TestElement.GUI_CLASS)</b>
+<b class="fc">&nbsp;          .equals(HttpDefaultsGui.class.getName());</b>
+<b class="fc">&nbsp;      endListener.registerEncoding(encoding, context, isDefaultCandidate);</b>
+<b class="fc">&nbsp;      boolean followRedirects =</b>
+<b class="fc">&nbsp;          isDefaultCandidate || testElement.getPropertyAsBoolean(HTTPSamplerBase.FOLLOW_REDIRECTS);</b>
+<b class="fc">&nbsp;      endListener.registerFollowRedirect(followRedirects, context, isDefaultCandidate);</b>
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    private static class DefaultsMethodContextEndListener implements MethodCallContextEndListener {</b>
+&nbsp;
+<b class="fc">&nbsp;      private final List&lt;EncodedCall&gt; encodedCalls = new ArrayList&lt;&gt;();</b>
+<b class="fc">&nbsp;      private final List&lt;RedirectableCall&gt; redirectableCalls = new ArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="fc">&nbsp;      private DefaultsMethodContextEndListener(MethodCallContext parentCtx) {</b>
+<b class="fc">&nbsp;        parentCtx.addEndListener(this);</b>
+&nbsp;      }
+&nbsp;
+&nbsp;      public void registerEncoding(String encoding, MethodCallContext ret,
+&nbsp;          boolean isDefaultCandidate) {
+<b class="fc">&nbsp;        encodedCalls.add(new EncodedCall(encoding, ret, isDefaultCandidate));</b>
+&nbsp;      }
+&nbsp;
+&nbsp;      public void registerFollowRedirect(boolean followRedirects, MethodCallContext ret,
+&nbsp;          boolean isDefaultCandidate) {
+<b class="fc">&nbsp;        redirectableCalls.add(new RedirectableCall(followRedirects, ret, isDefaultCandidate));</b>
+&nbsp;      }
+&nbsp;
+&nbsp;      @Override
+&nbsp;      public void execute(MethodCallContext ctx, MethodCall ret) {
+<b class="fc">&nbsp;        solveDefaultEncoding(ctx);</b>
+<b class="fc">&nbsp;        solveDefaultFollowRedirects(ctx);</b>
+&nbsp;      }
+&nbsp;
+&nbsp;      private void solveDefaultEncoding(MethodCallContext ctx) {
+<b class="fc">&nbsp;        EncodedCall defaultsCall = findDefaultEncodingCall(ctx);</b>
+<b class="fc">&nbsp;        if (defaultsCall != null) {</b>
+<b class="fc">&nbsp;          encodedCalls.stream()</b>
+<b class="fc">&nbsp;              .filter(c -&gt; c != defaultsCall &amp;&amp; !c.isDefaultCandidate</b>
+<b class="fc">&nbsp;                  &amp;&amp; c.encoding.equals(defaultsCall.encoding))</b>
+<b class="fc">&nbsp;              .forEach(EncodedCall::removeEncoding);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        DefaultsMethodContextEndListener parentListener = buildParentContextEndListener(ctx);</b>
+<b class="fc">&nbsp;        if (parentListener != null) {</b>
+<b class="fc">&nbsp;          parentListener.registerEncoding(defaultsCall != null ? defaultsCall.encoding : &quot;&quot;,</b>
+<b class="fc">&nbsp;              defaultsCall != null ? defaultsCall.ctx : null, false);</b>
+&nbsp;        }
+&nbsp;      }
+&nbsp;
+&nbsp;      private static DefaultsMethodContextEndListener buildParentContextEndListener(
+&nbsp;          MethodCallContext ctx) {
+<b class="fc">&nbsp;        MethodCallContext parentCtx = ctx.getParent();</b>
+<b class="fc">&nbsp;        return (parentCtx != null) ? parentCtx.computeEntryIfAbsent(DslHttpDefaults.class,</b>
+<b class="fc">&nbsp;            () -&gt; new DefaultsMethodContextEndListener(parentCtx)) : null;</b>
+&nbsp;      }
+&nbsp;
+&nbsp;      private EncodedCall findDefaultEncodingCall(MethodCallContext ctx) {
+<b class="fc">&nbsp;        if (encodedCalls.size() == 1) {</b>
+<b class="fc">&nbsp;          return encodedCalls.get(0);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        EncodedCall ret = encodedCalls.stream()</b>
+<b class="fc">&nbsp;            .filter(c -&gt; c.isDefaultCandidate &amp;&amp; !c.encoding.isEmpty())</b>
+<b class="fc">&nbsp;            .findAny()</b>
+<b class="fc">&nbsp;            .orElse(null);</b>
+<b class="fc">&nbsp;        if (ret != null) {</b>
+<b class="nc">&nbsp;          return ret;</b>
+&nbsp;        }
+<b class="fc">&nbsp;        String someEncoding = encodedCalls.stream()</b>
+<b class="fc">&nbsp;            .filter(c -&gt; !c.encoding.isEmpty())</b>
+<b class="fc">&nbsp;            .map(c -&gt; c.encoding)</b>
+<b class="fc">&nbsp;            .findAny()</b>
+<b class="fc">&nbsp;            .orElse(null);</b>
+<b class="fc">&nbsp;        if (someEncoding != null &amp;&amp; encodedCalls.stream()</b>
+<b class="fc">&nbsp;            .allMatch(c -&gt; c.isDefaultCandidate || c.encoding.equals(someEncoding))) {</b>
+<b class="fc">&nbsp;          ret = encodedCalls.stream()</b>
+<b class="fc">&nbsp;              .filter(c -&gt; c.isDefaultCandidate)</b>
+<b class="fc">&nbsp;              .findAny()</b>
+<b class="fc">&nbsp;              .orElse(null);</b>
+<b class="fc">&nbsp;          if (ret == null) {</b>
+<b class="fc">&nbsp;            ret = new EncodedCall(&quot;&quot;, buildDefaultsCall(ctx), true);</b>
+&nbsp;          }
+<b class="fc">&nbsp;          ret.setEncoding(someEncoding);</b>
+<b class="fc">&nbsp;          return ret;</b>
+&nbsp;        }
+<b class="fc">&nbsp;        return null;</b>
+&nbsp;      }
+&nbsp;
+&nbsp;      private MethodCallContext buildDefaultsCall(MethodCallContext ctx) {
+<b class="fc">&nbsp;        return ctx.prependChild(new DslHttpDefaults().buildConfiguredTestElement(), null);</b>
+&nbsp;      }
+&nbsp;
+&nbsp;      private void solveDefaultFollowRedirects(MethodCallContext ctx) {
+<b class="fc">&nbsp;        RedirectableCall defaultsCall = findDefaultRedirectableCall(ctx);</b>
+<b class="fc">&nbsp;        if (defaultsCall != null) {</b>
+<b class="fc">&nbsp;          redirectableCalls.stream()</b>
+<b class="fc">&nbsp;              .filter(c -&gt; c != defaultsCall)</b>
+<b class="fc">&nbsp;              .forEach(RedirectableCall::removeFollowRedirects);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        DefaultsMethodContextEndListener parentListener = buildParentContextEndListener(ctx);</b>
+<b class="fc">&nbsp;        if (parentListener != null) {</b>
+<b class="fc">&nbsp;          parentListener.registerFollowRedirect(</b>
+<b class="fc">&nbsp;              defaultsCall == null || defaultsCall.followRedirects,</b>
+<b class="fc">&nbsp;              defaultsCall != null ? defaultsCall.ctx : null, false);</b>
+&nbsp;        }
+&nbsp;      }
+&nbsp;
+&nbsp;      private RedirectableCall findDefaultRedirectableCall(MethodCallContext ctx) {
+<b class="fc">&nbsp;        if (redirectableCalls.size() == 1) {</b>
+<b class="fc">&nbsp;          return redirectableCalls.get(0);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        if (redirectableCalls.stream().allMatch(c -&gt; c.isDefaultCandidate || !c.followRedirects)) {</b>
+<b class="nc">&nbsp;          RedirectableCall ret = redirectableCalls.stream()</b>
+<b class="nc">&nbsp;              .filter(c -&gt; c.isDefaultCandidate)</b>
+<b class="nc">&nbsp;              .findAny()</b>
+<b class="nc">&nbsp;              .orElse(null);</b>
+<b class="nc">&nbsp;          if (ret == null) {</b>
+<b class="nc">&nbsp;            ret = new RedirectableCall(false, buildDefaultsCall(ctx), true);</b>
+&nbsp;          }
+<b class="nc">&nbsp;          ret.setFollowRedirects(false);</b>
+<b class="nc">&nbsp;          return ret;</b>
+&nbsp;        }
+<b class="fc">&nbsp;        return null;</b>
+&nbsp;      }
+&nbsp;
+&nbsp;    }
+&nbsp;
+&nbsp;  }
+&nbsp;
+<b class="fc">&nbsp;  private static class EncodedCall {</b>
+&nbsp;
+&nbsp;    private String encoding;
+&nbsp;    private final MethodCallContext ctx;
+&nbsp;    private final boolean isDefaultCandidate;
+&nbsp;
+<b class="fc">&nbsp;    private EncodedCall(String encoding, MethodCallContext ctx, boolean isDefaultCandidate) {</b>
+<b class="fc">&nbsp;      this.encoding = encoding;</b>
+<b class="fc">&nbsp;      this.ctx = ctx;</b>
+<b class="fc">&nbsp;      this.isDefaultCandidate = isDefaultCandidate;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setEncoding(String encoding) {
+<b class="fc">&nbsp;      this.encoding = encoding;</b>
+<b class="fc">&nbsp;      ctx.getMethodCall().chain(&quot;encoding&quot;, new EncodingParam(encoding, null));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void removeEncoding() {
+<b class="fc">&nbsp;      ctx.getMethodCall().unchain(&quot;encoding&quot;);</b>
+<b class="fc">&nbsp;      removeEmptyDefaultsCall(ctx);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;  }
+&nbsp;
+&nbsp;  private static void removeEmptyDefaultsCall(MethodCallContext ctx) {
+<b class="fc">&nbsp;    MethodCall methodCall = ctx.getMethodCall();</b>
+<b class="fc">&nbsp;    if (methodCall.getReturnType() == DslHttpDefaults.class &amp;&amp; methodCall.chainSize() == 0) {</b>
+<b class="fc">&nbsp;      ctx.getParent().getMethodCall()</b>
+<b class="fc">&nbsp;          .replaceChild(methodCall, MethodCall.emptyCall());</b>
+&nbsp;    }
+&nbsp;  }
+&nbsp;
+<b class="fc">&nbsp;  private static class RedirectableCall {</b>
+&nbsp;
+&nbsp;    private boolean followRedirects;
+&nbsp;    private final MethodCallContext ctx;
+&nbsp;    private final boolean isDefaultCandidate;
+&nbsp;
+&nbsp;    private RedirectableCall(boolean followRedirects, MethodCallContext ctx,
+<b class="fc">&nbsp;        boolean isDefaultCandidate) {</b>
+<b class="fc">&nbsp;      this.followRedirects = followRedirects;</b>
+<b class="fc">&nbsp;      this.ctx = ctx;</b>
+<b class="fc">&nbsp;      this.isDefaultCandidate = isDefaultCandidate;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setFollowRedirects(boolean followRedirects) {
+<b class="nc">&nbsp;      this.followRedirects = followRedirects;</b>
+<b class="nc">&nbsp;      ctx.getMethodCall().chain(&quot;followRedirects&quot;, new BoolParam(followRedirects, true));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void removeFollowRedirects() {
+<b class="nc">&nbsp;      ctx.getMethodCall().unchain(&quot;followRedirects&quot;);</b>
+<b class="nc">&nbsp;      removeEmptyDefaultsCall(ctx);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;  }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-03 20:57</div>
+</div>
+</body>
+</html>

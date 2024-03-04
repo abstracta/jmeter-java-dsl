@@ -1,0 +1,327 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=GBK"> 
+  <title>Coverage Report > InfluxDbBackendListener</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">us.abstracta.jmeter.javadsl.core.listeners</a>
+</div>
+
+<h1>Coverage Summary for Class: InfluxDbBackendListener (us.abstracta.jmeter.javadsl.core.listeners)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">InfluxDbBackendListener</td>
+<td class="coverageStat">
+  <span class="percent">
+    88.9%
+  </span>
+  <span class="absValue">
+    (8/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    85.7%
+  </span>
+  <span class="absValue">
+    (30/35)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">InfluxDbBackendListener$CodeBuilder</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (14/14)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    91.7%
+  </span>
+  <span class="absValue">
+    (11/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    89.8%
+  </span>
+  <span class="absValue">
+    (44/49)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package us.abstracta.jmeter.javadsl.core.listeners;
+&nbsp;
+&nbsp;import static java.util.stream.Collectors.joining;
+&nbsp;import static java.util.stream.IntStream.range;
+&nbsp;
+&nbsp;import java.lang.reflect.Method;
+&nbsp;import java.time.Instant;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import org.apache.jmeter.config.Arguments;
+&nbsp;import org.apache.jmeter.visualizers.backend.influxdb.InfluxdbBackendListenerClient;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.MethodCall;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.params.StringParam;
+&nbsp;
+&nbsp;/**
+&nbsp; * Test element which publishes all test run metrics to an InfluxDB instance.
+&nbsp; *
+&nbsp; * @since 0.4
+&nbsp; */
+&nbsp;public class InfluxDbBackendListener extends DslBackendListener&lt;InfluxDbBackendListener&gt; {
+&nbsp;
+&nbsp;  private static final String URL_ARG = &quot;influxdbUrl&quot;;
+&nbsp;  private static final String TITLE_ARG = &quot;testTitle&quot;;
+&nbsp;  private static final String MEASUREMENT_ARG = &quot;measurement&quot;;
+&nbsp;  private static final String APPLICATION_ARG = &quot;application&quot;;
+&nbsp;  private static final String TOKEN_ARG = &quot;influxdbToken&quot;;
+&nbsp;  private static final String SAMPLERS_REGEX_ARG = &quot;samplersRegex&quot;;
+&nbsp;  private static final String TAG_ARGS_PREFIX = &quot;TAG_&quot;;
+&nbsp;  private static final String PCT_ARG = &quot;percentiles&quot;;
+&nbsp;
+<b class="fc">&nbsp;  protected String title = &quot;Test jmeter-java-dsl &quot; + Instant.now().toString();</b>
+&nbsp;  protected String token;
+<b class="fc">&nbsp;  protected final Map&lt;String, String&gt; tags = new HashMap&lt;&gt;();</b>
+&nbsp;  protected String samplersRegex;
+&nbsp;  protected String measurement;
+&nbsp;  protected String applicationName;
+&nbsp;  protected String percentiles;
+&nbsp;
+&nbsp;  public InfluxDbBackendListener(String url) {
+<b class="fc">&nbsp;    super(InfluxdbBackendListenerClient.class, url);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Allows specifying a token for authentication with InfluxDB 2 instances.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * Check &lt;a href=&quot;https://docs.influxdata.com/influxdb/v2.0/security/&quot;&gt;InfluxDB documentation&lt;/a&gt;
+&nbsp;   * for more details.
+&nbsp;   *
+&nbsp;   * @param token to use to authenticate to InfluxDB
+&nbsp;   * @return the listener for further configuration or usage.
+&nbsp;   */
+&nbsp;  public InfluxDbBackendListener token(String token) {
+<b class="fc">&nbsp;    this.token = token;</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Allows setting a title for the test which will be included in started and ended annotations in
+&nbsp;   * &quot;events&quot; measurement.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * Consider setting this value to something that properly describes your application and the
+&nbsp;   * particular test run (some timestamp, some CI/CD build ID, some commit ID, etc.).
+&nbsp;   * &lt;p&gt;
+&nbsp;   * When not specified, this will default to &quot;jmeter-java-dsl&quot; plus the current timestamp.
+&nbsp;   *
+&nbsp;   * @param title to be included in started and ended annotations.
+&nbsp;   * @return the listener for further configuration or usage.
+&nbsp;   */
+&nbsp;  public InfluxDbBackendListener title(String title) {
+<b class="fc">&nbsp;    this.title = title;</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Allows specifying an application name tag to be included with collected metrics.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * This name can later be used to identify tests generated by this application on a given
+&nbsp;   * measurement, from other applications.
+&nbsp;   *
+&nbsp;   * @param applicationName specifies the name of the application tag.
+&nbsp;   * @return the listener for further configuration or usage.
+&nbsp;   * @since 0.38
+&nbsp;   */
+&nbsp;  public InfluxDbBackendListener application(String applicationName) {
+<b class="fc">&nbsp;    this.applicationName = applicationName;</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Allows specifying the name of the measurement that contains collected metrics sent to
+&nbsp;   * InfluxDB.
+&nbsp;   *
+&nbsp;   * @param measurement specifies the name of the measurement.
+&nbsp;   * @return the listener for further configuration or usage.
+&nbsp;   * @since 0.38
+&nbsp;   */
+&nbsp;  public InfluxDbBackendListener measurement(String measurement) {
+<b class="fc">&nbsp;    this.measurement = measurement;</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Allows specifying a regular expression used to filter collected metrics.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * This regular expression is applied to sample labels, and when matched, collected sample metrics
+&nbsp;   * will be sent to InfluxDB. Otherwise, they will be ignored.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * For example ^[^_].*&quot; - will exclude samplers which labels start with symbol &quot;_&quot;.
+&nbsp;   *
+&nbsp;   * @param samplersRegex specifies the name of the samplersRegex.
+&nbsp;   * @return the listener for further configuration or usage.
+&nbsp;   * @since 0.38
+&nbsp;   */
+&nbsp;  public InfluxDbBackendListener samplersRegex(String samplersRegex) {
+<b class="fc">&nbsp;    this.samplersRegex = samplersRegex;</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Allows adding tags to be included with every measurement sent to InfluxDB.
+&nbsp;   *
+&nbsp;   * @param name  specifies the name of the tag. Take into consideration that, in contrast to JMeter
+&nbsp;   *              GUI, no &lt;pre&gt;TAG_&lt;/pre&gt; prefix should be included.
+&nbsp;   * @param value specifies the value of the tag.
+&nbsp;   * @return the listener for further configuration or usage.
+&nbsp;   */
+&nbsp;  public InfluxDbBackendListener tag(String name, String value) {
+<b class="fc">&nbsp;    tags.put(name, value);</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Allows specifying a list of percentiles that will be calculated and sent to InfluxDb.
+&nbsp;   *
+&nbsp;   * @param percentiles specifies a list of percentiles as float values.
+&nbsp;   * @return the listener for further configuration or usage.
+&nbsp;   * @since 1.24
+&nbsp;   */
+&nbsp;  public InfluxDbBackendListener percentiles(float... percentiles) {
+<b class="nc">&nbsp;    this.percentiles = range(0, percentiles.length)</b>
+<b class="nc">&nbsp;            .mapToObj(i -&gt; Float.toString(percentiles[i]))</b>
+<b class="nc">&nbsp;            .collect(joining(&quot;;&quot;));</b>
+<b class="nc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  protected Arguments buildListenerArguments() {
+<b class="fc">&nbsp;    Arguments ret = new Arguments();</b>
+<b class="fc">&nbsp;    ret.addArgument(URL_ARG, url);</b>
+<b class="fc">&nbsp;    if (token != null) {</b>
+<b class="fc">&nbsp;      ret.addArgument(TOKEN_ARG, token);</b>
+&nbsp;    }
+<b class="fc">&nbsp;    ret.addArgument(&quot;summaryOnly&quot;, &quot;false&quot;);</b>
+<b class="fc">&nbsp;    ret.addArgument(TITLE_ARG, title);</b>
+<b class="fc">&nbsp;    if (applicationName != null) {</b>
+<b class="fc">&nbsp;      ret.addArgument(APPLICATION_ARG, applicationName);</b>
+&nbsp;    }
+<b class="fc">&nbsp;    if (measurement != null) {</b>
+<b class="fc">&nbsp;      ret.addArgument(MEASUREMENT_ARG, measurement);</b>
+&nbsp;    }
+<b class="fc">&nbsp;    if (samplersRegex != null) {</b>
+<b class="fc">&nbsp;      ret.addArgument(SAMPLERS_REGEX_ARG, samplersRegex);</b>
+&nbsp;    }
+<b class="fc">&nbsp;    if (percentiles != null) {</b>
+<b class="nc">&nbsp;      ret.addArgument(PCT_ARG, percentiles);</b>
+&nbsp;    }
+<b class="fc">&nbsp;    tags.forEach((name, value) -&gt; ret.addArgument(TAG_ARGS_PREFIX + name, value));</b>
+<b class="fc">&nbsp;    return ret;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  public static class CodeBuilder extends BackendListenerCodeBuilder {
+&nbsp;
+&nbsp;    public CodeBuilder(List&lt;Method&gt; builderMethods) {
+<b class="fc">&nbsp;      super(InfluxdbBackendListenerClient.class, builderMethods);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    protected MethodCall buildBackendListenerCall(Map&lt;String, String&gt; args,
+&nbsp;        Map&lt;String, String&gt; defaultValues) {
+<b class="fc">&nbsp;      MethodCall ret = buildMethodCall(new StringParam(args.get(URL_ARG)))</b>
+<b class="fc">&nbsp;          .chain(&quot;token&quot;, buildArgParam(TOKEN_ARG, args, defaultValues))</b>
+<b class="fc">&nbsp;          .chain(&quot;title&quot;, buildArgParam(TITLE_ARG, args, defaultValues))</b>
+<b class="fc">&nbsp;          .chain(&quot;application&quot;, buildArgParam(APPLICATION_ARG, args, defaultValues))</b>
+<b class="fc">&nbsp;          .chain(&quot;measurement&quot;, buildArgParam(MEASUREMENT_ARG, args, defaultValues))</b>
+<b class="fc">&nbsp;          .chain(&quot;samplersRegex&quot;, buildArgParam(SAMPLERS_REGEX_ARG, args, defaultValues))</b>
+<b class="fc">&nbsp;          .chain(&quot;percentiles&quot;, buildArgParam(PCT_ARG, args, defaultValues));</b>
+<b class="fc">&nbsp;      args.entrySet().stream()</b>
+<b class="fc">&nbsp;          .filter(e -&gt; e.getKey().startsWith(TAG_ARGS_PREFIX))</b>
+<b class="fc">&nbsp;          .forEach(</b>
+<b class="fc">&nbsp;              e -&gt; ret.chain(&quot;tag&quot;, new StringParam(e.getKey().substring(TAG_ARGS_PREFIX.length())),</b>
+<b class="fc">&nbsp;                  new StringParam(e.getValue())));</b>
+<b class="fc">&nbsp;      return ret;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;  }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-03 20:57</div>
+</div>
+</body>
+</html>

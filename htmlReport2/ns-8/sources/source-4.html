@@ -1,0 +1,452 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=GBK"> 
+  <title>Coverage Report > EmbeddedJmeterEngine</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">us.abstracta.jmeter.javadsl.core.engines</a>
+</div>
+
+<h1>Coverage Summary for Class: EmbeddedJmeterEngine (us.abstracta.jmeter.javadsl.core.engines)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">EmbeddedJmeterEngine</td>
+<td class="coverageStat">
+  <span class="percent">
+    93.3%
+  </span>
+  <span class="absValue">
+    (14/15)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    92.3%
+  </span>
+  <span class="absValue">
+    (72/78)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">EmbeddedJmeterEngine$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/3)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">EmbeddedJmeterEngine$2</td>
+<td class="coverageStat">
+  <span class="percent">
+    66.7%
+  </span>
+  <span class="absValue">
+    (2/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    66.7%
+  </span>
+  <span class="absValue">
+    (2/3)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">EmbeddedJmeterEngine$EmbeddedJMeterEngineStopper</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">EmbeddedJmeterEngine$TestRunner</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (6/6)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    92.3%
+  </span>
+  <span class="absValue">
+    (24/26)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    92.4%
+  </span>
+  <span class="absValue">
+    (85/92)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package us.abstracta.jmeter.javadsl.core.engines;
+&nbsp;
+&nbsp;import java.awt.BorderLayout;
+&nbsp;import java.awt.Component;
+&nbsp;import java.io.FileInputStream;
+&nbsp;import java.io.IOException;
+&nbsp;import java.net.URL;
+&nbsp;import java.time.Instant;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Properties;
+&nbsp;import java.util.concurrent.CompletableFuture;
+&nbsp;import java.util.concurrent.ExecutionException;
+&nbsp;import java.util.concurrent.Future;
+&nbsp;import java.util.function.Supplier;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;import javax.swing.ImageIcon;
+&nbsp;import javax.swing.JButton;
+&nbsp;import javax.swing.JPanel;
+&nbsp;import javax.swing.JToolBar;
+&nbsp;import org.apache.jmeter.engine.StandardJMeterEngine;
+&nbsp;import org.apache.jmeter.reporters.ResultCollector;
+&nbsp;import org.apache.jmeter.reporters.Summariser;
+&nbsp;import org.apache.jmeter.samplers.SampleResult;
+&nbsp;import org.apache.jmeter.util.JMeterUtils;
+&nbsp;import org.apache.jmeter.visualizers.Visualizer;
+&nbsp;import org.apache.jorphan.collections.HashTree;
+&nbsp;import org.apache.jorphan.collections.ListedHashTree;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;import us.abstracta.jmeter.javadsl.core.BuildTreeContext;
+&nbsp;import us.abstracta.jmeter.javadsl.core.DslJmeterEngine;
+&nbsp;import us.abstracta.jmeter.javadsl.core.DslTestPlan;
+&nbsp;import us.abstracta.jmeter.javadsl.core.TestPlanStats;
+&nbsp;import us.abstracta.jmeter.javadsl.core.listeners.DslVisualizer;
+&nbsp;
+&nbsp;/**
+&nbsp; * Allows running test plans in an embedded JMeter instance.
+&nbsp; *
+&nbsp; * @since 0.1
+&nbsp; */
+<b class="fc">&nbsp;public class EmbeddedJmeterEngine implements DslJmeterEngine {</b>
+&nbsp;
+<b class="fc">&nbsp;  private static final Logger LOG = LoggerFactory.getLogger(EmbeddedJmeterEngine.class);</b>
+<b class="fc">&nbsp;  private final Map&lt;String, Object&gt; props = new HashMap&lt;&gt;();</b>
+&nbsp;  private String propsFile;
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Allows setting properties to be used during test plan execution.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * This is an alternate to using {@link System#setProperty(String, String)} but that also works
+&nbsp;   * with &lt;pre&gt;props[&#39;PROP_NAME&#39;]&lt;/pre&gt; and &lt;pre&gt;props.get(&#39;PROP_NAME&#39;)&lt;/pre&gt; in groovy code, in
+&nbsp;   * addition to allowing to set arbitrary objects (and not just strings). This properties
+&nbsp;   * additionally don&#39;t alter the JVM properties, which is preferable to improve tests isolation.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * Setting arbitrary objects might be helpful to pass some object that can be reused by all
+&nbsp;   * threads in test plan (eg: a cache).
+&nbsp;   *
+&nbsp;   * @param name  specifies the name of the property, used by test plan to access the associated
+&nbsp;   *              value.
+&nbsp;   * @param value specifies a value to store associated to the name.
+&nbsp;   * @return the engine instance for further configuration or usage.
+&nbsp;   * @since 0.37
+&nbsp;   */
+&nbsp;  public EmbeddedJmeterEngine prop(String name, Object value) {
+<b class="fc">&nbsp;    props.put(name, value);</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Allows specifying a properties file path to get properties from.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * This is handy when different properties are required for different runs (eg: different
+&nbsp;   * environments).
+&nbsp;   * &lt;p&gt;
+&nbsp;   * This is an alternative to {@link #prop(String, Object)} which is handy for setting a small set
+&nbsp;   * of properties, or set them programmatically.
+&nbsp;   *
+&nbsp;   * @param propsFile is the path to the properties file to load.
+&nbsp;   * @return the engine instance for further configuration or usage.
+&nbsp;   * @since 0.57
+&nbsp;   */
+&nbsp;  public EmbeddedJmeterEngine propertiesFile(String propsFile) {
+<b class="fc">&nbsp;    this.propsFile = propsFile;</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public TestPlanStats run(DslTestPlan testPlan) throws IOException {
+<b class="fc">&nbsp;    return runInEnv(testPlan, new JmeterEnvironment());</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  protected TestPlanStats runInEnv(DslTestPlan testPlan, JmeterEnvironment env) throws IOException {
+<b class="fc">&nbsp;    Properties jmeterProps = JMeterUtils.getJMeterProperties();</b>
+<b class="fc">&nbsp;    if (propsFile != null) {</b>
+<b class="fc">&nbsp;      try (FileInputStream is = new FileInputStream(propsFile)) {</b>
+<b class="fc">&nbsp;        jmeterProps.load(is);</b>
+<b class="fc">&nbsp;      }</b>
+&nbsp;    }
+<b class="fc">&nbsp;    jmeterProps.putAll(props);</b>
+<b class="fc">&nbsp;    BaseTestStopper testStopper = buildTestStopper();</b>
+<b class="fc">&nbsp;    BuildTreeContext buildContext = new BuildTreeContext();</b>
+<b class="fc">&nbsp;    buildContext.setTestStopper(testStopper);</b>
+<b class="fc">&nbsp;    HashTree rootTree = new ListedHashTree();</b>
+<b class="fc">&nbsp;    HashTree testPlanTree = buildContext.buildTreeFor(testPlan, rootTree);</b>
+<b class="fc">&nbsp;    env.updateSearchPath(testPlanTree);</b>
+&nbsp;
+<b class="fc">&nbsp;    TestPlanStats stats = new TestPlanStats(EmbeddedStatsSummary::new);</b>
+<b class="fc">&nbsp;    addStatsCollector(testPlanTree, stats);</b>
+<b class="fc">&nbsp;    testPlanTree.add(new ResultCollector(new Summariser()));</b>
+&nbsp;
+<b class="fc">&nbsp;    List&lt;Future&lt;Void&gt;&gt; closedVisualizers = Collections.emptyList();</b>
+<b class="fc">&nbsp;    TestRunner testRunner = buildTestRunner(testPlanTree, rootTree, testStopper);</b>
+<b class="fc">&nbsp;    Map&lt;DslVisualizer, Supplier&lt;Component&gt;&gt; visualizers = buildContext.getVisualizers();</b>
+<b class="fc">&nbsp;    if (!visualizers.isEmpty()) {</b>
+&nbsp;      // this is required for proper visualization of labels and messages from resources bundle
+<b class="fc">&nbsp;      env.initLocale();</b>
+<b class="fc">&nbsp;      closedVisualizers = showVisualizers(visualizers, testRunner);</b>
+&nbsp;    }
+&nbsp;    /*
+&nbsp;     we register the start and end of test since calculating it from sample results may be
+&nbsp;     inaccurate when timers or post processors are used outside of transactions, since such time
+&nbsp;     is not included in sample results. Additionally, we want to provide a consistent meaning for
+&nbsp;     start, end and elapsed time for samplers, transactions and test plan (which would not be if
+&nbsp;     we only use sample results times).
+&nbsp;     */
+<b class="fc">&nbsp;    stats.setStart(Instant.now());</b>
+<b class="fc">&nbsp;    testRunner.run();</b>
+<b class="fc">&nbsp;    stats.setEnd(Instant.now());</b>
+<b class="fc">&nbsp;    awaitAllClosedVisualizers(closedVisualizers);</b>
+<b class="fc">&nbsp;    String stopMessage = testStopper.getStopMessage();</b>
+<b class="fc">&nbsp;    if (stopMessage != null) {</b>
+<b class="fc">&nbsp;      throw new AutoStoppedTestException(stopMessage);</b>
+&nbsp;    }
+<b class="fc">&nbsp;    return stats;</b>
+&nbsp;  }
+&nbsp;
+<b class="fc">&nbsp;  public static class EmbeddedJMeterEngineStopper extends BaseTestStopper {</b>
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected void stopTestExecution() {
+<b class="fc">&nbsp;      StandardJMeterEngine.stopEngine();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;  }
+&nbsp;
+&nbsp;  protected BaseTestStopper buildTestStopper() {
+<b class="fc">&nbsp;    return new EmbeddedJMeterEngineStopper();</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  protected void addStatsCollector(HashTree testPlanTree, TestPlanStats stats) {
+<b class="fc">&nbsp;    ResultCollector collector = new ResultCollector();</b>
+<b class="fc">&nbsp;    Visualizer statsVisualizer = new Visualizer() {</b>
+&nbsp;
+&nbsp;      @Override
+&nbsp;      public void add(SampleResult r) {
+<b class="fc">&nbsp;        stats.addSampleResult(r);</b>
+&nbsp;      }
+&nbsp;
+&nbsp;      @Override
+&nbsp;      public boolean isStats() {
+<b class="fc">&nbsp;        return true;</b>
+&nbsp;      }
+&nbsp;
+&nbsp;    };
+<b class="fc">&nbsp;    collector.setListener(statsVisualizer);</b>
+<b class="fc">&nbsp;    testPlanTree.add(collector);</b>
+<b class="fc">&nbsp;    testPlanTree.add(statsVisualizer);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  protected TestRunner buildTestRunner(HashTree testPlanTree, HashTree rootTree,
+&nbsp;      TestStopper testStopper) {
+<b class="fc">&nbsp;    StandardJMeterEngine engine = new StandardJMeterEngine();</b>
+<b class="fc">&nbsp;    engine.configure(rootTree);</b>
+<b class="fc">&nbsp;    return new TestRunner() {</b>
+&nbsp;
+&nbsp;      @Override
+&nbsp;      public void runTest() {
+<b class="fc">&nbsp;        engine.run();</b>
+&nbsp;      }
+&nbsp;
+&nbsp;      @Override
+&nbsp;      public void stop() {
+<b class="nc">&nbsp;        testStopper.stop(null);</b>
+&nbsp;      }
+&nbsp;
+&nbsp;    };
+&nbsp;  }
+&nbsp;
+<b class="fc">&nbsp;  public abstract static class TestRunner {</b>
+&nbsp;
+<b class="fc">&nbsp;    private final List&lt;Runnable&gt; endListeners = new ArrayList&lt;&gt;();</b>
+&nbsp;
+&nbsp;    public void addEndListener(Runnable listener) {
+<b class="fc">&nbsp;      endListeners.add(listener);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void run() {
+&nbsp;      try {
+<b class="fc">&nbsp;        runTest();</b>
+&nbsp;      } finally {
+<b class="fc">&nbsp;        endListeners.forEach(Runnable::run);</b>
+<b class="fc">&nbsp;      }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    protected abstract void runTest();
+&nbsp;
+&nbsp;    public abstract void stop();
+&nbsp;
+&nbsp;  }
+&nbsp;
+&nbsp;  private List&lt;Future&lt;Void&gt;&gt; showVisualizers(Map&lt;DslVisualizer, Supplier&lt;Component&gt;&gt; visualizers,
+&nbsp;      TestRunner testRunner) {
+<b class="fc">&nbsp;    return visualizers.entrySet().stream()</b>
+<b class="fc">&nbsp;        .map(e -&gt; {</b>
+<b class="fc">&nbsp;          CompletableFuture&lt;Void&gt; closedVisualizer = new CompletableFuture&lt;&gt;();</b>
+<b class="fc">&nbsp;          Component guiComponent = e.getValue().get();</b>
+<b class="fc">&nbsp;          JPanel panel = new JPanel();</b>
+<b class="fc">&nbsp;          panel.setLayout(new BorderLayout());</b>
+<b class="fc">&nbsp;          panel.add(buildToolbar(testRunner), BorderLayout.NORTH);</b>
+<b class="fc">&nbsp;          panel.add(guiComponent, BorderLayout.CENTER);</b>
+<b class="fc">&nbsp;          e.getKey().showTestElementGui(panel, () -&gt; closedVisualizer.complete(null));</b>
+<b class="fc">&nbsp;          return closedVisualizer;</b>
+&nbsp;        })
+<b class="fc">&nbsp;        .collect(Collectors.toList());</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private Component buildToolbar(TestRunner testRunner) {
+<b class="fc">&nbsp;    JToolBar toolbar = new JToolBar();</b>
+<b class="fc">&nbsp;    toolbar.add(buildStopButton(testRunner));</b>
+<b class="fc">&nbsp;    return toolbar;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private JButton buildStopButton(TestRunner testRunner) {
+<b class="fc">&nbsp;    URL iconResource = JMeterUtils.class.getClassLoader()</b>
+<b class="fc">&nbsp;        .getResource(&quot;org/apache/jmeter/images/toolbar/22x22/road-sign-us-stop.png&quot;);</b>
+<b class="fc">&nbsp;    JButton button = new JButton(new ImageIcon(iconResource));</b>
+<b class="fc">&nbsp;    button.setToolTipText(&quot;stop test plan&quot;);</b>
+<b class="fc">&nbsp;    button.addActionListener(e -&gt; {</b>
+<b class="nc">&nbsp;      button.setEnabled(false);</b>
+<b class="nc">&nbsp;      testRunner.stop();</b>
+&nbsp;    });
+<b class="fc">&nbsp;    testRunner.addEndListener(() -&gt; button.setEnabled(false));</b>
+<b class="fc">&nbsp;    return button;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  public void awaitAllClosedVisualizers(List&lt;Future&lt;Void&gt;&gt; closedVisualizers) {
+&nbsp;    try {
+<b class="fc">&nbsp;      for (Future&lt;Void&gt; closedVisualizer : closedVisualizers) {</b>
+&nbsp;        try {
+<b class="fc">&nbsp;          closedVisualizer.get();</b>
+<b class="nc">&nbsp;        } catch (ExecutionException e) {</b>
+<b class="nc">&nbsp;          LOG.warn(&quot;Problem waiting for a visualizer to close&quot;, e);</b>
+<b class="fc">&nbsp;        }</b>
+<b class="fc">&nbsp;      }</b>
+<b class="nc">&nbsp;    } catch (InterruptedException e) {</b>
+&nbsp;      //just stop waiting for visualizers and reset interrupted flag
+<b class="nc">&nbsp;      Thread.currentThread().interrupt();</b>
+<b class="fc">&nbsp;    }</b>
+&nbsp;  }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-03 22:39</div>
+</div>
+</body>
+</html>

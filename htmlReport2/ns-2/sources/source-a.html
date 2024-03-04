@@ -1,0 +1,259 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=GBK"> 
+  <title>Coverage Report > TestClassTemplate</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">us.abstracta.jmeter.javadsl.codegeneration</a>
+</div>
+
+<h1>Coverage Summary for Class: TestClassTemplate (us.abstracta.jmeter.javadsl.codegeneration)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">TestClassTemplate</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    94.4%
+  </span>
+  <span class="absValue">
+    (17/18)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    94.7%
+  </span>
+  <span class="absValue">
+    (71/75)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package us.abstracta.jmeter.javadsl.codegeneration;
+&nbsp;
+&nbsp;import java.io.BufferedReader;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.InputStreamReader;
+&nbsp;import java.nio.charset.StandardCharsets;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Map.Entry;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.TreeSet;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;import us.abstracta.jmeter.javadsl.core.util.StringTemplate;
+&nbsp;
+&nbsp;/**
+&nbsp; * Handles resolution of junit 5 test class code generation.
+&nbsp; *
+&nbsp; * @since 1.3
+&nbsp; */
+<b class="fc">&nbsp;public class TestClassTemplate {</b>
+&nbsp;
+<b class="fc">&nbsp;  private final Set&lt;String&gt; dependencies = new TreeSet&lt;&gt;();</b>
+<b class="fc">&nbsp;  private final Set&lt;String&gt; staticImports = new TreeSet&lt;&gt;();</b>
+<b class="fc">&nbsp;  private final Set&lt;String&gt; imports = new TreeSet&lt;&gt;();</b>
+<b class="fc">&nbsp;  private final List&lt;String&gt; methodDefinitions = new ArrayList&lt;&gt;();</b>
+&nbsp;  private String testPlan;
+&nbsp;
+&nbsp;  public static TestClassTemplate fromTestPlanMethodCall(MethodCall testPlan,
+&nbsp;      Map&lt;Class&lt;?&gt;, String&gt; dependencies) {
+<b class="fc">&nbsp;    return new TestClassTemplate()</b>
+<b class="fc">&nbsp;        .dependencies(testPlanUsedDependencies(testPlan, dependencies))</b>
+<b class="fc">&nbsp;        .staticImports(testPlan.getStaticImports())</b>
+<b class="fc">&nbsp;        .imports(testPlan.getImports())</b>
+<b class="fc">&nbsp;        .methodDefinitions(testPlanMethodDefinitions(testPlan))</b>
+<b class="fc">&nbsp;        .testPlan(testPlanCode(testPlan));</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private static Set&lt;String&gt; testPlanUsedDependencies(MethodCall testPlan,
+&nbsp;      Map&lt;Class&lt;?&gt;, String&gt; dependencies) {
+<b class="fc">&nbsp;    return dependencies.entrySet().stream()</b>
+<b class="fc">&nbsp;        .filter(e -&gt; testPlan.getStaticImports().contains(e.getKey().getName())</b>
+<b class="nc">&nbsp;            || testPlan.getImports().contains(e.getKey().getName()))</b>
+<b class="fc">&nbsp;        .map(Entry::getValue)</b>
+<b class="fc">&nbsp;        .collect(Collectors.toSet());</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private static List&lt;String&gt; testPlanMethodDefinitions(MethodCall testPlan) {
+<b class="fc">&nbsp;    return testPlan.getMethodDefinitions().entrySet().stream()</b>
+<b class="fc">&nbsp;        .map(e -&gt; buildMethodDefinitionCode(e.getKey(), e.getValue()))</b>
+<b class="fc">&nbsp;        .collect(Collectors.toList());</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private static String buildMethodDefinitionCode(String methodName, MethodCall methodCall) {
+<b class="fc">&nbsp;    return String.format(&quot;private %s %s() {\n&quot;</b>
+&nbsp;            + &quot;%sreturn %s;\n&quot;
+<b class="fc">&nbsp;            + &quot;}&quot;, methodCall.getReturnType().getSimpleName(), methodName, Indentation.INDENT,</b>
+<b class="fc">&nbsp;        methodCall.buildAssignmentCode(Indentation.indentLevel(2)));</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private static String testPlanCode(MethodCall testPlan) {
+<b class="fc">&nbsp;    String indent = Indentation.indentLevel(3);</b>
+<b class="fc">&nbsp;    String ret = testPlan.buildAssignmentCode(indent);</b>
+<b class="fc">&nbsp;    return ret.endsWith(Indentation.INDENT + &quot;)&quot;) ? ret : ret + &quot;\n&quot; + indent;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  public TestClassTemplate dependencies(Set&lt;String&gt; dependencies) {
+<b class="fc">&nbsp;    this.dependencies.addAll(dependencies);</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  public TestClassTemplate staticImports(Set&lt;String&gt; imports) {
+<b class="fc">&nbsp;    staticImports.addAll(imports);</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  public TestClassTemplate imports(Set&lt;String&gt; imports) {
+<b class="fc">&nbsp;    this.imports.addAll(imports);</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  public TestClassTemplate methodDefinitions(List&lt;String&gt; methods) {
+<b class="fc">&nbsp;    methodDefinitions.addAll(methods);</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  public TestClassTemplate testPlan(String testPlanCode) {
+<b class="fc">&nbsp;    this.testPlan = testPlanCode;</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  public String solve() {
+&nbsp;    try {
+<b class="fc">&nbsp;      Map&lt;Boolean, List&lt;String&gt;&gt; defaultImports = Arrays.stream(</b>
+<b class="fc">&nbsp;              resourceContents(&quot;/default-imports.txt&quot;)</b>
+<b class="fc">&nbsp;                  .split(&quot;\n&quot;))</b>
+<b class="fc">&nbsp;          .filter(s -&gt; !s.isEmpty())</b>
+<b class="fc">&nbsp;          .collect(Collectors.partitioningBy(s -&gt; s.startsWith(&quot;static &quot;)));</b>
+<b class="fc">&nbsp;      return new StringTemplate(resourceContents(&quot;/TestClass.template.java&quot;))</b>
+<b class="fc">&nbsp;          .bind(&quot;dependencies&quot;, buildDependencies())</b>
+<b class="fc">&nbsp;          .bind(&quot;staticImports&quot;, buildStaticImports(defaultImports.get(true)))</b>
+<b class="fc">&nbsp;          .bind(&quot;imports&quot;, buildImports(defaultImports.get(false), imports))</b>
+<b class="fc">&nbsp;          .bind(&quot;methodDefinitions&quot;, buildMethodDefinitions(methodDefinitions))</b>
+<b class="fc">&nbsp;          .bind(&quot;testPlan&quot;, testPlan)</b>
+<b class="fc">&nbsp;          .ignoreMissingBindings()</b>
+<b class="fc">&nbsp;          .solve();</b>
+<b class="nc">&nbsp;    } catch (IOException e) {</b>
+&nbsp;      // Only would happen if can&#39;t access resource that should be included in jar
+<b class="nc">&nbsp;      throw new RuntimeException(e);</b>
+&nbsp;    }
+&nbsp;  }
+&nbsp;
+&nbsp;  private String resourceContents(String resource) {
+<b class="fc">&nbsp;    try (BufferedReader reader = new BufferedReader(</b>
+<b class="fc">&nbsp;        new InputStreamReader(getClass().getResourceAsStream(resource), StandardCharsets.UTF_8))) {</b>
+<b class="fc">&nbsp;      return reader.lines()</b>
+<b class="fc">&nbsp;          .collect(Collectors.joining(&quot;\n&quot;));</b>
+<b class="fc">&nbsp;    } catch (IOException e) {</b>
+<b class="nc">&nbsp;      throw new RuntimeException(e);</b>
+&nbsp;    }
+&nbsp;  }
+&nbsp;
+&nbsp;  private String buildDependencies() throws IOException {
+<b class="fc">&nbsp;    TreeSet&lt;String&gt; ret = new TreeSet&lt;&gt;();</b>
+<b class="fc">&nbsp;    ret.addAll(Arrays.asList(resourceContents(&quot;/default-dependencies.txt&quot;)</b>
+<b class="fc">&nbsp;        .split(&quot;\n&quot;)));</b>
+<b class="fc">&nbsp;    ret.addAll(dependencies);</b>
+<b class="fc">&nbsp;    return ret.stream()</b>
+<b class="fc">&nbsp;        .map(d -&gt; &quot;//DEPS &quot; + d)</b>
+<b class="fc">&nbsp;        .collect(Collectors.joining(&quot;\n&quot;));</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private String buildStaticImports(List&lt;String&gt; defaultImports) {
+<b class="fc">&nbsp;    Set&lt;String&gt; additionalImports = staticImports.stream()</b>
+<b class="fc">&nbsp;        .map(s -&gt; String.format(&quot;static %s.*&quot;, s))</b>
+<b class="fc">&nbsp;        .collect(Collectors.toSet());</b>
+<b class="fc">&nbsp;    return buildImports(defaultImports, additionalImports);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private String buildImports(List&lt;String&gt; defaultImports, Set&lt;String&gt; imports) {
+<b class="fc">&nbsp;    TreeSet&lt;String&gt; ret = new TreeSet&lt;&gt;(defaultImports);</b>
+<b class="fc">&nbsp;    ret.addAll(imports);</b>
+<b class="fc">&nbsp;    return ret.stream()</b>
+<b class="fc">&nbsp;        .map(i -&gt; String.format(&quot;import %s;&quot;, i.replace(&quot;$&quot;, &quot;.&quot;)))</b>
+<b class="fc">&nbsp;        .collect(Collectors.joining(&quot;\n&quot;));</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private String buildMethodDefinitions(List&lt;String&gt; methods) {
+<b class="fc">&nbsp;    return methods.stream()</b>
+<b class="fc">&nbsp;        .map(m -&gt; String.format(&quot;\n%s\n&quot;, Indentation.indent(m, Indentation.INDENT)))</b>
+<b class="fc">&nbsp;        .collect(Collectors.joining());</b>
+&nbsp;  }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-03 22:39</div>
+</div>
+</body>
+</html>

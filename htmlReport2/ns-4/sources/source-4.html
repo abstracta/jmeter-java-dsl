@@ -1,0 +1,96 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=GBK"> 
+  <title>Coverage Report > DslJmeterEngine</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">us.abstracta.jmeter.javadsl.core</a>
+</div>
+
+<h1>Coverage Summary for Class: DslJmeterEngine (us.abstracta.jmeter.javadsl.core)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+</tr>
+<tr>
+  <td class="name">DslJmeterEngine</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package us.abstracta.jmeter.javadsl.core;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.util.concurrent.TimeoutException;
+&nbsp;
+&nbsp;/**
+&nbsp; * Interface to be implemented by classes allowing to run a DslTestPlan in different engines.
+&nbsp; *
+&nbsp; * @since 0.2
+&nbsp; */
+&nbsp;public interface DslJmeterEngine {
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Runs the given test plan obtaining the execution metrics.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * This method blocks execution until the test plan execution ends.
+&nbsp;   *
+&nbsp;   * @param testPlan to run in the JMeter engine.
+&nbsp;   * @return the metrics associated to the run.
+&nbsp;   * @throws IOException          when there is a problem with an IO operation.
+&nbsp;   * @throws InterruptedException when the execution thread is interrupted.
+&nbsp;   * @throws TimeoutException     when some configured time out is reached. Each engine might define
+&nbsp;   *                              a different set of timeouts.
+&nbsp;   */
+&nbsp;  TestPlanStats run(DslTestPlan testPlan)
+&nbsp;      throws IOException, InterruptedException, TimeoutException;
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-03 22:39</div>
+</div>
+</body>
+</html>

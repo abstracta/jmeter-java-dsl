@@ -1,0 +1,606 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=GBK"> 
+  <title>Coverage Report > DslResponseAssertion</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">us.abstracta.jmeter.javadsl.core.assertions</a>
+</div>
+
+<h1>Coverage Summary for Class: DslResponseAssertion (us.abstracta.jmeter.javadsl.core.assertions)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DslResponseAssertion</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (14/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (33/33)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">DslResponseAssertion$CodeBuilder</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (5/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    85.7%
+  </span>
+  <span class="absValue">
+    (18/21)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">DslResponseAssertion$CodeBuilder$StringsCollectionParam</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (8/8)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">DslResponseAssertion$TargetField</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (12/12)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">DslResponseAssertion$TestStringStrategy</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (8/8)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (29/29)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    96.3%
+  </span>
+  <span class="absValue">
+    (79/82)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package us.abstracta.jmeter.javadsl.core.assertions;
+&nbsp;
+&nbsp;import java.lang.reflect.Method;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.List;
+&nbsp;import java.util.function.Consumer;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;import org.apache.jmeter.assertions.ResponseAssertion;
+&nbsp;import org.apache.jmeter.assertions.gui.AssertionGui;
+&nbsp;import org.apache.jmeter.testelement.TestElement;
+&nbsp;import org.apache.jmeter.testelement.property.CollectionProperty;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.MethodCall;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.MethodParam;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.TestElementParamBuilder;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.params.BoolParam;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.params.EnumParam.EnumPropertyValue;
+&nbsp;import us.abstracta.jmeter.javadsl.core.testelements.DslScopedTestElement;
+&nbsp;
+&nbsp;/**
+&nbsp; * Allows marking a request result as success or failure by a specific result field value.
+&nbsp; *
+&nbsp; * @since 0.11
+&nbsp; */
+&nbsp;public class DslResponseAssertion extends DslScopedTestElement&lt;DslResponseAssertion&gt; implements
+&nbsp;    DslAssertion {
+&nbsp;
+&nbsp;  protected static final String DEFAULT_NAME = &quot;Response Assertion&quot;;
+&nbsp;
+<b class="fc">&nbsp;  protected TargetField fieldToTest = TargetField.RESPONSE_BODY;</b>
+&nbsp;  protected boolean ignoreStatus;
+<b class="fc">&nbsp;  protected List&lt;String&gt; testStrings = new ArrayList&lt;&gt;();</b>
+<b class="fc">&nbsp;  protected TestStringStrategy testStrategy = TestStringStrategy.SUBSTRING;</b>
+&nbsp;  protected boolean invertCheck;
+&nbsp;  protected boolean anyMatch;
+&nbsp;
+&nbsp;  public DslResponseAssertion(String name) {
+<b class="fc">&nbsp;    super(name != null ? name : DEFAULT_NAME, AssertionGui.class);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Specifies what field to apply the assertion to.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * When not specified it will apply the given assertion to the response body.
+&nbsp;   *
+&nbsp;   * @param fieldToTest specifies the field to apply the assertion to.
+&nbsp;   * @return the response assertion for further configuration or usage.
+&nbsp;   * @see TargetField
+&nbsp;   */
+&nbsp;  public DslResponseAssertion fieldToTest(TargetField fieldToTest) {
+<b class="fc">&nbsp;    this.fieldToTest = fieldToTest;</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Specifies that any previously status set to the request should be ignored, and request should
+&nbsp;   * be marked as success by default.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * This allows overriding the default behavior provided by JMeter when marking requests as failed
+&nbsp;   * (eg: HTTP status codes like 4xx or 5xx). This is particularly useful when tested application
+&nbsp;   * returns an unsuccessful response (eg: 400) but you want to consider some of those cases still
+&nbsp;   * as successful using a different criteria to determine when they are actually a failure (an
+&nbsp;   * unexpected response).
+&nbsp;   * &lt;p&gt;
+&nbsp;   * Take into consideration that if you specify multiple response assertions to the same sampler,
+&nbsp;   * then if this flag is enabled, any previous assertion result in same sampler will be ignored
+&nbsp;   * (marked as success). So, consider setting this flag in first response assertion only.
+&nbsp;   *
+&nbsp;   * @return the response assertion for further configuration or usage.
+&nbsp;   */
+&nbsp;  public DslResponseAssertion ignoreStatus() {
+<b class="fc">&nbsp;    return ignoreStatus(true);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Same as {@link #ignoreStatus()} but allowing to enable or disable it.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * This is helpful when the resolution is taken at runtime.
+&nbsp;   *
+&nbsp;   * @param enable specifies to enable or disable the setting. By default, it is set to false.
+&nbsp;   * @return the response assertion for further configuration or usage.
+&nbsp;   * @see #ignoreStatus()
+&nbsp;   * @since 1.0
+&nbsp;   */
+&nbsp;  public DslResponseAssertion ignoreStatus(boolean enable) {
+<b class="fc">&nbsp;    ignoreStatus = enable;</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Checks if the specified {@link #fieldToTest(TargetField)} contains the given substrings.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * By default, the main sample (not sub samples) response body will be checked, and all supplied
+&nbsp;   * substrings must be contained. Review other methods in this class if you need to check
+&nbsp;   * substrings but in some other ways (eg: in response headers, any match is enough, or none of
+&nbsp;   * specified substrings should be contained).
+&nbsp;   *
+&nbsp;   * @param substrings list of strings to be searched in the given field to test (by default
+&nbsp;   *                   response body).
+&nbsp;   * @return the response assertion for further configuration or usage.
+&nbsp;   */
+&nbsp;  public DslResponseAssertion containsSubstrings(String... substrings) {
+<b class="fc">&nbsp;    return testStrings(substrings, TestStringStrategy.SUBSTRING);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private DslResponseAssertion testStrings(String[] testStrings, TestStringStrategy strategy) {
+<b class="fc">&nbsp;    this.testStrings = Arrays.asList(testStrings);</b>
+<b class="fc">&nbsp;    this.testStrategy = strategy;</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Compares the configured {@link #fieldToTest(TargetField)} to the given strings for equality.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * By default, the main sample (not sub samples) response body will be checked, and all supplied
+&nbsp;   * strings must be equal to the body (in default setting only makes sense to specify one string).
+&nbsp;   * Review other methods in this class if you need to check equality to entire strings but in some
+&nbsp;   * other ways (eg: in response headers, any match is enough, or none of specified strings should
+&nbsp;   * be equal to the field value).
+&nbsp;   *
+&nbsp;   * @param strings list of strings to be compared against the given field to test (by default
+&nbsp;   *                response body).
+&nbsp;   * @return the response assertion for further configuration or usage.
+&nbsp;   */
+&nbsp;  public DslResponseAssertion equalsToStrings(String... strings) {
+<b class="fc">&nbsp;    return testStrings(strings, TestStringStrategy.EQUALS);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Checks if the configured {@link #fieldToTest(TargetField)} contains matches for given regular
+&nbsp;   * expressions.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * By default, the main sample (not sub samples) response body will be checked, and all supplied
+&nbsp;   * regular expressions must contain a match in the body. Review other methods in this class if you
+&nbsp;   * need to check regular expressions matches are contained but in some other ways (eg: in response
+&nbsp;   * headers, any regex match is enough, or none of specified regex should be contained in the field
+&nbsp;   * value).
+&nbsp;   * &lt;p&gt;
+&nbsp;   * By default, regular expressions evaluate in multi-line mode, which means that &#39;.&#39; does not
+&nbsp;   * match new lines, &#39;^&#39; matches start of lines and &#39;$&#39; matches end of lines. To use single-line
+&nbsp;   * mode prefix &#39;(?s)&#39; to the regular expressions. Regular expressions are also by default
+&nbsp;   * case-sensitive, which can be changed to insensitive by adding &#39;(?i)&#39; to the regex.
+&nbsp;   *
+&nbsp;   * @param regexes list of regular expressions to search for matches in the field to test (by
+&nbsp;   *                default response body).
+&nbsp;   * @return the response assertion for further configuration or usage.
+&nbsp;   */
+&nbsp;  public DslResponseAssertion containsRegexes(String... regexes) {
+<b class="fc">&nbsp;    return testStrings(regexes, TestStringStrategy.CONTAINS_REGEX);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Checks if the configured {@link #fieldToTest(TargetField)} matches (completely, and not just
+&nbsp;   * part of it) given regular expressions.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * By default, the main sample (not sub samples) response body will be checked, and all supplied
+&nbsp;   * regular expressions must match the entire body. Review other methods in this class if you need
+&nbsp;   * to check regular expressions matches but in some other ways (eg: in response headers, any regex
+&nbsp;   * match is enough, or none of specified regex should be matched with the field value).
+&nbsp;   * &lt;p&gt;
+&nbsp;   * By default, regular expressions evaluate in multi-line mode, which means that &#39;.&#39; does not
+&nbsp;   * match new lines, &#39;^&#39; matches start of lines and &#39;$&#39; matches end of lines. To use single-line
+&nbsp;   * mode prefix &#39;(?s)&#39; to the regular expressions. Regular expressions are also by default
+&nbsp;   * case-sensitive, which can be changed to insensitive by adding &#39;(?i)&#39; to the regex.
+&nbsp;   *
+&nbsp;   * @param regexes list of regular expressions the field to test (by default response body) must
+&nbsp;   *                match.
+&nbsp;   * @return the response assertion for further configuration or usage.
+&nbsp;   */
+&nbsp;  public DslResponseAssertion matchesRegexes(String... regexes) {
+<b class="fc">&nbsp;    return testStrings(regexes, TestStringStrategy.MATCHES_REGEX);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Allows inverting/negating each of the checks applied by the assertion.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * This is the same as the &quot;Not&quot; option in Response Assertion in JMeter GUI.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * It is important to note that the inversion of the check happens at each check and not to the
+&nbsp;   * final result. Eg:
+&nbsp;   *
+&nbsp;   * &lt;pre&gt;{@code
+&nbsp;   *   responseAssertion().containsSubstrings(&quot;error&quot;, &quot;failure&quot;).invertCheck()
+&nbsp;   * }&lt;/pre&gt;
+&nbsp;   * &lt;p&gt;
+&nbsp;   * Will check that the response does not contain &quot;error&quot; and does not contain &quot;failure&quot;. You can
+&nbsp;   * think it as {@code !(containsSubstring(&quot;error&quot;)) &amp;&amp; !(containsSubstring(&quot;failure&quot;))}.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * Similar logic applies when using in combination with anyMatch method. Eg:
+&nbsp;   *
+&nbsp;   * &lt;pre&gt;{@code
+&nbsp;   *    responseAssertion().containsSubstrings(&quot;error&quot;, &quot;failure&quot;).invertCheck().matchAny()
+&nbsp;   * }&lt;/pre&gt;
+&nbsp;   * &lt;p&gt;
+&nbsp;   * Will check that response does not contain both &quot;error&quot; and &quot;failure&quot; at the same time. This is
+&nbsp;   * analogous to {@code !(containsSubstring(&quot;error&quot;)) || !(containsSubstring(&quot;failure)}, which is
+&nbsp;   * equivalent to {@code !(containsSubstring(&quot;error&quot;) &amp;&amp; containsSubstring(&quot;failure))}.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * Keep in mind that order of invocations of methods in response assertion is irrelevant (so
+&nbsp;   * {@code invertCheck().matchAny()} gets the same result as {@code matchAny().invertCheck()}).
+&nbsp;   *
+&nbsp;   * @return the response assertion for further configuration or usage.
+&nbsp;   */
+&nbsp;  public DslResponseAssertion invertCheck() {
+<b class="fc">&nbsp;    return invertCheck(true);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Same as {@link #invertCheck()} but allowing to enable or disable it.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * This is helpful when the resolution is taken at runtime.
+&nbsp;   *
+&nbsp;   * @param enable specifies to enable or disable the setting. By default, it is set to false.
+&nbsp;   * @return the response assertion for further configuration or usage.
+&nbsp;   * @see #invertCheck()
+&nbsp;   * @since 1.0
+&nbsp;   */
+&nbsp;  public DslResponseAssertion invertCheck(boolean enable) {
+<b class="fc">&nbsp;    this.invertCheck = enable;</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Specifies that if any check matches then the response assertion is satisfied.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * This is the same as the &quot;Or&quot; option in Response Assertion in JMeter GUI.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * By default, when you use something like this:
+&nbsp;   *
+&nbsp;   * &lt;pre&gt;{@code
+&nbsp;   *    responseAssertion().containsSubstrings(&quot;success&quot;, &quot;OK&quot;)
+&nbsp;   * }&lt;/pre&gt;
+&nbsp;   * &lt;p&gt;
+&nbsp;   * The response assertion will be success when both &quot;success&quot; and &quot;OK&quot; sub strings appear in
+&nbsp;   * response body (if one or both don&#39;t appear, then it fails). You can think of it like
+&nbsp;   * {@code containsSubstring(&quot;success&quot;) &amp;&amp; containsSubstring(&quot;OK&quot;)}.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * If you want to check that any of them matches then use anyMatch, like this:
+&nbsp;   *
+&nbsp;   * &lt;pre&gt;{@code
+&nbsp;   *     responseAssertion().containsSubstrings(&quot;success&quot;, &quot;OK&quot;).anyMatch()
+&nbsp;   * }&lt;/pre&gt;
+&nbsp;   * &lt;p&gt;
+&nbsp;   * Which you can interpret as {@code containsSubstring(&quot;success&quot;) || containsSubstring(&quot;OK&quot;)}.
+&nbsp;   *
+&nbsp;   * @return the response assertion for further configuration or usage.
+&nbsp;   */
+&nbsp;  public DslResponseAssertion anyMatch() {
+<b class="fc">&nbsp;    return anyMatch(true);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Same as {@link #anyMatch()} but allowing to enable or disable it.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * This is helpful when the resolution is taken at runtime.
+&nbsp;   *
+&nbsp;   * @param enable specifies to enable or disable the setting. By default, it is set to false.
+&nbsp;   * @return the response assertion for further configuration or usage.
+&nbsp;   * @see #anyMatch()
+&nbsp;   * @since 1.0
+&nbsp;   */
+&nbsp;  public DslResponseAssertion anyMatch(boolean enable) {
+<b class="fc">&nbsp;    anyMatch = enable;</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  protected TestElement buildTestElement() {
+<b class="fc">&nbsp;    ResponseAssertion ret = new ResponseAssertion();</b>
+<b class="fc">&nbsp;    setScopeTo(ret);</b>
+<b class="fc">&nbsp;    ret.setProperty(&quot;Assertion.test_field&quot;, fieldToTest.propertyValue);</b>
+<b class="fc">&nbsp;    ret.setAssumeSuccess(ignoreStatus);</b>
+<b class="fc">&nbsp;    if (invertCheck) {</b>
+<b class="fc">&nbsp;      ret.setToNotType();</b>
+&nbsp;    }
+<b class="fc">&nbsp;    if (anyMatch) {</b>
+<b class="fc">&nbsp;      ret.setToOrType();</b>
+&nbsp;    }
+<b class="fc">&nbsp;    testStrategy.applyTo(ret);</b>
+<b class="fc">&nbsp;    testStrings.forEach(ret::addTestString);</b>
+<b class="fc">&nbsp;    return ret;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Identifies a particular field to apply the assertion to.
+&nbsp;   */
+<b class="fc">&nbsp;  public enum TargetField implements EnumPropertyValue {</b>
+&nbsp;    /**
+&nbsp;     * Applies the assertion to the response body.
+&nbsp;     */
+<b class="fc">&nbsp;    RESPONSE_BODY(&quot;response_data&quot;),</b>
+&nbsp;    /**
+&nbsp;     * Applies the assertion to the text obtained through &lt;a
+&nbsp;     * href=&quot;http://tika.apache.org/1.2/formats.html&quot;&gt;Apache Tika&lt;/a&gt; from the response body (which
+&nbsp;     * might be a pdf, excel, etc.).
+&nbsp;     */
+<b class="fc">&nbsp;    RESPONSE_BODY_AS_DOCUMENT(&quot;response_data_as_document&quot;),</b>
+&nbsp;    /**
+&nbsp;     * Applies the assertion to the response code (eg: the HTTP response code, like 200).
+&nbsp;     */
+<b class="fc">&nbsp;    RESPONSE_CODE(&quot;response_code&quot;),</b>
+&nbsp;    /**
+&nbsp;     * Applies the assertion to the response message (eg: the HTTP response message, like OK).
+&nbsp;     */
+<b class="fc">&nbsp;    RESPONSE_MESSAGE(&quot;response_message&quot;),</b>
+&nbsp;    /**
+&nbsp;     * Applies the assertion to the set of response headers. Response headers is a string with
+&nbsp;     * headers separated by new lines and names and values separated by colons.
+&nbsp;     */
+<b class="fc">&nbsp;    RESPONSE_HEADERS(&quot;response_headers&quot;),</b>
+&nbsp;    /**
+&nbsp;     * Applies the assertion to the set of request headers. Request headers is a string with headers
+&nbsp;     * separated by new lines and names and values separated by colons.
+&nbsp;     */
+<b class="fc">&nbsp;    REQUEST_HEADERS(&quot;request_headers&quot;),</b>
+&nbsp;    /**
+&nbsp;     * Applies the assertion to the requested URL.
+&nbsp;     */
+<b class="fc">&nbsp;    REQUEST_URL(&quot;sample_label&quot;),</b>
+&nbsp;    /**
+&nbsp;     * Applies the assertion to the request body.
+&nbsp;     */
+<b class="fc">&nbsp;    REQUEST_BODY(&quot;request_data&quot;);</b>
+&nbsp;
+&nbsp;    private final String propertyValue;
+&nbsp;
+<b class="fc">&nbsp;    TargetField(String propertyValue) {</b>
+<b class="fc">&nbsp;      this.propertyValue = &quot;Assertion.&quot; + propertyValue;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String propertyValue() {
+<b class="fc">&nbsp;      return propertyValue;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;  }
+&nbsp;
+<b class="fc">&nbsp;  public enum TestStringStrategy {</b>
+<b class="fc">&nbsp;    CONTAINS_REGEX(ResponseAssertion::setToContainsType),</b>
+<b class="fc">&nbsp;    MATCHES_REGEX(ResponseAssertion::setToMatchType),</b>
+<b class="fc">&nbsp;    SUBSTRING(ResponseAssertion::setToSubstringType),</b>
+<b class="fc">&nbsp;    EQUALS(ResponseAssertion::setToEqualsType);</b>
+&nbsp;
+&nbsp;    private final Consumer&lt;ResponseAssertion&gt; applier;
+&nbsp;
+<b class="fc">&nbsp;    TestStringStrategy(Consumer&lt;ResponseAssertion&gt; applier) {</b>
+<b class="fc">&nbsp;      this.applier = applier;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void applyTo(ResponseAssertion assertion) {
+<b class="fc">&nbsp;      applier.accept(assertion);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;  }
+&nbsp;
+<b class="fc">&nbsp;  public static class CodeBuilder extends ScopedTestElementCallBuilder&lt;ResponseAssertion&gt; {</b>
+&nbsp;
+&nbsp;    public CodeBuilder(List&lt;Method&gt; builderMethods) {
+<b class="fc">&nbsp;      super(&quot;Assertion&quot;, ResponseAssertion.class, builderMethods);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected MethodCall buildScopedMethodCall(ResponseAssertion testElement) {
+<b class="fc">&nbsp;      return buildMethodCall(new TestElementParamBuilder(testElement).nameParam(DEFAULT_NAME));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected void chainScopedElementAdditionalOptions(MethodCall ret,
+&nbsp;        ResponseAssertion testElement) {
+<b class="fc">&nbsp;      TestElementParamBuilder paramBuilder = new TestElementParamBuilder(testElement, &quot;Assertion&quot;);</b>
+<b class="fc">&nbsp;      ret.chain(&quot;fieldToTest&quot;, paramBuilder.enumParam(&quot;test_field&quot;, TargetField.RESPONSE_BODY));</b>
+<b class="fc">&nbsp;      ret.chain(&quot;ignoreStatus&quot;, paramBuilder.boolParam(&quot;assume_success&quot;, false));</b>
+<b class="fc">&nbsp;      ret.chain(&quot;anyMatch&quot;, new BoolParam(testElement.isOrType(), false));</b>
+<b class="fc">&nbsp;      ret.chain(&quot;invertCheck&quot;, new BoolParam(testElement.isNotType(), false));</b>
+<b class="fc">&nbsp;      ret.chain(findTestingStrategyMethod(testElement),</b>
+<b class="fc">&nbsp;          new StringsCollectionParam(testElement.getTestStrings()));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static class StringsCollectionParam extends MethodParam {
+&nbsp;
+&nbsp;      private final CollectionProperty collection;
+&nbsp;
+&nbsp;      protected StringsCollectionParam(CollectionProperty prop) {
+<b class="fc">&nbsp;        super(String[].class, prop.getStringValue());</b>
+<b class="fc">&nbsp;        collection = prop;</b>
+&nbsp;      }
+&nbsp;
+&nbsp;      @Override
+&nbsp;      protected String buildCode(String indent) {
+<b class="fc">&nbsp;        if (collection.size() == 1) {</b>
+<b class="fc">&nbsp;          return buildStringLiteral(collection.get(0).getStringValue(), indent);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        return &quot;\n&quot;</b>
+<b class="fc">&nbsp;            + propertyIterator2Stream(collection.iterator())</b>
+<b class="fc">&nbsp;            .map(p -&gt; indent + buildStringLiteral(p.getStringValue(), indent))</b>
+<b class="fc">&nbsp;            .collect(Collectors.joining(&quot;,\n&quot;))</b>
+&nbsp;            + &quot;\n&quot;;
+&nbsp;      }
+&nbsp;
+&nbsp;    }
+&nbsp;
+&nbsp;    private String findTestingStrategyMethod(ResponseAssertion testElement) {
+<b class="fc">&nbsp;      if (testElement.isSubstringType()) {</b>
+<b class="fc">&nbsp;        return &quot;containsSubstrings&quot;;</b>
+<b class="fc">&nbsp;      } else if (testElement.isEqualsType()) {</b>
+<b class="fc">&nbsp;        return &quot;equalsToStrings&quot;;</b>
+<b class="fc">&nbsp;      } else if (testElement.isContainsType()) {</b>
+<b class="fc">&nbsp;        return &quot;containsRegexes&quot;;</b>
+<b class="fc">&nbsp;      } else if (testElement.isMatchType()) {</b>
+<b class="fc">&nbsp;        return &quot;matchesRegexes&quot;;</b>
+&nbsp;      }
+<b class="nc">&nbsp;      throw new UnsupportedOperationException(</b>
+<b class="nc">&nbsp;          String.format(&quot;The response assertion has a type (%d) which is not supported by the DSL.&quot;,</b>
+<b class="nc">&nbsp;              testElement.getTestType()));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;  }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-03 22:39</div>
+</div>
+</body>
+</html>

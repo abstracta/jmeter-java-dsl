@@ -1,0 +1,126 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=GBK"> 
+  <title>Coverage Report > TimeMetricSummary</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">us.abstracta.jmeter.javadsl.core.stats</a>
+</div>
+
+<h1>Coverage Summary for Class: TimeMetricSummary (us.abstracta.jmeter.javadsl.core.stats)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+</tr>
+<tr>
+  <td class="name">TimeMetricSummary</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package us.abstracta.jmeter.javadsl.core.stats;
+&nbsp;
+&nbsp;import java.time.Duration;
+&nbsp;
+&nbsp;/**
+&nbsp; * Provides summary data for a set of timing values.
+&nbsp; *
+&nbsp; * @since 0.37
+&nbsp; */
+&nbsp;public interface TimeMetricSummary {
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Gets the minimum collected value.
+&nbsp;   */
+&nbsp;  Duration min();
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Gets the maximum collected value.
+&nbsp;   */
+&nbsp;  Duration max();
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Gets the mean/average of collected values.
+&nbsp;   */
+&nbsp;  Duration mean();
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Gets the median of collected values.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * The median is the same as percentile 50, and is the value for which 50% of the collected values
+&nbsp;   * is smaller/greater.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * This value might differ from {@link #mean()} when distribution of values is not symmetric.
+&nbsp;   */
+&nbsp;  Duration median();
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Gets the 90 percentile of samples times.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * 90% of samples took less or equal to the returned value.
+&nbsp;   */
+&nbsp;  Duration perc90();
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Gets the 95 percentile of samples times.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * 95% of samples took less or equal to the returned value.
+&nbsp;   */
+&nbsp;  Duration perc95();
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Gets the 99 percentile of samples times.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * 99% of samples took less or equal to the returned value.
+&nbsp;   */
+&nbsp;  Duration perc99();
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-03 22:39</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,206 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=GBK"> 
+  <title>Coverage Report > DslRecordingController</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">us.abstracta.jmeter.javadsl.core.controllers</a>
+</div>
+
+<h1>Coverage Summary for Class: DslRecordingController (us.abstracta.jmeter.javadsl.core.controllers)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DslRecordingController</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">DslRecordingController$CodeBuilder</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">DslRecordingController$OnlyChildrenMethodCall</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    66.7%
+  </span>
+  <span class="absValue">
+    (4/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    66.7%
+  </span>
+  <span class="absValue">
+    (4/6)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package us.abstracta.jmeter.javadsl.core.controllers;
+&nbsp;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.List;
+&nbsp;import org.apache.jmeter.protocol.http.control.RecordingController;
+&nbsp;import org.apache.jmeter.protocol.http.control.gui.RecordController;
+&nbsp;import org.apache.jmeter.testelement.TestElement;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.MethodCall;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.MethodCallContext;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.SingleTestElementCallBuilder;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.params.ChildrenParam;
+&nbsp;import us.abstracta.jmeter.javadsl.core.threadgroups.BaseThreadGroup.ThreadGroupChild;
+&nbsp;
+&nbsp;/**
+&nbsp; * This element is only provided to ignore recording controllers when generating DSL code from JMX.
+&nbsp; *
+&nbsp; * @since 0.50
+&nbsp; */
+&nbsp;public class DslRecordingController extends BaseController&lt;DslRecordingController&gt; {
+&nbsp;
+&nbsp;  public DslRecordingController(List&lt;ThreadGroupChild&gt; children) {
+<b class="nc">&nbsp;    super(&quot;Recording Controller&quot;, RecordController.class, children);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  protected TestElement buildTestElement() {
+<b class="nc">&nbsp;    throw new UnsupportedOperationException();</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  public static class CodeBuilder extends SingleTestElementCallBuilder&lt;RecordingController&gt; {
+&nbsp;
+&nbsp;    public CodeBuilder() {
+<b class="fc">&nbsp;      super(RecordingController.class, Collections.emptyList());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected MethodCall buildMethodCall(RecordingController testElement,
+&nbsp;        MethodCallContext context) {
+<b class="fc">&nbsp;      return new OnlyChildrenMethodCall();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;  }
+&nbsp;
+&nbsp;  public static class OnlyChildrenMethodCall extends MethodCall {
+&nbsp;
+&nbsp;    protected OnlyChildrenMethodCall() {
+<b class="fc">&nbsp;      super(null, DslController.class, new ChildrenParam&lt;&gt;(ThreadGroupChild[].class));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String buildCode(String indent) {
+<b class="fc">&nbsp;      return buildParamsCode(indent);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;  }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-03 22:39</div>
+</div>
+</body>
+</html>

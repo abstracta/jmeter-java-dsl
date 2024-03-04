@@ -1,0 +1,220 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=GBK"> 
+  <title>Coverage Report > GraphiteBackendListener</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">us.abstracta.jmeter.javadsl.core.listeners</a>
+</div>
+
+<h1>Coverage Summary for Class: GraphiteBackendListener (us.abstracta.jmeter.javadsl.core.listeners)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">GraphiteBackendListener</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (20/20)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">GraphiteBackendListener$CodeBuilder</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (5/5)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (6/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (25/25)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package us.abstracta.jmeter.javadsl.core.listeners;
+&nbsp;
+&nbsp;import java.lang.reflect.Method;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import org.apache.jmeter.config.Arguments;
+&nbsp;import org.apache.jmeter.visualizers.backend.graphite.GraphiteBackendListenerClient;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.MethodCall;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.params.StringParam;
+&nbsp;
+&nbsp;/**
+&nbsp; * Test element which publishes all test run metrics to a Graphite instance.
+&nbsp; *
+&nbsp; * @since 1.25
+&nbsp; */
+&nbsp;public class GraphiteBackendListener extends DslBackendListener&lt;GraphiteBackendListener&gt; {
+&nbsp;
+&nbsp;  private static final int PICKLE_PORT = 2004;
+&nbsp;  private static final String HOST_ARG = &quot;graphiteHost&quot;;
+&nbsp;  private static final String PORT_ARG = &quot;graphitePort&quot;;
+&nbsp;  private static final String PREFIX_ARG = &quot;rootMetricsPrefix&quot;;
+&nbsp;  private String prefix;
+&nbsp;
+&nbsp;  public GraphiteBackendListener(String url) {
+<b class="fc">&nbsp;    super(GraphiteBackendListenerClient.class, url);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Allows specifying the prefix used to store the metrics in Graphite.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * This is useful to group the metrics of a single run, test plan, project, etc.
+&nbsp;   *
+&nbsp;   * @param prefix specifies the prefix to be used to store the metrics. When not specified
+&nbsp;   *               &quot;jmeter.&quot; is used.
+&nbsp;   * @return the Graphite listener for further configuration or usage.
+&nbsp;   */
+&nbsp;  public GraphiteBackendListener metricsPrefix(String prefix) {
+<b class="fc">&nbsp;    this.prefix = prefix;</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  protected Arguments buildListenerArguments() {
+<b class="fc">&nbsp;    Arguments ret = new Arguments();</b>
+<b class="fc">&nbsp;    solveHostAndPort(url, ret);</b>
+<b class="fc">&nbsp;    if (prefix != null) {</b>
+<b class="fc">&nbsp;      ret.addArgument(PREFIX_ARG, prefix);</b>
+&nbsp;    }
+<b class="fc">&nbsp;    ret.addArgument(&quot;graphiteMetricsSender&quot;,</b>
+&nbsp;        &quot;org.apache.jmeter.visualizers.backend.graphite.PickleGraphiteMetricsSender&quot;);
+<b class="fc">&nbsp;    ret.addArgument(&quot;summaryOnly&quot;, &quot;false&quot;);</b>
+<b class="fc">&nbsp;    ret.addArgument(&quot;useRegexpForSamplersList&quot;, &quot;true&quot;);</b>
+<b class="fc">&nbsp;    ret.addArgument(&quot;samplersList&quot;, &quot;.*&quot;);</b>
+<b class="fc">&nbsp;    return ret;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private void solveHostAndPort(String url, Arguments args) {
+&nbsp;    String host;
+&nbsp;    String port;
+<b class="fc">&nbsp;    int portPos = url.indexOf(&quot;:&quot;);</b>
+<b class="fc">&nbsp;    if (portPos &gt;= 0) {</b>
+<b class="fc">&nbsp;      host = url.substring(0, portPos);</b>
+<b class="fc">&nbsp;      port = url.substring(portPos + 1);</b>
+&nbsp;    } else {
+<b class="fc">&nbsp;      host = url;</b>
+<b class="fc">&nbsp;      port = String.valueOf(PICKLE_PORT);</b>
+&nbsp;    }
+<b class="fc">&nbsp;    args.addArgument(HOST_ARG, host);</b>
+<b class="fc">&nbsp;    args.addArgument(PORT_ARG, port);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  public static class CodeBuilder extends BackendListenerCodeBuilder {
+&nbsp;
+&nbsp;    public CodeBuilder(List&lt;Method&gt; builderMethods) {
+<b class="fc">&nbsp;      super(GraphiteBackendListenerClient.class, builderMethods);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected MethodCall buildBackendListenerCall(Map&lt;String, String&gt; args,
+&nbsp;        Map&lt;String, String&gt; defaultValues) {
+<b class="fc">&nbsp;      String port = args.get(PORT_ARG);</b>
+<b class="fc">&nbsp;      return buildMethodCall(</b>
+&nbsp;          new StringParam(
+<b class="fc">&nbsp;              args.get(HOST_ARG) + (!String.valueOf(PICKLE_PORT).equals(port) ? &quot;:&quot; + port : &quot;&quot;)))</b>
+<b class="fc">&nbsp;          .chain(&quot;metricsPrefix&quot;, buildArgParam(PREFIX_ARG, args, defaultValues));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;  }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-03 20:57</div>
+</div>
+</body>
+</html>

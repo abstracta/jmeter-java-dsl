@@ -1,0 +1,982 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=GBK"> 
+  <title>Coverage Report > JtlWriter</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">us.abstracta.jmeter.javadsl.core.listeners</a>
+</div>
+
+<h1>Coverage Summary for Class: JtlWriter (us.abstracta.jmeter.javadsl.core.listeners)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">JtlWriter</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (35/35)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (156/156)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">JtlWriter$CodeBuilder</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (52/52)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">JtlWriter$SampleStatus</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">JtlWriter$SampleStatusParam</td>
+<td class="coverageStat">
+  <span class="percent">
+    80%
+  </span>
+  <span class="absValue">
+    (4/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    92.3%
+  </span>
+  <span class="absValue">
+    (12/13)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    97.8%
+  </span>
+  <span class="absValue">
+    (45/46)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    99.6%
+  </span>
+  <span class="absValue">
+    (222/223)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package us.abstracta.jmeter.javadsl.core.listeners;
+&nbsp;
+&nbsp;import java.io.File;
+&nbsp;import java.lang.reflect.Method;
+&nbsp;import java.time.Instant;
+&nbsp;import java.time.ZoneId;
+&nbsp;import java.time.format.DateTimeFormatter;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.UUID;
+&nbsp;import java.util.regex.Pattern;
+&nbsp;import org.apache.jmeter.reporters.ResultCollector;
+&nbsp;import org.apache.jmeter.samplers.SampleSaveConfiguration;
+&nbsp;import org.apache.jmeter.testelement.TestElement;
+&nbsp;import org.apache.jmeter.util.JMeterUtils;
+&nbsp;import org.apache.jmeter.visualizers.SimpleDataWriter;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.MethodCall;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.MethodCallContext;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.MethodParam;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.SingleTestElementCallBuilder;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.TestElementParamBuilder;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.params.BoolParam;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.params.StringParam;
+&nbsp;
+&nbsp;/**
+&nbsp; * Allows to generate a result log file (JTL) with data for each sample for a test plan, thread
+&nbsp; * group or sampler, depending on what level of test plan is added.
+&nbsp; * &lt;p&gt;
+&nbsp; * If jtlWriter is added at testPlan level it will log information about all samples in the test
+&nbsp; * plan, if added at thread group level it will only log samples for samplers contained within it,
+&nbsp; * if added as a sampler child, then only that sampler samples will be logged.
+&nbsp; * &lt;p&gt;
+&nbsp; * By default, this writer will use JMeter default JTL format, a csv with following fields:
+&nbsp; * timeStamp,elapsed,label,responseCode,responseMessage,threadName,dataType,success,failureMessage,
+&nbsp; * bytes,sentBytes,grpThreads,allThreads,URL,Latency,IdleTime,Connect. You can change the format to
+&nbsp; * XML and specify additional (or remove existing ones) fields to store with provided methods.
+&nbsp; * &lt;p&gt;
+&nbsp; * See &lt;a href=&quot;http://jmeter.apache.org/usermanual/listeners.html&quot;&gt;JMeter listeners doc&lt;/a&gt; for
+&nbsp; * more details on JTL format and settings.
+&nbsp; *
+&nbsp; * @since 0.1
+&nbsp; */
+&nbsp;public class JtlWriter extends BaseListener {
+&nbsp;
+&nbsp;  protected String jtlFile;
+&nbsp;  protected SampleStatus logOnly;
+&nbsp;  protected boolean saveAsXml;
+<b class="fc">&nbsp;  protected boolean saveElapsedTime = true;</b>
+<b class="fc">&nbsp;  protected boolean saveResponseMessage = true;</b>
+<b class="fc">&nbsp;  protected boolean saveSuccess = true;</b>
+<b class="fc">&nbsp;  protected boolean saveSentByteCount = true;</b>
+&nbsp;  protected boolean saveResponseFilename;
+&nbsp;  protected boolean saveEncoding;
+<b class="fc">&nbsp;  protected boolean saveIdleTime = true;</b>
+&nbsp;  protected boolean saveResponseHeaders;
+<b class="fc">&nbsp;  protected boolean saveAssertionResults = true;</b>
+<b class="fc">&nbsp;  protected boolean saveFieldNames = true;</b>
+<b class="fc">&nbsp;  protected boolean saveLabel = true;</b>
+<b class="fc">&nbsp;  protected boolean saveThreadName = true;</b>
+<b class="fc">&nbsp;  protected boolean saveAssertionFailureMessage = true;</b>
+<b class="fc">&nbsp;  protected boolean saveActiveThreadCounts = true;</b>
+<b class="fc">&nbsp;  protected boolean saveLatency = true;</b>
+&nbsp;  protected boolean saveSampleAndErrorCounts;
+&nbsp;  protected boolean saveRequestHeaders;
+&nbsp;  protected boolean saveResponseData;
+<b class="fc">&nbsp;  protected boolean saveTimeStamp = true;</b>
+<b class="fc">&nbsp;  protected boolean saveResponseCode = true;</b>
+<b class="fc">&nbsp;  protected boolean saveDataType = true;</b>
+<b class="fc">&nbsp;  protected boolean saveReceivedByteCount = true;</b>
+<b class="fc">&nbsp;  protected boolean saveUrl = true;</b>
+<b class="fc">&nbsp;  protected boolean saveConnectTime = true;</b>
+&nbsp;  protected boolean saveHostname;
+&nbsp;  protected boolean saveSamplerData;
+<b class="fc">&nbsp;  protected boolean saveSubResults = true;</b>
+<b class="fc">&nbsp;  protected List&lt;String&gt; sampleVariables = Collections.emptyList();</b>
+&nbsp;
+&nbsp;  public JtlWriter(String directoryPath, String fileName) {
+<b class="fc">&nbsp;    super(&quot;Simple Data Writer&quot;, SimpleDataWriter.class);</b>
+<b class="fc">&nbsp;    File directory = new File(directoryPath);</b>
+<b class="fc">&nbsp;    directory.mkdirs();</b>
+<b class="fc">&nbsp;    this.jtlFile = directory.toPath()</b>
+<b class="fc">&nbsp;        .resolve(fileName != null ? fileName : buildFileName())</b>
+<b class="fc">&nbsp;        .toString();</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private static String buildFileName() {
+<b class="fc">&nbsp;    DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern(&quot;yyyy-MM-dd hh-mm-ss&quot;)</b>
+<b class="fc">&nbsp;        .withZone(ZoneId.systemDefault());</b>
+<b class="fc">&nbsp;    return timeFormatter.format(Instant.now()) + &quot; &quot; + UUID.randomUUID() + &quot;.jtl&quot;;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Allows filtering which sample results to log according to their status.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * This is useful, for example, when you want to have a jtl file with basic information for
+&nbsp;   * success sample results, but a more detailed jtl file for the ones that fail.
+&nbsp;   *
+&nbsp;   * @param status specifies the status of the sample results to log. When set to null it will log
+&nbsp;   *               all sample results. By default, it is set to null.
+&nbsp;   * @return the JtlWriter for further configuration or usage.
+&nbsp;   * @since 1.4
+&nbsp;   */
+&nbsp;  public JtlWriter logOnly(SampleStatus status) {
+<b class="fc">&nbsp;    this.logOnly = status;</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+<b class="fc">&nbsp;  public enum SampleStatus {</b>
+<b class="fc">&nbsp;    SUCCESS, ERROR</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Allows setting to include all fields in XML format.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * This is just a shorter way of using {@link #withAllFields(boolean)} with true setting.
+&nbsp;   *
+&nbsp;   * @return the JtlWriter for further configuration or usage.
+&nbsp;   * @see #withAllFields(boolean)
+&nbsp;   * @since 1.0
+&nbsp;   */
+&nbsp;  public JtlWriter withAllFields() {
+<b class="fc">&nbsp;    return withAllFields(true);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Allows setting if all or none fields are enabled when saving the JTL.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * If you enable them all, then XML format will be used.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * Take into consideration that having a JTL writer with no fields enabled makes no sense. But,
+&nbsp;   * you may want to disable all fields to then enable specific ones, and not having to manually
+&nbsp;   * disable each of default included fields manually. The same applies when you want most of the
+&nbsp;   * fields except for some: in such case you can enable all and then manually disable the ones that
+&nbsp;   * you want to exclude.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * Also take into consideration that the more fields you add to JTL writer, the more time JMeter
+&nbsp;   * will spend on saving the information, and the more disk the file will consume. So, include
+&nbsp;   * fields thoughtfully.
+&nbsp;   *
+&nbsp;   * @param enabled specifies whether enable or disable all fields.
+&nbsp;   * @return the JtlWriter for further configuration or usage.
+&nbsp;   * @since 0.13
+&nbsp;   */
+&nbsp;  public JtlWriter withAllFields(boolean enabled) {
+<b class="fc">&nbsp;    saveAsXml = enabled;</b>
+<b class="fc">&nbsp;    saveElapsedTime = enabled;</b>
+<b class="fc">&nbsp;    saveResponseMessage = enabled;</b>
+<b class="fc">&nbsp;    saveSuccess = enabled;</b>
+<b class="fc">&nbsp;    saveSentByteCount = enabled;</b>
+<b class="fc">&nbsp;    saveResponseFilename = enabled;</b>
+<b class="fc">&nbsp;    saveEncoding = enabled;</b>
+<b class="fc">&nbsp;    saveIdleTime = enabled;</b>
+<b class="fc">&nbsp;    saveResponseHeaders = enabled;</b>
+<b class="fc">&nbsp;    saveAssertionResults = enabled;</b>
+<b class="fc">&nbsp;    saveFieldNames = enabled;</b>
+<b class="fc">&nbsp;    saveLabel = enabled;</b>
+<b class="fc">&nbsp;    saveThreadName = enabled;</b>
+<b class="fc">&nbsp;    saveAssertionFailureMessage = enabled;</b>
+<b class="fc">&nbsp;    saveActiveThreadCounts = enabled;</b>
+<b class="fc">&nbsp;    saveLatency = enabled;</b>
+<b class="fc">&nbsp;    saveSampleAndErrorCounts = enabled;</b>
+<b class="fc">&nbsp;    saveRequestHeaders = enabled;</b>
+<b class="fc">&nbsp;    saveResponseData = enabled;</b>
+<b class="fc">&nbsp;    saveTimeStamp = enabled;</b>
+<b class="fc">&nbsp;    saveResponseCode = enabled;</b>
+<b class="fc">&nbsp;    saveDataType = enabled;</b>
+<b class="fc">&nbsp;    saveReceivedByteCount = enabled;</b>
+<b class="fc">&nbsp;    saveUrl = enabled;</b>
+<b class="fc">&nbsp;    saveConnectTime = enabled;</b>
+<b class="fc">&nbsp;    saveHostname = enabled;</b>
+<b class="fc">&nbsp;    saveSamplerData = enabled;</b>
+<b class="fc">&nbsp;    saveSubResults = enabled;</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Allows specifying to use XML or CSV format for saving JTL.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * Take into consideration that some fields (like requestHeaders, responseHeaders, etc.) will only
+&nbsp;   * be saved when XML format is used.
+&nbsp;   *
+&nbsp;   * @param enabled specifies whether enable XML format saving, or disable it (and use CSV). By
+&nbsp;   *                default, it is set to false.
+&nbsp;   * @return the JtlWriter for further configuration or usage.
+&nbsp;   * @since 0.13
+&nbsp;   */
+&nbsp;  public JtlWriter saveAsXml(boolean enabled) {
+<b class="fc">&nbsp;    this.saveAsXml = enabled;</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Allows setting whether or not to include elapsed time (milliseconds spent in each sample) in
+&nbsp;   * generated JTL.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * This is usually the most important metric to collect during a performance test, so in general
+&nbsp;   * this should be included.
+&nbsp;   *
+&nbsp;   * @param enabled specifies whether enable or disable inclusion of elapsed time. By default, it is
+&nbsp;   *                set to true.
+&nbsp;   * @return the JtlWriter for further configuration or usage.
+&nbsp;   * @since 0.13
+&nbsp;   */
+&nbsp;  public JtlWriter withElapsedTime(boolean enabled) {
+<b class="fc">&nbsp;    this.saveElapsedTime = enabled;</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Allows setting whether or not to include response message (eg: &quot;OK&quot; for HTTP 200 status code)
+&nbsp;   * in generated JTL.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * This property is usually handy to trace potential issues, specially the ones that are not
+&nbsp;   * standard issues (like HTTPConnectionExceptions) which are not deducible from response code.
+&nbsp;   *
+&nbsp;   * @param enabled specifies whether enable or disable inclusion of response message. By default,
+&nbsp;   *                it is set to true.
+&nbsp;   * @return the JtlWriter for further configuration or usage.
+&nbsp;   * @since 0.13
+&nbsp;   */
+&nbsp;  public JtlWriter withResponseMessage(boolean enabled) {
+<b class="fc">&nbsp;    this.saveResponseMessage = enabled;</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Allows setting whether or not to include success (a boolean indicating if request was success
+&nbsp;   * or not) field in generated JTL.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * This property is usually handy to easily identify if a request failed or not (either due to
+&nbsp;   * default JMeter logic, or due to some assertion check or post processor alteration).
+&nbsp;   *
+&nbsp;   * @param enabled specifies whether enable or disable inclusion of success field. By default, it
+&nbsp;   *                is set to true.
+&nbsp;   * @return the JtlWriter for further configuration or usage.
+&nbsp;   * @since 0.13
+&nbsp;   */
+&nbsp;  public JtlWriter withSuccess(boolean enabled) {
+<b class="fc">&nbsp;    this.saveSuccess = enabled;</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Allows setting whether or not to include sent bytes count (number of bytes sent to server by
+&nbsp;   * request) field in generated JTL.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * This property is helpful when requests are dynamically generated or when you want to easily
+&nbsp;   * evaluate how much data/load has been transferred to the server.
+&nbsp;   *
+&nbsp;   * @param enabled specifies whether enable or disable inclusion of sent bytes count. By default,
+&nbsp;   *                it is set to true.
+&nbsp;   * @return the JtlWriter for further configuration or usage.
+&nbsp;   * @since 0.13
+&nbsp;   */
+&nbsp;  public JtlWriter withSentByteCount(boolean enabled) {
+<b class="fc">&nbsp;    this.saveSentByteCount = enabled;</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Allows setting whether or not to include response file name (name of file stored by
+&nbsp;   * {@link ResponseFileSaver}) field in generated JTL.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * This property is helpful when ResponseFileSaver is used to easily trace the request response
+&nbsp;   * contents and don&#39;t have to include them in JTL file itself.
+&nbsp;   *
+&nbsp;   * @param enabled specifies whether enable or disable inclusion of response file name. By default,
+&nbsp;   *                it is set to false.
+&nbsp;   * @return the JtlWriter for further configuration or usage.
+&nbsp;   * @since 0.13
+&nbsp;   */
+&nbsp;  public JtlWriter withResponseFilename(boolean enabled) {
+<b class="fc">&nbsp;    this.saveResponseFilename = enabled;</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Allows setting whether or not to include the response encoding (eg: UTF-8, ISO-8859-1, etc.)
+&nbsp;   * field in generated JTL.
+&nbsp;   *
+&nbsp;   * @param enabled specifies whether enable or disable inclusion of response encoding. By default,
+&nbsp;   *                it is set to false.
+&nbsp;   * @return the JtlWriter for further configuration or usage.
+&nbsp;   * @since 0.13
+&nbsp;   */
+&nbsp;  public JtlWriter withEncoding(boolean enabled) {
+<b class="fc">&nbsp;    this.saveEncoding = enabled;</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Allows setting whether or not to include the Idle time (milliseconds spent in JMeter
+&nbsp;   * processing, but not sampling, generally 0) field in generated JTL.
+&nbsp;   *
+&nbsp;   * @param enabled specifies whether enable or disable inclusion of idle time. By default, it is
+&nbsp;   *                set to true.
+&nbsp;   * @return the JtlWriter for further configuration or usage.
+&nbsp;   * @since 0.13
+&nbsp;   */
+&nbsp;  public JtlWriter withIdleTime(boolean enabled) {
+<b class="fc">&nbsp;    this.saveIdleTime = enabled;</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Allows setting whether or not to include response headers (eg: HTTP headers like Content-Type
+&nbsp;   * and the like) field in generated JTL.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * &lt;b&gt;Note:&lt;/b&gt; this field will only be saved if {@link #saveAsXml(boolean)} is also set to
+&nbsp;   * true.
+&nbsp;   *
+&nbsp;   * @param enabled specifies whether enable or disable inclusion of response headers. By default,
+&nbsp;   *                it is set to false.
+&nbsp;   * @return the JtlWriter for further configuration or usage.
+&nbsp;   * @since 0.13
+&nbsp;   */
+&nbsp;  public JtlWriter withResponseHeaders(boolean enabled) {
+<b class="fc">&nbsp;    this.saveResponseHeaders = enabled;</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Allows setting whether or not to include assertion results (with name, success field, and
+&nbsp;   * potential error message) info in generated JTL.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * &lt;b&gt;Note:&lt;/b&gt; this will only be saved if {@link #saveAsXml(boolean)} is also set to
+&nbsp;   * true.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * This info is handy when tracing why requests are marked as failure and exact reason.
+&nbsp;   *
+&nbsp;   * @param enabled specifies whether enable or disable inclusion of assertion results. By default,
+&nbsp;   *                it is set to true.
+&nbsp;   * @return the JtlWriter for further configuration or usage.
+&nbsp;   * @since 0.13
+&nbsp;   */
+&nbsp;  public JtlWriter withAssertionResults(boolean enabled) {
+<b class="fc">&nbsp;    this.saveAssertionResults = enabled;</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Allows setting whether or not to include assertion results (with name, success field, and
+&nbsp;   * potential error message) info in generated JTL.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * &lt;b&gt;Note:&lt;/b&gt; this will only be saved if {@link #saveAsXml(boolean)} is set to false (or not
+&nbsp;   * set, which defaults XML save to false).
+&nbsp;   *
+&nbsp;   * @param enabled specifies whether enable or disable inclusion of assertion results. By default,
+&nbsp;   *                it is set to true.
+&nbsp;   * @return the JtlWriter for further configuration or usage.
+&nbsp;   * @since 0.13
+&nbsp;   */
+&nbsp;  public JtlWriter withFieldNames(boolean enabled) {
+<b class="fc">&nbsp;    this.saveFieldNames = enabled;</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Allows setting whether or not to include sample label (i.e.: name of the request) field in
+&nbsp;   * generated JTL.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * In general, you should enable this field to properly identify results to associated samplers.
+&nbsp;   *
+&nbsp;   * @param enabled specifies whether enable or disable inclusion of sample labels. By default, it
+&nbsp;   *                is set to true.
+&nbsp;   * @return the JtlWriter for further configuration or usage.
+&nbsp;   * @since 0.13
+&nbsp;   */
+&nbsp;  public JtlWriter withLabel(boolean enabled) {
+<b class="fc">&nbsp;    this.saveLabel = enabled;</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Allows setting whether or not to include thread name field in generated JTL.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * This is helpful to identify the requests generated by each thread and allow tracing
+&nbsp;   * &quot;correlated&quot; requests (requests that are associated to previous requests in same thread).
+&nbsp;   *
+&nbsp;   * @param enabled specifies whether enable or disable inclusion of thread name. By default, it is
+&nbsp;   *                set to true.
+&nbsp;   * @return the JtlWriter for further configuration or usage.
+&nbsp;   * @since 0.13
+&nbsp;   */
+&nbsp;  public JtlWriter withThreadName(boolean enabled) {
+<b class="fc">&nbsp;    this.saveThreadName = enabled;</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Allows setting whether or not to include assertion failure message field in generated JTL.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * This is helpful to trace potential reason of a request being marked as failure.
+&nbsp;   *
+&nbsp;   * @param enabled specifies whether enable or disable inclusion of assertion failure message. By
+&nbsp;   *                default, it is set to true.
+&nbsp;   * @return the JtlWriter for further configuration or usage.
+&nbsp;   * @since 0.13
+&nbsp;   */
+&nbsp;  public JtlWriter withAssertionFailureMessage(boolean enabled) {
+<b class="fc">&nbsp;    this.saveAssertionFailureMessage = enabled;</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Allows setting whether or not to include active thread counts (basically, number of concurrent
+&nbsp;   * requests, both in the sample thread group, and in all thread groups) fields in generated JTL.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * This is helpful to know under how much load (concurrent requests) is the tested service at the
+&nbsp;   * moment the request was done.
+&nbsp;   *
+&nbsp;   * @param enabled specifies whether enable or disable inclusion of active thread counts. By
+&nbsp;   *                default, it is set to true.
+&nbsp;   * @return the JtlWriter for further configuration or usage.
+&nbsp;   * @since 0.13
+&nbsp;   */
+&nbsp;  public JtlWriter withActiveThreadCounts(boolean enabled) {
+<b class="fc">&nbsp;    this.saveActiveThreadCounts = enabled;</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Allows setting whether or not to include latency time (milliseconds between the sample started
+&nbsp;   * and first byte of response is received) field in generated JTL.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * This is usually helpful to identify how fast does the tested service takes to answer, taking
+&nbsp;   * out the time spent in transferring response data.
+&nbsp;   *
+&nbsp;   * @param enabled specifies whether enable or disable inclusion of latency time. By default, it is
+&nbsp;   *                set to true.
+&nbsp;   * @return the JtlWriter for further configuration or usage.
+&nbsp;   * @since 0.13
+&nbsp;   */
+&nbsp;  public JtlWriter withLatency(boolean enabled) {
+<b class="fc">&nbsp;    this.saveLatency = enabled;</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Allows setting whether or not to include sample counts (total and error counts) fields in
+&nbsp;   * generated JTL.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * In general sample count will be 1, and error count will be 0 or 1 depending on sample success
+&nbsp;   * or failure. But there are some scenarios where these counts might be greater, for example when
+&nbsp;   * controllers results are being included.
+&nbsp;   *
+&nbsp;   * @param enabled specifies whether enable or disable inclusion of sample counts. By default, it
+&nbsp;   *                is set to false.
+&nbsp;   * @return the JtlWriter for further configuration or usage.
+&nbsp;   * @since 0.13
+&nbsp;   */
+&nbsp;  public JtlWriter withSampleAndErrorCounts(boolean enabled) {
+<b class="fc">&nbsp;    this.saveSampleAndErrorCounts = enabled;</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Allows setting whether or not to include request headers (eg: HTTP headers like User-Agent and
+&nbsp;   * the like) field in generated JTL.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * &lt;b&gt;Note:&lt;/b&gt; this field will only be saved if {@link #saveAsXml(boolean)} is also set to
+&nbsp;   * true.
+&nbsp;   *
+&nbsp;   * @param enabled specifies whether enable or disable inclusion of request headers. By default, it
+&nbsp;   *                is set to false.
+&nbsp;   * @return the JtlWriter for further configuration or usage.
+&nbsp;   * @since 0.13
+&nbsp;   */
+&nbsp;  public JtlWriter withRequestHeaders(boolean enabled) {
+<b class="fc">&nbsp;    this.saveRequestHeaders = enabled;</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Allows setting whether or not to include response body field in generated JTL.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * &lt;b&gt;Note:&lt;/b&gt; this field will only be saved if {@link #saveAsXml(boolean)} is also set to
+&nbsp;   * true.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * This is usually helpful for tracing the response obtained by each sample. Consider using
+&nbsp;   * {@link ResponseFileSaver} to get a file for each response body.
+&nbsp;   *
+&nbsp;   * @param enabled specifies whether enable or disable inclusion of response body. By default, it
+&nbsp;   *                is set to false.
+&nbsp;   * @return the JtlWriter for further configuration or usage.
+&nbsp;   * @since 0.13
+&nbsp;   */
+&nbsp;  public JtlWriter withResponseData(boolean enabled) {
+<b class="fc">&nbsp;    this.saveResponseData = enabled;</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Allows setting whether or not to include timestamp (epoch when the sample started) field in
+&nbsp;   * generated JTL.
+&nbsp;   *
+&nbsp;   * @param enabled specifies whether enable or disable inclusion of timestamps. By default, it is
+&nbsp;   *                set to true.
+&nbsp;   * @return the JtlWriter for further configuration or usage.
+&nbsp;   * @since 0.13
+&nbsp;   */
+&nbsp;  public JtlWriter withTimeStamp(boolean enabled) {
+<b class="fc">&nbsp;    this.saveTimeStamp = enabled;</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Allows setting whether or not to include response codes (e.g.: 200) field in generated JTL.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * This field allows to quickly identify different reasons for failure in server (eg: bad request,
+&nbsp;   * service temporally unavailable, etc.).
+&nbsp;   *
+&nbsp;   * @param enabled specifies whether enable or disable inclusion of response codes. By default, it
+&nbsp;   *                is set to true.
+&nbsp;   * @return the JtlWriter for further configuration or usage.
+&nbsp;   * @since 0.13
+&nbsp;   */
+&nbsp;  public JtlWriter withResponseCode(boolean enabled) {
+<b class="fc">&nbsp;    this.saveResponseCode = enabled;</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Allows setting whether or not to include response data type (i.e.: binary or text) field in
+&nbsp;   * generated JTL.
+&nbsp;   *
+&nbsp;   * @param enabled specifies whether enable or disable inclusion of response data types. By
+&nbsp;   *                default, it is set to true.
+&nbsp;   * @return the JtlWriter for further configuration or usage.
+&nbsp;   * @since 0.13
+&nbsp;   */
+&nbsp;  public JtlWriter withDataType(boolean enabled) {
+<b class="fc">&nbsp;    this.saveDataType = enabled;</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Allows setting whether or not to include received bytes count (number of bytes sent by server
+&nbsp;   * in the response) field in generated JTL.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * This property is helpful to measure how much load is the network getting and how much
+&nbsp;   * information is the tested service generating.
+&nbsp;   *
+&nbsp;   * @param enabled specifies whether enable or disable inclusion of received bytes counts. By
+&nbsp;   *                default, it is set to true.
+&nbsp;   * @return the JtlWriter for further configuration or usage.
+&nbsp;   * @since 0.13
+&nbsp;   */
+&nbsp;  public JtlWriter withReceivedByteCount(boolean enabled) {
+<b class="fc">&nbsp;    this.saveReceivedByteCount = enabled;</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Allows setting whether or not to include url field in generated JTL.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * This property is helpful when URLs are dynamically generated and may vary for the sample
+&nbsp;   * sampler
+&nbsp;   *
+&nbsp;   * @param enabled specifies whether enable or disable inclusion of urls. By default, it is set to
+&nbsp;   *                true.
+&nbsp;   * @return the JtlWriter for further configuration or usage.
+&nbsp;   * @since 0.13
+&nbsp;   */
+&nbsp;  public JtlWriter withUrl(boolean enabled) {
+<b class="fc">&nbsp;    this.saveUrl = enabled;</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Allows setting whether or not to include connect time (milliseconds between the sample started
+&nbsp;   * and connection is established to service to start sending request) field in generated JTL.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * This is usually helpful to identify issues in network latency when connecting or server load
+&nbsp;   * when serving connection requests.
+&nbsp;   *
+&nbsp;   * @param enabled specifies whether enable or disable inclusion of connect time. By default, it is
+&nbsp;   *                set to true.
+&nbsp;   * @return the JtlWriter for further configuration or usage.
+&nbsp;   * @since 0.13
+&nbsp;   */
+&nbsp;  public JtlWriter withConnectTime(boolean enabled) {
+<b class="fc">&nbsp;    this.saveConnectTime = enabled;</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Allows setting whether or not to include host name (name of host that did the sample) field in
+&nbsp;   * generated JTL.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * This particularly helpful when running JMeter in a distributed fashion to identify which node
+&nbsp;   * the sample result is associated to.
+&nbsp;   *
+&nbsp;   * @param enabled specifies whether enable or disable inclusion of host names. By default, it is
+&nbsp;   *                set to false.
+&nbsp;   * @return the JtlWriter for further configuration or usage.
+&nbsp;   * @since 0.13
+&nbsp;   */
+&nbsp;  public JtlWriter withHostname(boolean enabled) {
+<b class="fc">&nbsp;    this.saveHostname = enabled;</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Allows setting whether or not to include sampler data (like cookies, HTTP method, request body
+&nbsp;   * and redirection URL) entries in generated JTL.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * &lt;b&gt;Note:&lt;/b&gt; this field will only be saved if {@link #saveAsXml(boolean)} is also set to
+&nbsp;   * true.
+&nbsp;   *
+&nbsp;   * @param enabled specifies whether enable or disable inclusion of sample data. By default, it is
+&nbsp;   *                set to false.
+&nbsp;   * @return the JtlWriter for further configuration or usage.
+&nbsp;   * @since 0.13
+&nbsp;   */
+&nbsp;  public JtlWriter withSamplerData(boolean enabled) {
+<b class="fc">&nbsp;    this.saveSamplerData = enabled;</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Allows setting whether or not to include sub results (like redirects) entries in generated
+&nbsp;   * JTL.
+&nbsp;   *
+&nbsp;   * @param enabled specifies whether enable or disable inclusion of sub results. By default, it is
+&nbsp;   *                set to true.
+&nbsp;   * @return the JtlWriter for further configuration or usage.
+&nbsp;   * @since 0.13
+&nbsp;   */
+&nbsp;  public JtlWriter withSubResults(boolean enabled) {
+<b class="fc">&nbsp;    this.saveSubResults = enabled;</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Allows specifying JMeter variables to include in generated jtl file.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * &lt;b&gt;Warning:&lt;/b&gt; variables to sample are test plan wide. This means that if you set them in one
+&nbsp;   * jtl writer, they will appear in all jtl writers used in the test plan. Moreover, if you set
+&nbsp;   * them in different jtl writers, only variables set on latest one will be considered.
+&nbsp;   *
+&nbsp;   * @param variables names of JMeter variables to include in jtl file.
+&nbsp;   * @return the JtlWriter for further configuration or usage.
+&nbsp;   * @since 0.22
+&nbsp;   */
+&nbsp;  public JtlWriter withVariables(String... variables) {
+<b class="fc">&nbsp;    this.sampleVariables = Arrays.asList(variables);</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public TestElement buildTestElement() {
+<b class="fc">&nbsp;    ResultCollector logger = new ResultCollector();</b>
+<b class="fc">&nbsp;    logger.setFilename(jtlFile);</b>
+<b class="fc">&nbsp;    if (logOnly != null) {</b>
+<b class="fc">&nbsp;      logger.setSuccessOnlyLogging(logOnly == SampleStatus.SUCCESS);</b>
+<b class="fc">&nbsp;      logger.setErrorLogging(logOnly == SampleStatus.ERROR);</b>
+&nbsp;    }
+<b class="fc">&nbsp;    SampleSaveConfiguration config = logger.getSaveConfig();</b>
+<b class="fc">&nbsp;    config.setAsXml(saveAsXml);</b>
+<b class="fc">&nbsp;    config.setTime(saveElapsedTime);</b>
+<b class="fc">&nbsp;    config.setMessage(saveResponseMessage);</b>
+<b class="fc">&nbsp;    config.setSuccess(saveSuccess);</b>
+<b class="fc">&nbsp;    config.setSentBytes(saveSentByteCount);</b>
+<b class="fc">&nbsp;    config.setFileName(saveResponseFilename);</b>
+<b class="fc">&nbsp;    config.setEncoding(saveEncoding);</b>
+<b class="fc">&nbsp;    config.setIdleTime(saveIdleTime);</b>
+<b class="fc">&nbsp;    config.setResponseHeaders(saveResponseHeaders);</b>
+<b class="fc">&nbsp;    config.setAssertions(saveAssertionResults);</b>
+<b class="fc">&nbsp;    config.setFieldNames(saveFieldNames);</b>
+<b class="fc">&nbsp;    config.setLabel(saveLabel);</b>
+<b class="fc">&nbsp;    config.setThreadName(saveThreadName);</b>
+<b class="fc">&nbsp;    config.setAssertionResultsFailureMessage(saveAssertionFailureMessage);</b>
+<b class="fc">&nbsp;    config.setThreadCounts(saveActiveThreadCounts);</b>
+<b class="fc">&nbsp;    config.setLatency(saveLatency);</b>
+<b class="fc">&nbsp;    config.setSampleCount(saveSampleAndErrorCounts);</b>
+<b class="fc">&nbsp;    config.setRequestHeaders(saveRequestHeaders);</b>
+<b class="fc">&nbsp;    config.setResponseData(saveResponseData);</b>
+<b class="fc">&nbsp;    config.setTimestamp(saveTimeStamp);</b>
+<b class="fc">&nbsp;    config.setCode(saveResponseCode);</b>
+<b class="fc">&nbsp;    config.setDataType(saveDataType);</b>
+<b class="fc">&nbsp;    config.setBytes(saveReceivedByteCount);</b>
+<b class="fc">&nbsp;    config.setUrl(saveUrl);</b>
+<b class="fc">&nbsp;    config.setConnectTime(saveConnectTime);</b>
+<b class="fc">&nbsp;    config.setHostname(saveHostname);</b>
+<b class="fc">&nbsp;    config.setSamplerData(saveSamplerData);</b>
+<b class="fc">&nbsp;    config.setSubresults(saveSubResults);</b>
+<b class="fc">&nbsp;    if (!sampleVariables.isEmpty()) {</b>
+<b class="fc">&nbsp;      JMeterUtils.setProperty(&quot;sample_variables&quot;, String.join(&quot;,&quot;, sampleVariables));</b>
+&nbsp;    }
+<b class="fc">&nbsp;    return logger;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  public static class CodeBuilder extends SingleTestElementCallBuilder&lt;ResultCollector&gt; {
+&nbsp;
+&nbsp;    public CodeBuilder(List&lt;Method&gt; builderMethods) {
+<b class="fc">&nbsp;      super(ResultCollector.class, builderMethods);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean matches(MethodCallContext context) {
+<b class="fc">&nbsp;      if (!super.matches(context)) {</b>
+<b class="fc">&nbsp;        return false;</b>
+&nbsp;      }
+&nbsp;      /*
+&nbsp;       We use this approach instead of ResultCollector.getFilename, to avoid JMeter
+&nbsp;       property resolution solving to empty interfering with conversion.
+&nbsp;       */
+<b class="fc">&nbsp;      TestElementParamBuilder paramBuilder = new TestElementParamBuilder(context.getTestElement());</b>
+<b class="fc">&nbsp;      return !paramBuilder.stringParam(ResultCollector.FILENAME).isDefault();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected MethodCall buildMethodCall(ResultCollector collector, MethodCallContext context) {
+<b class="fc">&nbsp;      TestElementParamBuilder paramBuilder = new TestElementParamBuilder(collector);</b>
+<b class="fc">&nbsp;      String fileName = paramBuilder.stringParam(ResultCollector.FILENAME).getExpression();</b>
+<b class="fc">&nbsp;      String[] fileParts = fileName.split(Pattern.quote(File.separator), 2);</b>
+<b class="fc">&nbsp;      MethodCall ret = buildMethodCall(new StringParam(fileParts.length &gt; 1 ? fileParts[0] : &quot;&quot;),</b>
+&nbsp;          new StringParam(fileParts[fileParts.length - 1]));
+<b class="fc">&nbsp;      SampleSaveConfiguration config = collector.getSaveConfig();</b>
+<b class="fc">&nbsp;      if (isAllSet(config)) {</b>
+<b class="fc">&nbsp;        return ret.chain(&quot;withAllFields&quot;, new BoolParam(true, false));</b>
+&nbsp;      }
+<b class="fc">&nbsp;      ret.chain(&quot;logOnly&quot;, SampleStatusParam.fromParamBuilder(paramBuilder));</b>
+<b class="fc">&nbsp;      return ret.chain(&quot;saveAsXml&quot;, new BoolParam(config.saveAsXml(), false))</b>
+<b class="fc">&nbsp;          .chain(&quot;withElapsedTime&quot;, new BoolParam(config.saveTime(), true))</b>
+<b class="fc">&nbsp;          .chain(&quot;withResponseMessage&quot;, new BoolParam(config.saveMessage(), true))</b>
+<b class="fc">&nbsp;          .chain(&quot;withSuccess&quot;, new BoolParam(config.saveSuccess(), true))</b>
+<b class="fc">&nbsp;          .chain(&quot;withSentByteCount&quot;, new BoolParam(config.saveSentBytes(), true))</b>
+<b class="fc">&nbsp;          .chain(&quot;withResponseFilename&quot;, new BoolParam(config.saveFileName(), false))</b>
+<b class="fc">&nbsp;          .chain(&quot;withEncoding&quot;, new BoolParam(config.saveEncoding(), false))</b>
+<b class="fc">&nbsp;          .chain(&quot;withIdleTime&quot;, new BoolParam(config.saveIdleTime(), true))</b>
+<b class="fc">&nbsp;          .chain(&quot;withResponseHeaders&quot;, new BoolParam(config.saveResponseHeaders(), false))</b>
+<b class="fc">&nbsp;          .chain(&quot;withAssertionResults&quot;, new BoolParam(config.saveAssertions(), true))</b>
+<b class="fc">&nbsp;          .chain(&quot;withFieldNames&quot;, new BoolParam(config.saveFieldNames(), true))</b>
+<b class="fc">&nbsp;          .chain(&quot;withLabel&quot;, new BoolParam(config.saveLabel(), true))</b>
+<b class="fc">&nbsp;          .chain(&quot;withThreadName&quot;, new BoolParam(config.saveThreadName(), true))</b>
+<b class="fc">&nbsp;          .chain(&quot;withAssertionFailureMessage&quot;,</b>
+<b class="fc">&nbsp;              new BoolParam(config.saveAssertionResultsFailureMessage(), true))</b>
+<b class="fc">&nbsp;          .chain(&quot;withActiveThreadCounts&quot;, new BoolParam(config.saveThreadCounts(), true))</b>
+<b class="fc">&nbsp;          .chain(&quot;withLatency&quot;, new BoolParam(config.saveLatency(), true))</b>
+<b class="fc">&nbsp;          .chain(&quot;withSampleAndErrorCounts&quot;, new BoolParam(config.saveSampleCount(), false))</b>
+<b class="fc">&nbsp;          .chain(&quot;withRequestHeaders&quot;, new BoolParam(config.saveRequestHeaders(), false))</b>
+<b class="fc">&nbsp;          .chain(&quot;withResponseData&quot;, new BoolParam(config.saveResponseData(), false))</b>
+<b class="fc">&nbsp;          .chain(&quot;withTimeStamp&quot;, new BoolParam(config.saveTimestamp(), true))</b>
+<b class="fc">&nbsp;          .chain(&quot;withResponseCode&quot;, new BoolParam(config.saveCode(), true))</b>
+<b class="fc">&nbsp;          .chain(&quot;withDataType&quot;, new BoolParam(config.saveDataType(), true))</b>
+<b class="fc">&nbsp;          .chain(&quot;withReceivedByteCount&quot;, new BoolParam(config.saveBytes(), true))</b>
+<b class="fc">&nbsp;          .chain(&quot;withUrl&quot;, new BoolParam(config.saveUrl(), true))</b>
+<b class="fc">&nbsp;          .chain(&quot;withConnectTime&quot;, new BoolParam(config.saveConnectTime(), true))</b>
+<b class="fc">&nbsp;          .chain(&quot;withHostname&quot;, new BoolParam(config.saveHostname(), false))</b>
+<b class="fc">&nbsp;          .chain(&quot;withSamplerData&quot;, new BoolParam(config.saveSamplerData(), false))</b>
+<b class="fc">&nbsp;          .chain(&quot;withSubResults&quot;, new BoolParam(config.saveSubresults(), true));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private boolean isAllSet(SampleSaveConfiguration config) {
+<b class="fc">&nbsp;      return config.saveAsXml() &amp;&amp; config.saveTime() &amp;&amp; config.saveMessage() &amp;&amp; config.saveSuccess()</b>
+<b class="fc">&nbsp;          &amp;&amp; config.saveSentBytes() &amp;&amp; config.saveFileName() &amp;&amp; config.saveEncoding()</b>
+<b class="fc">&nbsp;          &amp;&amp; config.saveIdleTime() &amp;&amp; config.saveResponseHeaders() &amp;&amp; config.saveAssertions()</b>
+<b class="fc">&nbsp;          &amp;&amp; config.saveFieldNames() &amp;&amp; config.saveLabel() &amp;&amp; config.saveThreadName()</b>
+<b class="fc">&nbsp;          &amp;&amp; config.saveAssertionResultsFailureMessage() &amp;&amp; config.saveThreadCounts()</b>
+<b class="fc">&nbsp;          &amp;&amp; config.saveLatency() &amp;&amp; config.saveSampleCount() &amp;&amp; config.saveRequestHeaders()</b>
+<b class="fc">&nbsp;          &amp;&amp; config.saveResponseData() &amp;&amp; config.saveTimestamp() &amp;&amp; config.saveCode()</b>
+<b class="fc">&nbsp;          &amp;&amp; config.saveDataType() &amp;&amp; config.saveBytes() &amp;&amp; config.saveUrl()</b>
+<b class="fc">&nbsp;          &amp;&amp; config.saveConnectTime() &amp;&amp; config.saveHostname() &amp;&amp; config.saveSamplerData()</b>
+<b class="fc">&nbsp;          &amp;&amp; config.saveSubresults();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;  }
+&nbsp;
+&nbsp;  private static class SampleStatusParam extends MethodParam {
+&nbsp;
+&nbsp;    private final SampleStatus sampleStatus;
+&nbsp;
+&nbsp;    private SampleStatusParam(SampleStatus sampleStatus) {
+<b class="fc">&nbsp;      super(SampleStatus.class, null);</b>
+<b class="fc">&nbsp;      this.sampleStatus = sampleStatus;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static MethodParam fromParamBuilder(TestElementParamBuilder paramBuilder) {
+<b class="fc">&nbsp;      SampleStatus status = null;</b>
+<b class="fc">&nbsp;      MethodParam successOnly = paramBuilder.boolParam(</b>
+&nbsp;          &quot;ResultCollector.success_only_logging&quot;, false);
+<b class="fc">&nbsp;      if (!successOnly.isDefault()) {</b>
+<b class="fc">&nbsp;        status = SampleStatus.SUCCESS;</b>
+&nbsp;      } else {
+<b class="fc">&nbsp;        MethodParam errorOnly = paramBuilder.boolParam(&quot;ResultCollector.error_logging&quot;, false);</b>
+<b class="fc">&nbsp;        if (!errorOnly.isDefault()) {</b>
+<b class="fc">&nbsp;          status = SampleStatus.ERROR;</b>
+&nbsp;        }
+&nbsp;      }
+<b class="fc">&nbsp;      return new SampleStatusParam(status);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean isDefault() {
+<b class="fc">&nbsp;      return sampleStatus == null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Set&lt;String&gt; getImports() {
+<b class="nc">&nbsp;      return Collections.singleton(SampleStatus.class.getName());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected String buildCode(String indent) {
+<b class="fc">&nbsp;      return SampleStatus.class.getSimpleName() + &quot;.&quot; + sampleStatus.name();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;  }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-03 20:57</div>
+</div>
+</body>
+</html>

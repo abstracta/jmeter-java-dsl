@@ -1,0 +1,141 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=GBK"> 
+  <title>Coverage Report > CountMetricSummary</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">us.abstracta.jmeter.javadsl.core.stats</a>
+</div>
+
+<h1>Coverage Summary for Class: CountMetricSummary (us.abstracta.jmeter.javadsl.core.stats)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">CountMetricSummary</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    75%
+  </span>
+  <span class="absValue">
+    (3/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    83.3%
+  </span>
+  <span class="absValue">
+    (5/6)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package us.abstracta.jmeter.javadsl.core.stats;
+&nbsp;
+&nbsp;/**
+&nbsp; * Provides summary data for a set of count values.
+&nbsp; *
+&nbsp; * @since 0.37
+&nbsp; */
+<b class="fc">&nbsp;public class CountMetricSummary {</b>
+&nbsp;
+<b class="fc">&nbsp;  private long val = 0;</b>
+&nbsp;  private long elapsedTimeMillis;
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Updates collected summary data with given info.
+&nbsp;   * @param inc contains the last value counted.
+&nbsp;   * @param elapsedTimeMillis specifies the number of milliseconds since the count started.
+&nbsp;   */
+&nbsp;  public void increment(long inc, long elapsedTimeMillis) {
+<b class="fc">&nbsp;    val += inc;</b>
+<b class="fc">&nbsp;    this.elapsedTimeMillis = elapsedTimeMillis;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Provides the average count per second for the given metric.
+&nbsp;   */
+&nbsp;  public double perSecond() {
+<b class="nc">&nbsp;    return elapsedTimeMillis != 0 ? val / ((double) elapsedTimeMillis / 1000) : 0;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Provides the total count (the sum).
+&nbsp;   */
+&nbsp;  public long total() {
+<b class="fc">&nbsp;    return val;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-03 22:39</div>
+</div>
+</body>
+</html>

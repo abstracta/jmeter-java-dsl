@@ -1,0 +1,256 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=GBK"> 
+  <title>Coverage Report > BuildTreeContext</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">us.abstracta.jmeter.javadsl.core</a>
+</div>
+
+<h1>Coverage Summary for Class: BuildTreeContext (us.abstracta.jmeter.javadsl.core)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">BuildTreeContext</td>
+<td class="coverageStat">
+  <span class="percent">
+    78.9%
+  </span>
+  <span class="absValue">
+    (15/19)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    69.4%
+  </span>
+  <span class="absValue">
+    (25/36)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">BuildTreeContext$TreeContextEndListener</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    78.9%
+  </span>
+  <span class="absValue">
+    (15/19)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    69.4%
+  </span>
+  <span class="absValue">
+    (25/36)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package us.abstracta.jmeter.javadsl.core;
+&nbsp;
+&nbsp;import java.awt.Component;
+&nbsp;import java.io.File;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.LinkedHashMap;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.function.Supplier;
+&nbsp;import org.apache.jorphan.collections.HashTree;
+&nbsp;import us.abstracta.jmeter.javadsl.core.engines.TestStopper;
+&nbsp;import us.abstracta.jmeter.javadsl.core.listeners.DslVisualizer;
+&nbsp;
+&nbsp;/**
+&nbsp; * Contains information that can be used by elements to share info
+&nbsp; * &lt;p&gt;
+&nbsp; * Eg: adding additional items to test plan when a particular protocol element is added.
+&nbsp; *
+&nbsp; * @since 0.17
+&nbsp; */
+&nbsp;public class BuildTreeContext {
+&nbsp;
+&nbsp;  private final BuildTreeContext parent;
+<b class="fc">&nbsp;  private final Map&lt;String, Object&gt; entries = new HashMap&lt;&gt;();</b>
+<b class="fc">&nbsp;  private final List&lt;TreeContextEndListener&gt; endListeners = new ArrayList&lt;&gt;();</b>
+&nbsp;  private final Map&lt;DslVisualizer, Supplier&lt;Component&gt;&gt; visualizers;
+&nbsp;  private final Map&lt;String, File&gt; assetFiles;
+&nbsp;  /*
+&nbsp;   check comment on buildTreeFor to understand why this field is not final and not initialized in
+&nbsp;   constructor
+&nbsp;   */
+&nbsp;  private DslTestElement element;
+&nbsp;  private TestStopper testStopper;
+&nbsp;
+&nbsp;  public BuildTreeContext() {
+<b class="fc">&nbsp;    this(null, new LinkedHashMap&lt;&gt;(), null);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private BuildTreeContext(BuildTreeContext parent,
+&nbsp;      Map&lt;DslVisualizer, Supplier&lt;Component&gt;&gt; visualizers,
+<b class="fc">&nbsp;      Map&lt;String, File&gt; assetFiles) {</b>
+<b class="fc">&nbsp;    this.parent = parent;</b>
+<b class="fc">&nbsp;    this.visualizers = visualizers;</b>
+<b class="fc">&nbsp;    this.assetFiles = assetFiles;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  public BuildTreeContext getParent() {
+<b class="fc">&nbsp;    return parent;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  public DslTestElement getTestElement() {
+<b class="fc">&nbsp;    return element;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  public BuildTreeContext getRoot() {
+<b class="fc">&nbsp;    return isRoot() ? this : parent.getRoot();</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  public boolean isRoot() {
+<b class="fc">&nbsp;    return parent == null;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  public Object getEntry(String key) {
+<b class="nc">&nbsp;    return entries.get(key);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  public &lt;T&gt; T getOrCreateEntry(String key, Supplier&lt;T&gt; supplier) {
+<b class="fc">&nbsp;    return (T) entries.computeIfAbsent(key, k -&gt; supplier.get());</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  public void setEntry(String key, Object value) {
+<b class="nc">&nbsp;    entries.put(key, value);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  public void setTestStopper(TestStopper testStopper) {
+<b class="fc">&nbsp;    this.testStopper = testStopper;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  public TestStopper getTestStopper() {
+<b class="fc">&nbsp;    return getRoot().testStopper;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  public void addEndListener(TreeContextEndListener endListener) {
+<b class="fc">&nbsp;    endListeners.add(endListener);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  public void addVisualizer(DslVisualizer visualizer, Supplier&lt;Component&gt; guiBuilder) {
+<b class="fc">&nbsp;    visualizers.put(visualizer, guiBuilder);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  public Map&lt;DslVisualizer, Supplier&lt;Component&gt;&gt; getVisualizers() {
+<b class="fc">&nbsp;    return visualizers;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  public HashTree buildChild(DslTestElement child, HashTree parentTree) {
+<b class="fc">&nbsp;    return new BuildTreeContext(this, visualizers, assetFiles)</b>
+<b class="fc">&nbsp;        .buildTreeFor(child, parentTree);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /*
+&nbsp;  Instead of passing the element as argument to this method we could initialize it in constructor.
+&nbsp;  We might implement this change in a future major release, but for the time being is left as is to
+&nbsp;  avoid breaking API compatibility.
+&nbsp;   */
+&nbsp;  public HashTree buildTreeFor(DslTestElement element, HashTree parentTree) {
+<b class="fc">&nbsp;    this.element = element;</b>
+<b class="fc">&nbsp;    HashTree ret = element.buildTreeUnder(parentTree, this);</b>
+<b class="fc">&nbsp;    endListeners.forEach(l -&gt; l.execute(this, ret));</b>
+<b class="fc">&nbsp;    return ret;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  public static BuildTreeContext buildRemoteExecutionContext() {
+<b class="nc">&nbsp;    return new BuildTreeContext(null, new LinkedHashMap&lt;&gt;(), new LinkedHashMap&lt;&gt;());</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  public String processAssetFile(String assetPath) {
+<b class="fc">&nbsp;    if (assetFiles == null) {</b>
+<b class="fc">&nbsp;      return assetPath;</b>
+&nbsp;    } else {
+<b class="nc">&nbsp;      File asset = new File(assetPath);</b>
+<b class="nc">&nbsp;      String fileName = asset.getName();</b>
+<b class="nc">&nbsp;      int index = 1;</b>
+<b class="nc">&nbsp;      while (assetFiles.containsKey(fileName) &amp;&amp; !asset.equals(assetFiles.get(fileName))) {</b>
+<b class="nc">&nbsp;        fileName = (index++) + &quot;-&quot; + asset.getName();</b>
+&nbsp;      }
+<b class="nc">&nbsp;      assetFiles.put(fileName, asset);</b>
+<b class="nc">&nbsp;      return fileName;</b>
+&nbsp;    }
+&nbsp;  }
+&nbsp;
+&nbsp;  public Map&lt;String, File&gt; getAssetFiles() {
+<b class="nc">&nbsp;    return assetFiles;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  public interface TreeContextEndListener {
+&nbsp;
+&nbsp;    void execute(BuildTreeContext context, HashTree tree);
+&nbsp;
+&nbsp;  }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-03 20:57</div>
+</div>
+</body>
+</html>

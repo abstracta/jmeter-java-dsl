@@ -1,0 +1,296 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=GBK"> 
+  <title>Coverage Report > DslCodeGenerator</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">us.abstracta.jmeter.javadsl.codegeneration</a>
+</div>
+
+<h1>Coverage Summary for Class: DslCodeGenerator (us.abstracta.jmeter.javadsl.codegeneration)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DslCodeGenerator</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    75%
+  </span>
+  <span class="absValue">
+    (12/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    79.7%
+  </span>
+  <span class="absValue">
+    (47/59)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package us.abstracta.jmeter.javadsl.codegeneration;
+&nbsp;
+&nbsp;import java.io.File;
+&nbsp;import java.io.IOException;
+&nbsp;import java.lang.reflect.InvocationTargetException;
+&nbsp;import java.lang.reflect.Method;
+&nbsp;import java.lang.reflect.Modifier;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.Comparator;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;import org.apache.jmeter.testelement.TestElement;
+&nbsp;import org.apache.jorphan.collections.HashTree;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;import us.abstracta.jmeter.javadsl.JmeterDsl;
+&nbsp;import us.abstracta.jmeter.javadsl.core.DslTestElement;
+&nbsp;import us.abstracta.jmeter.javadsl.core.controllers.DslIncludeController;
+&nbsp;import us.abstracta.jmeter.javadsl.core.controllers.DslModuleController;
+&nbsp;import us.abstracta.jmeter.javadsl.core.controllers.DslProxyControl;
+&nbsp;import us.abstracta.jmeter.javadsl.core.controllers.DslRecordingController;
+&nbsp;import us.abstracta.jmeter.javadsl.core.controllers.DslTestFragmentController;
+&nbsp;import us.abstracta.jmeter.javadsl.core.engines.JmeterEnvironment;
+&nbsp;import us.abstracta.jmeter.javadsl.core.testelements.BaseTestElement;
+&nbsp;
+&nbsp;/**
+&nbsp; * Generates DSL code from JMX files.
+&nbsp; * &lt;p&gt;
+&nbsp; * Take into account that code generation is a continuous improving process, so please report any
+&nbsp; * unexpected or missing conversions as issues in repository, so we keep improving it.
+&nbsp; * &lt;p&gt;
+&nbsp; * Check {@link MethodCallBuilder} for instructions on how to implement DSL code generation for new
+&nbsp; * DSL test elements.
+&nbsp; *
+&nbsp; * @see MethodCallBuilder
+&nbsp; * @since 0.45
+&nbsp; */
+&nbsp;public class DslCodeGenerator implements MethodCallBuilderRegistry {
+&nbsp;
+<b class="fc">&nbsp;  private static final Logger LOG = LoggerFactory.getLogger(DslCodeGenerator.class);</b>
+&nbsp;
+<b class="fc">&nbsp;  private final List&lt;MethodCallBuilder&gt; builders = new ArrayList&lt;&gt;();</b>
+<b class="fc">&nbsp;  private final Map&lt;Class&lt;?&gt;, String&gt; dependencies = new HashMap&lt;&gt;();</b>
+<b class="fc">&nbsp;  private final Map&lt;String, Object&gt; builderOptions = new HashMap&lt;&gt;();</b>
+&nbsp;
+<b class="fc">&nbsp;  public DslCodeGenerator() {</b>
+<b class="fc">&nbsp;    builders.addAll(findCallBuilders(JmeterDsl.class));</b>
+<b class="fc">&nbsp;    dependencies.put(JmeterDsl.class, &quot;us.abstracta.jmeter:jmeter-java-dsl&quot;);</b>
+<b class="fc">&nbsp;    builders.add(new DslRecordingController.CodeBuilder());</b>
+<b class="fc">&nbsp;    builders.add(new DslProxyControl.CodeBuilder());</b>
+<b class="fc">&nbsp;    builders.add(new DslModuleController.CodeBuilder());</b>
+<b class="fc">&nbsp;    builders.add(new DslIncludeController.CodeBuilder());</b>
+<b class="fc">&nbsp;    builders.addAll(findCallBuilders(DslTestFragmentController.class));</b>
+<b class="fc">&nbsp;    sortBuilders();</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private List&lt;MethodCallBuilder&gt; findCallBuilders(Class&lt;?&gt;... dslClasses) {
+<b class="fc">&nbsp;    Map&lt;Class&lt;? extends DslTestElement&gt;, List&lt;Method&gt;&gt; builderMethods = findBuilderMethods(</b>
+&nbsp;        dslClasses);
+<b class="fc">&nbsp;    return builderMethods.entrySet().stream()</b>
+<b class="fc">&nbsp;        .map(e -&gt; buildCallBuilder(e.getKey(), e.getValue()))</b>
+<b class="fc">&nbsp;        .filter(Objects::nonNull)</b>
+<b class="fc">&nbsp;        .collect(Collectors.toList());</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private Map&lt;Class&lt;? extends DslTestElement&gt;, List&lt;Method&gt;&gt; findBuilderMethods(
+&nbsp;      Class&lt;?&gt;... dslClasses) {
+<b class="fc">&nbsp;    return Arrays.stream(dslClasses)</b>
+<b class="fc">&nbsp;        .flatMap(c -&gt; Arrays.stream(c.getDeclaredMethods())</b>
+<b class="fc">&nbsp;            .filter(m -&gt; Modifier.isPublic(m.getModifiers()) &amp;&amp; Modifier.isStatic(m.getModifiers())</b>
+<b class="fc">&nbsp;                &amp;&amp; BaseTestElement.class.isAssignableFrom(m.getReturnType())))</b>
+<b class="fc">&nbsp;        .collect(Collectors.groupingBy(m -&gt; (Class&lt;? extends DslTestElement&gt;) m.getReturnType()));</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private MethodCallBuilder buildCallBuilder(
+&nbsp;      Class&lt;? extends DslTestElement&gt; testElementClass, List&lt;Method&gt; builderMethods) {
+<b class="fc">&nbsp;    String builderClass = testElementClass.getName() + &quot;$CodeBuilder&quot;;</b>
+&nbsp;    try {
+<b class="fc">&nbsp;      return (MethodCallBuilder) Class.forName(builderClass)</b>
+<b class="fc">&nbsp;          .getConstructor(List.class)</b>
+<b class="fc">&nbsp;          .newInstance(builderMethods);</b>
+<b class="fc">&nbsp;    } catch (ClassNotFoundException e) {</b>
+<b class="fc">&nbsp;      LOG.debug(&quot;No code builder associated to {}&quot;, testElementClass);</b>
+<b class="fc">&nbsp;      return null;</b>
+<b class="nc">&nbsp;    } catch (NoSuchMethodException | InvocationTargetException | InstantiationException</b>
+&nbsp;             | IllegalAccessException e) {
+<b class="nc">&nbsp;      throw new RuntimeException(&quot;Problem instantiating builder for &quot; + builderClass</b>
+&nbsp;          + &quot;. Check builder constructor with a list of methods and registry as parameters.&quot;, e);
+&nbsp;    }
+&nbsp;  }
+&nbsp;
+&nbsp;  private void sortBuilders() {
+<b class="fc">&nbsp;    builders.sort(Comparator.comparing(MethodCallBuilder::order));</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Allows registering DSL classes containing builder methods, which can be used to generate DSL
+&nbsp;   * code for.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * This method allows you to register DSL classes from none core modules or your own custom DSL
+&nbsp;   * classes. This is the way DslGenerators can discover new DSL test elements, and their associated
+&nbsp;   * MethodCallBuilder instances, to generate code for.
+&nbsp;   *
+&nbsp;   * @param dslClasses are the classes containing builder methods.
+&nbsp;   * @return the DslCodeGenerator instance for further configuration or usage.
+&nbsp;   */
+&nbsp;  public DslCodeGenerator addBuildersFrom(Class&lt;?&gt;... dslClasses) {
+<b class="nc">&nbsp;    builders.addAll(findCallBuilders(dslClasses));</b>
+<b class="nc">&nbsp;    sortBuilders();</b>
+<b class="nc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Allows registering MethodCallBuilders that are not associated to a DSL builder method.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * This is helpful when some element has no DSL builder method counterpart, but still there is a
+&nbsp;   * way to convert the element (eg: ignoring it all together, only converting children, etc).
+&nbsp;   *
+&nbsp;   * @param builders list of MethodCallBuilders to register into the generator.
+&nbsp;   * @return the DslCodeGenerator instance for further configuration or usage.
+&nbsp;   * @since 0.50
+&nbsp;   */
+&nbsp;  public DslCodeGenerator addBuilders(MethodCallBuilder... builders) {
+<b class="nc">&nbsp;    this.builders.addAll(Arrays.asList(builders));</b>
+<b class="nc">&nbsp;    sortBuilders();</b>
+<b class="nc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Allows registering libraries required to use a specific class.
+&nbsp;   *
+&nbsp;   * @param dependencyClass   is the class to register a library for.
+&nbsp;   * @param dependencyLocator the &lt;a
+&nbsp;   *                          href=&quot;https://www.jbang.dev/documentation/guide/latest/dependencies.html&quot;&gt;jbang
+&nbsp;   *                          library locator&lt;/a&gt; for the library containing the class.
+&nbsp;   * @return the DslCodeGenerator instance for further configuration or usage.
+&nbsp;   * @since 0.62
+&nbsp;   */
+&nbsp;  public DslCodeGenerator addDependency(Class&lt;?&gt; dependencyClass, String dependencyLocator) {
+<b class="nc">&nbsp;    dependencies.put(dependencyClass, dependencyLocator);</b>
+<b class="nc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Generates DSL code from JMX file.
+&nbsp;   *
+&nbsp;   * @param file is the JMX file from which DSL code will be generated.
+&nbsp;   * @return the generated DSL MethodCall used to generate code from.
+&nbsp;   * @throws IOException when there is some problem reading the file.
+&nbsp;   */
+&nbsp;  public String generateCodeFromJmx(File file) throws IOException {
+<b class="fc">&nbsp;    return TestClassTemplate.fromTestPlanMethodCall(buildMethodCallFromJmxFile(file), dependencies)</b>
+<b class="fc">&nbsp;        .solve();</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  public MethodCall buildMethodCallFromJmxFile(File file) throws IOException {
+<b class="fc">&nbsp;    JmeterEnvironment env = new JmeterEnvironment();</b>
+<b class="fc">&nbsp;    HashTree tree = env.loadTree(new File(file.getPath()));</b>
+<b class="fc">&nbsp;    TestElement testPlanElem = (TestElement) tree.getArray()[0];</b>
+<b class="fc">&nbsp;    MethodCallContext ctx = new MethodCallContext(testPlanElem, tree.getTree(testPlanElem), null,</b>
+&nbsp;        this);
+<b class="fc">&nbsp;    builderOptions.forEach(ctx::setEntry);</b>
+<b class="fc">&nbsp;    return ctx.buildMethodCall();</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public Optional&lt;MethodCallBuilder&gt; findBuilderMatchingContext(MethodCallContext context) {
+<b class="fc">&nbsp;    return builders.stream()</b>
+<b class="fc">&nbsp;        .filter(b -&gt; b.matches(context))</b>
+<b class="fc">&nbsp;        .findAny();</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public &lt;T extends MethodCallBuilder&gt; T findBuilderByClass(Class&lt;T&gt; builderClass) {
+<b class="fc">&nbsp;    return builders.stream()</b>
+<b class="fc">&nbsp;        .filter(builderClass::isInstance)</b>
+<b class="fc">&nbsp;        .map(builderClass::cast)</b>
+<b class="fc">&nbsp;        .findAny()</b>
+<b class="fc">&nbsp;        .orElse(null);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  public DslCodeGenerator setBuilderOption(String optionName, Object optionValue) {
+<b class="nc">&nbsp;    builderOptions.put(optionName, optionValue);</b>
+<b class="nc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-03 22:39</div>
+</div>
+</body>
+</html>

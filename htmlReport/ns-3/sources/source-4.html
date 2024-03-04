@@ -1,0 +1,165 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=GBK"> 
+  <title>Coverage Report > DurationParam</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">us.abstracta.jmeter.javadsl.codegeneration.params</a>
+</div>
+
+<h1>Coverage Summary for Class: DurationParam (us.abstracta.jmeter.javadsl.codegeneration.params)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DurationParam</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    80%
+  </span>
+  <span class="absValue">
+    (4/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    59.1%
+  </span>
+  <span class="absValue">
+    (13/22)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package us.abstracta.jmeter.javadsl.codegeneration.params;
+&nbsp;
+&nbsp;import java.time.Duration;
+&nbsp;import java.time.temporal.ChronoUnit;
+&nbsp;import java.time.temporal.TemporalUnit;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.Set;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.MethodCall;
+&nbsp;
+&nbsp;/**
+&nbsp; * Is a parameter with a Duration value.
+&nbsp; *
+&nbsp; * @since 0.45
+&nbsp; */
+&nbsp;public class DurationParam extends FixedParam&lt;Duration&gt; {
+&nbsp;
+&nbsp;  public DurationParam(String expression, Duration defaultValue) {
+<b class="fc">&nbsp;    this(expression, defaultValue, ChronoUnit.SECONDS);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  public DurationParam(Duration value) {
+<b class="fc">&nbsp;    super(Duration.class, value, null);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  public DurationParam(String expression, Duration defaultValue, TemporalUnit unit) {
+<b class="fc">&nbsp;    super(Duration.class, expression, v -&gt; Duration.of(Long.parseLong(v), unit), defaultValue);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public Set&lt;String&gt; getImports() {
+<b class="nc">&nbsp;    return Collections.singleton(Duration.class.getName());</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public String buildCode(String indent) {
+<b class="fc">&nbsp;    if (value.isZero()) {</b>
+<b class="fc">&nbsp;      return Duration.class.getSimpleName() + &quot;.ZERO&quot;;</b>
+&nbsp;    }
+&nbsp;    TemporalUnit outputUnit;
+&nbsp;    long outputValue;
+<b class="fc">&nbsp;    if (value.getNano() != 0) {</b>
+<b class="fc">&nbsp;      outputUnit = ChronoUnit.MILLIS;</b>
+<b class="fc">&nbsp;      outputValue = value.toMillis();</b>
+<b class="fc">&nbsp;    } else if (value.toMinutes() * 60 != value.getSeconds()) {</b>
+<b class="fc">&nbsp;      outputUnit = ChronoUnit.SECONDS;</b>
+<b class="fc">&nbsp;      outputValue = value.getSeconds();</b>
+<b class="nc">&nbsp;    } else if (value.toHours() * 60 != value.toMinutes()) {</b>
+<b class="nc">&nbsp;      outputUnit = ChronoUnit.MINUTES;</b>
+<b class="nc">&nbsp;      outputValue = value.toMinutes();</b>
+<b class="nc">&nbsp;    } else if (value.toDays() * 24 != value.toHours()) {</b>
+<b class="nc">&nbsp;      outputUnit = ChronoUnit.HOURS;</b>
+<b class="nc">&nbsp;      outputValue = value.toHours();</b>
+&nbsp;    } else {
+<b class="nc">&nbsp;      outputUnit = ChronoUnit.DAYS;</b>
+<b class="nc">&nbsp;      outputValue = value.toDays();</b>
+&nbsp;    }
+<b class="fc">&nbsp;    return MethodCall.forStaticMethod(Duration.class, &quot;of&quot; + outputUnit, new LongParam(outputValue))</b>
+<b class="fc">&nbsp;        .buildCode();</b>
+&nbsp;  }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-03 20:57</div>
+</div>
+</body>
+</html>

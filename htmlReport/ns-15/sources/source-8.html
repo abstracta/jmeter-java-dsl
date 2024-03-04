@@ -1,0 +1,824 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=GBK"> 
+  <title>Coverage Report > DslHttpSampler</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">us.abstracta.jmeter.javadsl.http</a>
+</div>
+
+<h1>Coverage Summary for Class: DslHttpSampler (us.abstracta.jmeter.javadsl.http)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DslHttpSampler</td>
+<td class="coverageStat">
+  <span class="percent">
+    89.3%
+  </span>
+  <span class="absValue">
+    (25/28)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    93.4%
+  </span>
+  <span class="absValue">
+    (85/91)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">DslHttpSampler$CodeBuilder</td>
+<td class="coverageStat">
+  <span class="percent">
+    90%
+  </span>
+  <span class="absValue">
+    (9/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    91.7%
+  </span>
+  <span class="absValue">
+    (55/60)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">DslHttpSampler$CodeBuilder$HttpMethodParam</td>
+<td class="coverageStat">
+  <span class="percent">
+    87.5%
+  </span>
+  <span class="absValue">
+    (7/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    64.7%
+  </span>
+  <span class="absValue">
+    (11/17)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">DslHttpSampler$HttpClientImpl</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (6/6)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    90%
+  </span>
+  <span class="absValue">
+    (45/50)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    90.2%
+  </span>
+  <span class="absValue">
+    (157/174)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package us.abstracta.jmeter.javadsl.http;
+&nbsp;
+&nbsp;import java.lang.reflect.Method;
+&nbsp;import java.nio.charset.Charset;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Locale;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.function.Function;
+&nbsp;import org.apache.http.entity.ContentType;
+&nbsp;import org.apache.jmeter.config.Arguments;
+&nbsp;import org.apache.jmeter.protocol.http.control.HeaderManager;
+&nbsp;import org.apache.jmeter.protocol.http.control.gui.HttpTestSampleGui;
+&nbsp;import org.apache.jmeter.protocol.http.sampler.HTTPSamplerBase;
+&nbsp;import org.apache.jmeter.protocol.http.sampler.HTTPSamplerProxy;
+&nbsp;import org.apache.jmeter.protocol.http.util.HTTPArgument;
+&nbsp;import org.apache.jmeter.protocol.http.util.HTTPConstants;
+&nbsp;import org.apache.jmeter.protocol.http.util.HTTPConstantsInterface;
+&nbsp;import org.apache.jmeter.protocol.http.util.HTTPFileArg;
+&nbsp;import org.apache.jmeter.testelement.property.JMeterProperty;
+&nbsp;import org.apache.jorphan.collections.HashTree;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.MethodCall;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.MethodCallContext;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.MethodParam;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.TestElementParamBuilder;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.params.BoolParam;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.params.EnumParam.EnumPropertyValue;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.params.StringParam;
+&nbsp;import us.abstracta.jmeter.javadsl.core.BuildTreeContext;
+&nbsp;import us.abstracta.jmeter.javadsl.core.preprocessors.DslJsr223PreProcessor.PreProcessorVars;
+&nbsp;import us.abstracta.jmeter.javadsl.core.util.PropertyScriptBuilder;
+&nbsp;import us.abstracta.jmeter.javadsl.core.util.PropertyScriptBuilder.PropertyScript;
+&nbsp;
+&nbsp;/**
+&nbsp; * Allows to configure a JMeter HTTP sampler to make HTTP requests in a test plan.
+&nbsp; *
+&nbsp; * @since 0.1
+&nbsp; */
+&nbsp;public class DslHttpSampler extends DslBaseHttpSampler&lt;DslHttpSampler&gt; {
+&nbsp;
+&nbsp;  private static final String DEFAULT_NAME = &quot;HTTP Request&quot;;
+&nbsp;
+&nbsp;  protected final PropertyScriptBuilder&lt;String&gt; urlBuilder;
+<b class="fc">&nbsp;  protected String method = HTTPConstants.GET;</b>
+<b class="fc">&nbsp;  protected final List&lt;HTTPArgument&gt; arguments = new ArrayList&lt;&gt;();</b>
+&nbsp;  protected Object body;
+&nbsp;  protected boolean multiPart;
+<b class="fc">&nbsp;  protected final List&lt;HTTPFileArg&gt; files = new ArrayList&lt;&gt;();</b>
+&nbsp;  protected Charset encoding;
+&nbsp;  protected Boolean followRedirects;
+&nbsp;  protected boolean downloadEmbeddedResources;
+&nbsp;  protected String embeddedResourcesMatchRegex;
+&nbsp;  protected String embeddedResourcesNotMatchRegex;
+&nbsp;  protected HttpClientImpl clientImpl;
+&nbsp;  protected HTTPSamplerProxy element;
+&nbsp;
+&nbsp;  public DslHttpSampler(String name, String url) {
+<b class="fc">&nbsp;    this(name, url, null);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private DslHttpSampler(String name, String url, PropertyScriptBuilder&lt;String&gt; urlBuilder) {
+<b class="fc">&nbsp;    super(name != null ? name : DEFAULT_NAME, url, HttpTestSampleGui.class);</b>
+<b class="fc">&nbsp;    this.urlBuilder = urlBuilder;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  public DslHttpSampler(String name, Function&lt;PreProcessorVars, String&gt; urlSupplier) {
+<b class="fc">&nbsp;    this(name, null, new PropertyScriptBuilder&lt;&gt;(</b>
+<b class="fc">&nbsp;        scriptVars -&gt; urlSupplier.apply(new PreProcessorVars(scriptVars.sampler))));</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  public DslHttpSampler(String name, Class&lt;? extends PropertyScript&lt;String&gt;&gt; urlSolverClass) {
+<b class="nc">&nbsp;    this(name, null, new PropertyScriptBuilder&lt;&gt;(urlSolverClass));</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Specifies that the sampler should send an HTTP POST to defined URL.
+&nbsp;   *
+&nbsp;   * @param body        to include in HTTP POST request body.
+&nbsp;   * @param contentType to be sent as Content-Type header in HTTP POST request.
+&nbsp;   * @return the sampler for further configuration or usage.
+&nbsp;   * @since 0.42
+&nbsp;   */
+&nbsp;  public DslHttpSampler post(String body, ContentType contentType) {
+<b class="fc">&nbsp;    return method(HTTPConstants.POST)</b>
+<b class="fc">&nbsp;        .contentType(contentType)</b>
+<b class="fc">&nbsp;        .body(body);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Same as {@link #post(String, ContentType)} but allowing to use a dynamically calculated body.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * This method is just an abstraction that uses jexl2 function as HTTP request body.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * &lt;b&gt;WARNING:&lt;/b&gt; This only works when using embedded jmeter engine.
+&nbsp;   * Check &lt;a href=&quot;https://abstracta.github.io/jmeter-java-dsl/guide/#lambdas&quot;&gt;the user guide&lt;/a&gt;
+&nbsp;   * for details on some alternative.
+&nbsp;   *
+&nbsp;   * @param bodySupplier function to calculate the body on each request.
+&nbsp;   * @param contentType  to be sent as Content-Type header in HTTP POST request.
+&nbsp;   * @return the sampler for further configuration or usage.
+&nbsp;   * @see #body(Function)
+&nbsp;   * @since 0.42
+&nbsp;   */
+&nbsp;  public DslHttpSampler post(Function&lt;PreProcessorVars, String&gt; bodySupplier,
+&nbsp;      ContentType contentType) {
+<b class="fc">&nbsp;    return method(HTTPConstants.POST)</b>
+<b class="fc">&nbsp;        .contentType(contentType)</b>
+<b class="fc">&nbsp;        .body(bodySupplier);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Same as {@link #post(Function, ContentType)} but with support for running at scale in a remote
+&nbsp;   * engine.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * Check &lt;a href=&quot;https://abstracta.github.io/jmeter-java-dsl/guide/#lambdas&quot;&gt;the user guide&lt;/a&gt;
+&nbsp;   * for details on additional steps required to run them at scale in a remote engine.
+&nbsp;   *
+&nbsp;   * @see #post(Function, ContentType)
+&nbsp;   * @since 1.14
+&nbsp;   */
+&nbsp;  public DslHttpSampler post(Class&lt;? extends PropertyScript&lt;String&gt;&gt; bodySolverClass,
+&nbsp;      ContentType contentType) {
+<b class="nc">&nbsp;    return method(HTTPConstants.POST)</b>
+<b class="nc">&nbsp;        .contentType(contentType)</b>
+<b class="nc">&nbsp;        .body(bodySolverClass);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Specifies the HTTP method to be used in the HTTP request generated by the sampler.
+&nbsp;   *
+&nbsp;   * @param method is the HTTP method to be used by the sampler.
+&nbsp;   * @return the sampler for further configuration or usage.
+&nbsp;   * @since 0.42
+&nbsp;   */
+&nbsp;  public DslHttpSampler method(String method) {
+<b class="fc">&nbsp;    this.method = method;</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Specifies the body to be sent in the HTTP request generated by the sampler.
+&nbsp;   *
+&nbsp;   * @param body to be used as in the body of the HTTP request.
+&nbsp;   * @return the sampler for further configuration or usage.
+&nbsp;   */
+&nbsp;  public DslHttpSampler body(String body) {
+<b class="fc">&nbsp;    this.body = body;</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Same as {@link #body(String)} but allows using dynamically calculated HTTP request body.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * This method is just an abstraction that uses jexl2 function as HTTP request body.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * &lt;b&gt;WARNING:&lt;/b&gt; This only works when using embedded jmeter engine.
+&nbsp;   * Check &lt;a href=&quot;https://abstracta.github.io/jmeter-java-dsl/guide/#lambdas&quot;&gt;the user guide&lt;/a&gt;
+&nbsp;   * for details on some alternative.
+&nbsp;   *
+&nbsp;   * @param bodySupplier function to calculate the body on each request.
+&nbsp;   * @return the sampler for further configuration or usage.
+&nbsp;   * @since 0.10
+&nbsp;   */
+&nbsp;  public DslHttpSampler body(Function&lt;PreProcessorVars, String&gt; bodySupplier) {
+<b class="fc">&nbsp;    this.body = new PropertyScriptBuilder&lt;&gt;(</b>
+<b class="fc">&nbsp;        scriptVars -&gt; bodySupplier.apply(new PreProcessorVars(scriptVars.sampler)));</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Same as {@link #body(Function)} but with support for running at scale in a remote engine.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * Check &lt;a href=&quot;https://abstracta.github.io/jmeter-java-dsl/guide/#lambdas&quot;&gt;the user guide&lt;/a&gt;
+&nbsp;   * for details on additional steps required to run them at scale in a remote engine.
+&nbsp;   *
+&nbsp;   * @see #body(Function)
+&nbsp;   * @since 1.14
+&nbsp;   */
+&nbsp;  public DslHttpSampler body(Class&lt;? extends PropertyScript&lt;String&gt;&gt; bodySolverClass) {
+<b class="nc">&nbsp;    this.body = new PropertyScriptBuilder&lt;&gt;(bodySolverClass);</b>
+<b class="nc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Specifies a file to be sent as body of the request.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * This method is useful to send binary data in request (eg: uploading an image to a server).
+&nbsp;   *
+&nbsp;   * @param filePath is path to the file to be sent as request body.
+&nbsp;   * @return the sampler for further configuration or usage.
+&nbsp;   * @since 0.44
+&nbsp;   */
+&nbsp;  public DslHttpSampler bodyFile(String filePath) {
+<b class="fc">&nbsp;    files.add(new HTTPFileArg(filePath, &quot;&quot;, &quot;&quot;));</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Allows specifying a query parameter or url encoded form body parameter.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * JMeter will automatically URL encode provided parameters names and values. Use
+&nbsp;   * {@link #rawParam(String, String)} to send parameters values which are already encoded and
+&nbsp;   * should be sent as is by JMeter.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * JMeter will use provided parameter in query string if method is GET, DELETE or OPTIONS,
+&nbsp;   * otherwise it will use them in url encoded form body.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * If you set a parameter with empty string name, it results in same behavior as using
+&nbsp;   * {@link #body(String)} method. In general, you either use body function or parameters functions,
+&nbsp;   * but don&#39;t use both of them in same sampler.
+&nbsp;   *
+&nbsp;   * @param name  specifies the name of the parameter.
+&nbsp;   * @param value specifies the value of the parameter to be URL encoded to include in URL
+&nbsp;   * @return the sampler for further configuration or usage.
+&nbsp;   * @since 0.42
+&nbsp;   */
+&nbsp;  public DslHttpSampler param(String name, String value) {
+<b class="fc">&nbsp;    arguments.add(new HTTPArgument(name, value));</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Same as {@link #param(String, String)} but param name and value will be sent with no additional
+&nbsp;   * encoding.
+&nbsp;   *
+&nbsp;   * @see #param(String, String)
+&nbsp;   * @since 0.54
+&nbsp;   */
+&nbsp;  public DslHttpSampler rawParam(String name, String value) {
+<b class="fc">&nbsp;    HTTPArgument arg = new HTTPArgument(name, value);</b>
+<b class="fc">&nbsp;    arg.setAlwaysEncoded(false);</b>
+<b class="fc">&nbsp;    arguments.add(arg);</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Specifies a part of a multipart form body.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * In general, samplers should not use this method in combination with
+&nbsp;   * {@link #param(String, String)} or {@link #rawParam(String, String)}.
+&nbsp;   *
+&nbsp;   * @param name        specifies the name of the part.
+&nbsp;   * @param value       specifies the string to be sent in the part.
+&nbsp;   * @param contentType specifies the content-type associated to the part.
+&nbsp;   * @return the sampler for further configuration or usage.
+&nbsp;   * @since 0.42
+&nbsp;   */
+&nbsp;  public DslHttpSampler bodyPart(String name, String value, ContentType contentType) {
+<b class="fc">&nbsp;    multiPart = true;</b>
+<b class="fc">&nbsp;    HTTPArgument arg = new HTTPArgument(name, value);</b>
+<b class="fc">&nbsp;    arg.setContentType(contentType.toString());</b>
+<b class="fc">&nbsp;    arguments.add(arg);</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Specifies a file to be sent in a multipart form body.
+&nbsp;   *
+&nbsp;   * @param name        is the name to be assigned to the file part.
+&nbsp;   * @param filePath    is path to the file to be sent in the multipart form body.
+&nbsp;   * @param contentType the content type associated to the part.
+&nbsp;   * @return the sampler for further configuration or usage.
+&nbsp;   * @since 0.42
+&nbsp;   */
+&nbsp;  public DslHttpSampler bodyFilePart(String name, String filePath, ContentType contentType) {
+<b class="fc">&nbsp;    multiPart = true;</b>
+<b class="fc">&nbsp;    files.add(new HTTPFileArg(filePath, name, contentType.toString()));</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Specifies the charset to be used to encode URLs and request contents.
+&nbsp;   *
+&nbsp;   * @param encoding contains the charset to be used.
+&nbsp;   * @return the sampler for further configuration or usage.
+&nbsp;   * @since 0.39
+&nbsp;   */
+&nbsp;  public DslHttpSampler encoding(Charset encoding) {
+<b class="fc">&nbsp;    this.encoding = encoding;</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Allows enabling/disabling automatic request for redirects.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * When a response is a redirection response (3xx status code with a Location header), JMeter
+&nbsp;   * automatically generates a new request to the redirected destination registering the redirect
+&nbsp;   * request as a sub sample. This method allows enabling/disabling such behavior.
+&nbsp;   *
+&nbsp;   * @param followRedirects sets either to enable or disable automatic redirects. By default,
+&nbsp;   *                        redirects are automatically followed.
+&nbsp;   * @return the sampler for further configuration or usage.
+&nbsp;   * @since 0.21
+&nbsp;   */
+&nbsp;  public DslHttpSampler followRedirects(boolean followRedirects) {
+<b class="fc">&nbsp;    this.followRedirects = followRedirects;</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Allows enabling automatic download of HTML embedded resources (images, iframes, etc).
+&nbsp;   * &lt;p&gt;
+&nbsp;   * When enabled JMeter will automatically parse HTMLs and download any found embedded resources
+&nbsp;   * adding their information as sub samples of the original request.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * Additionally, and in contrast to JMeter, this will download embedded resources in parallel by
+&nbsp;   * default (with up to 6 parallel downloads). The DSL enables this behavior by default since it is
+&nbsp;   * the most common way to use it to properly emulate browsers behavior.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * Check &lt;a
+&nbsp;   * href=&quot;https://jmeter.apache.org/usermanual/component_reference.html#HTTP_Request&quot;&gt;JMeter HTTP
+&nbsp;   * Request documentation&lt;/a&gt; for additional details on embedded resources download.
+&nbsp;   *
+&nbsp;   * @return the sampler for further configuration or usage.
+&nbsp;   * @since 0.24
+&nbsp;   */
+&nbsp;  public DslHttpSampler downloadEmbeddedResources() {
+<b class="fc">&nbsp;    return downloadEmbeddedResources(true);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Same as {@link #downloadEmbeddedResources()} but allowing to enable or disable the setting.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * This is helpful when the resolution is taken at runtime.
+&nbsp;   *
+&nbsp;   * @param enable specifies to enable or disable the setting. By default, it is set to false.
+&nbsp;   * @return the sampler for further configuration or usage.
+&nbsp;   * @since 1.0
+&nbsp;   */
+&nbsp;  public DslHttpSampler downloadEmbeddedResources(boolean enable) {
+<b class="fc">&nbsp;    this.downloadEmbeddedResources = enable;</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Same as {@link #downloadEmbeddedResources()} but allowing to specify which embedded resources
+&nbsp;   * to actually download.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * This is helpful when only some particular requests need to be downloaded and the rest should be
+&nbsp;   * ignored. Eg: to only make requests to the site under test, and no other external services.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * An alternative is using {@link #downloadEmbeddedResourcesNotMatching(String)}. If a resources
+&nbsp;   * matches this regex and also one specified in
+&nbsp;   * {@link #downloadEmbeddedResourcesNotMatching(String)}, then it will be ignored.
+&nbsp;   *
+&nbsp;   * @param urlRegex specifies the regular expression which will be used to ignore embedded
+&nbsp;   *                 resources that have a URL matching with it.
+&nbsp;   * @return the sampler for further configuration or usage.
+&nbsp;   * @see #downloadEmbeddedResources()
+&nbsp;   * @see #downloadEmbeddedResourcesNotMatching(String)
+&nbsp;   * @since 1.2
+&nbsp;   */
+&nbsp;  public DslHttpSampler downloadEmbeddedResourcesMatching(String urlRegex) {
+<b class="fc">&nbsp;    this.downloadEmbeddedResources = true;</b>
+<b class="fc">&nbsp;    this.embeddedResourcesMatchRegex = urlRegex;</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Same as {@link #downloadEmbeddedResources()} but allowing to ignore embedded resources with URL
+&nbsp;   * matching a given regular expression.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * This is helpful when some particular requests (for example to other external services) don&#39;t
+&nbsp;   * want to be included in the test execution.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * An alternative is using {@link #downloadEmbeddedResourcesMatching(String)}. If a resources
+&nbsp;   * matches this regex and also one specified in
+&nbsp;   * {@link #downloadEmbeddedResourcesMatching(String)}, then it will be ignored.
+&nbsp;   *
+&nbsp;   * @param urlRegex specifies the regular expression which will be used to ignore embedded
+&nbsp;   *                 resources that have a URL matching with it.
+&nbsp;   * @return the sampler for further configuration or usage.
+&nbsp;   * @see #downloadEmbeddedResources()
+&nbsp;   * @see #downloadEmbeddedResourcesMatching(String)
+&nbsp;   * @since 1.2
+&nbsp;   */
+&nbsp;  public DslHttpSampler downloadEmbeddedResourcesNotMatching(String urlRegex) {
+<b class="fc">&nbsp;    this.downloadEmbeddedResources = true;</b>
+<b class="fc">&nbsp;    this.embeddedResourcesNotMatchRegex = urlRegex;</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Allows specifying the HTTP client implementation to use for this particular sampler.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * Changing the default implementation ({@link DslHttpSampler.HttpClientImpl#HTTP_CLIENT}) to
+&nbsp;   * {@link DslHttpSampler.HttpClientImpl#JAVA} may improve performance in some scenarios
+&nbsp;   * (connection time, memory, cpu usage). But, Java implementation has its own limitations, check
+&nbsp;   * &lt;a href=&quot;https://jmeter.apache.org/usermanual/component_reference.html#HTTP_Request&quot;&gt;JMeter
+&nbsp;   * documentation&lt;/a&gt; for more details.
+&nbsp;   *
+&nbsp;   * @param clientImpl the HTTP client implementation to use. If none is specified, then
+&nbsp;   *                   {@link DslHttpSampler.HttpClientImpl#HTTP_CLIENT} is used.
+&nbsp;   * @return the sampler for further configuration or usage.
+&nbsp;   * @since 0.39
+&nbsp;   */
+&nbsp;  public DslHttpSampler clientImpl(HttpClientImpl clientImpl) {
+<b class="fc">&nbsp;    this.clientImpl = clientImpl;</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public HTTPSamplerProxy configureHttpTestElement(HTTPSamplerProxy elem) {
+<b class="fc">&nbsp;    this.element = elem;</b>
+<b class="fc">&nbsp;    elem.setMethod(method);</b>
+<b class="fc">&nbsp;    elem.setArguments(buildArguments());</b>
+<b class="fc">&nbsp;    if (multiPart) {</b>
+<b class="fc">&nbsp;      elem.setDoMultipart(true);</b>
+&nbsp;    }
+&nbsp;    /*
+&nbsp;     we clone file args to avoid test plan executions changing variable and function references
+&nbsp;     with solved entries (like FunctionProperty)
+&nbsp;     */
+<b class="fc">&nbsp;    elem.setHTTPFiles(files.stream()</b>
+<b class="fc">&nbsp;        .map(f -&gt; (HTTPFileArg) f.clone())</b>
+<b class="fc">&nbsp;        .toArray(HTTPFileArg[]::new));</b>
+<b class="fc">&nbsp;    if (encoding != null) {</b>
+<b class="fc">&nbsp;      elem.setContentEncoding(encoding.toString());</b>
+&nbsp;    }
+<b class="fc">&nbsp;    if (followRedirects != null) {</b>
+<b class="fc">&nbsp;      elem.setFollowRedirects(followRedirects);</b>
+&nbsp;    }
+<b class="fc">&nbsp;    elem.setUseKeepAlive(true);</b>
+<b class="fc">&nbsp;    HttpElementHelper.modifyTestElementEmbeddedResources(elem, downloadEmbeddedResources,</b>
+&nbsp;        embeddedResourcesMatchRegex, embeddedResourcesNotMatchRegex);
+<b class="fc">&nbsp;    if (clientImpl != null) {</b>
+<b class="fc">&nbsp;      elem.setImplementation(clientImpl.propertyValue);</b>
+&nbsp;    }
+<b class="fc">&nbsp;    return elem;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public HashTree buildTreeUnder(HashTree parent, BuildTreeContext context) {
+<b class="fc">&nbsp;    files.forEach(f -&gt; f.setPath(context.processAssetFile(f.getPath())));</b>
+<b class="fc">&nbsp;    if (path == null &amp;&amp; urlBuilder != null) {</b>
+<b class="fc">&nbsp;      path = urlBuilder.build();</b>
+&nbsp;    }
+<b class="fc">&nbsp;    HashTree ret = super.buildTreeUnder(parent, context);</b>
+<b class="fc">&nbsp;    if (followRedirects == null) {</b>
+&nbsp;      /*
+&nbsp;      Not setting follow redirects default value in buildTestElement and differing it, allows for
+&nbsp;      httpDefaults to define follow redirect behavior for elements that have not specified a value.
+&nbsp;       */
+<b class="fc">&nbsp;      DslHttpDefaults.addPendingFollowRedirectsElement(element, context);</b>
+&nbsp;    }
+<b class="fc">&nbsp;    return ret;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private Arguments buildArguments() {
+<b class="fc">&nbsp;    Arguments args = new Arguments();</b>
+<b class="fc">&nbsp;    if (body != null) {</b>
+<b class="fc">&nbsp;      HTTPArgument arg = new HTTPArgument(&quot;&quot;, body instanceof PropertyScriptBuilder</b>
+<b class="fc">&nbsp;          ? ((PropertyScriptBuilder&lt;String&gt;) body).build()</b>
+<b class="fc">&nbsp;          : body.toString(), false);</b>
+<b class="fc">&nbsp;      arg.setAlwaysEncoded(false);</b>
+<b class="fc">&nbsp;      args.addArgument(arg);</b>
+&nbsp;    }
+&nbsp;    /*
+&nbsp;     we clone arguments to avoid test plan executions changing variable and function references
+&nbsp;     with solved entries (like FunctionProperty)
+&nbsp;     */
+<b class="fc">&nbsp;    arguments.forEach(arg -&gt; args.addArgument((HTTPArgument) arg.clone()));</b>
+<b class="fc">&nbsp;    return args;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Specifies an HTTP client implementation to be used by HTTP samplers.
+&nbsp;   */
+<b class="fc">&nbsp;  public enum HttpClientImpl implements EnumPropertyValue {</b>
+&nbsp;    /**
+&nbsp;     * Specifies to use the Java implementation.
+&nbsp;     */
+<b class="fc">&nbsp;    JAVA(&quot;Java&quot;),</b>
+&nbsp;    /**
+&nbsp;     * Specifies to use the Apache HttpClient implementation. This is the default one and usually
+&nbsp;     * the preferred one.
+&nbsp;     */
+<b class="fc">&nbsp;    HTTP_CLIENT(&quot;HttpClient4&quot;);</b>
+&nbsp;
+&nbsp;    public final String propertyValue;
+&nbsp;
+<b class="fc">&nbsp;    HttpClientImpl(String propertyValue) {</b>
+<b class="fc">&nbsp;      this.propertyValue = propertyValue;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String propertyValue() {
+<b class="fc">&nbsp;      return propertyValue;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;  }
+&nbsp;
+&nbsp;  public static class CodeBuilder extends BaseHttpSamplerCodeBuilder {
+&nbsp;
+<b class="fc">&nbsp;    public static final String PREFER_ENCODED_PARAMS = getBuilderOptionName(CodeBuilder.class,</b>
+&nbsp;        &quot;preferEncodedParams&quot;);
+&nbsp;
+&nbsp;    public CodeBuilder(List&lt;Method&gt; builderMethods) {
+<b class="fc">&nbsp;      super(DEFAULT_NAME, HttpTestSampleGui.class, builderMethods);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected MethodCall buildBaseHttpMethodCall(MethodParam name, MethodParam url,
+&nbsp;        TestElementParamBuilder paramBuilder) {
+<b class="fc">&nbsp;      return buildMethodCall(name, url);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected void chainAdditionalOptions(MethodCall ret, TestElementParamBuilder paramBuilder) {
+<b class="fc">&nbsp;      HttpElementHelper.chainEncodingToMethodCall(ret, paramBuilder);</b>
+<b class="fc">&nbsp;      ret.chain(&quot;followRedirects&quot;, buildFollowRedirectsParam(paramBuilder));</b>
+<b class="fc">&nbsp;      HttpElementHelper.chainEmbeddedResourcesOptionsToMethodCall(ret, paramBuilder);</b>
+<b class="fc">&nbsp;      HttpElementHelper.chainClientImplToMethodCall(ret, paramBuilder);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected void chainRequestCalls(MethodCall ret, HTTPSamplerProxy testElem,
+&nbsp;        MethodCallContext buildContext) {
+<b class="fc">&nbsp;      TestElementParamBuilder paramBuilder = new TestElementParamBuilder(testElem);</b>
+<b class="fc">&nbsp;      MethodParam method = HttpMethodParam.from(paramBuilder);</b>
+<b class="fc">&nbsp;      MethodCallContext headers = buildContext.removeChild(HeaderManager.class::isInstance);</b>
+<b class="fc">&nbsp;      String contentType = removeContentTypeHeader(headers);</b>
+<b class="fc">&nbsp;      Arguments args = testElem.getArguments();</b>
+<b class="fc">&nbsp;      if (method instanceof StringParam &amp;&amp; !method.isDefault() &amp;&amp; HTTPConstants.POST.equals(</b>
+<b class="fc">&nbsp;          ((StringParam) method).getValue().toUpperCase(Locale.US)) &amp;&amp; !testElem.getUseMultipart()</b>
+<b class="fc">&nbsp;          &amp;&amp; contentType != null &amp;&amp; isRawBody(args)) {</b>
+<b class="fc">&nbsp;        ret.chain(&quot;post&quot;, buildRawBody(args), new ContentTypeParam(contentType));</b>
+<b class="fc">&nbsp;        chainHeaders(ret, headers);</b>
+&nbsp;        return;
+&nbsp;      }
+<b class="fc">&nbsp;      ret.chain(&quot;method&quot;, method);</b>
+<b class="fc">&nbsp;      if (contentType != null) {</b>
+<b class="fc">&nbsp;        chainContentType(ret, contentType);</b>
+&nbsp;      }
+<b class="fc">&nbsp;      chainHeaders(ret, headers);</b>
+<b class="fc">&nbsp;      if (isRawBody(args)) {</b>
+<b class="fc">&nbsp;        ret.chain(&quot;body&quot;, buildRawBody(args));</b>
+<b class="fc">&nbsp;      } else if (testElem.getSendFileAsPostBody()) {</b>
+<b class="fc">&nbsp;        HTTPFileArg file = testElem.getHTTPFiles()[0];</b>
+<b class="fc">&nbsp;        String fileMimeType = file.getMimeType();</b>
+<b class="fc">&nbsp;        if (contentType == null &amp;&amp; fileMimeType != null &amp;&amp; !fileMimeType.isEmpty()</b>
+<b class="fc">&nbsp;            &amp;&amp; !fileMimeType.equals(new HTTPFileArg(file.getPath()).getMimeType())) {</b>
+<b class="nc">&nbsp;          chainContentType(ret, file.getMimeType());</b>
+&nbsp;        }
+<b class="fc">&nbsp;        ret.chain(&quot;bodyFile&quot;, new StringParam(file.getPath()));</b>
+<b class="fc">&nbsp;      } else if (testElem.getUseMultipart()) {</b>
+<b class="fc">&nbsp;        for (JMeterProperty prop : args) {</b>
+<b class="fc">&nbsp;          HTTPArgument arg = (HTTPArgument) prop.getObjectValue();</b>
+<b class="fc">&nbsp;          ret.chain(&quot;bodyPart&quot;, new StringParam(arg.getName()), new StringParam(arg.getValue()),</b>
+<b class="fc">&nbsp;              new ContentTypeParam(arg.getContentType()));</b>
+<b class="fc">&nbsp;        }</b>
+<b class="fc">&nbsp;        for (HTTPFileArg file : testElem.getHTTPFiles()) {</b>
+<b class="fc">&nbsp;          ret.chain(&quot;bodyFilePart&quot;, new StringParam(file.getParamName()),</b>
+<b class="fc">&nbsp;              new StringParam(file.getPath()), new ContentTypeParam(file.getMimeType()));</b>
+&nbsp;        }
+&nbsp;      } else {
+<b class="fc">&nbsp;        for (JMeterProperty prop : args) {</b>
+<b class="fc">&nbsp;          HTTPArgument arg = (HTTPArgument) prop.getObjectValue();</b>
+<b class="fc">&nbsp;          if (arg.isAlwaysEncoded() || (preferEncodedParams(buildContext)</b>
+<b class="nc">&nbsp;              &amp;&amp; !differsFromEncodedParam(arg))) {</b>
+<b class="fc">&nbsp;            ret.chain(&quot;param&quot;, new StringParam(arg.getName()), new StringParam(arg.getValue()));</b>
+&nbsp;          } else {
+<b class="fc">&nbsp;            ret.chain(&quot;rawParam&quot;, new StringParam(arg.getName()),</b>
+<b class="fc">&nbsp;                new StringParam(arg.getValue()));</b>
+&nbsp;          }
+<b class="fc">&nbsp;        }</b>
+&nbsp;      }
+&nbsp;    }
+&nbsp;
+&nbsp;    private boolean preferEncodedParams(MethodCallContext buildContext) {
+<b class="fc">&nbsp;      Object option = buildContext.getBuilderOption(PREFER_ENCODED_PARAMS);</b>
+<b class="fc">&nbsp;      return option != null &amp;&amp; (boolean) option;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private boolean differsFromEncodedParam(HTTPArgument arg) {
+<b class="nc">&nbsp;      return !arg.getName().equals(arg.getEncodedName())</b>
+<b class="nc">&nbsp;          || !arg.getValue().equals(arg.getEncodedValue());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private boolean isRawBody(Arguments args) {
+<b class="fc">&nbsp;      return args.getArgumentCount() == 1 &amp;&amp; args.getArgument(0).getName().isEmpty();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private StringParam buildRawBody(Arguments args) {
+<b class="fc">&nbsp;      return new StringParam(args.getArgument(0).getValue());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private MethodParam buildFollowRedirectsParam(TestElementParamBuilder paramBuilder) {
+<b class="fc">&nbsp;      MethodParam follow = paramBuilder.boolParam(HTTPSamplerBase.FOLLOW_REDIRECTS, true);</b>
+<b class="fc">&nbsp;      if (!follow.isDefault()) {</b>
+<b class="fc">&nbsp;        return follow;</b>
+&nbsp;      } else {
+<b class="fc">&nbsp;        MethodParam auto = paramBuilder.boolParam(HTTPSamplerBase.AUTO_REDIRECTS, false);</b>
+<b class="fc">&nbsp;        return auto instanceof BoolParam &amp;&amp; Boolean.TRUE.equals(((BoolParam) auto).getValue())</b>
+<b class="nc">&nbsp;            ? new BoolParam(true, true)</b>
+<b class="fc">&nbsp;            : follow;</b>
+&nbsp;      }
+&nbsp;    }
+&nbsp;
+&nbsp;    private static class HttpMethodParam extends StringParam {
+&nbsp;
+<b class="fc">&nbsp;      private static final Map&lt;String, String&gt; CONSTANT_METHODS = findConstantNamesMap(</b>
+&nbsp;          HTTPConstantsInterface.class, String.class,
+&nbsp;          f -&gt; {
+&nbsp;            try {
+<b class="fc">&nbsp;              String value = (String) f.get(null);</b>
+<b class="fc">&nbsp;              return !HTTPConstants.HTTP_1_1.equals(value) &amp;&amp; value.equals(</b>
+<b class="fc">&nbsp;                  value.toUpperCase(Locale.US));</b>
+<b class="nc">&nbsp;            } catch (IllegalAccessException e) {</b>
+&nbsp;              /*
+&nbsp;               this should never happen since the predicate is only applied to public static fields
+&nbsp;               */
+<b class="nc">&nbsp;              throw new RuntimeException(e);</b>
+&nbsp;            }
+&nbsp;          });
+&nbsp;
+&nbsp;      private HttpMethodParam(String expression, String defaultValue) {
+<b class="fc">&nbsp;        super(expression, defaultValue);</b>
+&nbsp;      }
+&nbsp;
+&nbsp;      public static MethodParam from(TestElementParamBuilder paramBuilder) {
+<b class="fc">&nbsp;        return paramBuilder.buildParam(HTTPSamplerBase.METHOD, HttpMethodParam::new,</b>
+&nbsp;            HTTPConstants.GET);
+&nbsp;      }
+&nbsp;
+&nbsp;      @Override
+&nbsp;      public boolean isDefault() {
+<b class="fc">&nbsp;        return super.isDefault() || value != null &amp;&amp; defaultValue != null</b>
+<b class="fc">&nbsp;            &amp;&amp; defaultValue.equals(value.toUpperCase(Locale.US));</b>
+&nbsp;      }
+&nbsp;
+&nbsp;      @Override
+&nbsp;      public Set&lt;String&gt; getImports() {
+<b class="nc">&nbsp;        return findConstant() != null</b>
+<b class="nc">&nbsp;            ? Collections.singleton(HTTPConstants.class.getName())</b>
+<b class="nc">&nbsp;            : Collections.emptySet();</b>
+&nbsp;      }
+&nbsp;
+&nbsp;      private String findConstant() {
+<b class="fc">&nbsp;        return CONSTANT_METHODS.get(value != null ? value.toUpperCase(Locale.US) : null);</b>
+&nbsp;      }
+&nbsp;
+&nbsp;      @Override
+&nbsp;      public String buildCode(String indent) {
+<b class="fc">&nbsp;        String constant = findConstant();</b>
+<b class="fc">&nbsp;        return constant != null ? HTTPConstants.class.getSimpleName() + &quot;.&quot; + constant</b>
+<b class="nc">&nbsp;            : super.buildCode(indent);</b>
+&nbsp;      }
+&nbsp;
+&nbsp;    }
+&nbsp;
+&nbsp;  }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-03 20:57</div>
+</div>
+</body>
+</html>

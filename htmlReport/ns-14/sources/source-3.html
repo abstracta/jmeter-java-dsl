@@ -1,0 +1,210 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=GBK"> 
+  <title>Coverage Report > PropertyScriptBuilder</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">us.abstracta.jmeter.javadsl.core.util</a>
+</div>
+
+<h1>Coverage Summary for Class: PropertyScriptBuilder (us.abstracta.jmeter.javadsl.core.util)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">PropertyScriptBuilder</td>
+<td class="coverageStat">
+  <span class="percent">
+    83.3%
+  </span>
+  <span class="absValue">
+    (5/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    85.7%
+  </span>
+  <span class="absValue">
+    (12/14)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">PropertyScriptBuilder$PropertyScript</td>
+  </tr>
+  <tr>
+    <td class="name">PropertyScriptBuilder$PropertyScriptVars</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/3)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    85.7%
+  </span>
+  <span class="absValue">
+    (6/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    88.2%
+  </span>
+  <span class="absValue">
+    (15/17)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package us.abstracta.jmeter.javadsl.core.util;
+&nbsp;
+&nbsp;import org.apache.jmeter.threads.JMeterContext;
+&nbsp;import org.apache.jmeter.util.JMeterUtils;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import us.abstracta.jmeter.javadsl.core.util.DslScript.DslScriptRegistry;
+&nbsp;import us.abstracta.jmeter.javadsl.core.util.DslScript.DslScriptVars;
+&nbsp;
+&nbsp;/**
+&nbsp; * Contains logic to create a script to be contained in a JMeter property (like if conditions).
+&nbsp; *
+&nbsp; * @since 0.27
+&nbsp; */
+&nbsp;public class PropertyScriptBuilder&lt;T&gt; {
+&nbsp;
+&nbsp;  protected final String scriptString;
+&nbsp;  protected final PropertyScript&lt;T&gt; script;
+&nbsp;  protected final Class&lt;? extends PropertyScript&lt;T&gt;&gt; scriptClass;
+&nbsp;
+&nbsp;  public PropertyScriptBuilder(String script) {
+<b class="fc">&nbsp;    this(script, null, null);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private PropertyScriptBuilder(String scriptString, PropertyScript&lt;T&gt; script,
+<b class="fc">&nbsp;      Class&lt;? extends PropertyScript&lt;T&gt;&gt; scriptClass) {</b>
+<b class="fc">&nbsp;    this.script = script;</b>
+<b class="fc">&nbsp;    this.scriptString = scriptString;</b>
+<b class="fc">&nbsp;    this.scriptClass = scriptClass;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  public PropertyScriptBuilder(PropertyScript&lt;T&gt; script) {
+<b class="fc">&nbsp;    this(null, script, null);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  public PropertyScriptBuilder(Class&lt;? extends PropertyScript&lt;T&gt;&gt; scriptClass) {
+<b class="nc">&nbsp;    this(null, null, scriptClass);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  public String build() {
+<b class="fc">&nbsp;    if (scriptString != null) {</b>
+<b class="fc">&nbsp;      return scriptString;</b>
+<b class="fc">&nbsp;    } else if (script != null) {</b>
+<b class="fc">&nbsp;      return buildFunction(String.format(&quot;props.get(&#39;%s&#39;)&quot;, DslScriptRegistry.register(script)));</b>
+&nbsp;    } else {
+<b class="nc">&nbsp;      return buildFunction(String.format(&quot;new(&#39;%s&#39;)&quot;, scriptClass.getName()));</b>
+&nbsp;    }
+&nbsp;  }
+&nbsp;
+&nbsp;  private String buildFunction(String script) {
+&nbsp;    // when trying with jexl3 got a lot worse performance, so using jexl2
+<b class="fc">&nbsp;    return JmeterFunction.from(&quot;__jexl2&quot;,</b>
+<b class="fc">&nbsp;        script + String.format(&quot;.run(new(&#39;%s&#39;,ctx,log))&quot;, PropertyScriptVars.class.getName()));</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Allows to use any java code as property.
+&nbsp;   *
+&nbsp;   * @see PropertyScriptBuilder.PropertyScriptVars for a list of provided variables in script
+&nbsp;   * execution
+&nbsp;   */
+&nbsp;  public interface PropertyScript&lt;T&gt; extends DslScript&lt;PropertyScriptVars, T&gt; {
+&nbsp;
+&nbsp;  }
+&nbsp;
+&nbsp;  public static class PropertyScriptVars extends DslScriptVars {
+&nbsp;
+&nbsp;    public final String threadName;
+&nbsp;
+&nbsp;    public PropertyScriptVars(JMeterContext ctx, Logger log) {
+<b class="fc">&nbsp;      super(ctx.getPreviousResult(), ctx, ctx.getVariables(), JMeterUtils.getJMeterProperties(),</b>
+<b class="fc">&nbsp;          ctx.getCurrentSampler(), log);</b>
+<b class="fc">&nbsp;      this.threadName = Thread.currentThread().getName();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;  }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-03 20:57</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,406 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=GBK"> 
+  <title>Coverage Report > TestElementParamBuilder</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">us.abstracta.jmeter.javadsl.codegeneration</a>
+</div>
+
+<h1>Coverage Summary for Class: TestElementParamBuilder (us.abstracta.jmeter.javadsl.codegeneration)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">TestElementParamBuilder</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    95%
+  </span>
+  <span class="absValue">
+    (19/20)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    88.2%
+  </span>
+  <span class="absValue">
+    (30/34)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package us.abstracta.jmeter.javadsl.codegeneration;
+&nbsp;
+&nbsp;import java.nio.charset.Charset;
+&nbsp;import java.time.Duration;
+&nbsp;import java.time.temporal.ChronoUnit;
+&nbsp;import java.util.function.BiFunction;
+&nbsp;import org.apache.jmeter.testelement.TestElement;
+&nbsp;import org.apache.jmeter.testelement.property.JMeterProperty;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.params.BoolParam;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.params.DoubleParam;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.params.DurationParam;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.params.DynamicParam;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.params.EncodingParam;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.params.EnumParam;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.params.FloatParam;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.params.IntParam;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.params.LongParam;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.params.NameParam;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.params.StringParam;
+&nbsp;
+&nbsp;/**
+&nbsp; * Is a wrapper class for {@link TestElement} for easy creation of {@link MethodParam} instances.
+&nbsp; *
+&nbsp; * @since 0.45
+&nbsp; */
+&nbsp;public class TestElementParamBuilder {
+&nbsp;
+&nbsp;  private final TestElement testElement;
+&nbsp;  private final String propsPrefix;
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Creates an instance for a given {@link TestElement}.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * When creating parameters from properties names, fully qualified property names are required.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * If the test element has a common prefix for properties, consider using
+&nbsp;   * {@link #TestElementParamBuilder(TestElement, String)} instead.
+&nbsp;   *
+&nbsp;   * @param testElement is the JMeter test element backing this parameter builder.
+&nbsp;   */
+&nbsp;  public TestElementParamBuilder(TestElement testElement) {
+<b class="fc">&nbsp;    this(testElement, null);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Same as {@link #TestElementParamBuilder(TestElement)} but allowing to define a common
+&nbsp;   * properties prefix for the test element.
+&nbsp;   *
+&nbsp;   * @param testElement is the JMeter test element backing this parameter builder.
+&nbsp;   * @param propsPrefix is the common prefix for all properties of the test element.
+&nbsp;   * @see #TestElementParamBuilder(TestElement)
+&nbsp;   */
+<b class="fc">&nbsp;  public TestElementParamBuilder(TestElement testElement, String propsPrefix) {</b>
+<b class="fc">&nbsp;    this.testElement = testElement;</b>
+<b class="fc">&nbsp;    this.propsPrefix = propsPrefix != null ? propsPrefix + &quot;.&quot; : &quot;&quot;;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Generates a MethodParam representing a test element name.
+&nbsp;   *
+&nbsp;   * @param defaultName is the default name used by the JMeter test element.
+&nbsp;   * @return the MethodParam instance.
+&nbsp;   */
+&nbsp;  public NameParam nameParam(String defaultName) {
+<b class="fc">&nbsp;    return new NameParam(testElement.getName(), defaultName);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Generates a MethodParam representing an integer test element property.
+&nbsp;   *
+&nbsp;   * @param propName     is the name of the property holding an integer value. For nested properties
+&nbsp;   *                     (a property that is inside another object property) you can use the slash
+&nbsp;   *                     character to separate the levels (eg: http_config/use_proxy).
+&nbsp;   * @param defaultValue is the default value used by the test element for this property.
+&nbsp;   * @return the MethodParam instance.
+&nbsp;   * @throws UnsupportedOperationException when no integer can be parsed from the property value.
+&nbsp;   * @since 0.61
+&nbsp;   */
+&nbsp;  public MethodParam intParam(String propName, Integer defaultValue) {
+<b class="fc">&nbsp;    return buildParam(propName, IntParam::new, defaultValue);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Same as {@link #intParam(String, Integer)} but with no default value.
+&nbsp;   *
+&nbsp;   * @param propName is the name of the property. For nested properties (a property that is inside
+&nbsp;   *                 another object property) you can use the slash character to separate the levels
+&nbsp;   *                 (eg: http_config/use_proxy).
+&nbsp;   * @return the {@link MethodParam} instance.
+&nbsp;   * @see #intParam(String, Integer)
+&nbsp;   */
+&nbsp;  public MethodParam intParam(String propName) {
+<b class="fc">&nbsp;    return intParam(propName, null);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  public &lt;V, T extends MethodParam&gt; MethodParam buildParam(String propName,
+&nbsp;      BiFunction&lt;String, V, T&gt; builder, V defaultValue) {
+<b class="fc">&nbsp;    String propVal = prop(propName).getStringValue();</b>
+<b class="fc">&nbsp;    if (propVal != null &amp;&amp; DynamicParam.matches(propVal)) {</b>
+<b class="fc">&nbsp;      return new DynamicParam(propVal);</b>
+&nbsp;    }
+&nbsp;    try {
+<b class="fc">&nbsp;      return builder.apply(propVal, defaultValue);</b>
+<b class="nc">&nbsp;    } catch (Exception e) {</b>
+<b class="nc">&nbsp;      throw new UnsupportedOperationException(</b>
+<b class="nc">&nbsp;          String.format(&quot;DSL does not currently support &#39;%s&#39; as value for %s. If you need this &quot;</b>
+&nbsp;                  + &quot;support please open an issue in GitHub repository.&quot;, propVal,
+&nbsp;              propsPrefix + propName), e);
+&nbsp;    }
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Gets the {@link JMeterProperty} instance for the given test element and property name.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * This is useful in general to access raw values of properties, and abstract how to access them
+&nbsp;   * (eg: if they are nested in object properties you can easily access them using slashes)
+&nbsp;   *
+&nbsp;   * @param propName is the name of the property. For nested properties (a property that is inside
+&nbsp;   *                 another object property) you can use the slash character to separate the levels
+&nbsp;   *                 (eg: http_config/use_proxy).
+&nbsp;   * @return the {@link JMeterProperty} instance.
+&nbsp;   */
+&nbsp;  public JMeterProperty prop(String propName) {
+<b class="fc">&nbsp;    propName = propsPrefix + propName;</b>
+<b class="fc">&nbsp;    String[] propLevels = propName.split(&quot;/&quot;);</b>
+<b class="fc">&nbsp;    TestElement propHolder = testElement;</b>
+<b class="fc">&nbsp;    for (int i = 0; i &lt; propLevels.length - 1; i++) {</b>
+<b class="fc">&nbsp;      propHolder = (TestElement) testElement.getProperty(propLevels[i]).getObjectValue();</b>
+&nbsp;    }
+<b class="fc">&nbsp;    return propHolder.getProperty(propLevels[propLevels.length - 1]);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Generates a MethodParam representing a long test element property.
+&nbsp;   *
+&nbsp;   * @param propName     is the name of the property holding a long value. For nested properties (a
+&nbsp;   *                     property that is inside another object property) you can use the slash
+&nbsp;   *                     character to separate the levels (eg: http_config/use_proxy).
+&nbsp;   * @param defaultValue is the default value used by the test element for this property.
+&nbsp;   * @return the MethodParam instance.
+&nbsp;   * @throws UnsupportedOperationException when no long can be parsed from the property value.
+&nbsp;   * @since 1.10
+&nbsp;   */
+&nbsp;  public MethodParam longParam(String propName, Long defaultValue) {
+<b class="fc">&nbsp;    return buildParam(propName, LongParam::new, defaultValue);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Same as {@link #longParam(String, Long)} but with no default value.
+&nbsp;   *
+&nbsp;   * @param propName is the name of the property holding a long value. For nested properties (a
+&nbsp;   *                 property that is inside another object property) you can use the slash
+&nbsp;   *                 character to separate the levels (eg: http_config/use_proxy).
+&nbsp;   * @return the MethodParam instance.
+&nbsp;   * @throws UnsupportedOperationException when no long can be parsed from the property value.
+&nbsp;   * @since 0.61
+&nbsp;   */
+&nbsp;  public MethodParam longParam(String propName) {
+<b class="nc">&nbsp;    return longParam(propName, null);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Generates a MethodParam representing a float test element property.
+&nbsp;   *
+&nbsp;   * @param propName is the name of the property holding a float value. For nested properties (a
+&nbsp;   *                 property that is inside another object property) you can use the slash
+&nbsp;   *                 character to separate the levels (eg: http_config/use_proxy).
+&nbsp;   * @return the MethodParam instance.
+&nbsp;   * @throws UnsupportedOperationException when no float can be parsed from the property value.
+&nbsp;   * @since 0.63
+&nbsp;   */
+&nbsp;  public MethodParam floatParam(String propName) {
+<b class="fc">&nbsp;    return buildParam(propName, FloatParam::new, null);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Generates a MethodParam representing a double test element property.
+&nbsp;   *
+&nbsp;   * @param propName is the name of the property holding a double value. For nested properties (a
+&nbsp;   *                 property that is inside another object property) you can use the slash
+&nbsp;   *                 character to separate the levels (eg: http_config/use_proxy).
+&nbsp;   * @return the MethodParam instance.
+&nbsp;   * @throws UnsupportedOperationException when no double can be parsed from the property value.
+&nbsp;   * @since 0.61
+&nbsp;   */
+&nbsp;  public MethodParam doubleParam(String propName) {
+<b class="fc">&nbsp;    return buildParam(propName, DoubleParam::new, null);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Gets a MethodParam for a string test element property.
+&nbsp;   *
+&nbsp;   * @param propName     is the name of the property. For nested properties (a property that is
+&nbsp;   *                     inside another object property) you can use the slash character to separate
+&nbsp;   *                     the levels (eg: http_config/use_proxy).
+&nbsp;   * @param defaultValue the default value assigned to the JMeter test element property.
+&nbsp;   * @return the {@link MethodParam} instance.
+&nbsp;   */
+&nbsp;  public MethodParam stringParam(String propName, String defaultValue) {
+<b class="fc">&nbsp;    return new StringParam(prop(propName).getStringValue(), defaultValue);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Same as {@link #stringParam(String, String)} but with no default value.
+&nbsp;   *
+&nbsp;   * @param propName is the name of the property. For nested properties (a property that is inside
+&nbsp;   *                 another object property) you can use the slash character to separate the levels
+&nbsp;   *                 (eg: http_config/use_proxy).
+&nbsp;   * @return the {@link MethodParam} instance.
+&nbsp;   * @see #stringParam(String, String)
+&nbsp;   */
+&nbsp;  public MethodParam stringParam(String propName) {
+<b class="fc">&nbsp;    return stringParam(propName, null);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Gets a MethodParam representing a boolean test element property.
+&nbsp;   *
+&nbsp;   * @param propName     is the name of the property. For nested properties (a property that is
+&nbsp;   *                     inside another object property) you can use the slash character to separate
+&nbsp;   *                     the levels (eg: http_config/use_proxy).
+&nbsp;   * @param defaultValue the default value assigned to the JMeter test element property.
+&nbsp;   * @return the {@link MethodParam} instance.
+&nbsp;   */
+&nbsp;  public MethodParam boolParam(String propName, boolean defaultValue) {
+<b class="fc">&nbsp;    return buildParam(propName, BoolParam::new, defaultValue);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Gets a MethodParam representing a test element property containing a duration (in seconds).
+&nbsp;   *
+&nbsp;   * @param propName     is the name of the property. For nested properties (a property that is
+&nbsp;   *                     inside another object property) you can use the slash character to separate
+&nbsp;   *                     the levels (eg: http_config/use_proxy).
+&nbsp;   * @param defaultValue the default value assigned to the JMeter test element property.
+&nbsp;   * @return the {@link MethodParam} instance.
+&nbsp;   */
+&nbsp;  public MethodParam durationParam(String propName, Duration defaultValue) {
+<b class="fc">&nbsp;    return buildParam(propName, DurationParam::new, defaultValue);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Same as {@link #durationParam(String, Duration)} but with no default value.
+&nbsp;   *
+&nbsp;   * @param propName is the name of the property. For nested properties (a property that is inside
+&nbsp;   *                 another object property) you can use the slash character to separate the levels
+&nbsp;   *                 (eg: http_config/use_proxy).
+&nbsp;   * @return the {@link MethodParam} instance.
+&nbsp;   * @see #durationParam(String, Duration)
+&nbsp;   */
+&nbsp;  public MethodParam durationParam(String propName) {
+<b class="fc">&nbsp;    return durationParam(propName, null);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Gets a MethodParam representing a test element property containing a duration (in
+&nbsp;   * milliseconds).
+&nbsp;   *
+&nbsp;   * @param propName     is the name of the property. For nested properties (a property that is
+&nbsp;   *                     inside another object property) you can use the slash character to separate
+&nbsp;   *                     the levels (eg: http_config/use_proxy).
+&nbsp;   * @param defaultValue the default value assigned to the JMeter test element property.
+&nbsp;   * @return the {@link MethodParam} instance.
+&nbsp;   */
+&nbsp;  public MethodParam durationParamMillis(String propName, Duration defaultValue) {
+<b class="fc">&nbsp;    return buildParam(propName,</b>
+<b class="fc">&nbsp;        (expression, defValue) -&gt; new DurationParam(expression, defValue, ChronoUnit.MILLIS),</b>
+&nbsp;        defaultValue);
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Gets a MethodParam representing a test element property with a restricted set (enumerated) of
+&nbsp;   * string values.
+&nbsp;   *
+&nbsp;   * @param propName     is the name of the property. For nested properties (a property that is
+&nbsp;   *                     inside another object property) you can use the slash character to separate
+&nbsp;   *                     the levels (eg: http_config/use_proxy).
+&nbsp;   * @param defaultValue the default value assigned to the JMeter test element property.
+&nbsp;   * @return the {@link MethodParam} instance.
+&nbsp;   * @since 0.62
+&nbsp;   */
+&nbsp;  public &lt;T extends Enum&lt;?&gt; &amp; EnumParam.EnumPropertyValue&gt; MethodParam enumParam(String propName,
+&nbsp;      T defaultValue) {
+<b class="fc">&nbsp;    Class&lt;T&gt; enumType = (Class&lt;T&gt;) defaultValue.getClass();</b>
+<b class="fc">&nbsp;    return buildParam(propName, (s, d) -&gt; new EnumParam&lt;&gt;(enumType, s, d), defaultValue);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Gets a MethodParam representing a test element property containing an encoding (Charset).
+&nbsp;   *
+&nbsp;   * @param propName     is the name of the property. For nested properties (a property that is
+&nbsp;   *                     inside another object property) you can use the slash character to separate
+&nbsp;   *                     the levels (eg: http_config/use_proxy).
+&nbsp;   * @param defaultValue the default value assigned to the JMeter test element property.
+&nbsp;   * @return the {@link MethodParam} instance.
+&nbsp;   * @since 0.62
+&nbsp;   */
+&nbsp;  public MethodParam encodingParam(String propName, Charset defaultValue) {
+<b class="fc">&nbsp;    return buildParam(propName, EncodingParam::new, defaultValue);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-03 20:57</div>
+</div>
+</body>
+</html>

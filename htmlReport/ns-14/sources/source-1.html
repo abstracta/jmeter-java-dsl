@@ -1,0 +1,285 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=GBK"> 
+  <title>Coverage Report > DslScript</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">us.abstracta.jmeter.javadsl.core.util</a>
+</div>
+
+<h1>Coverage Summary for Class: DslScript (us.abstracta.jmeter.javadsl.core.util)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+  <tr>
+    <td class="name">DslScript$DslScriptRegistry</td>
+<td class="coverageStat">
+  <span class="percent">
+    75%
+  </span>
+  <span class="absValue">
+    (3/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    83.3%
+  </span>
+  <span class="absValue">
+    (5/6)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">DslScript$DslScriptVars</td>
+<td class="coverageStat">
+  <span class="percent">
+    12.5%
+  </span>
+  <span class="absValue">
+    (1/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    16.7%
+  </span>
+  <span class="absValue">
+    (7/42)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    33.3%
+  </span>
+  <span class="absValue">
+    (4/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    25%
+  </span>
+  <span class="absValue">
+    (12/48)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package us.abstracta.jmeter.javadsl.core.util;
+&nbsp;
+&nbsp;import java.time.Instant;
+&nbsp;import java.util.LinkedHashMap;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Map.Entry;
+&nbsp;import java.util.Properties;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;import org.apache.jmeter.protocol.http.sampler.HTTPSampleResult;
+&nbsp;import org.apache.jmeter.protocol.http.util.HTTPConstants;
+&nbsp;import org.apache.jmeter.samplers.SampleResult;
+&nbsp;import org.apache.jmeter.samplers.Sampler;
+&nbsp;import org.apache.jmeter.threads.JMeterContext;
+&nbsp;import org.apache.jmeter.threads.JMeterVariables;
+&nbsp;import org.apache.jmeter.util.JMeterUtils;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import us.abstracta.jmeter.javadsl.core.util.DslScript.DslScriptVars;
+&nbsp;
+&nbsp;/**
+&nbsp; * Specifies methods of lambdas used in jsr223 elements and controller properties.
+&nbsp; *
+&nbsp; * @since 0.27
+&nbsp; */
+&nbsp;public interface DslScript&lt;P extends DslScriptVars, R&gt; {
+&nbsp;
+&nbsp;  R run(P scriptVars) throws Exception;
+&nbsp;
+&nbsp;  abstract class DslScriptVars {
+&nbsp;
+&nbsp;    public final SampleResult prev;
+&nbsp;    public final JMeterContext ctx;
+&nbsp;    public final JMeterVariables vars;
+&nbsp;    public final Properties props;
+&nbsp;    public final Sampler sampler;
+&nbsp;    public final Logger log;
+&nbsp;
+&nbsp;    public DslScriptVars(SampleResult prev, JMeterContext ctx, JMeterVariables vars,
+<b class="fc">&nbsp;        Properties props, Sampler sampler, Logger log) {</b>
+<b class="fc">&nbsp;      this.prev = prev;</b>
+<b class="fc">&nbsp;      this.ctx = ctx;</b>
+<b class="fc">&nbsp;      this.vars = vars;</b>
+<b class="fc">&nbsp;      this.props = props;</b>
+<b class="fc">&nbsp;      this.sampler = sampler;</b>
+<b class="fc">&nbsp;      this.log = log;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Builds a map from last sample result to ease visualization and debugging.
+&nbsp;     *
+&nbsp;     * @return map from last sample result.
+&nbsp;     */
+&nbsp;    public Map&lt;String, Object&gt; prevMap() {
+<b class="nc">&nbsp;      Map&lt;String, Object&gt; ret = prevMetadata();</b>
+<b class="nc">&nbsp;      ret.putAll(prevMetrics());</b>
+<b class="nc">&nbsp;      ret.put(&quot;request&quot;, prevRequest());</b>
+<b class="nc">&nbsp;      ret.put(&quot;response&quot;, prevResponse());</b>
+<b class="nc">&nbsp;      return ret;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Builds a map from last sample result including most significant metadata to ease
+&nbsp;     * visualization and debugging.
+&nbsp;     *
+&nbsp;     * @return map of last sample result most significant metadata.
+&nbsp;     */
+&nbsp;    public Map&lt;String, Object&gt; prevMetadata() {
+<b class="nc">&nbsp;      Map&lt;String, Object&gt; ret = new LinkedHashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;      ret.put(&quot;label&quot;, prev.getSampleLabel());</b>
+<b class="nc">&nbsp;      ret.put(&quot;timestamp&quot;, Instant.ofEpochMilli(prev.getTimeStamp()));</b>
+<b class="nc">&nbsp;      SampleResult parent = prev.getParent();</b>
+<b class="nc">&nbsp;      if (parent != null) {</b>
+<b class="nc">&nbsp;        ret.put(&quot;parent&quot;, parent.getSampleLabel());</b>
+&nbsp;      }
+<b class="nc">&nbsp;      ret.put(&quot;successful&quot;, prev.isSuccessful());</b>
+<b class="nc">&nbsp;      ret.put(&quot;threadName&quot;, prev.getThreadName());</b>
+<b class="nc">&nbsp;      ret.put(&quot;threadsCount&quot;, prev.getAllThreads());</b>
+<b class="nc">&nbsp;      ret.put(&quot;threadGroupSize&quot;, prev.getGroupThreads());</b>
+<b class="nc">&nbsp;      return ret;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Builds a map from last sample result collected metrics to ease visualization and debugging.
+&nbsp;     *
+&nbsp;     * @return map of last sample collected metrics.
+&nbsp;     */
+&nbsp;    public Map&lt;String, Object&gt; prevMetrics() {
+<b class="nc">&nbsp;      Map&lt;String, Object&gt; ret = new LinkedHashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;      ret.put(&quot;sampleMillis&quot;, prev.getTime());</b>
+<b class="nc">&nbsp;      ret.put(&quot;connectionMillis&quot;, prev.getConnectTime());</b>
+<b class="nc">&nbsp;      ret.put(&quot;latencyMillis&quot;, prev.getLatency());</b>
+<b class="nc">&nbsp;      ret.put(&quot;sentBytes&quot;, prev.getSentBytes());</b>
+<b class="nc">&nbsp;      ret.put(&quot;receivedBytes&quot;, prev.getBytesAsLong());</b>
+<b class="nc">&nbsp;      return ret;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Builds a string from last sample result request to ease visualization and debugging.
+&nbsp;     *
+&nbsp;     * @return string representing last sample request.
+&nbsp;     */
+&nbsp;    public String prevRequest() {
+<b class="nc">&nbsp;      return prev instanceof HTTPSampleResult ? httpRequestString((HTTPSampleResult) prev)</b>
+<b class="nc">&nbsp;          : prev.getRequestHeaders() + &quot;\n&quot; + prev.getSamplerData();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private String httpRequestString(HTTPSampleResult result) {
+<b class="nc">&nbsp;      String cookiesHeader = result.getCookies();</b>
+<b class="nc">&nbsp;      if (cookiesHeader != null &amp;&amp; !cookiesHeader.isEmpty()) {</b>
+<b class="nc">&nbsp;        cookiesHeader = HTTPConstants.HEADER_COOKIE + &quot;: &quot; + cookiesHeader + &quot;\n&quot;;</b>
+&nbsp;      }
+<b class="nc">&nbsp;      return result.getHTTPMethod() + &quot; &quot; + result.getUrlAsString() + &quot;\n&quot;</b>
+<b class="nc">&nbsp;          + result.getRequestHeaders() + cookiesHeader + &quot;\n&quot;</b>
+<b class="nc">&nbsp;          + result.getQueryString();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Builds a string from last sample result response to ease visualization and debugging.
+&nbsp;     *
+&nbsp;     * @return string representing last sample response.
+&nbsp;     */
+&nbsp;    public String prevResponse() {
+<b class="nc">&nbsp;      String statusLine = prev instanceof HTTPSampleResult ? &quot;&quot;</b>
+<b class="nc">&nbsp;          : prev.getResponseCode() + &quot; &quot; + prev.getResponseMessage() + &quot;\n&quot;;</b>
+<b class="nc">&nbsp;      return statusLine + prev.getResponseHeaders() + &quot;\n&quot; + prev.getResponseDataAsString();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets a map from current JMeter variables, making them easier to visualize, mainly while
+&nbsp;     * debugging.
+&nbsp;     *
+&nbsp;     * @return map created from JMeter variables.
+&nbsp;     */
+&nbsp;    public Map&lt;String, Object&gt; varsMap() {
+<b class="nc">&nbsp;      return vars.entrySet().stream().collect(Collectors.toMap(Entry::getKey, Entry::getValue));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;  }
+&nbsp;
+<b class="nc">&nbsp;  class DslScriptRegistry {</b>
+&nbsp;
+<b class="fc">&nbsp;    private static int currentScriptId = 1;</b>
+&nbsp;
+&nbsp;    public static String register(Object script) {
+<b class="fc">&nbsp;      String ret = &quot;lambdaScript&quot; + (currentScriptId++);</b>
+<b class="fc">&nbsp;      JMeterUtils.getJMeterProperties().put(ret, script);</b>
+<b class="fc">&nbsp;      return ret;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static &lt;T&gt; T findLambdaScript(String scriptId) {
+<b class="fc">&nbsp;      return (T) JMeterUtils.getJMeterProperties().get(scriptId);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;  }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-03 20:57</div>
+</div>
+</body>
+</html>

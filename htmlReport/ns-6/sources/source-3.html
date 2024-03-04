@@ -1,0 +1,519 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=GBK"> 
+  <title>Coverage Report > DslCsvDataSet</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">us.abstracta.jmeter.javadsl.core.configs</a>
+</div>
+
+<h1>Coverage Summary for Class: DslCsvDataSet (us.abstracta.jmeter.javadsl.core.configs)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DslCsvDataSet</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (17/17)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    98.1%
+  </span>
+  <span class="absValue">
+    (53/54)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">DslCsvDataSet$CodeBuilder</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (6/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (27/27)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">DslCsvDataSet$Sharing</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (7/7)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (27/27)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    98.9%
+  </span>
+  <span class="absValue">
+    (87/88)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package us.abstracta.jmeter.javadsl.core.configs;
+&nbsp;
+&nbsp;import com.blazemeter.jmeter.RandomCSVDataSetConfig;
+&nbsp;import com.blazemeter.jmeter.RandomCSVDataSetConfigGui;
+&nbsp;import java.lang.reflect.Method;
+&nbsp;import java.nio.charset.Charset;
+&nbsp;import java.nio.charset.StandardCharsets;
+&nbsp;import java.util.List;
+&nbsp;import org.apache.jmeter.config.CSVDataSet;
+&nbsp;import org.apache.jmeter.testbeans.gui.TestBeanGUI;
+&nbsp;import org.apache.jmeter.testelement.TestElement;
+&nbsp;import org.apache.jorphan.collections.HashTree;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.MethodCall;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.MethodCallBuilder;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.MethodCallContext;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.MethodParam;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.TestElementParamBuilder;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.params.BoolParam;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.params.EnumParam;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.params.EnumParam.EnumPropertyValue;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.params.StringArrayParam;
+&nbsp;import us.abstracta.jmeter.javadsl.core.BuildTreeContext;
+&nbsp;
+&nbsp;/**
+&nbsp; * Allows using a CSV file as input data for JMeter variables to use in test plan.
+&nbsp; * &lt;p&gt;
+&nbsp; * This element reads a CSV file and uses each line to generate JMeter variables to be used in each
+&nbsp; * iteration and thread of the test plan.
+&nbsp; * &lt;p&gt;
+&nbsp; * Is ideal to be able to easily create test plans that test with a lot of different of potential
+&nbsp; * requests or flows.
+&nbsp; * &lt;p&gt;
+&nbsp; * By default, it consumes comma separated variables, which names are included in first line of CSV,
+&nbsp; * automatically resets to the beginning of the file when the end is reached and the consumption of
+&nbsp; * the file is shared by all threads and thread groups in the test plan (ie: any iteration on a
+&nbsp; * thread will consume a line from the file, and advance to following line).
+&nbsp; * &lt;p&gt;
+&nbsp; * Additionally, this element sets by default the &quot;quoted data&quot; flag on JMeter CSV Data Set
+&nbsp; * element.
+&nbsp; *
+&nbsp; * @since 0.24
+&nbsp; */
+&nbsp;public class DslCsvDataSet extends BaseConfigElement {
+&nbsp;
+&nbsp;  private String file;
+<b class="fc">&nbsp;  private String delimiter = &quot;,&quot;;</b>
+<b class="fc">&nbsp;  private String encoding = StandardCharsets.UTF_8.name();</b>
+&nbsp;  private String[] variableNames;
+&nbsp;  private boolean ignoreFirstLine;
+&nbsp;  private boolean stopThread;
+<b class="fc">&nbsp;  private Sharing shareMode = Sharing.ALL_THREADS;</b>
+&nbsp;  private boolean randomOrder;
+&nbsp;
+&nbsp;  public DslCsvDataSet(String csvFile) {
+<b class="fc">&nbsp;    super(&quot;CSV Data Set Config&quot;, TestBeanGUI.class);</b>
+<b class="fc">&nbsp;    this.file = csvFile;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Specifies the delimiter used by the file to separate variable values.
+&nbsp;   *
+&nbsp;   * @param delimiter specifies the delimiter. By default, it uses commas (,) as delimiters. If you
+&nbsp;   *                  need to use tabs, then specify &quot;\\t&quot;.
+&nbsp;   * @return the dataset for further configuration or usage.
+&nbsp;   */
+&nbsp;  public DslCsvDataSet delimiter(String delimiter) {
+<b class="fc">&nbsp;    this.delimiter = delimiter;</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Specifies the file encoding used by the file.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * This method is useful when specifying a dynamic encoding (through JMeter variable or function
+&nbsp;   * reference). Otherwise prefer using {@link #encoding(Charset)}.
+&nbsp;   *
+&nbsp;   * @param encoding the file encoding of the file. By default, it will use UTF-8 (which differs
+&nbsp;   *                 from JMeter default, to have more consistent test plan execution). This might
+&nbsp;   *                 require to be changed but in general is good to have all files in same encoding
+&nbsp;   *                 (eg: UTF-8).
+&nbsp;   * @return the dataset for further configuration or usage.
+&nbsp;   */
+&nbsp;  public DslCsvDataSet encoding(String encoding) {
+<b class="fc">&nbsp;    this.encoding = encoding;</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Specifies the file encoding used by the file.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * If you need to specify a dynamic encoding (through JMeter variable or function reference), then
+&nbsp;   * use {@link #encoding(String)} instead.
+&nbsp;   *
+&nbsp;   * @param encoding the file encoding of the file. By default, it will use UTF-8 (which differs
+&nbsp;   *                 from JMeter default, to have more consistent test plan execution). This might
+&nbsp;   *                 require to be changed but in general is good to have all files in same encoding
+&nbsp;   *                 (eg: UTF-8).
+&nbsp;   * @return the dataset for further configuration or usage.
+&nbsp;   */
+&nbsp;  public DslCsvDataSet encoding(Charset encoding) {
+<b class="fc">&nbsp;    this.encoding = encoding.name();</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Specifies variable names to be assigned to the parsed values.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * If you have a CSV file with existing headers and want to overwrite the name of generated
+&nbsp;   * variables, then use {@link #ignoreFirstLine()} in conjunction with this method to specify the
+&nbsp;   * new variable names. If you have a CSV file without a headers line, then you will need to use
+&nbsp;   * this method to set proper names for the variables (otherwise first line of data will be used as
+&nbsp;   * headers, which will not be good).
+&nbsp;   *
+&nbsp;   * @param variableNames names of variables to be extracted from the CSV file.
+&nbsp;   * @return the dataset  for further configuration or usage.
+&nbsp;   */
+&nbsp;  public DslCsvDataSet variableNames(String... variableNames) {
+<b class="fc">&nbsp;    this.variableNames = variableNames;</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Specifies to ignore first line of the CSV.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * This should only be used in conjunction with {@link #variableNames(String...)} to overwrite
+&nbsp;   * existing CSV headers names.
+&nbsp;   *
+&nbsp;   * @return the dataset for further configuration or usage.
+&nbsp;   */
+&nbsp;  public DslCsvDataSet ignoreFirstLine() {
+<b class="fc">&nbsp;    return ignoreFirstLine(true);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Same as {@link #ignoreFirstLine()} but allowing to enable or disable it.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * This is helpful when the resolution is taken at runtime.
+&nbsp;   *
+&nbsp;   * @param enable specifies to enable or disable the setting. By default, it is set to false.
+&nbsp;   * @return the dataset for further configuration or usage.
+&nbsp;   * @see #ignoreFirstLine()
+&nbsp;   * @since 1.0
+&nbsp;   */
+&nbsp;  public DslCsvDataSet ignoreFirstLine(boolean enable) {
+<b class="fc">&nbsp;    this.ignoreFirstLine = enable;</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Specifies to stop threads when end of given CSV file is reached.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * This method will automatically internally set JMeter test element property &quot;recycle on EOF&quot;, so
+&nbsp;   * you don&#39;t need to worry about such property.
+&nbsp;   *
+&nbsp;   * @return the dataset for further configuration or usage.
+&nbsp;   */
+&nbsp;  public DslCsvDataSet stopThreadOnEOF() {
+<b class="fc">&nbsp;    return stopThreadOnEOF(true);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Same as {@link #stopThreadOnEOF()} but allowing to enable or disable it.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * This is helpful when the resolution is taken at runtime.
+&nbsp;   *
+&nbsp;   * @param enable specifies to enable or disable the setting. By default, it is set to false.
+&nbsp;   * @return the dataset for further configuration or usage.
+&nbsp;   * @see #stopThreadOnEOF()
+&nbsp;   * @since 1.0
+&nbsp;   */
+&nbsp;  public DslCsvDataSet stopThreadOnEOF(boolean enable) {
+<b class="fc">&nbsp;    this.stopThread = enable;</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Allows changing the way CSV file is consumed (shared) by threads.
+&nbsp;   *
+&nbsp;   * @param shareMode specifies the way threads consume information from the CSV file. By default,
+&nbsp;   *                  all threads share the CSV information, meaning that any thread iteration will
+&nbsp;   *                  advance the consumption of the file (the file is a singleton). When
+&nbsp;   *                  {@link #randomOrder()} is used, THREAD_GROUP shared mode is not supported.
+&nbsp;   * @return the dataset for further configuration or usage.
+&nbsp;   * @see Sharing
+&nbsp;   */
+&nbsp;  public DslCsvDataSet sharedIn(Sharing shareMode) {
+<b class="fc">&nbsp;    this.shareMode = shareMode;</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Specifies to get file lines in random order instead of sequentially iterating over them.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * When this method is invoked
+&nbsp;   * &lt;a
+&nbsp;   * href=&quot;https://github.com/Blazemeter/jmeter-bzm-plugins/blob/master/random-csv-data-set/RandomCSVDataSetConfig.md&quot;&gt;Random
+&nbsp;   * CSV Data Set plugin&lt;/a&gt; is used.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * &lt;b&gt;Warning:&lt;/b&gt; Getting lines in random order has a performance penalty.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * &lt;b&gt;Warning:&lt;/b&gt; When random order is enabled, share mode THREAD_GROUP is not supported.
+&nbsp;   *
+&nbsp;   * @return the dataset for further configuration or usage.
+&nbsp;   * @since 0.36
+&nbsp;   */
+&nbsp;  public DslCsvDataSet randomOrder() {
+<b class="fc">&nbsp;    return randomOrder(true);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Same as {@link #randomOrder()} but allowing to enable or disable it.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * This is helpful when the resolution is taken at runtime.
+&nbsp;   *
+&nbsp;   * @param enable specifies to enable or disable the setting. By default, it is set to false.
+&nbsp;   * @return the dataset for further configuration or usage.
+&nbsp;   * @see #randomOrder()
+&nbsp;   * @since 1.0
+&nbsp;   */
+&nbsp;  public DslCsvDataSet randomOrder(boolean enable) {
+<b class="fc">&nbsp;    this.randomOrder = enable;</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public HashTree buildTreeUnder(HashTree parent, BuildTreeContext context) {
+<b class="fc">&nbsp;    file = context.processAssetFile(file);</b>
+<b class="fc">&nbsp;    return super.buildTreeUnder(parent, context);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  protected TestElement buildTestElement() {
+<b class="fc">&nbsp;    return randomOrder ? buildRandomCsvDataSet() : buildSimpleCsvDataSet();</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private TestElement buildRandomCsvDataSet() {
+<b class="fc">&nbsp;    guiClass = RandomCSVDataSetConfigGui.class;</b>
+<b class="fc">&nbsp;    RandomCSVDataSetConfig ret = new RandomCSVDataSetConfig();</b>
+<b class="fc">&nbsp;    ret.setFilename(file);</b>
+<b class="fc">&nbsp;    ret.setDelimiter(delimiter);</b>
+<b class="fc">&nbsp;    ret.setFileEncoding(encoding);</b>
+<b class="fc">&nbsp;    if (variableNames != null) {</b>
+<b class="fc">&nbsp;      ret.setVariableNames(buildVariablesPropertyValue());</b>
+&nbsp;    }
+<b class="fc">&nbsp;    ret.setIgnoreFirstLine(ignoreFirstLine);</b>
+<b class="fc">&nbsp;    if (shareMode == Sharing.THREAD_GROUP) {</b>
+<b class="nc">&nbsp;      throw new IllegalStateException(</b>
+&nbsp;          &quot;CSV data sets with random order don&#39;t support THREAD_GROUP sharing mode&quot;);
+&nbsp;    }
+<b class="fc">&nbsp;    ret.setIndependentListPerThread(shareMode == Sharing.THREAD);</b>
+<b class="fc">&nbsp;    ret.setRewindOnTheEndOfList(!stopThread);</b>
+<b class="fc">&nbsp;    ret.setRandomOrder(randomOrder);</b>
+<b class="fc">&nbsp;    return ret;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private String buildVariablesPropertyValue() {
+<b class="fc">&nbsp;    return String.join(&quot;,&quot;, variableNames);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private CSVDataSet buildSimpleCsvDataSet() {
+<b class="fc">&nbsp;    CSVDataSet ret = new CSVDataSet();</b>
+<b class="fc">&nbsp;    ret.setFilename(file);</b>
+<b class="fc">&nbsp;    ret.setDelimiter(delimiter);</b>
+<b class="fc">&nbsp;    ret.setFileEncoding(encoding);</b>
+<b class="fc">&nbsp;    if (variableNames != null) {</b>
+<b class="fc">&nbsp;      ret.setVariableNames(buildVariablesPropertyValue());</b>
+&nbsp;    }
+<b class="fc">&nbsp;    ret.setIgnoreFirstLine(ignoreFirstLine);</b>
+<b class="fc">&nbsp;    ret.setQuotedData(true);</b>
+<b class="fc">&nbsp;    ret.setRecycle(!stopThread);</b>
+<b class="fc">&nbsp;    ret.setStopThread(stopThread);</b>
+<b class="fc">&nbsp;    ret.setShareMode(shareMode.propertyValue);</b>
+<b class="fc">&nbsp;    return ret;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Specifies the way the threads in a test plan consume the CSV.
+&nbsp;   */
+<b class="fc">&nbsp;  public enum Sharing implements EnumPropertyValue {</b>
+&nbsp;    /**
+&nbsp;     * All threads in the test plan will share the CSV file, meaning that any thread iteration will
+&nbsp;     * consume an entry from it. You can think as having only one pointer to the current line of the
+&nbsp;     * CSV, being advanced by any thread iteration. The file is only opened once.
+&nbsp;     */
+<b class="fc">&nbsp;    ALL_THREADS(&quot;all&quot;),</b>
+&nbsp;    /**
+&nbsp;     * CSV file consumption is only shared within thread groups. This means that threads in separate
+&nbsp;     * thread groups will use separate indexes to consume the data. The file is open once per thread
+&nbsp;     * group.
+&nbsp;     */
+<b class="fc">&nbsp;    THREAD_GROUP(&quot;group&quot;),</b>
+&nbsp;    /**
+&nbsp;     * CSV file consumption is isolated per thread. This means that each thread will start consuming
+&nbsp;     * the CSV from the beginning and not share any information with other threads. The file is open
+&nbsp;     * once per thread.
+&nbsp;     */
+<b class="fc">&nbsp;    THREAD(&quot;thread&quot;);</b>
+&nbsp;
+&nbsp;    private final String propertyValue;
+&nbsp;
+<b class="fc">&nbsp;    Sharing(String jmeterPropertySuffix) {</b>
+<b class="fc">&nbsp;      this.propertyValue = &quot;shareMode.&quot; + jmeterPropertySuffix;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String propertyValue() {
+<b class="fc">&nbsp;      return propertyValue;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;  }
+&nbsp;
+&nbsp;  public static class CodeBuilder extends MethodCallBuilder {
+&nbsp;
+&nbsp;    public CodeBuilder(List&lt;Method&gt; builderMethods) {
+<b class="fc">&nbsp;      super(builderMethods);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean matches(MethodCallContext context) {
+<b class="fc">&nbsp;      TestElement testElement = context.getTestElement();</b>
+<b class="fc">&nbsp;      return testElement.getClass() == CSVDataSet.class</b>
+<b class="fc">&nbsp;          || testElement.getClass() == RandomCSVDataSetConfig.class;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected MethodCall buildMethodCall(MethodCallContext context) {
+<b class="fc">&nbsp;      TestElement testElement = context.getTestElement();</b>
+<b class="fc">&nbsp;      TestElementParamBuilder paramBuilder = new TestElementParamBuilder(testElement);</b>
+<b class="fc">&nbsp;      MethodCall ret = buildMethodCall(paramBuilder.stringParam(&quot;filename&quot;));</b>
+<b class="fc">&nbsp;      ret.chain(&quot;ignoreFirstLine&quot;, paramBuilder.boolParam(&quot;ignoreFirstLine&quot;, false));</b>
+<b class="fc">&nbsp;      ret.chain(&quot;variableNames&quot;,</b>
+<b class="fc">&nbsp;          new StringArrayParam(testElement.getPropertyAsString(&quot;variableNames&quot;)));</b>
+<b class="fc">&nbsp;      ret.chain(&quot;delimiter&quot;, paramBuilder.stringParam(&quot;delimiter&quot;, &quot;,&quot;));</b>
+<b class="fc">&nbsp;      ret.chain(&quot;randomOrder&quot;, buildRandomOrderParameter(testElement, paramBuilder));</b>
+<b class="fc">&nbsp;      ret.chain(&quot;encoding&quot;, paramBuilder.encodingParam(&quot;fileEncoding&quot;, StandardCharsets.UTF_8));</b>
+<b class="fc">&nbsp;      ret.chain(&quot;sharedIn&quot;, buildSharingParameter(testElement, paramBuilder));</b>
+<b class="fc">&nbsp;      ret.chain(&quot;stopThreadOnEOF&quot;, buildStopThreadParameter(testElement, paramBuilder));</b>
+<b class="fc">&nbsp;      return ret;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private MethodParam buildSharingParameter(TestElement testElement,
+&nbsp;        TestElementParamBuilder paramBuilder) {
+<b class="fc">&nbsp;      if (testElement instanceof RandomCSVDataSetConfig) {</b>
+<b class="fc">&nbsp;        return paramBuilder.boolParam(&quot;independentListPerThread&quot;, false).isDefault()</b>
+<b class="fc">&nbsp;            ? new EnumParam&lt;&gt;(Sharing.class, Sharing.ALL_THREADS.propertyValue, Sharing.ALL_THREADS)</b>
+<b class="fc">&nbsp;            : new EnumParam&lt;&gt;(Sharing.class, Sharing.THREAD.propertyValue, Sharing.ALL_THREADS);</b>
+&nbsp;      } else {
+<b class="fc">&nbsp;        return paramBuilder.enumParam(&quot;shareMode&quot;, Sharing.ALL_THREADS);</b>
+&nbsp;      }
+&nbsp;    }
+&nbsp;
+&nbsp;    private MethodParam buildStopThreadParameter(TestElement testElement,
+&nbsp;        TestElementParamBuilder paramBuilder) {
+<b class="fc">&nbsp;      if (testElement instanceof CSVDataSet) {</b>
+<b class="fc">&nbsp;        return paramBuilder.boolParam(&quot;stopThread&quot;, false);</b>
+&nbsp;      } else {
+<b class="fc">&nbsp;        MethodParam rewind = paramBuilder.boolParam(&quot;rewindOnTheEndOfList&quot;, true);</b>
+<b class="fc">&nbsp;        return new BoolParam(!rewind.isDefault(), false);</b>
+&nbsp;      }
+&nbsp;    }
+&nbsp;
+&nbsp;    private MethodParam buildRandomOrderParameter(TestElement testElement,
+&nbsp;        TestElementParamBuilder paramBuilder) {
+<b class="fc">&nbsp;      return new BoolParam(testElement.getClass() == RandomCSVDataSetConfig.class</b>
+<b class="fc">&nbsp;          &amp;&amp; !paramBuilder.boolParam(&quot;randomOrder&quot;, false).isDefault(), false);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;  }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-03 20:57</div>
+</div>
+</body>
+</html>

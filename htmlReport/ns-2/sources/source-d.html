@@ -1,0 +1,90 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=GBK"> 
+  <title>Coverage Report > CodeSegment</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">us.abstracta.jmeter.javadsl.codegeneration</a>
+</div>
+
+<h1>Coverage Summary for Class: CodeSegment (us.abstracta.jmeter.javadsl.codegeneration)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+</tr>
+<tr>
+  <td class="name">CodeSegment</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package us.abstracta.jmeter.javadsl.codegeneration;
+&nbsp;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.Map;
+&nbsp;
+&nbsp;/**
+&nbsp; * Specifies part of code to be generated including common logic required byt different type of code
+&nbsp; * segments.
+&nbsp; *
+&nbsp; * @since 1.5
+&nbsp; */
+&nbsp;public interface CodeSegment {
+&nbsp;
+&nbsp;  String buildCode(String indent);
+&nbsp;
+&nbsp;  Collection&lt;String&gt; getStaticImports();
+&nbsp;
+&nbsp;  Collection&lt;String&gt; getImports();
+&nbsp;
+&nbsp;  Map&lt;String, ? extends MethodCall&gt; getMethodDefinitions();
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-03 20:57</div>
+</div>
+</body>
+</html>

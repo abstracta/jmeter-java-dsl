@@ -1,0 +1,201 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=GBK"> 
+  <title>Coverage Report > DslTestFragmentController</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">us.abstracta.jmeter.javadsl.core.controllers</a>
+</div>
+
+<h1>Coverage Summary for Class: DslTestFragmentController (us.abstracta.jmeter.javadsl.core.controllers)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DslTestFragmentController</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">DslTestFragmentController$CodeBuilder</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (6/6)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    42.9%
+  </span>
+  <span class="absValue">
+    (3/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    60%
+  </span>
+  <span class="absValue">
+    (6/10)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package us.abstracta.jmeter.javadsl.core.controllers;
+&nbsp;
+&nbsp;import java.lang.reflect.Method;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.List;
+&nbsp;import org.apache.jmeter.control.TestFragmentController;
+&nbsp;import org.apache.jmeter.control.gui.TestFragmentControllerGui;
+&nbsp;import org.apache.jmeter.testelement.TestElement;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.MethodCall;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.MethodCallBuilder;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.MethodCallContext;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.TestElementParamBuilder;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.params.ChildrenParam;
+&nbsp;import us.abstracta.jmeter.javadsl.core.DslTestPlan.TestPlanChild;
+&nbsp;import us.abstracta.jmeter.javadsl.core.threadgroups.BaseThreadGroup.ThreadGroupChild;
+&nbsp;
+&nbsp;/*
+&nbsp;This test element provides its own builder method (and not included in JMeter Dsl) since will only
+&nbsp;be used in conversions, and we currently don&#39;t see any really valuable (aside from not creating a
+&nbsp;sample result) benefit, to expose it to DSL users, over using transaction controller for grouping
+&nbsp;requests.
+&nbsp; */
+&nbsp;public class DslTestFragmentController extends BaseController&lt;DslTestFragmentController&gt; implements
+&nbsp;    TestPlanChild {
+&nbsp;
+&nbsp;  private static final String DEFAULT_NAME = &quot;Test Fragment&quot;;
+&nbsp;
+&nbsp;  protected DslTestFragmentController(String name, List&lt;ThreadGroupChild&gt; children) {
+<b class="nc">&nbsp;    super(name == null ? DEFAULT_NAME : name, TestFragmentControllerGui.class, children);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /*
+&nbsp;   Used to provide a holder just for conversion and be able to easily inject a list of children
+&nbsp;   elements in a test plan
+&nbsp;   */
+&nbsp;  public static DslTestFragmentController fragment(ThreadGroupChild... children) {
+<b class="nc">&nbsp;    return fragment(null, children);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  public static DslTestFragmentController fragment(String name, ThreadGroupChild... children) {
+<b class="nc">&nbsp;    return new DslTestFragmentController(name, Arrays.asList(children));</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  protected TestElement buildTestElement() {
+<b class="nc">&nbsp;    throw new UnsupportedOperationException();</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  public static class CodeBuilder extends MethodCallBuilder {
+&nbsp;
+&nbsp;    public CodeBuilder(List&lt;Method&gt; builderMethods) {
+<b class="fc">&nbsp;      super(builderMethods);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean matches(MethodCallContext context) {
+<b class="fc">&nbsp;      return context.getTestElement() instanceof TestFragmentController;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected MethodCall buildMethodCall(MethodCallContext context) {
+<b class="fc">&nbsp;      TestElement element = context.getTestElement();</b>
+<b class="fc">&nbsp;      MethodCall methodDefinitionBody = buildMethodCall(</b>
+<b class="fc">&nbsp;          new TestElementParamBuilder(element).nameParam(DEFAULT_NAME),</b>
+&nbsp;          new ChildrenParam&lt;&gt;(ThreadGroupChild[].class));
+<b class="fc">&nbsp;      return new FragmentMethodCall(element, methodDefinitionBody, context);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;  }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-03 20:57</div>
+</div>
+</body>
+</html>

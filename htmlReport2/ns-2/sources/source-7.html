@@ -1,0 +1,238 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=GBK"> 
+  <title>Coverage Report > MethodParam</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">us.abstracta.jmeter.javadsl.codegeneration</a>
+</div>
+
+<h1>Coverage Summary for Class: MethodParam (us.abstracta.jmeter.javadsl.codegeneration)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">MethodParam</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    93.3%
+  </span>
+  <span class="absValue">
+    (14/15)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    82.8%
+  </span>
+  <span class="absValue">
+    (24/29)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package us.abstracta.jmeter.javadsl.codegeneration;
+&nbsp;
+&nbsp;import java.lang.reflect.Field;
+&nbsp;import java.lang.reflect.Modifier;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.function.Predicate;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;import java.util.stream.Stream;
+&nbsp;
+&nbsp;/**
+&nbsp; * Generates code for a MethodCall parameter.
+&nbsp; * &lt;p&gt;
+&nbsp; * This class should be extended to implement custom types of parameters (eg: check
+&nbsp; * {@link us.abstracta.jmeter.javadsl.http.ContentTypeParam}
+&nbsp; *
+&nbsp; * @since 0.45
+&nbsp; */
+&nbsp;/*
+&nbsp;This class should extend CodeSegment, but we haven&#39;t changed it yet since such change would break
+&nbsp;compatibility for users extending from MethodParam. They would be required to change buildCode
+&nbsp;method visibility from protected to public.
+&nbsp; */
+&nbsp;public abstract class MethodParam {
+&nbsp;
+&nbsp;  protected final Class&lt;?&gt; paramType;
+&nbsp;  protected final String expression;
+&nbsp;
+<b class="fc">&nbsp;  protected MethodParam(Class&lt;?&gt; paramType, String expression) {</b>
+<b class="fc">&nbsp;    this.paramType = paramType;</b>
+<b class="fc">&nbsp;    this.expression = expression != null &amp;&amp; expression.isEmpty() ? null : expression;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  public String getExpression() {
+<b class="fc">&nbsp;    return expression == null ? &quot;&quot; : expression;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  protected Class&lt;?&gt; getType() {
+<b class="fc">&nbsp;    return paramType;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Allows checking if a parameter is set to the default value.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * This is usually used in {@link MethodCallBuilder} instances to check if a parameter is set or
+&nbsp;   * not to some custom value, and some method chaingin is required or not.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * This method may, and is, overwritten by subclasses depending on the semantics of each type of
+&nbsp;   * parameter.
+&nbsp;   *
+&nbsp;   * @return true when the value is the default one or not specified (null), false otherwise.
+&nbsp;   */
+&nbsp;  public boolean isDefault() {
+<b class="fc">&nbsp;    return expression == null;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  protected boolean isIgnored() {
+<b class="fc">&nbsp;    return false;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Gets all classes that are required to be imported by generated code.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * Override this method if you implement a custom MethodParam that requires some particular
+&nbsp;   * import.
+&nbsp;   *
+&nbsp;   * @return the set of required classes names that need to be imported by generated code.
+&nbsp;   */
+&nbsp;  public Set&lt;String&gt; getStaticImports() {
+<b class="fc">&nbsp;    return Collections.emptySet();</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Gets all classes that are required to be statically imported by generated code.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * Override this method if you implement a custom MethodParam that requires some particular static
+&nbsp;   * import.
+&nbsp;   *
+&nbsp;   * @return the set of required classes names that need to be statically imported by generated
+&nbsp;   * code.
+&nbsp;   */
+&nbsp;  public Set&lt;String&gt; getImports() {
+<b class="fc">&nbsp;    return Collections.emptySet();</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  public Map&lt;String, MethodCall&gt; getMethodDefinitions() {
+<b class="fc">&nbsp;    return Collections.emptyMap();</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  protected String buildCode(String indent) {
+<b class="fc">&nbsp;    return buildStringLiteral(getExpression(), indent);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  protected static String buildStringLiteral(String value, String indent) {
+<b class="fc">&nbsp;    return &quot;\&quot;&quot; + value.replace(&quot;\\&quot;, &quot;\\\\&quot;)</b>
+<b class="fc">&nbsp;        .replace(&quot;\&quot;&quot;, &quot;\\\&quot;&quot;)</b>
+<b class="fc">&nbsp;        .replace(&quot;\t&quot;, &quot;\\t&quot;)</b>
+<b class="fc">&nbsp;        .replace(&quot;\r&quot;, &quot;\\r&quot;)</b>
+<b class="fc">&nbsp;        .replace(&quot;\n&quot;, &quot;\\n&quot; + (!indent.isEmpty() ? &quot;\&quot;\n&quot; + indent + &quot;+ \&quot;&quot; : &quot;&quot;))</b>
+<b class="fc">&nbsp;        .replaceAll(&quot;\n&quot; + indent + &quot;\\+ \&quot;\&quot;$&quot;, &quot;&quot;)</b>
+&nbsp;        + &quot;\&quot;&quot;;
+&nbsp;  }
+&nbsp;
+&nbsp;  protected static &lt;T&gt; Map&lt;T, String&gt; findConstantNamesMap(Class&lt;?&gt; constantsHolderClass,
+&nbsp;      Class&lt;T&gt; constantClass, Predicate&lt;Field&gt; filter) {
+<b class="fc">&nbsp;    return findConstantNamesFields(constantsHolderClass, constantClass, filter)</b>
+<b class="fc">&nbsp;        .collect(Collectors.toMap(f -&gt; {</b>
+&nbsp;          try {
+<b class="fc">&nbsp;            return constantClass.cast(f.get(null));</b>
+<b class="nc">&nbsp;          } catch (IllegalAccessException e) {</b>
+&nbsp;            // this should never happen since we are iterating over public static fields
+<b class="nc">&nbsp;            throw new RuntimeException(e);</b>
+&nbsp;          }
+&nbsp;        }, Field::getName));
+&nbsp;  }
+&nbsp;
+&nbsp;  private static Stream&lt;Field&gt; findConstantNamesFields(Class&lt;?&gt; constantsHolderClass,
+&nbsp;      Class&lt;?&gt; constantClass, Predicate&lt;Field&gt; filter) {
+<b class="fc">&nbsp;    return Arrays.stream(constantsHolderClass.getDeclaredFields())</b>
+<b class="fc">&nbsp;        .filter(f -&gt; Modifier.isPublic(f.getModifiers()) &amp;&amp; Modifier.isStatic(f.getModifiers())</b>
+<b class="fc">&nbsp;            &amp;&amp; Modifier.isFinal(f.getModifiers()) &amp;&amp; f.getType() == constantClass</b>
+<b class="fc">&nbsp;            &amp;&amp; filter.test(f));</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  protected static Set&lt;String&gt; findConstantNames(Class&lt;?&gt; constantsHolderClass,
+&nbsp;      Class&lt;?&gt; constantClass, Predicate&lt;Field&gt; filter) {
+<b class="nc">&nbsp;    return findConstantNamesFields(constantsHolderClass, constantClass, filter)</b>
+<b class="nc">&nbsp;        .map(Field::getName)</b>
+<b class="nc">&nbsp;        .collect(Collectors.toSet());</b>
+&nbsp;  }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-03 22:39</div>
+</div>
+</body>
+</html>

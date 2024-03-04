@@ -1,0 +1,231 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=GBK"> 
+  <title>Coverage Report > MethodCallBuilder</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">us.abstracta.jmeter.javadsl.codegeneration</a>
+</div>
+
+<h1>Coverage Summary for Class: MethodCallBuilder (us.abstracta.jmeter.javadsl.codegeneration)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">MethodCallBuilder</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (6/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    85.7%
+  </span>
+  <span class="absValue">
+    (12/14)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package us.abstracta.jmeter.javadsl.codegeneration;
+&nbsp;
+&nbsp;import java.lang.reflect.Method;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Spliterators;
+&nbsp;import java.util.stream.Stream;
+&nbsp;import java.util.stream.StreamSupport;
+&nbsp;import org.apache.jmeter.testelement.property.JMeterProperty;
+&nbsp;import org.apache.jmeter.testelement.property.PropertyIterator;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.params.ChildrenParam;
+&nbsp;
+&nbsp;/**
+&nbsp; * Builds a method call for a particular DSL test element.
+&nbsp; * &lt;p&gt;
+&nbsp; * Almost (there might be some exceptions) every DSL test element should have an associated
+&nbsp; * MethodCallBuilder (as inner class) which is in charge to generate the DSL code (in fact an
+&nbsp; * instance of MethodCall used to generate the code) for that test element when proper tree node is
+&nbsp; * found in a JMeter test plan.
+&nbsp; * &lt;p&gt;
+&nbsp; * Whenever you implement a new DSL test element remember creating a nested class named CodeBuilder
+&nbsp; * extending MethodCallBuilder with the proper logic for generating its DSL code. Check
+&nbsp; * {@link us.abstracta.jmeter.javadsl.core.DslTestPlan.CodeBuilder} for an example.
+&nbsp; *
+&nbsp; * @since 0.45
+&nbsp; */
+&nbsp;public abstract class MethodCallBuilder {
+&nbsp;
+&nbsp;  protected final List&lt;Method&gt; builderMethods;
+&nbsp;
+&nbsp;  /**
+&nbsp;   * This constructor is used by the DslCodeGenerator to instantiate MethodCallBuilders providing
+&nbsp;   * them their associated builder methods found in DSL classes registered on the DslCodeGenerator.
+&nbsp;   *
+&nbsp;   * @param builderMethods the list of builder methods found in the DSL classes associated to this
+&nbsp;   *                       MethodCallBuilder parent DSL test element
+&nbsp;   */
+<b class="fc">&nbsp;  protected MethodCallBuilder(List&lt;Method&gt; builderMethods) {</b>
+<b class="fc">&nbsp;    this.builderMethods = builderMethods;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Allows checking if this builder can build method calls for the given context.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * This method is invoked in every registered MethodCallBuilder, until one is found that matches.
+&nbsp;   *
+&nbsp;   * @param context provides information used to determine if a method call might be created by this
+&nbsp;   *                builder. For example: JMeter test plan tree node test element, parent context, a
+&nbsp;   *                map of entries to host custom information, etc.
+&nbsp;   * @return true if this builder knows how to build a method call for the context, false otherwise.
+&nbsp;   * @since 0.52
+&nbsp;   */
+&nbsp;  public abstract boolean matches(MethodCallContext context);
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Generates the method call instance for the particular DSL test element.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * You can check {@link us.abstracta.jmeter.javadsl.core.DslTestPlan.CodeBuilder} to get an idea
+&nbsp;   * of how a general implementation of this method looks like
+&nbsp;   * &lt;p&gt;
+&nbsp;   * If you find a scenario where your MethodCallBuilder applies to the given context, but no code
+&nbsp;   * has to be generated for it, then use {@link MethodCall#emptyCall()} to return a call that
+&nbsp;   * generates no code.
+&nbsp;   *
+&nbsp;   * @param context provides all information that might be required to generate the method call. For
+&nbsp;   *                example: JMeter test plan tree node test element, parent context, a map of
+&nbsp;   *                entries to host custom information, etc.
+&nbsp;   * @return generated method call for the DSL test element.
+&nbsp;   */
+&nbsp;  protected abstract MethodCall buildMethodCall(MethodCallContext context);
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Builds a method call for the given set of parameters using one of registered builder methods.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * This method is the starting point for creating the MethodCall returned by
+&nbsp;   * {@link #buildMethodCall(MethodCallContext)}.
+&nbsp;   *
+&nbsp;   * @param params contains the list of parameters to find the proper builder method and associate
+&nbsp;   *               to the method call. If the MethodCall accepts as parameter children DSL test
+&nbsp;   *               elements, then remember adding an array class for {@link ChildrenParam} (eg:
+&nbsp;   *               {@code new ChildrenParam&lt;&gt;(TestPlanChild[].class)}).
+&nbsp;   * @return generated method call.
+&nbsp;   * @throws UnsupportedOperationException if no builder method is found for the given parameters.
+&nbsp;   */
+&nbsp;  protected MethodCall buildMethodCall(MethodParam... params) {
+<b class="fc">&nbsp;    return MethodCall.fromBuilderMethod(findBuilderMethod(params), params);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private Method findBuilderMethod(MethodParam... params) {
+<b class="fc">&nbsp;    Method ret = MethodCall.findParamsMatchingMethod(builderMethods.stream(), params);</b>
+<b class="fc">&nbsp;    if (ret == null) {</b>
+<b class="nc">&nbsp;      throw MethodCall.buildNoMatchingMethodFoundException(</b>
+<b class="nc">&nbsp;          builderMethods.get(0).getName() + &quot; builder&quot;, params);</b>
+&nbsp;    }
+<b class="fc">&nbsp;    return ret;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * This method allows specifying an order over builders.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * Low values for order will make builders execute first than higher values.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * This is handy when the order is relevant, for instance if a builder is more generic than others
+&nbsp;   * and should be used as fallback when others don&#39;t match.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * No need for specifying an order for each builder. In most of the cases using the default value
+&nbsp;   * is ok. Only overwrite when you need a specific order between builders (implementing fallback of
+&nbsp;   * builders).
+&nbsp;   *
+&nbsp;   * @return a number used to order this builder among other existing values.
+&nbsp;   * @since 0.60
+&nbsp;   */
+&nbsp;  public int order() {
+<b class="fc">&nbsp;    return 1;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  protected static Stream&lt;JMeterProperty&gt; propertyIterator2Stream(PropertyIterator iter) {
+<b class="fc">&nbsp;    return StreamSupport.stream(Spliterators.spliteratorUnknownSize(iter, 0), false);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  protected static String getBuilderOptionName(Class&lt;?&gt; builderClass, String optionName) {
+<b class="fc">&nbsp;    String builderName = builderClass.getName();</b>
+<b class="fc">&nbsp;    String builderNamePrefix = builderName.substring(builderName.lastIndexOf(&#39;.&#39;,</b>
+<b class="fc">&nbsp;        builderName.length() - builderClass.getSimpleName().length() - 2));</b>
+<b class="fc">&nbsp;    return  builderNamePrefix + &quot;.&quot; + optionName;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-03 20:57</div>
+</div>
+</body>
+</html>

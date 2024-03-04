@@ -1,0 +1,440 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=GBK"> 
+  <title>Coverage Report > MethodCallContext</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">us.abstracta.jmeter.javadsl.codegeneration</a>
+</div>
+
+<h1>Coverage Summary for Class: MethodCallContext (us.abstracta.jmeter.javadsl.codegeneration)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">MethodCallContext</td>
+<td class="coverageStat">
+  <span class="percent">
+    91.3%
+  </span>
+  <span class="absValue">
+    (21/23)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    88.7%
+  </span>
+  <span class="absValue">
+    (63/71)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">MethodCallContext$MethodCallContextEndListener</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    91.3%
+  </span>
+  <span class="absValue">
+    (21/23)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    88.7%
+  </span>
+  <span class="absValue">
+    (63/71)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package us.abstracta.jmeter.javadsl.codegeneration;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Comparator;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.function.Predicate;
+&nbsp;import java.util.function.Supplier;
+&nbsp;import java.util.function.UnaryOperator;
+&nbsp;import org.apache.jmeter.config.ConfigElement;
+&nbsp;import org.apache.jmeter.testelement.TestElement;
+&nbsp;import org.apache.jorphan.collections.HashTree;
+&nbsp;import org.apache.jorphan.collections.ListedHashTree;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;/**
+&nbsp; * Contains information and logic needed by {@link MethodCallBuilder} instances to create
+&nbsp; * MethodCalls for a given JMeter test plan subtree.
+&nbsp; * &lt;p&gt;
+&nbsp; * One MethodCallContext is created for each JMeter test element in a test plan tree, and they are
+&nbsp; * linked in tree structure (through {@link #getParent()} method to provide entire structure to
+&nbsp; * {@link MethodCallBuilder} instances when building a MethodCall
+&nbsp; *
+&nbsp; * @since 0.45
+&nbsp; */
+&nbsp;public class MethodCallContext {
+&nbsp;
+<b class="fc">&nbsp;  private static final Logger LOG = LoggerFactory.getLogger(MethodCallContext.class);</b>
+&nbsp;  private static final String UNSUPPORTED_USAGE_WARNING = &quot;Using unsupported() as parent for &quot;
+&nbsp;      + &quot;children&#39;s conversions and ease manual code completion.&quot;;
+&nbsp;
+&nbsp;  private final TestElement testElement;
+&nbsp;  private final HashTree childrenTree;
+&nbsp;  private final MethodCallContext parent;
+&nbsp;  private final MethodCallContext root;
+&nbsp;  private final MethodCallBuilderRegistry builderRegistry;
+<b class="fc">&nbsp;  private final Map&lt;Object, Object&gt; entries = new HashMap&lt;&gt;();</b>
+<b class="fc">&nbsp;  private final List&lt;MethodCallContextEndListener&gt; endListeners = new ArrayList&lt;&gt;();</b>
+&nbsp;  private MethodCall methodCall;
+<b class="fc">&nbsp;  private final Map&lt;TestElement, MethodCallContext&gt; contextRegistry = new HashMap&lt;&gt;();</b>
+<b class="fc">&nbsp;  private final Map&lt;TestElement, UnaryOperator&lt;MethodCall&gt;&gt; pendingReplacements = new HashMap&lt;&gt;();</b>
+&nbsp;
+&nbsp;  public MethodCallContext(TestElement testElement, HashTree childrenTree,
+<b class="fc">&nbsp;      MethodCallContext parent, MethodCallBuilderRegistry builderRegistry) {</b>
+<b class="fc">&nbsp;    this.testElement = testElement;</b>
+&nbsp;    // sorting simplifies code builder
+<b class="fc">&nbsp;    this.childrenTree = childrenTree == null ? new ListedHashTree() : sortTree(childrenTree);</b>
+<b class="fc">&nbsp;    this.parent = parent;</b>
+<b class="fc">&nbsp;    this.root = parent == null ? this : parent.root;</b>
+<b class="fc">&nbsp;    this.builderRegistry = builderRegistry;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private HashTree sortTree(HashTree tree) {
+<b class="fc">&nbsp;    ListedHashTree ret = new ListedHashTree();</b>
+<b class="fc">&nbsp;    tree.list().stream()</b>
+<b class="fc">&nbsp;        .sorted(Comparator.comparingInt(k -&gt; k instanceof ConfigElement ? 0 : 1))</b>
+<b class="fc">&nbsp;        .forEach(k -&gt; ret.set(k, sortTree(tree.getTree(k))));</b>
+<b class="fc">&nbsp;    return ret;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Gets the JMeter test element associated to this context.
+&nbsp;   *
+&nbsp;   * @return the test element.
+&nbsp;   */
+&nbsp;  public TestElement getTestElement() {
+<b class="fc">&nbsp;    return testElement;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Gets the parent context.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * This is useful in some scenarios to register end listeners on parent node, or access root
+&nbsp;   * context for globally shared entries (check {@link #setEntry(Object, Object)}).
+&nbsp;   *
+&nbsp;   * @return the parent context. Null is returned if the current context is the root context.
+&nbsp;   */
+&nbsp;  public MethodCallContext getParent() {
+<b class="fc">&nbsp;    return parent;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Gets the root context associated to the test plan.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * This is useful when some data has to only be processed once and at root of the test plan build
+&nbsp;   * context.
+&nbsp;   *
+&nbsp;   * @return the parent context. Null is returned if the current context is the root context.
+&nbsp;   */
+&nbsp;  public MethodCallContext getRoot() {
+<b class="fc">&nbsp;    return root;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Gets the JMeter test plan subtree of children elements of current context test element.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * This is useful when some alteration or inspection is required in the tree before other builder
+&nbsp;   * methods try to convert contained test elements.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * Eg: {@link us.abstracta.jmeter.javadsl.http.DslHttpSampler.CodeBuilder} uses this method to
+&nbsp;   * remove children HTTP Headers which are directly included as chained methods of httpSampler
+&nbsp;   * method invocation.
+&nbsp;   *
+&nbsp;   * @return the JMeter test plan children subtree.
+&nbsp;   */
+&nbsp;  public HashTree getChildrenTree() {
+<b class="fc">&nbsp;    return childrenTree;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Gets a value associated to a given key in the context.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * The context allows you to store (through {@link #setEntry(Object, Object)}) any sort of
+&nbsp;   * information on it that may be required later on be used by the builder in some other test
+&nbsp;   * element context (for example: check if a test element already was processed by this builder).
+&nbsp;   *
+&nbsp;   * @param key is an object identifying an entry in the context. A simple way of sharing info for a
+&nbsp;   *            MethodCallBuilder is just use the MethodCallBuilder class as key, storing some
+&nbsp;   *            custom class instance with structured context info for the particular
+&nbsp;   *            MethodCallBuilder.
+&nbsp;   * @return the value associated to the key. Null is returned if no entry is associated to the key.
+&nbsp;   */
+&nbsp;  public Object getEntry(Object key) {
+<b class="fc">&nbsp;    return entries.get(key);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Allows to store a value associated to a given key in the context.
+&nbsp;   *
+&nbsp;   * @param key   identifies the entry in context to later on be able to retrieve it.
+&nbsp;   * @param value the value to store in the context, associated to the given key.
+&nbsp;   * @see #getEntry(Object) for more details
+&nbsp;   */
+&nbsp;  public void setEntry(Object key, Object value) {
+<b class="nc">&nbsp;    entries.put(key, value);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Gets existing entry or creates a new one using provided computation function.
+&nbsp;   *
+&nbsp;   * @param key         identifies the entry in context to later on be able to retrieve it.
+&nbsp;   * @param computation function used to build the new entry for the given key, if none exists.
+&nbsp;   * @see #getEntry(Object) for more details
+&nbsp;   * @since 1.3
+&nbsp;   */
+&nbsp;  public &lt;V&gt; V computeEntryIfAbsent(Object key, Supplier&lt;V&gt; computation) {
+<b class="fc">&nbsp;    return (V) entries.computeIfAbsent(key, k -&gt; computation.get());</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Allows registering logic that needs to be executed at the end of MethodCall build for this
+&nbsp;   * context.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * This allows to do some advance stuff, like registering some action/logic to be executed on a
+&nbsp;   * parent context after processing current context and only under some specific condition (eg:
+&nbsp;   * when no other sibling test element is included in parent context).
+&nbsp;   *
+&nbsp;   * @param listener specifies the listener containing the logic to be executed at the end of
+&nbsp;   *                 MethodCall build.
+&nbsp;   */
+&nbsp;  public void addEndListener(MethodCallContextEndListener listener) {
+<b class="fc">&nbsp;    endListeners.add(listener);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Builds a MethodCall for the current context.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * This might be useful in some MethodCallBuilders to trigger a build of children context (after
+&nbsp;   * removal for example).
+&nbsp;   *
+&nbsp;   * @return the {@link MethodCall} instance.
+&nbsp;   */
+&nbsp;  public MethodCall buildMethodCall() {
+&nbsp;    try {
+<b class="fc">&nbsp;      methodCall = builderRegistry.findBuilderMatchingContext(this)</b>
+<b class="fc">&nbsp;          .map(b -&gt; b.buildMethodCall(this))</b>
+<b class="fc">&nbsp;          .orElseGet(() -&gt; {</b>
+<b class="nc">&nbsp;            LOG.warn(&quot;No builder found for {}({}). &quot; + UNSUPPORTED_USAGE_WARNING,</b>
+<b class="nc">&nbsp;                testElement.getClass(), testElement.getName());</b>
+<b class="nc">&nbsp;            return MethodCall.buildUnsupported();</b>
+&nbsp;          });
+<b class="fc">&nbsp;      root.contextRegistry.put(testElement, this);</b>
+<b class="fc">&nbsp;      methodCall.setCommented(!testElement.isEnabled());</b>
+<b class="fc">&nbsp;      addChildrenTo(methodCall);</b>
+<b class="fc">&nbsp;      executeEndListeners(methodCall);</b>
+<b class="fc">&nbsp;      UnaryOperator&lt;MethodCall&gt; replacement = root.pendingReplacements.remove(testElement);</b>
+<b class="fc">&nbsp;      if (replacement != null) {</b>
+<b class="fc">&nbsp;        methodCall = replacement.apply(methodCall);</b>
+&nbsp;      }
+<b class="fc">&nbsp;      return methodCall;</b>
+<b class="nc">&nbsp;    } catch (RuntimeException e) {</b>
+<b class="nc">&nbsp;      LOG.warn(&quot;Could not build code for {}({}). &quot; + UNSUPPORTED_USAGE_WARNING,</b>
+<b class="nc">&nbsp;          testElement.getClass(), testElement.getName(), e);</b>
+<b class="nc">&nbsp;      return MethodCall.buildUnsupported();</b>
+&nbsp;    }
+&nbsp;  }
+&nbsp;
+&nbsp;  private void executeEndListeners(MethodCall ret) {
+<b class="fc">&nbsp;    endListeners.forEach(l -&gt; l.execute(this, ret));</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private void addChildrenTo(MethodCall call) {
+<b class="fc">&nbsp;    childrenTree.list().stream()</b>
+<b class="fc">&nbsp;        .map(e -&gt; child((TestElement) e, childrenTree.getTree(e))</b>
+<b class="fc">&nbsp;            .buildMethodCall())</b>
+<b class="fc">&nbsp;        .forEach(call::child);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Allows creating a child context for the given test element and tree.
+&nbsp;   *
+&nbsp;   * @param element      the test element associated to the child context.
+&nbsp;   * @param childrenTree the test element subtree.
+&nbsp;   * @return the created child method context.
+&nbsp;   * @since 1.3
+&nbsp;   */
+&nbsp;  public MethodCallContext child(TestElement element, HashTree childrenTree) {
+<b class="fc">&nbsp;    return new MethodCallContext(element, childrenTree, this, builderRegistry);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Adds a child method call context, as first child call, built using provided test element and
+&nbsp;   * tree.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * This is useful when it is needed to modify existing test plan, for example, to optimize it and
+&nbsp;   * use default config elements that avoid code duplication in children elements.
+&nbsp;   *
+&nbsp;   * @param testElement  specifies the test element from which to create the new method call.
+&nbsp;   * @param childrenTree specifies children elements of the test element, which are also going to be
+&nbsp;   *                     built and attached as children method calls of the method call created for
+&nbsp;   *                     the test element.
+&nbsp;   * @return the created child method call context.
+&nbsp;   * @since 1.8
+&nbsp;   */
+&nbsp;  public MethodCallContext prependChild(TestElement testElement, HashTree childrenTree) {
+<b class="fc">&nbsp;    MethodCallContext child = child(testElement, childrenTree);</b>
+<b class="fc">&nbsp;    MethodCall childCall = child.buildMethodCall();</b>
+<b class="fc">&nbsp;    methodCall.prependChild(childCall);</b>
+<b class="fc">&nbsp;    return child;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Allows removing an instance of the given test element class from the children tree.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * If multiple instances exists, then only the first one is removed.
+&nbsp;   *
+&nbsp;   * @param filter specifies condition to be matched by test element to be removed.
+&nbsp;   * @return the context associated to the removed test element, or null if no test element is
+&nbsp;   * found.
+&nbsp;   */
+&nbsp;  public MethodCallContext removeChild(Predicate&lt;TestElement&gt; filter) {
+<b class="fc">&nbsp;    Optional&lt;?&gt; child = childrenTree.list().stream()</b>
+<b class="fc">&nbsp;        .map(o -&gt; (TestElement) o)</b>
+<b class="fc">&nbsp;        .filter(filter)</b>
+<b class="fc">&nbsp;        .findAny();</b>
+<b class="fc">&nbsp;    child.ifPresent(childrenTree::remove);</b>
+<b class="fc">&nbsp;    return child</b>
+<b class="fc">&nbsp;        .map(c -&gt; child((TestElement) c, childrenTree.getTree(c)))</b>
+<b class="fc">&nbsp;        .orElse(null);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Finds the builder associated to the given JMeter test element class.
+&nbsp;   *
+&nbsp;   * @param builderClass is the class of the builder to find.
+&nbsp;   * @param &lt;T&gt;          is the type of the builder to find. This provides proper type safety when
+&nbsp;   *                     using the method.
+&nbsp;   * @return the builder associated to the given JMeter test element class, or null if none is
+&nbsp;   * found.
+&nbsp;   */
+&nbsp;  public &lt;T extends MethodCallBuilder&gt; T findBuilder(Class&lt;T&gt; builderClass) {
+<b class="fc">&nbsp;    return builderRegistry.findBuilderByClass(builderClass);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * The method call created for this context.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * This is useful mainly when method calls need to be modified after their creation, for example
+&nbsp;   * in an end listener ({@link #addEndListener(MethodCallContextEndListener)}).
+&nbsp;   *
+&nbsp;   * @return the created method call, if it has been already created, null otherwise.
+&nbsp;   * @since 1.8
+&nbsp;   */
+&nbsp;  public MethodCall getMethodCall() {
+<b class="fc">&nbsp;    return methodCall;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Allows replacing or transforming the method call associated to a given test element.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * This is particularly helpful in scenarios like module controller, where basic conversion of a
+&nbsp;   * controller has to be replaced by a call to a test fragment containing the target controller
+&nbsp;   * pointed by the module controller
+&nbsp;   *
+&nbsp;   * @param element  is the test element associated to the method call to be replaced/transformed.
+&nbsp;   * @param operator provides the logic to be applied to create a new method call from the original
+&nbsp;   *                 test element method call.
+&nbsp;   * @since 1.3
+&nbsp;   */
+&nbsp;  public void replaceMethodCall(TestElement element, UnaryOperator&lt;MethodCall&gt; operator) {
+<b class="fc">&nbsp;    MethodCallContext elementContext = root.contextRegistry.get(element);</b>
+<b class="fc">&nbsp;    if (elementContext != null) {</b>
+<b class="fc">&nbsp;      MethodCall original = elementContext.methodCall;</b>
+<b class="fc">&nbsp;      MethodCall replacement = operator.apply(original);</b>
+<b class="fc">&nbsp;      if (replacement != original) {</b>
+<b class="fc">&nbsp;        elementContext.parent.methodCall.replaceChild(original, replacement);</b>
+&nbsp;      }
+<b class="fc">&nbsp;    } else {</b>
+<b class="fc">&nbsp;      root.pendingReplacements.put(element, operator);</b>
+&nbsp;    }
+&nbsp;  }
+&nbsp;
+&nbsp;  public Object getBuilderOption(String optionName) {
+<b class="fc">&nbsp;    return root.getEntry(optionName);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  public interface MethodCallContextEndListener {
+&nbsp;
+&nbsp;    void execute(MethodCallContext context, MethodCall call);
+&nbsp;
+&nbsp;  }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-03 22:39</div>
+</div>
+</body>
+</html>

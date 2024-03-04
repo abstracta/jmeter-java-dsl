@@ -1,0 +1,394 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=GBK"> 
+  <title>Coverage Report > HtmlReporter</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">us.abstracta.jmeter.javadsl.core.listeners</a>
+</div>
+
+<h1>Coverage Summary for Class: HtmlReporter (us.abstracta.jmeter.javadsl.core.listeners)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">HtmlReporter</td>
+<td class="coverageStat">
+  <span class="percent">
+    85.7%
+  </span>
+  <span class="absValue">
+    (6/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    92%
+  </span>
+  <span class="absValue">
+    (23/25)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">HtmlReporter$1</td>
+  </tr>
+  <tr>
+    <td class="name">HtmlReporter$ApdexThresholds</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (5/5)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">HtmlReporter$AutoFlushingResultCollector</td>
+<td class="coverageStat">
+  <span class="percent">
+    66.7%
+  </span>
+  <span class="absValue">
+    (2/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    75%
+  </span>
+  <span class="absValue">
+    (3/4)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">HtmlReporter$HtmlReportSummariser</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (8/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    87.1%
+  </span>
+  <span class="absValue">
+    (27/31)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    90.5%
+  </span>
+  <span class="absValue">
+    (19/21)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    89.2%
+  </span>
+  <span class="absValue">
+    (58/65)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package us.abstracta.jmeter.javadsl.core.listeners;
+&nbsp;
+&nbsp;import java.io.File;
+&nbsp;import java.time.Duration;
+&nbsp;import java.time.Instant;
+&nbsp;import java.time.ZoneId;
+&nbsp;import java.time.format.DateTimeFormatter;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.UUID;
+&nbsp;import java.util.concurrent.atomic.AtomicInteger;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;import org.apache.jmeter.JMeter;
+&nbsp;import org.apache.jmeter.report.config.ConfigurationException;
+&nbsp;import org.apache.jmeter.report.config.ReportGeneratorConfiguration;
+&nbsp;import org.apache.jmeter.report.dashboard.GenerationException;
+&nbsp;import org.apache.jmeter.report.dashboard.ReportGenerator;
+&nbsp;import org.apache.jmeter.reporters.ResultCollector;
+&nbsp;import org.apache.jmeter.reporters.Summariser;
+&nbsp;import org.apache.jmeter.samplers.SampleEvent;
+&nbsp;import org.apache.jmeter.testelement.TestElement;
+&nbsp;import org.apache.jmeter.util.JMeterUtils;
+&nbsp;import org.apache.jmeter.visualizers.SimpleDataWriter;
+&nbsp;
+&nbsp;/**
+&nbsp; * Generates a nice HTML report at the end of test plan execution.
+&nbsp; *
+&nbsp; * @since 0.6
+&nbsp; */
+<b class="fc">&nbsp;public class HtmlReporter extends BaseListener {</b>
+&nbsp;
+&nbsp;  protected File reportDirectory;
+<b class="fc">&nbsp;  protected final ApdexThresholds apdexThresholds = new ApdexThresholds();</b>
+<b class="fc">&nbsp;  protected final Map&lt;String, ApdexThresholds&gt; labelApdexThresholds = new HashMap&lt;&gt;();</b>
+&nbsp;  private Duration granularity;
+&nbsp;
+&nbsp;  public HtmlReporter(String reportsDirectoryPath, String name) {
+<b class="fc">&nbsp;    super(&quot;Simple Data Writer&quot;, SimpleDataWriter.class);</b>
+<b class="fc">&nbsp;    File reportsDirectory = new File(reportsDirectoryPath);</b>
+<b class="fc">&nbsp;    reportsDirectory.mkdirs();</b>
+<b class="fc">&nbsp;    reportDirectory = reportsDirectory.toPath().resolve(name != null ? name : buildReportName())</b>
+<b class="fc">&nbsp;        .toFile();</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private static String buildReportName() {
+<b class="fc">&nbsp;    DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern(&quot;yyyy-MM-dd hh-mm-ss&quot;)</b>
+<b class="fc">&nbsp;        .withZone(ZoneId.systemDefault());</b>
+<b class="fc">&nbsp;    return timeFormatter.format(Instant.now()) + &quot; &quot; + UUID.randomUUID();</b>
+&nbsp;  }
+&nbsp;
+<b class="fc">&nbsp;  public static class ApdexThresholds {</b>
+&nbsp;
+&nbsp;    public Duration satisfied;
+&nbsp;    public Duration tolerated;
+&nbsp;
+<b class="fc">&nbsp;    private ApdexThresholds() {</b>
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    public ApdexThresholds(Duration satisfied, Duration tolerated) {</b>
+<b class="fc">&nbsp;      this.satisfied = satisfied;</b>
+<b class="fc">&nbsp;      this.tolerated = tolerated;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Allows specifying the granularity for time graphs.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * This is handy if you need to get more or less detail presented in time graphs.
+&nbsp;   *
+&nbsp;   * @param granularity specifies the granularity to be set. When not specified, the default value
+&nbsp;   *                    is 1 minute. Due to &lt;a
+&nbsp;   *                    href=&quot;https://bz.apache.org/bugzilla/show_bug.cgi?id=60149&quot;&gt;existing
+&nbsp;   *                    bug&lt;/a&gt;, set this value to a duration greater than 1 second to avoid issues
+&nbsp;   *                    with TPS graphs.
+&nbsp;   * @return the HtmlReporter for further configuration and usage.
+&nbsp;   * @since 1.9
+&nbsp;   */
+&nbsp;  public HtmlReporter timeGraphsGranularity(Duration granularity) {
+<b class="nc">&nbsp;    this.granularity = granularity;</b>
+<b class="nc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Allows to configure general Apdex thresholds for all requests.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * Apdex allows to evaluate user satisfaction according to response times. You may find more about
+&nbsp;   * this &lt;a href=&quot;https://en.wikipedia.org/wiki/Apdex&quot;&gt;here&lt;/a&gt;.
+&nbsp;   *
+&nbsp;   * @param satisfiedThreshold specifies the satisfaction threshold. When not specified this value
+&nbsp;   *                           defaults to 1500.
+&nbsp;   * @param toleratedThreshold specifies the tolerance threshold. When not specified this value
+&nbsp;   *                           defaults to 3000.
+&nbsp;   * @return the HtmlReporter for further configuration and usage.
+&nbsp;   * @since 0.59
+&nbsp;   */
+&nbsp;  public HtmlReporter apdexThresholds(Duration satisfiedThreshold, Duration toleratedThreshold) {
+<b class="fc">&nbsp;    this.apdexThresholds.satisfied = satisfiedThreshold;</b>
+<b class="fc">&nbsp;    this.apdexThresholds.tolerated = toleratedThreshold;</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Allows to configure a particular sample label Apdex thresholds.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * You can use it to control the apdex thresholds for a set of samplers or transactions that share
+&nbsp;   * same label.
+&nbsp;   *
+&nbsp;   * @param sampleLabelRegex   regular expression used to match sample labels to apply the
+&nbsp;   *                           thresholds to.
+&nbsp;   * @param satisfiedThreshold specifies the satisfaction threshold. When not specified, the general
+&nbsp;   *                           apdex thresholds for all requests are applied.
+&nbsp;   * @param toleratedThreshold specifies the tolerance threshold. When not specified, the general
+&nbsp;   *                           apdex thresholds for all requests are applied.
+&nbsp;   * @return the HtmlReporter for further configuration and usage.
+&nbsp;   * @see #apdexThresholds(Duration, Duration)
+&nbsp;   * @since 0.59
+&nbsp;   */
+&nbsp;  public HtmlReporter transactionApdexThresholds(String sampleLabelRegex,
+&nbsp;      Duration satisfiedThreshold, Duration toleratedThreshold) {
+<b class="fc">&nbsp;    labelApdexThresholds.put(sampleLabelRegex,</b>
+&nbsp;        new ApdexThresholds(satisfiedThreshold, toleratedThreshold));
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public TestElement buildTestElement() {
+<b class="fc">&nbsp;    if (!reportDirectory.exists()) {</b>
+<b class="fc">&nbsp;      reportDirectory.mkdirs();</b>
+&nbsp;    }
+<b class="fc">&nbsp;    File resultsFile = new File(reportDirectory, &quot;report.jtl&quot;);</b>
+<b class="fc">&nbsp;    HtmlReportSummariser reporter = new HtmlReportSummariser(resultsFile);</b>
+<b class="fc">&nbsp;    ResultCollector logger = new AutoFlushingResultCollector(reporter);</b>
+<b class="fc">&nbsp;    logger.setFilename(resultsFile.getPath());</b>
+<b class="fc">&nbsp;    return logger;</b>
+&nbsp;  }
+&nbsp;
+<b class="fc">&nbsp;  private class HtmlReportSummariser extends Summariser {</b>
+&nbsp;
+&nbsp;    private final File resultsFile;
+<b class="fc">&nbsp;    private final AtomicInteger hostsCount = new AtomicInteger(0);</b>
+&nbsp;
+<b class="fc">&nbsp;    private HtmlReportSummariser(File resultsFile) {</b>
+<b class="fc">&nbsp;      this.resultsFile = resultsFile;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void testStarted(String host) {
+<b class="fc">&nbsp;      super.testStarted(host);</b>
+<b class="fc">&nbsp;      hostsCount.incrementAndGet();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void sampleOccurred(SampleEvent e) {
+&nbsp;      // same as previous method
+<b class="fc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void testEnded(String host) {
+&nbsp;      // verify that all remote hosts have ended before generating report
+<b class="fc">&nbsp;      if (hostsCount.decrementAndGet() &lt;= 0) {</b>
+&nbsp;        try {
+<b class="fc">&nbsp;          configureApdexThresholds();</b>
+<b class="fc">&nbsp;          configureGranularity();</b>
+<b class="fc">&nbsp;          JMeterUtils.setProperty(JMeter.JMETER_REPORT_OUTPUT_DIR_PROPERTY,</b>
+<b class="fc">&nbsp;              new File(resultsFile.getParent()).getAbsolutePath());</b>
+<b class="fc">&nbsp;          new ReportGenerator(resultsFile.getPath(), null).generate();</b>
+<b class="nc">&nbsp;        } catch (GenerationException | ConfigurationException e) {</b>
+<b class="nc">&nbsp;          throw new RuntimeException(e);</b>
+<b class="fc">&nbsp;        }</b>
+&nbsp;      }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void configureApdexThresholds() {
+<b class="fc">&nbsp;      if (apdexThresholds.satisfied != null) {</b>
+<b class="fc">&nbsp;        JMeterUtils.setProperty(ReportGeneratorConfiguration.REPORT_GENERATOR_KEY_PREFIX</b>
+<b class="fc">&nbsp;            + &quot;.apdex_satisfied_threshold&quot;, &quot;&quot; + apdexThresholds.satisfied.toMillis());</b>
+&nbsp;      }
+<b class="fc">&nbsp;      if (apdexThresholds.tolerated != null) {</b>
+<b class="fc">&nbsp;        JMeterUtils.setProperty(ReportGeneratorConfiguration.REPORT_GENERATOR_KEY_PREFIX</b>
+<b class="fc">&nbsp;            + &quot;.apdex_tolerated_threshold&quot;, &quot;&quot; + apdexThresholds.tolerated.toMillis());</b>
+&nbsp;      }
+<b class="fc">&nbsp;      String transactionsApdex = labelApdexThresholds.entrySet().stream()</b>
+<b class="fc">&nbsp;          .map(e -&gt; e.getKey() + &quot;:&quot; + e.getValue().satisfied.toMillis() + &quot;|&quot;</b>
+<b class="fc">&nbsp;              + e.getValue().tolerated.toMillis())</b>
+<b class="fc">&nbsp;          .collect(Collectors.joining(&quot;;&quot;));</b>
+<b class="fc">&nbsp;      if (!transactionsApdex.isEmpty()) {</b>
+<b class="fc">&nbsp;        JMeterUtils.setProperty(ReportGeneratorConfiguration.REPORT_GENERATOR_KEY_PREFIX</b>
+&nbsp;            + &quot;.apdex_per_transaction&quot;, &quot;&quot; + transactionsApdex);
+&nbsp;      }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void configureGranularity() {
+<b class="fc">&nbsp;      if (granularity != null) {</b>
+<b class="nc">&nbsp;        JMeterUtils.setProperty(&quot;jmeter.reportgenerator.overall_granularity&quot;,</b>
+<b class="nc">&nbsp;            String.valueOf(granularity.toMillis()));</b>
+&nbsp;      }
+&nbsp;    }
+&nbsp;
+&nbsp;  }
+&nbsp;
+&nbsp;  /*
+&nbsp;   this class is required to assure (even in remote execution) that file is written before
+&nbsp;   generating report
+&nbsp;   */
+&nbsp;  public static class AutoFlushingResultCollector extends ResultCollector {
+&nbsp;
+<b class="nc">&nbsp;    public AutoFlushingResultCollector() {</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public AutoFlushingResultCollector(Summariser summer) {
+<b class="fc">&nbsp;      super(summer);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void testEnded(String host) {
+<b class="fc">&nbsp;      flushFile();</b>
+<b class="fc">&nbsp;      super.testEnded(host);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;  }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-03 20:57</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,235 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=GBK"> 
+  <title>Coverage Report > PercentController</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">us.abstracta.jmeter.javadsl.core.controllers</a>
+</div>
+
+<h1>Coverage Summary for Class: PercentController (us.abstracta.jmeter.javadsl.core.controllers)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">PercentController</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (10/10)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">PercentController$CodeBuilder</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (10/10)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (7/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (20/20)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package us.abstracta.jmeter.javadsl.core.controllers;
+&nbsp;
+&nbsp;import java.lang.reflect.Method;
+&nbsp;import java.util.List;
+&nbsp;import org.apache.jmeter.control.ThroughputController;
+&nbsp;import org.apache.jmeter.control.gui.ThroughputControllerGui;
+&nbsp;import org.apache.jmeter.testelement.TestElement;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.MethodCall;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.MethodCallBuilder;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.MethodCallContext;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.TestElementParamBuilder;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.params.ChildrenParam;
+&nbsp;import us.abstracta.jmeter.javadsl.core.threadgroups.BaseThreadGroup.ThreadGroupChild;
+&nbsp;
+&nbsp;/**
+&nbsp; * Allows running only given percent of times given test plan elements.
+&nbsp; * &lt;p&gt;
+&nbsp; * Internally this uses JMeter Throughput Controller (which has misleading name) with percent
+&nbsp; * executions option.
+&nbsp; * &lt;p&gt;
+&nbsp; * The execution of elements is deterministic, holding execution until percentage is reached. For
+&nbsp; * example, if the percent is 25, the execution of child elements will look like: [skip, skip, skip,
+&nbsp; * run, skip, skip, skip, run, ...].
+&nbsp; * &lt;p&gt;
+&nbsp; * Execution of children is always run as an atomic set (each time/iteration either all or none of
+&nbsp; * the children are run).
+&nbsp; *
+&nbsp; * @since 0.25
+&nbsp; */
+&nbsp;public class PercentController extends BaseController&lt;PercentController&gt; {
+&nbsp;
+&nbsp;  protected String percent;
+&nbsp;  protected boolean perThread;
+&nbsp;
+&nbsp;  public PercentController(String percent, List&lt;ThreadGroupChild&gt; children) {
+<b class="fc">&nbsp;    super(&quot;Percent Selector Controller&quot;, ThroughputControllerGui.class, children);</b>
+<b class="fc">&nbsp;    this.percent = percent;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Specifies to apply percent control per thread instead of shared by all threads.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * This might be useful when a more deterministic behavior is required per thread, and each thread
+&nbsp;   * execution has to be controlled, instead of relying on in general threads execution percentage.
+&nbsp;   *
+&nbsp;   * @return the controller for further configuration or usage.
+&nbsp;   * @since 1.0
+&nbsp;   */
+&nbsp;  public PercentController perThread() {
+<b class="fc">&nbsp;    return perThread(true);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Same as {@link #perThread()} but allowing to enable or disable it.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * This is helpful when the resolution is taken at runtime.
+&nbsp;   *
+&nbsp;   * @param enable specifies to enable or disable the setting. By default, it is set to false.
+&nbsp;   * @return the controller for further configuration or usage.
+&nbsp;   * @see #perThread()
+&nbsp;   * @since 0.63
+&nbsp;   */
+&nbsp;  public PercentController perThread(boolean enable) {
+<b class="fc">&nbsp;    perThread = enable;</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  protected TestElement buildTestElement() {
+<b class="fc">&nbsp;    ThroughputController ret = new ThroughputController();</b>
+<b class="fc">&nbsp;    ret.setStyle(ThroughputController.BYPERCENT);</b>
+<b class="fc">&nbsp;    ret.setPercentThroughput(percent);</b>
+<b class="fc">&nbsp;    ret.setPerThread(perThread);</b>
+<b class="fc">&nbsp;    return ret;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  public static class CodeBuilder extends MethodCallBuilder {
+&nbsp;
+&nbsp;    public CodeBuilder(List&lt;Method&gt; builderMethods) {
+<b class="fc">&nbsp;      super(builderMethods);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean matches(MethodCallContext context) {
+<b class="fc">&nbsp;      TestElement elem = context.getTestElement();</b>
+<b class="fc">&nbsp;      if (!(elem instanceof ThroughputController)) {</b>
+<b class="fc">&nbsp;        return false;</b>
+&nbsp;      }
+<b class="fc">&nbsp;      ThroughputController controller = (ThroughputController) elem;</b>
+<b class="fc">&nbsp;      return controller.getStyle() == ThroughputController.BYPERCENT;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected MethodCall buildMethodCall(MethodCallContext context) {
+<b class="fc">&nbsp;      TestElementParamBuilder paramBuilder = new TestElementParamBuilder(context.getTestElement(),</b>
+&nbsp;          &quot;ThroughputController&quot;);
+<b class="fc">&nbsp;      MethodCall ret = buildMethodCall(paramBuilder.floatParam(&quot;percentThroughput&quot;),</b>
+&nbsp;          new ChildrenParam&lt;&gt;(ThreadGroupChild[].class));
+<b class="fc">&nbsp;      ret.chain(&quot;perThread&quot;, paramBuilder.boolParam(&quot;perThread&quot;, false));</b>
+<b class="fc">&nbsp;      return ret;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;  }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-03 22:39</div>
+</div>
+</body>
+</html>

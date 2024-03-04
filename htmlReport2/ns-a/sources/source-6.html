@@ -1,0 +1,135 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=GBK"> 
+  <title>Coverage Report > AutoStopTestBeanBeanInfo</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">us.abstracta.jmeter.javadsl.core.listeners.autostop</a>
+</div>
+
+<h1>Coverage Summary for Class: AutoStopTestBeanBeanInfo (us.abstracta.jmeter.javadsl.core.listeners.autostop)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">AutoStopTestBeanBeanInfo</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (14/14)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package us.abstracta.jmeter.javadsl.core.listeners.autostop;
+&nbsp;
+&nbsp;import java.beans.PropertyDescriptor;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Arrays;
+&nbsp;import org.apache.jmeter.testbeans.BeanInfoSupport;
+&nbsp;import org.apache.jmeter.testbeans.gui.TableEditor;
+&nbsp;import org.apache.jmeter.util.JMeterUtils;
+&nbsp;
+&nbsp;public class AutoStopTestBeanBeanInfo extends BeanInfoSupport {
+&nbsp;
+&nbsp;  public AutoStopTestBeanBeanInfo() {
+<b class="fc">&nbsp;    super(AutoStopTestBean.class);</b>
+<b class="fc">&nbsp;    PropertyDescriptor p = property(&quot;conditions&quot;);</b>
+<b class="fc">&nbsp;    p.setPropertyEditorClass(TableEditor.class);</b>
+<b class="fc">&nbsp;    p.setValue(TableEditor.CLASSNAME, AutoStopConditionElement.class.getName());</b>
+<b class="fc">&nbsp;    String[] props = new String[]{&quot;regex&quot;, &quot;metric&quot;, &quot;aggregation&quot;, &quot;percentile&quot;,</b>
+&nbsp;        &quot;aggregationResetPeriodSeconds&quot;, &quot;comparison&quot;, &quot;value&quot;, &quot;holdsForSeconds&quot;};
+<b class="fc">&nbsp;    p.setValue(TableEditor.HEADERS, Arrays.stream(props)</b>
+<b class="fc">&nbsp;        .map(prop -&gt; JMeterUtils.getResString(&quot;autostop_&quot; + prop))</b>
+<b class="fc">&nbsp;        .toArray(String[]::new));</b>
+<b class="fc">&nbsp;    p.setValue(TableEditor.OBJECT_PROPERTIES, props);</b>
+<b class="fc">&nbsp;    p.setValue(NOT_UNDEFINED, Boolean.TRUE);</b>
+<b class="fc">&nbsp;    p.setValue(DEFAULT, new ArrayList&lt;&gt;());</b>
+<b class="fc">&nbsp;    p.setValue(MULTILINE, Boolean.TRUE);</b>
+<b class="fc">&nbsp;    property(&quot;regex&quot;);</b>
+&nbsp;    //cannot mark this property as hidden since otherwise it wouldn&#39;t be serialized
+<b class="fc">&nbsp;    property(&quot;testStopper&quot;);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-03 22:39</div>
+</div>
+</body>
+</html>

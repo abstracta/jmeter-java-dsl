@@ -1,0 +1,101 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=GBK"> 
+  <title>Coverage Report > DslTestElement</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">us.abstracta.jmeter.javadsl.core</a>
+</div>
+
+<h1>Coverage Summary for Class: DslTestElement (us.abstracta.jmeter.javadsl.core)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+</tr>
+<tr>
+  <td class="name">DslTestElement</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package us.abstracta.jmeter.javadsl.core;
+&nbsp;
+&nbsp;import org.apache.jorphan.collections.HashTree;
+&nbsp;
+&nbsp;/**
+&nbsp; * Interface to be implemented by all elements composing a JMeter test plan.
+&nbsp; *
+&nbsp; * @since 0.1
+&nbsp; */
+&nbsp;public interface DslTestElement {
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Builds the JMeter HashTree for this TestElement under the provided tree node.
+&nbsp;   *
+&nbsp;   * @param parent the node which will be the parent for the created tree.
+&nbsp;   * @param context context information which contains information shared by elements while building
+&nbsp;   * the test plan tree (eg: adding additional items to test plan when a particular protocol element
+&nbsp;   * is added).
+&nbsp;   * @return The tree created under the parent node.
+&nbsp;   * @since 0.17
+&nbsp;   */
+&nbsp;  HashTree buildTreeUnder(HashTree parent, BuildTreeContext context);
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Shows the test element in it&#39;s defined GUI in a popup window.
+&nbsp;   *
+&nbsp;   * This might be handy to visualize the element as it looks in JMeter GUI.
+&nbsp;   *
+&nbsp;   * @since 0.18
+&nbsp;   */
+&nbsp;  void showInGui();
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-03 20:57</div>
+</div>
+</body>
+</html>

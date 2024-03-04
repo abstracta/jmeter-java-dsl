@@ -1,0 +1,187 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=GBK"> 
+  <title>Coverage Report > ResponseFileSaver</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">us.abstracta.jmeter.javadsl.core.listeners</a>
+</div>
+
+<h1>Coverage Summary for Class: ResponseFileSaver (us.abstracta.jmeter.javadsl.core.listeners)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ResponseFileSaver</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (5/5)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">ResponseFileSaver$CodeBuilder</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/3)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (8/8)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package us.abstracta.jmeter.javadsl.core.listeners;
+&nbsp;
+&nbsp;import java.lang.reflect.Method;
+&nbsp;import java.util.List;
+&nbsp;import org.apache.jmeter.reporters.ResultSaver;
+&nbsp;import org.apache.jmeter.reporters.gui.ResultSaverGui;
+&nbsp;import org.apache.jmeter.testelement.TestElement;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.MethodCall;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.MethodCallContext;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.SingleTestElementCallBuilder;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.TestElementParamBuilder;
+&nbsp;
+&nbsp;/**
+&nbsp; * Generates one file for each response of a sample/request.
+&nbsp; * &lt;p&gt;
+&nbsp; * This element is dependant of the scope: this means that if you add it at test plan level it will
+&nbsp; * generate files for all samplers in test plan, if added at thread group level then it will
+&nbsp; * generate files for samplers only in the thread group, and if you add it at sampler level it will
+&nbsp; * generate files only for the associated sampler.
+&nbsp; * &lt;p&gt;
+&nbsp; * By default, it will generate one file for each response using the given (which might include the
+&nbsp; * directory location) prefix to create the files and adding an incremental number to each response
+&nbsp; * and an extension according to the response mime type.
+&nbsp; *
+&nbsp; * @since 0.13
+&nbsp; */
+&nbsp;public class ResponseFileSaver extends BaseListener {
+&nbsp;
+&nbsp;  protected String fileNamePrefix;
+&nbsp;
+&nbsp;  public ResponseFileSaver(String fileNamePrefix) {
+<b class="fc">&nbsp;    super(&quot;Save Responses to a file&quot;, ResultSaverGui.class);</b>
+<b class="fc">&nbsp;    this.fileNamePrefix = fileNamePrefix;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  protected TestElement buildTestElement() {
+<b class="fc">&nbsp;    ResultSaver ret = new ResultSaver();</b>
+<b class="fc">&nbsp;    ret.setFilename(fileNamePrefix);</b>
+<b class="fc">&nbsp;    return ret;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  public static class CodeBuilder extends SingleTestElementCallBuilder&lt;ResultSaver&gt; {
+&nbsp;
+&nbsp;    public CodeBuilder(List&lt;Method&gt; builderMethods) {
+<b class="fc">&nbsp;      super(ResultSaver.class, builderMethods);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected MethodCall buildMethodCall(ResultSaver testElement, MethodCallContext context) {
+<b class="fc">&nbsp;      return buildMethodCall(</b>
+<b class="fc">&nbsp;          new TestElementParamBuilder(testElement).stringParam(ResultSaver.FILENAME));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;  }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-03 22:39</div>
+</div>
+</body>
+</html>
