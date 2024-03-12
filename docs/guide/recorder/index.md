@@ -15,7 +15,7 @@ jbang us.abstracta.jmeter:jmeter-java-dsl-cli:1.25.3 recorder http://retailstore
 :::
 
 ::: tip
-Use `java -jar jmdsl.jar recorder --help` to see the list of options to customize your recording.
+Use `java -jar jmdsl.jar help recorder` to see the list of options to customize your recording.
 :::
 
 ::: tip
