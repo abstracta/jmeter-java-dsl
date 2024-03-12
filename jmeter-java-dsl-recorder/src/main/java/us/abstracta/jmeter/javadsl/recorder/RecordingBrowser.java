@@ -43,11 +43,7 @@ public class RecordingBrowser implements AutoCloseable {
     proxy.setHttpProxy(recordingProxy);
     proxy.setSslProxy(recordingProxy);
     ret.setProxy(proxy);
-    /*
-     remote-allow-origins is required due to this issue:
-     https://github.com/SeleniumHQ/selenium/issues/11750
-     */
-    ret.addArguments("--incognito", "--proxy-bypass-list=<-loopback>", "--remote-allow-origins=*");
+    ret.addArguments("--incognito", "--proxy-bypass-list=<-loopback>");
     ret.addArguments(args);
     ret.setAcceptInsecureCerts(true);
     return ret;
