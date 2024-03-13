@@ -37,7 +37,7 @@ jobs:
       - name: update docs version
         run: .github/fix-docs-version.sh ${{ inputs.version }}
       - name: commit release version
-        uses: stefanzweifel/git-auto-commit-action@v4
+        uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: '[skip ci] Set release version'
           branch: master
@@ -76,7 +76,7 @@ jobs:
       - name: update to next SNAPSHOT version
         run: mvn --batch-mode --no-transfer-progress versions:set -DnewVersion=${{ env.SNAPSHOT_VERSION }}
       - name: commit SNAPSHOT version
-        uses: stefanzweifel/git-auto-commit-action@v4
+        uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: '[skip ci] Set SNAPSHOT version'
           branch: master
@@ -85,7 +85,7 @@ jobs:
         run: .github/vuepress-deploy.sh
         env:
           ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           repository: abstracta/jmeter-java-dsl-sample
           path: jmeter-java-dsl-sample
