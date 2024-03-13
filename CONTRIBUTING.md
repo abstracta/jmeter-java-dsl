@@ -55,7 +55,7 @@ You can check more complete and complex diagrams [here](docs/diagrams).
 
 Here we will detail the main steps and things to take into consideration when implementing a new test element, or extending an existing one.
 
-Before doing any coding, consider that the project uses Java 8, maven 3.5, nodejs 18+, pnpm 8+, and docker as main dependencies, so make sure that you install them beforehand. You might also install [devbox](https://www.jetpack.io/devbox/docs/) and [direnv](https://direnv.net/) and then use existing devbox configuration to setup the development environment.
+Before doing any coding, consider that the project uses Java 11, maven 3.5, nodejs 20+, pnpm 8+, and docker as main dependencies, so make sure that you install them beforehand. You might also install [devbox](https://www.jetpack.io/devbox/docs/) and [direnv](https://direnv.net/) and then use existing devbox configuration to setup the development environment.
 
 Additionally, the project uses checkstyle for enforcing code consistency and conventions. You can get IDEs settings from [here](https://github.com/google/styleguide), which already matches the code style rules. Using IDEs autoformatting with such configurations should automatically fix most styling issues.
 

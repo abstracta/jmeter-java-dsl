@@ -129,7 +129,7 @@
     <dependency>
       <groupId>com.github.caciocavallosilano</groupId>
       <artifactId>cacio-tta</artifactId>
-      <version>1.10</version>
+      <version>1.11.1</version>
       <scope>test</scope>
     </dependency>
     <dependency>
