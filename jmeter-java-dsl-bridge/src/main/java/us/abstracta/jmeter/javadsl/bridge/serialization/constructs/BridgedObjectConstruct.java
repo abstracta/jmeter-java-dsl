@@ -14,6 +14,7 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.apache.http.entity.ContentType;
 import org.yaml.snakeyaml.nodes.MappingNode;
 import org.yaml.snakeyaml.nodes.Node;
 import org.yaml.snakeyaml.nodes.ScalarNode;
@@ -46,6 +47,7 @@ public class BridgedObjectConstruct extends BaseBridgedObjectConstruct {
     ret.put(boolean.class, Boolean::parseBoolean);
     ret.put(double.class, Double::parseDouble);
     ret.put(Duration.class, Duration::parse);
+    ret.put(ContentType.class, ContentType::parse);
     ret.put(String.class, s -> s);
     return ret;
   }
