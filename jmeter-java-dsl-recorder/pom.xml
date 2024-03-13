@@ -16,6 +16,12 @@
     projects (ej: jmeter-java-dsl-cli)
   </description>
 
+  <properties>
+    <!-- Using java 11 since last version of selenium driver with java 8 does not have support for latest version of chrome driver. -->
+    <maven.compiler.source>11</maven.compiler.source>
+    <maven.compiler.target>11</maven.compiler.target>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>com.blazemeter</groupId>

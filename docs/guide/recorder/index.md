@@ -22,6 +22,12 @@ Use `java -jar jmdsl.jar help recorder` to see the list of options to customize 
 In general use `---url-includes` to ignore URLs that are not relevant to the performance test.
 :::
 
+::: warning
+Unlike the rest of JMeter DSL, which is compiled with Java 8, `jmdsl.jar` and `us.abstracta.jmeter:jmeter-java-dsl-cli` are compiled with Java 11 due to some dependencies requirement (latest Selenium drivers mainly).
+
+So, to run above commands, you will need Java 11 or newer.
+:::
+
 ### Correlations
 
 To avoid fragile test plans with fixed values in request parameters, the DSL recorder, through the usage of the [JMeter Correlation Recorder Plugin](https://github.com/Blazemeter/CorrelationRecorder), allows you to define correlation rules.

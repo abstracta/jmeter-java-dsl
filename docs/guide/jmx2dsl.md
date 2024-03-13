@@ -76,6 +76,12 @@ public class PerformanceTest {
 }
 ```
 
+::: warning
+Unlike the rest of JMeter DSL which is compiled with Java 8, `jmdsl.jar` and `us.abstracta.jmeter:jmeter-java-dsl-cli` are compiled with Java 11 due to some dependencies requirement (latest Selenium drivers mainly).
+
+So, to run above commands, you will need Java 11 or newer.
+:::
+
 ::: tip
 Review and try generated code before executing it as is. I.e: tune thread groups and iterations to 1 to give it a try.
 :::

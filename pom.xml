@@ -55,8 +55,7 @@
     <junit-platform.version>1.9.1</junit-platform.version>
     <assertj-core.version>3.23.1</assertj-core.version>
     <jackson.version>2.14.2</jackson.version>
-    <!-- This is the last version compatible with java 8. 4.14 requires java 11. -->
-    <selenium.version>4.13.0</selenium.version>
+    <selenium.version>4.18.0</selenium.version>
     <!-- same version as JMeter dependency -->
     <slf4j.version>1.7.36</slf4j.version>
     <retrofit.version>2.9.0</retrofit.version>
@@ -174,6 +173,7 @@
           <version>3.11.0</version>
           <configuration>
             <compilerArgs>
+              <!-- this is to preserve parameters names, mainly for bridge service reflection logic -->
               <arg>-parameters</arg>
             </compilerArgs>
           </configuration>
