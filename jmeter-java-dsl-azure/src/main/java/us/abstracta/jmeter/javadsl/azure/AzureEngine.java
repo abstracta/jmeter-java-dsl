@@ -532,7 +532,8 @@ public class AzureEngine extends BaseRemoteEngine<AzureClient, AzureTestPlanStat
 
   private TestRun awaitVirtualUsers(TestRun testRun) throws InterruptedException, IOException {
     Instant start = Instant.now();
-    while (testRun.getVirtualUsers() == null && !hasTimedOut(TEST_END_TIMEOUT, start)) {
+    while ((testRun.getVirtualUsers() == null || testRun.getTestRunStatistics() == null)
+        && !hasTimedOut(TEST_END_TIMEOUT, start)) {
       Thread.sleep(STATUS_POLL_PERIOD.toMillis());
       testRun = apiClient.findTestRunById(testRun.getId());
     }
