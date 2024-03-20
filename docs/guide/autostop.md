@@ -26,7 +26,7 @@ public class PerformanceTest {
           httpSampler("http://my.service")
         ),
         autoStop()
-          .when(errors().total().isGreaterThan(0)) // when any sample fails, then test plan will stop and an exception will be thrown pointing to this condition.
+          .when(errors().total().greaterThan(0)) // when any sample fails, then test plan will stop and an exception will be thrown pointing to this condition.
     ).run();
   }
 
