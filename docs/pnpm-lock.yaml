@@ -683,7 +683,7 @@ packages:
       '@mdit/plugin-tex': 0.4.8
       '@types/katex': 0.16.5
       '@types/markdown-it': 12.2.3
-      katex: 0.16.9
+      katex: 0.16.10
       markdown-it: 13.0.2
     dev: true
 
@@ -2298,8 +2298,8 @@ packages:
       graceful-fs: 4.2.11
     dev: true
 
-  /katex@0.16.9:
-    resolution: {integrity: sha512-fsSYjWS0EEOwvy81j3vRA8TEAhQhKiqO+FQaKWp0m39qwOzHVBgAUBIXWj1pB+O2W3fIpNa6Y9KSKCVbfPhyAQ==}
+  /katex@0.16.10:
+    resolution: {integrity: sha512-ZiqaC04tp2O5utMsl2TEZTXxa6WSC4yo0fv5ML++D3QZv/vx2Mct0mTlRx3O+uUkjfuAgOkzsCmq5MiUEsDDdA==}
     hasBin: true
     dependencies:
       commander: 8.3.0
@@ -3268,7 +3268,7 @@ packages:
       echarts: 5.4.3
       flowchart.ts: 1.0.1
       js-yaml: 4.1.0
-      katex: 0.16.9
+      katex: 0.16.10
       markdown-it: 13.0.2
       mermaid: 10.2.4
       reveal.js: 4.6.1
