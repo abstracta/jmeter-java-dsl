@@ -1,0 +1,225 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=GBK"> 
+  <title>Coverage Report > DslViewResultsTree</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">us.abstracta.jmeter.javadsl.core.listeners</a>
+</div>
+
+<h1>Coverage Summary for Class: DslViewResultsTree (us.abstracta.jmeter.javadsl.core.listeners)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DslViewResultsTree</td>
+<td class="coverageStat">
+  <span class="percent">
+    75%
+  </span>
+  <span class="absValue">
+    (3/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    66.7%
+  </span>
+  <span class="absValue">
+    (6/9)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">DslViewResultsTree$CodeBuilder</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (6/6)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    85.7%
+  </span>
+  <span class="absValue">
+    (6/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    80%
+  </span>
+  <span class="absValue">
+    (12/15)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package us.abstracta.jmeter.javadsl.core.listeners;
+&nbsp;
+&nbsp;import java.lang.reflect.Method;
+&nbsp;import java.util.List;
+&nbsp;import org.apache.jmeter.reporters.ResultCollector;
+&nbsp;import org.apache.jmeter.testelement.TestElement;
+&nbsp;import org.apache.jmeter.util.JMeterUtils;
+&nbsp;import org.apache.jmeter.visualizers.ViewResultsFullVisualizer;
+&nbsp;import org.apache.jorphan.collections.HashTree;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.MethodCall;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.MethodCallContext;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.SingleGuiClassCallBuilder;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.TestElementParamBuilder;
+&nbsp;import us.abstracta.jmeter.javadsl.core.BuildTreeContext;
+&nbsp;
+&nbsp;/**
+&nbsp; * Shows a popup window including live results tree using JMeter built-in View Results Tree
+&nbsp; * element.
+&nbsp; * &lt;p&gt;
+&nbsp; * If resultsTreeVisualizer is added at testPlan level it will show information about all samples in
+&nbsp; * the test plan, if added at thread group level it will only show samples for samplers contained
+&nbsp; * within it, if added as a sampler child, then only that sampler samples will be shown.
+&nbsp; *
+&nbsp; * @since 0.19
+&nbsp; */
+&nbsp;public class DslViewResultsTree extends DslVisualizer {
+&nbsp;
+&nbsp;  private static final String MAX_RESULTS_PROPERTY_NAME = &quot;view.results.tree.max_results&quot;;
+&nbsp;  protected int resultsLimit;
+&nbsp;
+&nbsp;  public DslViewResultsTree() {
+<b class="fc">&nbsp;    super(&quot;View Results Tree&quot;, ViewResultsFullVisualizer.class);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Specifies the maximum number of sample results to show.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * When the limit is reached, only latest sample results are shown.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * Take into consideration that the greater the number of displayed results, the more system
+&nbsp;   * memory is required, which might cause an OutOfMemoryError depending on JVM settings.
+&nbsp;   *
+&nbsp;   * @param resultsLimit the maximum number of sample results to show. When not set the default
+&nbsp;   *                     value is 500.
+&nbsp;   * @return the visualizer for further configuration or usage.
+&nbsp;   */
+&nbsp;  public DslViewResultsTree resultsLimit(int resultsLimit) {
+<b class="nc">&nbsp;    this.resultsLimit = resultsLimit;</b>
+<b class="nc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public HashTree buildTreeUnder(HashTree parent, BuildTreeContext context) {
+<b class="fc">&nbsp;    int prevLimit = JMeterUtils.getPropDefault(MAX_RESULTS_PROPERTY_NAME, 500);</b>
+<b class="fc">&nbsp;    JMeterUtils.setProperty(MAX_RESULTS_PROPERTY_NAME, String.valueOf(resultsLimit));</b>
+&nbsp;    try {
+<b class="fc">&nbsp;      return super.buildTreeUnder(parent, context);</b>
+&nbsp;    } finally {
+<b class="fc">&nbsp;      JMeterUtils.setProperty(MAX_RESULTS_PROPERTY_NAME, String.valueOf(prevLimit));</b>
+<b class="nc">&nbsp;    }</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  protected TestElement buildTestElement() {
+<b class="fc">&nbsp;    return new ResultCollector();</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  public static class CodeBuilder extends SingleGuiClassCallBuilder {
+&nbsp;
+&nbsp;    public CodeBuilder(List&lt;Method&gt; builderMethods) {
+<b class="fc">&nbsp;      super(ViewResultsFullVisualizer.class, builderMethods);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean matches(MethodCallContext context) {
+<b class="fc">&nbsp;      if (!super.matches(context)) {</b>
+<b class="fc">&nbsp;        return false;</b>
+&nbsp;      }
+&nbsp;      /*
+&nbsp;       Only apply if file is empty to use the less possible feature, instead of using exact match.
+&nbsp;       Additionally, we use this approach instead of ResultCollector.getFilename, to avoid JMeter
+&nbsp;       property resolution solving to empty interfering with conversion.
+&nbsp;       */
+<b class="fc">&nbsp;      TestElementParamBuilder paramBuilder = new TestElementParamBuilder(context.getTestElement());</b>
+<b class="fc">&nbsp;      return paramBuilder.stringParam(ResultCollector.FILENAME).isDefault();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected MethodCall buildMethodCall(MethodCallContext context) {
+<b class="fc">&nbsp;      return buildMethodCall();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;  }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-03 22:39</div>
+</div>
+</body>
+</html>

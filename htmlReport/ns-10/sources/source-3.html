@@ -1,0 +1,302 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=GBK"> 
+  <title>Coverage Report > DslScopedTestElement</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">us.abstracta.jmeter.javadsl.core.testelements</a>
+</div>
+
+<h1>Coverage Summary for Class: DslScopedTestElement (us.abstracta.jmeter.javadsl.core.testelements)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DslScopedTestElement</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (9/9)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">DslScopedTestElement$Scope</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (5/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (9/9)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">DslScopedTestElement$ScopedTestElementCallBuilder</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (12/12)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (13/13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (30/30)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package us.abstracta.jmeter.javadsl.core.testelements;
+&nbsp;
+&nbsp;import java.lang.reflect.Method;
+&nbsp;import java.util.List;
+&nbsp;import java.util.function.Consumer;
+&nbsp;import org.apache.jmeter.gui.JMeterGUIComponent;
+&nbsp;import org.apache.jmeter.testelement.AbstractScopedTestElement;
+&nbsp;import org.apache.jmeter.testelement.TestElement;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.MethodCall;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.MethodCallContext;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.MethodParam;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.SingleTestElementCallBuilder;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.TestElementParamBuilder;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.params.EnumParam.EnumPropertyValue;
+&nbsp;
+&nbsp;/**
+&nbsp; * Contains common logic for test elements that only process certain samples.
+&nbsp; *
+&nbsp; * @param &lt;T&gt; is the type of the test element that extends this class (to properly inherit fluent
+&nbsp; *            API methods).
+&nbsp; * @since 0.11
+&nbsp; */
+&nbsp;public abstract class DslScopedTestElement&lt;T extends DslScopedTestElement&lt;T&gt;&gt; extends
+&nbsp;    BaseTestElement {
+&nbsp;
+<b class="fc">&nbsp;  protected Scope scope = Scope.MAIN_SAMPLE;</b>
+&nbsp;  protected String scopeVariable;
+&nbsp;
+&nbsp;  protected DslScopedTestElement(String name, Class&lt;? extends JMeterGUIComponent&gt; guiClass) {
+<b class="fc">&nbsp;    super(name, guiClass);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Allows specifying if the element should be applied to main sample and/or sub samples.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * When not specified the element will only apply to main sample.
+&nbsp;   *
+&nbsp;   * @param scope specifying to what sample result apply the element to.
+&nbsp;   * @return the DSL element for further configuration or usage.
+&nbsp;   * @see Scope
+&nbsp;   */
+&nbsp;  public T scope(Scope scope) {
+<b class="fc">&nbsp;    this.scope = scope;</b>
+<b class="fc">&nbsp;    return (T) this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Allows specifying that the element should be applied to the contents of a given JMeter
+&nbsp;   * variable.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * This setting overrides any setting on scope and fieldToCheck.
+&nbsp;   *
+&nbsp;   * @param scopeVariable specifies the name of the variable to apply the element to.
+&nbsp;   * @return the DSL element for further configuration or usage.
+&nbsp;   */
+&nbsp;  public T scopeVariable(String scopeVariable) {
+<b class="fc">&nbsp;    this.scopeVariable = scopeVariable;</b>
+<b class="fc">&nbsp;    return (T) this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  protected void setScopeTo(AbstractScopedTestElement testElement) {
+<b class="fc">&nbsp;    scope.applyTo(testElement);</b>
+<b class="fc">&nbsp;    if (scopeVariable != null) {</b>
+<b class="fc">&nbsp;      testElement.setScopeVariable(scopeVariable);</b>
+&nbsp;    }
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Specifies to which samples apply the regular extractor to.
+&nbsp;   */
+<b class="fc">&nbsp;  public enum Scope implements EnumPropertyValue {</b>
+&nbsp;    /**
+&nbsp;     * Applies the regular extractor to all samples (main and sub samples).
+&nbsp;     */
+<b class="fc">&nbsp;    ALL_SAMPLES(AbstractScopedTestElement::setScopeAll, &quot;all&quot;),</b>
+&nbsp;    /**
+&nbsp;     * Applies the regular extractor only to main sample (sub samples, like redirects, are not
+&nbsp;     * included).
+&nbsp;     */
+<b class="fc">&nbsp;    MAIN_SAMPLE(AbstractScopedTestElement::setScopeParent, &quot;parent&quot;),</b>
+&nbsp;    /**
+&nbsp;     * Applies the regular extractor only to sub samples (redirects, embedded resources, etc.).
+&nbsp;     */
+<b class="fc">&nbsp;    SUB_SAMPLES(AbstractScopedTestElement::setScopeChildren, &quot;children&quot;);</b>
+&nbsp;
+&nbsp;    private final Consumer&lt;AbstractScopedTestElement&gt; applier;
+&nbsp;    private final String propertyValue;
+&nbsp;
+<b class="fc">&nbsp;    Scope(Consumer&lt;AbstractScopedTestElement&gt; applier, String propertyValue) {</b>
+<b class="fc">&nbsp;      this.applier = applier;</b>
+<b class="fc">&nbsp;      this.propertyValue = propertyValue;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void applyTo(AbstractScopedTestElement re) {
+<b class="fc">&nbsp;      applier.accept(re);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String propertyValue() {
+<b class="fc">&nbsp;      return propertyValue;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Abstracts common logic for
+&nbsp;   * {@link us.abstracta.jmeter.javadsl.core.testelements.DslScopedTestElement} method call
+&nbsp;   * builders.
+&nbsp;   *
+&nbsp;   * @param &lt;T&gt; is the type of test element class that is used to identify when this call builder
+&nbsp;   *            should apply.
+&nbsp;   * @since 0.62
+&nbsp;   */
+&nbsp;  protected abstract static class ScopedTestElementCallBuilder&lt;T extends TestElement&gt; extends
+&nbsp;      SingleTestElementCallBuilder&lt;T&gt; {
+&nbsp;
+&nbsp;    private final String scopePrefix;
+&nbsp;
+&nbsp;    protected ScopedTestElementCallBuilder(Class&lt;T&gt; testElementClass, List&lt;Method&gt; builderMethods) {
+<b class="fc">&nbsp;      this(&quot;Sample&quot;, testElementClass, builderMethods);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    protected ScopedTestElementCallBuilder(String scopePrefix, Class&lt;T&gt; testElementClass,
+&nbsp;        List&lt;Method&gt; builderMethods) {
+<b class="fc">&nbsp;      super(testElementClass, builderMethods);</b>
+<b class="fc">&nbsp;      this.scopePrefix = scopePrefix;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected MethodCall buildMethodCall(T testElement, MethodCallContext context) {
+<b class="fc">&nbsp;      MethodCall ret = buildScopedMethodCall(testElement);</b>
+<b class="fc">&nbsp;      chainScopeTo(ret, testElement, scopePrefix);</b>
+<b class="fc">&nbsp;      chainScopedElementAdditionalOptions(ret, testElement);</b>
+<b class="fc">&nbsp;      return ret;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static void chainScopeTo(MethodCall ret, TestElement testElement, String scopePrefix) {
+<b class="fc">&nbsp;      TestElementParamBuilder paramBuilder = new TestElementParamBuilder(testElement);</b>
+<b class="fc">&nbsp;      MethodParam scopeVar = paramBuilder.stringParam(&quot;Scope.variable&quot;);</b>
+<b class="fc">&nbsp;      if (scopeVar.isDefault()) {</b>
+<b class="fc">&nbsp;        ret.chain(&quot;scope&quot;, paramBuilder.enumParam(scopePrefix + &quot;.scope&quot;, Scope.MAIN_SAMPLE));</b>
+&nbsp;      } else {
+<b class="fc">&nbsp;        ret.chain(&quot;scopeVariable&quot;, scopeVar);</b>
+&nbsp;      }
+&nbsp;    }
+&nbsp;
+&nbsp;    protected abstract MethodCall buildScopedMethodCall(T testElement);
+&nbsp;
+&nbsp;    protected abstract void chainScopedElementAdditionalOptions(MethodCall ret, T testElement);
+&nbsp;
+&nbsp;  }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-03 20:57</div>
+</div>
+</body>
+</html>

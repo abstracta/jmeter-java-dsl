@@ -1,0 +1,142 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=GBK"> 
+  <title>Coverage Report > AutoStopAggregation</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">us.abstracta.jmeter.javadsl.core.listeners.autostop</a>
+</div>
+
+<h1>Coverage Summary for Class: AutoStopAggregation (us.abstracta.jmeter.javadsl.core.listeners.autostop)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">AutoStopAggregation</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (12/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (14/14)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package us.abstracta.jmeter.javadsl.core.listeners.autostop;
+&nbsp;
+&nbsp;import java.util.function.Function;
+&nbsp;import us.abstracta.jmeter.javadsl.core.listeners.autostop.aggregators.AutoStopAggregator;
+&nbsp;import us.abstracta.jmeter.javadsl.core.listeners.autostop.aggregators.AverageAggregator;
+&nbsp;import us.abstracta.jmeter.javadsl.core.listeners.autostop.aggregators.PerSecondAggregator;
+&nbsp;import us.abstracta.jmeter.javadsl.core.listeners.autostop.aggregators.PercentAggregator;
+&nbsp;import us.abstracta.jmeter.javadsl.core.listeners.autostop.aggregators.PercentileAggregator;
+&nbsp;import us.abstracta.jmeter.javadsl.core.listeners.autostop.aggregators.SimpleAggregator;
+&nbsp;
+<b class="fc">&nbsp;public enum AutoStopAggregation {</b>
+<b class="fc">&nbsp;  MIN(c -&gt; &quot;min&quot;, c -&gt; new SimpleAggregator&lt;Long&gt;(Math::min)),</b>
+<b class="fc">&nbsp;  MAX(c -&gt; &quot;max&quot;, c -&gt; new SimpleAggregator&lt;Long&gt;(Math::max)),</b>
+<b class="fc">&nbsp;  MEAN(c -&gt; &quot;mean&quot;, c -&gt; new AverageAggregator()),</b>
+<b class="fc">&nbsp;  PERCENTILE(c -&gt; PercentileAggregator.getName(c.getPercentile()),</b>
+<b class="fc">&nbsp;      c -&gt; new PercentileAggregator(c.getPercentile())),</b>
+<b class="fc">&nbsp;  TOTAL(c -&gt; &quot;total&quot;, c -&gt; new SimpleAggregator&lt;&gt;(Long::sum)),</b>
+<b class="fc">&nbsp;  PER_SECOND(c -&gt; &quot;per second&quot;, c -&gt; new PerSecondAggregator(c.getClock())),</b>
+<b class="fc">&nbsp;  PERCENT(c -&gt; &quot;percent&quot;, c -&gt; new PercentAggregator());</b>
+&nbsp;
+&nbsp;  private final Function&lt;AutoStopConditionElement, String&gt; nameSolver;
+&nbsp;  private final Function&lt;AutoStopConditionElement, AutoStopAggregator&lt;?&gt;&gt; aggregatorBuilder;
+&nbsp;
+&nbsp;  AutoStopAggregation(Function&lt;AutoStopConditionElement, String&gt; nameSolver,
+<b class="fc">&nbsp;      Function&lt;AutoStopConditionElement, AutoStopAggregator&lt;?&gt;&gt; aggregatorBuilder) {</b>
+<b class="fc">&nbsp;    this.nameSolver = nameSolver;</b>
+<b class="fc">&nbsp;    this.aggregatorBuilder = aggregatorBuilder;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  public AutoStopAggregator&lt;?&gt; buildAggregator(AutoStopConditionElement condition) {
+<b class="fc">&nbsp;    return aggregatorBuilder.apply(condition);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  public String getNameFor(AutoStopConditionElement condition) {
+<b class="fc">&nbsp;    return nameSolver.apply(condition);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-03 20:57</div>
+</div>
+</body>
+</html>

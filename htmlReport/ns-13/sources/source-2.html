@@ -1,0 +1,198 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=GBK"> 
+  <title>Coverage Report > DslConstantTimer</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">us.abstracta.jmeter.javadsl.core.timers</a>
+</div>
+
+<h1>Coverage Summary for Class: DslConstantTimer (us.abstracta.jmeter.javadsl.core.timers)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DslConstantTimer</td>
+<td class="coverageStat">
+  <span class="percent">
+    66.7%
+  </span>
+  <span class="absValue">
+    (2/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    83.3%
+  </span>
+  <span class="absValue">
+    (5/6)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">DslConstantTimer$CodeBuilder</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    83.3%
+  </span>
+  <span class="absValue">
+    (5/6)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    80%
+  </span>
+  <span class="absValue">
+    (4/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    83.3%
+  </span>
+  <span class="absValue">
+    (10/12)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package us.abstracta.jmeter.javadsl.core.timers;
+&nbsp;
+&nbsp;import java.lang.reflect.Method;
+&nbsp;import java.time.Duration;
+&nbsp;import java.util.List;
+&nbsp;import org.apache.jmeter.testelement.TestElement;
+&nbsp;import org.apache.jmeter.timers.ConstantTimer;
+&nbsp;import org.apache.jmeter.timers.RandomTimer;
+&nbsp;import org.apache.jmeter.timers.gui.ConstantTimerGui;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.MethodCall;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.MethodCallContext;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.MethodParam;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.SingleTestElementCallBuilder;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.TestElementParamBuilder;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.params.DurationParam;
+&nbsp;
+&nbsp;/**
+&nbsp; * Allows using JMeter Constant Timers which pause the thread for a given period.
+&nbsp; * &lt;p&gt;
+&nbsp; * The pause calculated by the timer will be applied after samplers pre-processors execution and
+&nbsp; * before actual sampling.
+&nbsp; * &lt;p&gt;
+&nbsp; * Take into consideration that timers applies to all samplers in their scope: if added at test plan
+&nbsp; * level, it will apply to all samplers in test plan; if added at thread group level, it will apply
+&nbsp; * only to samples in such thread group; if added as child of a sampler, it will only apply to that
+&nbsp; * sampler.
+&nbsp; *
+&nbsp; * @since 0.62
+&nbsp; */
+&nbsp;public class DslConstantTimer extends BaseTimer {
+&nbsp;
+&nbsp;  protected String duration;
+&nbsp;
+&nbsp;  public DslConstantTimer(String duration) {
+<b class="fc">&nbsp;    super(&quot;Constant Timer&quot;, ConstantTimerGui.class);</b>
+<b class="fc">&nbsp;    this.duration = duration;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Deprecated
+&nbsp;  public DslConstantTimer(Duration duration) {
+<b class="nc">&nbsp;    this(String.valueOf(duration.toMillis()));</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  protected TestElement buildTestElement() {
+<b class="fc">&nbsp;    ConstantTimer ret = new ConstantTimer();</b>
+<b class="fc">&nbsp;    ret.setDelay(duration);</b>
+<b class="fc">&nbsp;    return ret;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  public static class CodeBuilder extends SingleTestElementCallBuilder&lt;ConstantTimer&gt; {
+&nbsp;
+&nbsp;    public CodeBuilder(List&lt;Method&gt; builderMethods) {
+<b class="fc">&nbsp;      super(ConstantTimer.class, builderMethods);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected MethodCall buildMethodCall(ConstantTimer testElement, MethodCallContext context) {
+<b class="fc">&nbsp;      TestElementParamBuilder paramBuilder = new TestElementParamBuilder(testElement);</b>
+<b class="fc">&nbsp;      MethodParam delay = paramBuilder.durationParamMillis(RandomTimer.DELAY, null);</b>
+<b class="fc">&nbsp;      return delay instanceof DurationParam &amp;&amp; ((DurationParam) delay).getValue().isZero()</b>
+<b class="nc">&nbsp;          ? MethodCall.emptyCall()</b>
+<b class="fc">&nbsp;          : buildMethodCall(delay);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;  }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-03 20:57</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,244 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=GBK"> 
+  <title>Coverage Report > DslSimpleThreadGroup</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">us.abstracta.jmeter.javadsl.core.threadgroups</a>
+</div>
+
+<h1>Coverage Summary for Class: DslSimpleThreadGroup (us.abstracta.jmeter.javadsl.core.threadgroups)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DslSimpleThreadGroup</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (5/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (14/14)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">DslSimpleThreadGroup$SimpleThreadGroupCodeBuilder</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (8/8)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (7/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (22/22)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package us.abstracta.jmeter.javadsl.core.threadgroups;
+&nbsp;
+&nbsp;import java.lang.reflect.Method;
+&nbsp;import java.util.List;
+&nbsp;import org.apache.jmeter.control.LoopController;
+&nbsp;import org.apache.jmeter.gui.JMeterGUIComponent;
+&nbsp;import org.apache.jmeter.testelement.TestElement;
+&nbsp;import org.apache.jmeter.threads.AbstractThreadGroup;
+&nbsp;import org.apache.jmeter.threads.ThreadGroup;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.MethodCall;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.MethodCallContext;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.SingleTestElementCallBuilder;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.TestElementParamBuilder;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.params.ChildrenParam;
+&nbsp;
+&nbsp;/**
+&nbsp; * Contains common logic for thread groups that only require children in constructor and provide
+&nbsp; * simple settings (like iterations, threads, etc).
+&nbsp; *
+&nbsp; * @param &lt;T&gt; is the type of the thread group. Used for proper contract definition of fluent builder
+&nbsp; *            methods.
+&nbsp; * @since 0.33
+&nbsp; */
+&nbsp;public abstract class DslSimpleThreadGroup&lt;T extends DslSimpleThreadGroup&lt;T&gt;&gt; extends
+&nbsp;    BaseThreadGroup&lt;T&gt; {
+&nbsp;
+<b class="fc">&nbsp;  protected int threadCount = 1;</b>
+<b class="fc">&nbsp;  protected int iterations = 1;</b>
+&nbsp;
+&nbsp;  protected DslSimpleThreadGroup(String name, Class&lt;? extends JMeterGUIComponent&gt; guiClass,
+&nbsp;      List&lt;ThreadGroupChild&gt; children) {
+<b class="fc">&nbsp;    super(name, guiClass, children);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Allows specifying the number of iterations (times) to run the child elements of the thread
+&nbsp;   * group for each configured thread.
+&nbsp;   *
+&nbsp;   * @param iterations contains number of iterations to run in each thread of the thread group. When
+&nbsp;   *                   -1 is specified, then the thread group will have no limit of iterations and
+&nbsp;   *                   will run until some other condition (like on error and stopping on error is
+&nbsp;   *                   configured) stops the thread group. By default, this value is initialized to
+&nbsp;   *                   1.
+&nbsp;   * @return the thread group for further configuration or usage.
+&nbsp;   */
+&nbsp;  public T iterations(int iterations) {
+<b class="fc">&nbsp;    this.iterations = iterations;</b>
+<b class="fc">&nbsp;    return (T) this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Allows specifying the number of threads to run in parallel iterations of provided tasks.
+&nbsp;   *
+&nbsp;   * @param threadCount is the number of threads to use. By default is 1.
+&nbsp;   * @return the thread group for further configuration or usage.
+&nbsp;   */
+&nbsp;  public T threadCount(int threadCount) {
+<b class="fc">&nbsp;    this.threadCount = threadCount;</b>
+<b class="fc">&nbsp;    return (T) this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Allows specifying thread group children elements (samplers, listeners, post processors, etc.).
+&nbsp;   * &lt;p&gt;
+&nbsp;   * This method is just an alternative to the constructor specification of children, and is handy
+&nbsp;   * when you want to keep general thread group settings together and then specify children (instead
+&nbsp;   * of specifying children and at the end alternative settings like iterations).
+&nbsp;   *
+&nbsp;   * @param children list of test elements to add as children of the thread group.
+&nbsp;   * @return the altered thread group to allow for fluent API usage.
+&nbsp;   */
+&nbsp;  @Override
+&nbsp;  public T children(ThreadGroupChild... children) {
+<b class="fc">&nbsp;    return super.children(children);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  protected AbstractThreadGroup buildThreadGroup() {
+<b class="fc">&nbsp;    AbstractThreadGroup ret = buildSimpleThreadGroup();</b>
+<b class="fc">&nbsp;    LoopController loopController = new LoopController();</b>
+<b class="fc">&nbsp;    ret.setNumThreads(threadCount);</b>
+<b class="fc">&nbsp;    ret.setSamplerController(loopController);</b>
+<b class="fc">&nbsp;    loopController.setLoops(iterations);</b>
+<b class="fc">&nbsp;    return ret;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  protected abstract AbstractThreadGroup buildSimpleThreadGroup();
+&nbsp;
+&nbsp;  protected abstract static class SimpleThreadGroupCodeBuilder&lt;T extends TestElement&gt; extends
+&nbsp;      SingleTestElementCallBuilder&lt;T&gt; {
+&nbsp;
+&nbsp;    private final String defaultName;
+&nbsp;
+&nbsp;    protected SimpleThreadGroupCodeBuilder(Class&lt;T&gt; testElementClass, String defaultName,
+&nbsp;        List&lt;Method&gt; builderMethods) {
+<b class="fc">&nbsp;      super(testElementClass, builderMethods);</b>
+<b class="fc">&nbsp;      this.defaultName = defaultName;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected MethodCall buildMethodCall(T testElement, MethodCallContext context) {
+<b class="fc">&nbsp;      TestElementParamBuilder paramBuilder = new TestElementParamBuilder(testElement);</b>
+<b class="fc">&nbsp;      return buildMethodCall(paramBuilder.nameParam(defaultName),</b>
+&nbsp;          new ChildrenParam&lt;&gt;(ThreadGroupChild[].class))
+<b class="fc">&nbsp;          .chain(&quot;threadCount&quot;, paramBuilder.intParam(ThreadGroup.NUM_THREADS, 1))</b>
+<b class="fc">&nbsp;          .chain(&quot;iterations&quot;,</b>
+<b class="fc">&nbsp;              paramBuilder.intParam(ThreadGroup.MAIN_CONTROLLER + &quot;/&quot; + LoopController.LOOPS, 1))</b>
+<b class="fc">&nbsp;          .chain(&quot;sampleErrorAction&quot;, paramBuilder.enumParam(AbstractThreadGroup.ON_SAMPLE_ERROR,</b>
+&nbsp;              SampleErrorAction.CONTINUE));
+&nbsp;    }
+&nbsp;
+&nbsp;  }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-03 22:39</div>
+</div>
+</body>
+</html>

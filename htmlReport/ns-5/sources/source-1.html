@@ -1,0 +1,424 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=GBK"> 
+  <title>Coverage Report > DslJsonAssertion</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">us.abstracta.jmeter.javadsl.core.assertions</a>
+</div>
+
+<h1>Coverage Summary for Class: DslJsonAssertion (us.abstracta.jmeter.javadsl.core.assertions)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DslJsonAssertion</td>
+<td class="coverageStat">
+  <span class="percent">
+    90.9%
+  </span>
+  <span class="absValue">
+    (10/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    91.5%
+  </span>
+  <span class="absValue">
+    (43/47)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">DslJsonAssertion$CodeBuilder</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (8/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (30/30)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">DslJsonAssertion$NullParam</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/3)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    95.5%
+  </span>
+  <span class="absValue">
+    (21/22)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    95%
+  </span>
+  <span class="absValue">
+    (76/80)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package us.abstracta.jmeter.javadsl.core.assertions;
+&nbsp;
+&nbsp;import com.fasterxml.jackson.core.JsonProcessingException;
+&nbsp;import com.fasterxml.jackson.databind.ObjectMapper;
+&nbsp;import java.lang.reflect.Method;
+&nbsp;import java.util.List;
+&nbsp;import org.apache.jmeter.assertions.JSONPathAssertion;
+&nbsp;import org.apache.jmeter.assertions.gui.JSONPathAssertionGui;
+&nbsp;import org.apache.jmeter.assertions.jmespath.JMESPathAssertion;
+&nbsp;import org.apache.jmeter.assertions.jmespath.gui.JMESPathAssertionGui;
+&nbsp;import org.apache.jmeter.testelement.TestElement;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.MethodCall;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.MethodCallBuilder;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.MethodCallContext;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.MethodParam;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.TestElementParamBuilder;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.params.StringParam;
+&nbsp;import us.abstracta.jmeter.javadsl.core.postprocessors.DslJsonExtractor.CodeBuilder.JsonPathQueryLanguageParam;
+&nbsp;import us.abstracta.jmeter.javadsl.core.postprocessors.DslJsonExtractor.JsonQueryLanguage;
+&nbsp;import us.abstracta.jmeter.javadsl.core.testelements.BaseTestElement;
+&nbsp;
+&nbsp;/**
+&nbsp; * Allows asserting that part of a JSON response exists or has some value.
+&nbsp; * &lt;p&gt;
+&nbsp; * By default, the assertion will just check for the existence of given JSON JMESPath.
+&nbsp; *
+&nbsp; * @since 1.15
+&nbsp; */
+&nbsp;public class DslJsonAssertion extends BaseTestElement implements DslAssertion {
+&nbsp;
+&nbsp;  private static final String DEFAULT_JMESPATH_NAME = &quot;JSON JMESPath Assertion&quot;;
+&nbsp;  private static final String DEFAULT_JSONPATH_NAME = &quot;JSON Assertion&quot;;
+<b class="fc">&nbsp;  private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();</b>
+&nbsp;
+&nbsp;  protected String query;
+&nbsp;  protected boolean isRegex;
+&nbsp;  protected boolean validateValue;
+&nbsp;  protected String value;
+&nbsp;  protected boolean not;
+<b class="fc">&nbsp;  protected JsonQueryLanguage queryLanguage = JsonQueryLanguage.JMES_PATH;</b>
+&nbsp;
+&nbsp;  public DslJsonAssertion(String name, String query) {
+<b class="fc">&nbsp;    super(name, null);</b>
+<b class="fc">&nbsp;    this.query = query;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Specifies to check the value extracted with the given query to match the given regular
+&nbsp;   * expression.
+&nbsp;   *
+&nbsp;   * @param regex specifies the regular expression to check extracted value with.
+&nbsp;   * @return the assertion element for further configuration or usage.
+&nbsp;   */
+&nbsp;  public DslJsonAssertion matches(String regex) {
+<b class="fc">&nbsp;    validateValue = true;</b>
+<b class="fc">&nbsp;    isRegex = true;</b>
+<b class="fc">&nbsp;    value = regex;</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Specifies to check the value extracted is the given value.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * &lt;b&gt;Warning:&lt;/b&gt; This method serializes the value with Jackson library and then configures
+&nbsp;   * JMeter element with such value. If you want to pass the raw JSON to compare with, use
+&nbsp;   * {@link #equalsToJson(String)} instead.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * If you want to use a JMeter expression (Eg: {@code &quot;${VAR}&quot;}) for checking for some primitive
+&nbsp;   * type (like int or boolean), then use {@link #equalsToJson(String)} instead.
+&nbsp;   *
+&nbsp;   * @param value specifies the value to check the extracted value against. Here you can pass
+&nbsp;   *              primitive types (like ints, booleans, etc), Strings, collections (lists, maps),
+&nbsp;   *              arrays, and even objects to be serialized with Jackson library. You can also
+&nbsp;   *              specify null if you want to check if extracted value is null.
+&nbsp;   * @return the assertion element for further configuration or usage.
+&nbsp;   * @see #equalsToJson(String)
+&nbsp;   */
+&nbsp;  public DslJsonAssertion equalsTo(Object value) {
+<b class="fc">&nbsp;    validateValue = true;</b>
+<b class="fc">&nbsp;    isRegex = false;</b>
+&nbsp;    try {
+<b class="fc">&nbsp;      this.value = value != null ? OBJECT_MAPPER.writeValueAsString(value) : null;</b>
+<b class="nc">&nbsp;    } catch (JsonProcessingException e) {</b>
+<b class="nc">&nbsp;      throw new IllegalArgumentException(e);</b>
+<b class="fc">&nbsp;    }</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Specifies the raw JSON value to check the extracted value is equals to.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * When using this method you must provide the actual JSON representation of the value. For
+&nbsp;   * example, if you want to check the value is a given string, then you have to quote it like
+&nbsp;   * {@code &quot;\&quot;test string\&quot;&quot;}.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * In general prefer using {@link #equalsTo(Object)} which is simpler.
+&nbsp;   *
+&nbsp;   * @param json specifies the raw json to check the extracted value against. You can specify here
+&nbsp;   *             simple values like {@code &quot;1&quot;}, {@code &quot;\&quot;test string\&quot;&quot;}, or more complex ones
+&nbsp;   *             like {@code &quot;[1, 2, 3]&quot;} or {@code &quot;{\&quot;prop\&quot;: 1}&quot;}. If you want to use a JMeter
+&nbsp;   *             expression (eg: {@code &quot;${VAR}&quot;}) for checking for a string value, you should add
+&nbsp;   *             quotes to it (eg: {@code &quot;\&quot;${VAR}\&quot;&quot;}).
+&nbsp;   * @return the assertion element for further configuration or usage.
+&nbsp;   * @see #equalsTo(Object)
+&nbsp;   * @since 1.16
+&nbsp;   */
+&nbsp;  public DslJsonAssertion equalsToJson(String json) {
+<b class="fc">&nbsp;    validateValue = true;</b>
+<b class="fc">&nbsp;    isRegex = false;</b>
+<b class="fc">&nbsp;    this.value = json;</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Allows to check the inverse/negated condition specified by the rest of assertion settings.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * For example, you can use it to check that a given path doesn&#39;t exist, or that extracted value
+&nbsp;   * is not a given one or does not match a given pattern.
+&nbsp;   *
+&nbsp;   * @return the assertion element for further configuration or usage.
+&nbsp;   */
+&nbsp;  public DslJsonAssertion not() {
+<b class="fc">&nbsp;    not = !not;</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Sames as {@link #not} but allowing to enable/disable the setting with a variable.
+&nbsp;   *
+&nbsp;   * @param negated when true, specifies to negate the check. When false, specifies to not negate
+&nbsp;   *                the check.
+&nbsp;   * @return the assertion element for further configuration or usage.
+&nbsp;   */
+&nbsp;  public DslJsonAssertion not(boolean negated) {
+<b class="nc">&nbsp;    not = negated;</b>
+<b class="nc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Allows selecting the query language to use for JSON assertion.
+&nbsp;   *
+&nbsp;   * @param queryLanguage specifies the query language to use for assertions. When no value is
+&nbsp;   *                      specified, JMESPath is used by default.
+&nbsp;   * @return the assertion for further configuration and usage.
+&nbsp;   * @see JsonQueryLanguage
+&nbsp;   */
+&nbsp;  public DslJsonAssertion queryLanguage(JsonQueryLanguage queryLanguage) {
+<b class="fc">&nbsp;    this.queryLanguage = queryLanguage;</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  protected TestElement buildTestElement() {
+<b class="fc">&nbsp;    return queryLanguage == JsonQueryLanguage.JMES_PATH ? buildJmesPathAssertion()</b>
+<b class="fc">&nbsp;        : buildJsonPathAssertion();</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private TestElement buildJmesPathAssertion() {
+<b class="fc">&nbsp;    name = name != null ? name : DEFAULT_JMESPATH_NAME;</b>
+<b class="fc">&nbsp;    guiClass = JMESPathAssertionGui.class;</b>
+<b class="fc">&nbsp;    JMESPathAssertion ret = new JMESPathAssertion();</b>
+<b class="fc">&nbsp;    ret.setJmesPath(query);</b>
+<b class="fc">&nbsp;    ret.setJsonValidationBool(validateValue);</b>
+<b class="fc">&nbsp;    ret.setIsRegex(isRegex);</b>
+<b class="fc">&nbsp;    ret.setExpectedValue(value != null ? value.toString() : null);</b>
+<b class="fc">&nbsp;    ret.setExpectNull(validateValue &amp;&amp; value == null);</b>
+<b class="fc">&nbsp;    ret.setInvert(not);</b>
+<b class="fc">&nbsp;    return ret;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private TestElement buildJsonPathAssertion() {
+<b class="fc">&nbsp;    name = name != null ? name : DEFAULT_JSONPATH_NAME;</b>
+<b class="fc">&nbsp;    guiClass = JSONPathAssertionGui.class;</b>
+<b class="fc">&nbsp;    JSONPathAssertion ret = new JSONPathAssertion();</b>
+<b class="fc">&nbsp;    ret.setJsonPath(query);</b>
+<b class="fc">&nbsp;    ret.setJsonValidationBool(validateValue);</b>
+<b class="fc">&nbsp;    ret.setIsRegex(isRegex);</b>
+<b class="fc">&nbsp;    ret.setExpectedValue(value != null ? value.toString() : null);</b>
+<b class="fc">&nbsp;    ret.setExpectNull(validateValue &amp;&amp; value == null);</b>
+<b class="fc">&nbsp;    ret.setInvert(not);</b>
+<b class="fc">&nbsp;    return ret;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  public static class CodeBuilder extends MethodCallBuilder {
+&nbsp;
+&nbsp;    public CodeBuilder(List&lt;Method&gt; builderMethods) {
+<b class="fc">&nbsp;      super(builderMethods);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean matches(MethodCallContext context) {
+<b class="fc">&nbsp;      TestElement testElement = context.getTestElement();</b>
+<b class="fc">&nbsp;      return testElement.getClass() == JMESPathAssertion.class</b>
+<b class="fc">&nbsp;          || testElement.getClass() == JSONPathAssertion.class;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected MethodCall buildMethodCall(MethodCallContext context) {
+<b class="fc">&nbsp;      return context.getTestElement().getClass() == JSONPathAssertion.class</b>
+<b class="fc">&nbsp;          ? buildJsonPathMethodCall(context)</b>
+<b class="fc">&nbsp;          : buildJmesPathMethodCall(context);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private MethodCall buildJsonPathMethodCall(MethodCallContext context) {
+<b class="fc">&nbsp;      TestElement testElement = context.getTestElement();</b>
+<b class="fc">&nbsp;      TestElementParamBuilder paramBuilder = new TestElementParamBuilder(testElement);</b>
+<b class="fc">&nbsp;      MethodCall ret = buildAssertionMethodCall(DEFAULT_JSONPATH_NAME, JSONPathAssertion.JSONPATH,</b>
+&nbsp;          paramBuilder);
+<b class="fc">&nbsp;      ret.chain(&quot;queryLanguage&quot;, new JsonPathQueryLanguageParam());</b>
+<b class="fc">&nbsp;      chainNot(ret, JSONPathAssertion.INVERT, paramBuilder);</b>
+<b class="fc">&nbsp;      chainValueMatch(ret, JSONPathAssertion.JSONVALIDATION, JSONPathAssertion.ISREGEX,</b>
+&nbsp;          JSONPathAssertion.EXPECTEDVALUE, JSONPathAssertion.EXPECT_NULL, testElement);
+<b class="fc">&nbsp;      return ret;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private MethodCall buildAssertionMethodCall(String defaultName, String queryProp,
+&nbsp;        TestElementParamBuilder paramBuilder) {
+<b class="fc">&nbsp;      return buildMethodCall(paramBuilder.nameParam(defaultName),</b>
+<b class="fc">&nbsp;          paramBuilder.stringParam(queryProp));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void chainNot(MethodCall ret, String propName,
+&nbsp;        TestElementParamBuilder paramBuilder) {
+<b class="fc">&nbsp;      ret.chain(&quot;not&quot;, paramBuilder.boolParam(propName, false));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void chainValueMatch(MethodCall ret, String validationProp, String regexProp,
+&nbsp;        String valueProp, String nullProp, TestElement element) {
+<b class="fc">&nbsp;      if (!element.getPropertyAsBoolean(validationProp)) {</b>
+&nbsp;        return;
+&nbsp;      }
+<b class="fc">&nbsp;      if (element.getPropertyAsBoolean(regexProp)) {</b>
+<b class="fc">&nbsp;        ret.chain(&quot;matches&quot;,</b>
+<b class="fc">&nbsp;            new StringParam(element.getPropertyAsString(valueProp)));</b>
+&nbsp;      } else {
+<b class="fc">&nbsp;        if (element.getPropertyAsBoolean(nullProp)) {</b>
+<b class="fc">&nbsp;          ret.chain(&quot;equalsTo&quot;, new NullParam());</b>
+&nbsp;        } else {
+<b class="fc">&nbsp;          ret.chain(&quot;equalsToJson&quot;, new StringParam(element.getPropertyAsString(valueProp)));</b>
+&nbsp;        }
+&nbsp;      }
+&nbsp;    }
+&nbsp;
+&nbsp;    private MethodCall buildJmesPathMethodCall(MethodCallContext context) {
+<b class="fc">&nbsp;      TestElement testElement = context.getTestElement();</b>
+<b class="fc">&nbsp;      TestElementParamBuilder paramBuilder = new TestElementParamBuilder(testElement);</b>
+<b class="fc">&nbsp;      MethodCall ret = buildAssertionMethodCall(DEFAULT_JMESPATH_NAME, &quot;JMES_PATH&quot;,</b>
+&nbsp;          paramBuilder);
+<b class="fc">&nbsp;      chainNot(ret, &quot;INVERT&quot;, paramBuilder);</b>
+<b class="fc">&nbsp;      chainValueMatch(ret, &quot;JSONVALIDATION&quot;, &quot;ISREGEX&quot;, &quot;EXPECTED_VALUE&quot;, &quot;EXPECT_NULL&quot;,</b>
+&nbsp;          testElement);
+<b class="fc">&nbsp;      return ret;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;  }
+&nbsp;
+&nbsp;  private static class NullParam extends MethodParam {
+&nbsp;
+&nbsp;    protected NullParam() {
+<b class="fc">&nbsp;      super(Object.class, null);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean isDefault() {
+<b class="fc">&nbsp;      return false;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected String buildCode(String indent) {
+<b class="fc">&nbsp;      return &quot;null&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;  }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-03 20:57</div>
+</div>
+</body>
+</html>

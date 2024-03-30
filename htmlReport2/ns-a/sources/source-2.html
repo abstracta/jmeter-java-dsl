@@ -1,0 +1,131 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=GBK"> 
+  <title>Coverage Report > AutoStopComparison</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">us.abstracta.jmeter.javadsl.core.listeners.autostop</a>
+</div>
+
+<h1>Coverage Summary for Class: AutoStopComparison (us.abstracta.jmeter.javadsl.core.listeners.autostop)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">AutoStopComparison</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (8/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (10/10)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package us.abstracta.jmeter.javadsl.core.listeners.autostop;
+&nbsp;
+&nbsp;import java.util.function.BiFunction;
+&nbsp;
+<b class="fc">&nbsp;public enum AutoStopComparison {</b>
+<b class="fc">&nbsp;  LT(&quot;&lt;&quot;, (v1, v2) -&gt; v1.compareTo(v2) &lt; 0),</b>
+<b class="fc">&nbsp;  LTE(&quot;&lt;=&quot;, (v1, v2) -&gt; v1.compareTo(v2) &lt;= 0),</b>
+<b class="fc">&nbsp;  GT(&quot;&gt;&quot;, (v1, v2) -&gt; v1.compareTo(v2) &gt; 0),</b>
+<b class="fc">&nbsp;  GTE(&quot;&gt;=&quot;, (v1, v2) -&gt; v1.compareTo(v2) &gt;= 0);</b>
+&nbsp;
+&nbsp;  private final String name;
+&nbsp;  private final BiFunction&lt;Comparable, Comparable, Boolean&gt; comparator;
+&nbsp;
+<b class="fc">&nbsp;  AutoStopComparison(String name, BiFunction&lt;Comparable, Comparable, Boolean&gt; comparator) {</b>
+<b class="fc">&nbsp;    this.name = name;</b>
+<b class="fc">&nbsp;    this.comparator = comparator;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  boolean compare(Comparable&lt;?&gt; v1, Comparable&lt;?&gt; v2) {
+<b class="fc">&nbsp;    return comparator.apply(v1, v2);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  public String getName() {
+<b class="fc">&nbsp;    return name;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-03 22:39</div>
+</div>
+</body>
+</html>

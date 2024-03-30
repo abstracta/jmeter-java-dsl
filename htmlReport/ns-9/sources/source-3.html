@@ -1,0 +1,258 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=GBK"> 
+  <title>Coverage Report > DslBackendListener</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">us.abstracta.jmeter.javadsl.core.listeners</a>
+</div>
+
+<h1>Coverage Summary for Class: DslBackendListener (us.abstracta.jmeter.javadsl.core.listeners)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DslBackendListener</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (5/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    90.5%
+  </span>
+  <span class="absValue">
+    (19/21)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">DslBackendListener$BackendListenerCodeBuilder</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    88.2%
+  </span>
+  <span class="absValue">
+    (15/17)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (9/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    89.5%
+  </span>
+  <span class="absValue">
+    (34/38)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package us.abstracta.jmeter.javadsl.core.listeners;
+&nbsp;
+&nbsp;import java.lang.reflect.Method;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import org.apache.jmeter.config.Argument;
+&nbsp;import org.apache.jmeter.config.Arguments;
+&nbsp;import org.apache.jmeter.testelement.TestElement;
+&nbsp;import org.apache.jmeter.testelement.property.JMeterProperty;
+&nbsp;import org.apache.jmeter.visualizers.backend.BackendListener;
+&nbsp;import org.apache.jmeter.visualizers.backend.BackendListenerClient;
+&nbsp;import org.apache.jmeter.visualizers.backend.BackendListenerGui;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.MethodCall;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.MethodCallBuilder;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.MethodCallContext;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.MethodParam;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.TestElementParamBuilder;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.params.StringParam;
+&nbsp;
+&nbsp;/**
+&nbsp; * Contains common logic used by test elements that use the backend listener.
+&nbsp; *
+&nbsp; * @since 0.20
+&nbsp; */
+&nbsp;public abstract class DslBackendListener&lt;T extends DslBackendListener&lt;T&gt;&gt; extends BaseListener {
+&nbsp;
+&nbsp;  protected final String url;
+&nbsp;  protected final Class&lt;? extends BackendListenerClient&gt; listenerClass;
+<b class="fc">&nbsp;  protected int queueSize = 5000;</b>
+&nbsp;
+&nbsp;  protected DslBackendListener(Class&lt;? extends BackendListenerClient&gt; listenerClass, String url) {
+<b class="fc">&nbsp;    super(&quot;Backend Listener&quot;, BackendListenerGui.class);</b>
+<b class="fc">&nbsp;    this.url = url;</b>
+<b class="fc">&nbsp;    this.listenerClass = listenerClass;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Specifies the length of sample results queue used to asynchronously send the information to the
+&nbsp;   * backend service.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * When the queue reaches this limit, then the test plan execution will be affected since sample
+&nbsp;   * results will get blocked until there is space in the queue, affecting the general execution of
+&nbsp;   * the test plan and in consequence collected metrics.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * When not specified, this value defaults to 5000.
+&nbsp;   *
+&nbsp;   * @param queueSize the size of the queue to use.
+&nbsp;   * @return the listener for further configuration or usage.
+&nbsp;   */
+&nbsp;  public T queueSize(int queueSize) {
+<b class="fc">&nbsp;    this.queueSize = queueSize;</b>
+<b class="fc">&nbsp;    return (T) this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  protected TestElement buildTestElement() {
+<b class="fc">&nbsp;    BackendListener ret = new BackendListener();</b>
+<b class="fc">&nbsp;    ret.setClassname(listenerClass.getName());</b>
+<b class="fc">&nbsp;    ret.setQueueSize(String.valueOf(queueSize));</b>
+<b class="fc">&nbsp;    ret.setArguments(buildArguments());</b>
+<b class="fc">&nbsp;    return ret;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private Arguments buildArguments() {
+&nbsp;    try {
+<b class="fc">&nbsp;      Arguments ret = listenerClass.newInstance().getDefaultParameters();</b>
+<b class="fc">&nbsp;      addAllArguments(buildListenerArguments(), ret);</b>
+<b class="fc">&nbsp;      return ret;</b>
+<b class="nc">&nbsp;    } catch (InstantiationException | IllegalAccessException e) {</b>
+<b class="nc">&nbsp;      throw new RuntimeException(e);</b>
+&nbsp;    }
+&nbsp;  }
+&nbsp;
+&nbsp;  protected abstract Arguments buildListenerArguments();
+&nbsp;
+&nbsp;  private void addAllArguments(Arguments args, Arguments ret) {
+<b class="fc">&nbsp;    for (JMeterProperty prop : args) {</b>
+<b class="fc">&nbsp;      Argument arg = (Argument) prop.getObjectValue();</b>
+<b class="fc">&nbsp;      ret.removeArgument(arg.getName());</b>
+<b class="fc">&nbsp;      ret.addArgument(arg.getName(), arg.getValue());</b>
+<b class="fc">&nbsp;    }</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  protected abstract static class BackendListenerCodeBuilder extends MethodCallBuilder {
+&nbsp;
+&nbsp;    private final Class&lt;? extends BackendListenerClient&gt; backendListenerClass;
+&nbsp;
+&nbsp;    public BackendListenerCodeBuilder(Class&lt;? extends BackendListenerClient&gt; backendListenerClass,
+&nbsp;        List&lt;Method&gt; builderMethods) {
+<b class="fc">&nbsp;      super(builderMethods);</b>
+<b class="fc">&nbsp;      this.backendListenerClass = backendListenerClass;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean matches(MethodCallContext context) {
+<b class="fc">&nbsp;      TestElement testElement = context.getTestElement();</b>
+<b class="fc">&nbsp;      return testElement instanceof BackendListener</b>
+<b class="fc">&nbsp;          &amp;&amp; backendListenerClass.getName().equals(((BackendListener) testElement).getClassname());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected MethodCall buildMethodCall(MethodCallContext context) {
+&nbsp;      try {
+<b class="fc">&nbsp;        TestElementParamBuilder paramBuilder = new TestElementParamBuilder(</b>
+<b class="fc">&nbsp;            context.getTestElement());</b>
+<b class="fc">&nbsp;        Map&lt;String, String&gt; args = ((BackendListener) context.getTestElement()).getArguments()</b>
+<b class="fc">&nbsp;            .getArgumentsAsMap();</b>
+<b class="fc">&nbsp;        Map&lt;String, String&gt; defaultValues = backendListenerClass.newInstance()</b>
+<b class="fc">&nbsp;            .getDefaultParameters()</b>
+<b class="fc">&nbsp;            .getArgumentsAsMap();</b>
+<b class="fc">&nbsp;        return buildBackendListenerCall(args, defaultValues)</b>
+<b class="fc">&nbsp;            .chain(&quot;queueSize&quot;, paramBuilder.intParam(BackendListener.QUEUE_SIZE));</b>
+<b class="nc">&nbsp;      } catch (InstantiationException | IllegalAccessException e) {</b>
+<b class="nc">&nbsp;        throw new RuntimeException(e);</b>
+&nbsp;      }
+&nbsp;    }
+&nbsp;
+&nbsp;    protected abstract MethodCall buildBackendListenerCall(Map&lt;String, String&gt; args,
+&nbsp;        Map&lt;String, String&gt; defaultValues);
+&nbsp;
+&nbsp;    protected MethodParam buildArgParam(String argName, Map&lt;String, String&gt; args,
+&nbsp;        Map&lt;String, String&gt; defaultArgs) {
+<b class="fc">&nbsp;      return new StringParam(args.get(argName), defaultArgs.get(argName));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;  }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-03 20:57</div>
+</div>
+</body>
+</html>

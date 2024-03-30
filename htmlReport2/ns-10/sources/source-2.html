@@ -1,0 +1,394 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=GBK"> 
+  <title>Coverage Report > DslJsr223TestElement</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">us.abstracta.jmeter.javadsl.core.testelements</a>
+</div>
+
+<h1>Coverage Summary for Class: DslJsr223TestElement (us.abstracta.jmeter.javadsl.core.testelements)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DslJsr223TestElement</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (6/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (18/18)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">DslJsr223TestElement$Jsr223DslLambdaTestElement</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (10/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    90.5%
+  </span>
+  <span class="absValue">
+    (19/21)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">DslJsr223TestElement$Jsr223Script</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">DslJsr223TestElement$Jsr223ScriptVars</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/4)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">DslJsr223TestElement$Jsr223TestElementCallBuilder</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (6/6)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (20/20)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    96.1%
+  </span>
+  <span class="absValue">
+    (49/51)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package us.abstracta.jmeter.javadsl.core.testelements;
+&nbsp;
+&nbsp;import java.lang.reflect.Method;
+&nbsp;import java.util.List;
+&nbsp;import org.apache.jmeter.config.ConfigTestElement;
+&nbsp;import org.apache.jmeter.config.gui.SimpleConfigGui;
+&nbsp;import org.apache.jmeter.engine.event.LoopIterationEvent;
+&nbsp;import org.apache.jmeter.engine.event.LoopIterationListener;
+&nbsp;import org.apache.jmeter.engine.util.ConfigMergabilityIndicator;
+&nbsp;import org.apache.jmeter.testbeans.TestBean;
+&nbsp;import org.apache.jmeter.testbeans.gui.TestBeanGUI;
+&nbsp;import org.apache.jmeter.testelement.AbstractTestElement;
+&nbsp;import org.apache.jmeter.testelement.TestElement;
+&nbsp;import org.apache.jmeter.testelement.TestIterationListener;
+&nbsp;import org.apache.jmeter.testelement.ThreadListener;
+&nbsp;import org.apache.jmeter.threads.JMeterContext;
+&nbsp;import org.apache.jmeter.util.JMeterUtils;
+&nbsp;import org.apache.jmeter.util.JSR223TestElement;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.MethodCall;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.MethodCallContext;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.SingleTestElementCallBuilder;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.TestElementParamBuilder;
+&nbsp;import us.abstracta.jmeter.javadsl.core.testelements.DslJsr223TestElement.Jsr223ScriptVars;
+&nbsp;import us.abstracta.jmeter.javadsl.core.util.DslScript;
+&nbsp;import us.abstracta.jmeter.javadsl.core.util.DslScript.DslScriptRegistry;
+&nbsp;import us.abstracta.jmeter.javadsl.core.util.DslScript.DslScriptVars;
+&nbsp;
+&nbsp;/**
+&nbsp; * Abstracts common logic used by JSR223 test elements.
+&nbsp; *
+&nbsp; * @since 0.8
+&nbsp; */
+&nbsp;public abstract class DslJsr223TestElement&lt;T extends DslJsr223TestElement&lt;T, V&gt;,
+&nbsp;    V extends Jsr223ScriptVars&gt; extends BaseTestElement {
+&nbsp;
+&nbsp;  protected static final String DEFAULT_LANGUAGE = &quot;groovy&quot;;
+&nbsp;
+&nbsp;  protected final String scriptString;
+&nbsp;  protected final Jsr223Script&lt;?&gt; script;
+&nbsp;  protected final Class&lt;? extends Jsr223Script&lt;?&gt;&gt; scriptClass;
+<b class="fc">&nbsp;  protected String language = DEFAULT_LANGUAGE;</b>
+&nbsp;
+&nbsp;  public DslJsr223TestElement(String name, String defaultName, Jsr223Script&lt;?&gt; script) {
+<b class="fc">&nbsp;    this(name, defaultName, null, script, null);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private DslJsr223TestElement(String name, String defaultName, String scriptString,
+&nbsp;      Jsr223Script&lt;?&gt; script, Class&lt;? extends Jsr223Script&lt;?&gt;&gt; scriptClass) {
+<b class="fc">&nbsp;    super(name != null ? name : defaultName, TestBeanGUI.class);</b>
+<b class="fc">&nbsp;    this.script = script;</b>
+<b class="fc">&nbsp;    this.scriptString = scriptString;</b>
+<b class="fc">&nbsp;    this.scriptClass = scriptClass;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  public DslJsr223TestElement(String name, String defaultName, String script) {
+<b class="fc">&nbsp;    this(name, defaultName, script, null, null);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  public DslJsr223TestElement(String name, String defaultName,
+&nbsp;      Class&lt;? extends Jsr223Script&lt;?&gt;&gt; scriptClass) {
+<b class="fc">&nbsp;    this(name, defaultName, null, null, scriptClass);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  public T language(String language) {
+<b class="fc">&nbsp;    this.language = language;</b>
+<b class="fc">&nbsp;    return (T) this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  protected TestElement buildTestElement() {
+<b class="fc">&nbsp;    if (scriptString != null) {</b>
+<b class="fc">&nbsp;      JSR223TestElement ret = buildJsr223TestElement();</b>
+<b class="fc">&nbsp;      ret.setScriptLanguage(language);</b>
+<b class="fc">&nbsp;      ret.setScript(scriptString);</b>
+<b class="fc">&nbsp;      return ret;</b>
+&nbsp;    } else {
+<b class="fc">&nbsp;      Jsr223DslLambdaTestElement&lt;?&gt; ret = buildLambdaTestElement();</b>
+<b class="fc">&nbsp;      ret.setScriptId(script != null ? DslScriptRegistry.register(script) : scriptClass.getName());</b>
+<b class="fc">&nbsp;      return ret;</b>
+&nbsp;    }
+&nbsp;  }
+&nbsp;
+&nbsp;  protected abstract JSR223TestElement buildJsr223TestElement();
+&nbsp;
+&nbsp;  protected abstract Jsr223DslLambdaTestElement&lt;V&gt; buildLambdaTestElement();
+&nbsp;
+&nbsp;  public abstract static class Jsr223DslLambdaTestElement&lt;V extends Jsr223ScriptVars&gt; extends
+&nbsp;      AbstractTestElement implements TestBean, ThreadListener, TestIterationListener,
+&nbsp;      LoopIterationListener, ConfigMergabilityIndicator {
+&nbsp;
+&nbsp;    private static final String SCRIPT_ID_PROP = &quot;SCRIPT_ID&quot;;
+&nbsp;    private Jsr223Script&lt;V&gt; script;
+&nbsp;
+<b class="fc">&nbsp;    public Jsr223DslLambdaTestElement() {</b>
+<b class="fc">&nbsp;      setComment(</b>
+&nbsp;          &quot;Check https://abstracta.github.io/jmeter-java-dsl/guide/#lambdas for instructions on how to run this element in remote engines (like BlazeMeter) or in JMeter standalone GUI.&quot;);
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setScriptId(String scriptId) {
+<b class="fc">&nbsp;      setProperty(SCRIPT_ID_PROP, scriptId);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getScriptId() {
+<b class="fc">&nbsp;      return getPropertyAsString(SCRIPT_ID_PROP);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void threadStarted() {
+<b class="fc">&nbsp;      script = getScript();</b>
+<b class="fc">&nbsp;      if (script instanceof ThreadListener) {</b>
+<b class="fc">&nbsp;        ((ThreadListener) script).threadStarted();</b>
+&nbsp;      }
+&nbsp;    }
+&nbsp;
+&nbsp;    private Jsr223Script&lt;V&gt; getScript() {
+<b class="fc">&nbsp;      String scriptId = getScriptId();</b>
+<b class="fc">&nbsp;      Jsr223Script&lt;V&gt; script = DslScriptRegistry.findLambdaScript(scriptId);</b>
+&nbsp;      try {
+<b class="fc">&nbsp;        return script != null ? script : (Jsr223Script&lt;V&gt;) Class.forName(scriptId).newInstance();</b>
+<b class="nc">&nbsp;      } catch (ReflectiveOperationException e) {</b>
+<b class="nc">&nbsp;        throw new RuntimeException(e);</b>
+&nbsp;      }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void testIterationStart(LoopIterationEvent event) {
+<b class="fc">&nbsp;      if (script instanceof TestIterationListener) {</b>
+<b class="fc">&nbsp;        ((TestIterationListener) script).testIterationStart(event);</b>
+&nbsp;      }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void iterationStart(LoopIterationEvent iterEvent) {
+<b class="fc">&nbsp;      if (script instanceof LoopIterationListener) {</b>
+<b class="fc">&nbsp;        ((LoopIterationListener) script).iterationStart(iterEvent);</b>
+&nbsp;      }
+&nbsp;    }
+&nbsp;
+&nbsp;    public void run(V vars) throws Exception {
+<b class="fc">&nbsp;      script.run(vars);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void threadFinished() {
+<b class="fc">&nbsp;      if (script instanceof ThreadListener) {</b>
+<b class="fc">&nbsp;        ((ThreadListener) script).threadFinished();</b>
+&nbsp;      }
+&nbsp;    }
+&nbsp;
+&nbsp;    // This is required to avoid the issue https://github.com/abstracta/jmeter-java-dsl/issues/240
+&nbsp;    @Override
+&nbsp;    public boolean applies(ConfigTestElement configElement) {
+<b class="fc">&nbsp;      return SimpleConfigGui.class.getName()</b>
+<b class="fc">&nbsp;          .equals(configElement.getProperty(TestElement.GUI_CLASS).getStringValue());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;  }
+&nbsp;
+&nbsp;  protected interface Jsr223Script&lt;V extends Jsr223ScriptVars&gt; extends DslScript&lt;V, Void&gt; {
+&nbsp;
+&nbsp;    @Override
+&nbsp;    default Void run(V vars) throws Exception {
+<b class="fc">&nbsp;      runScript(vars);</b>
+<b class="fc">&nbsp;      return null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    void runScript(V vars) throws Exception;
+&nbsp;
+&nbsp;  }
+&nbsp;
+&nbsp;  public static class Jsr223ScriptVars extends DslScriptVars {
+&nbsp;
+&nbsp;    public final String label;
+&nbsp;
+&nbsp;    public Jsr223ScriptVars(TestElement testElement, JMeterContext ctx) {
+<b class="fc">&nbsp;      super(ctx.getPreviousResult(), ctx, ctx.getVariables(), JMeterUtils.getJMeterProperties(),</b>
+<b class="fc">&nbsp;          ctx.getCurrentSampler(),</b>
+<b class="fc">&nbsp;          LoggerFactory.getLogger(testElement.getClass().getName() + &quot;.&quot; + testElement.getName()));</b>
+<b class="fc">&nbsp;      this.label = testElement.getName();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;  }
+&nbsp;
+&nbsp;  public static class Jsr223TestElementCallBuilder&lt;T extends TestElement&gt; extends
+&nbsp;      SingleTestElementCallBuilder&lt;T&gt; {
+&nbsp;
+&nbsp;    private final String defaultName;
+&nbsp;
+&nbsp;    protected Jsr223TestElementCallBuilder(Class&lt;T&gt; testElementClass, String defaultName,
+&nbsp;        List&lt;Method&gt; builderMethods) {
+<b class="fc">&nbsp;      super(testElementClass, builderMethods);</b>
+<b class="fc">&nbsp;      this.defaultName = defaultName;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected MethodCall buildMethodCall(T testElement,
+&nbsp;        MethodCallContext context) {
+<b class="fc">&nbsp;      TestElementParamBuilder paramBuilder = new TestElementParamBuilder(testElement);</b>
+<b class="fc">&nbsp;      return buildMethodCall(paramBuilder.nameParam(defaultName),</b>
+<b class="fc">&nbsp;          paramBuilder.stringParam(&quot;script&quot;))</b>
+<b class="fc">&nbsp;          .chain(&quot;language&quot;, paramBuilder.stringParam(&quot;scriptLanguage&quot;, DEFAULT_LANGUAGE));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;  }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-03 22:39</div>
+</div>
+</body>
+</html>

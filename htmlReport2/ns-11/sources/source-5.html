@@ -1,0 +1,180 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=GBK"> 
+  <title>Coverage Report > DslTeardownThreadGroup</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">us.abstracta.jmeter.javadsl.core.threadgroups</a>
+</div>
+
+<h1>Coverage Summary for Class: DslTeardownThreadGroup (us.abstracta.jmeter.javadsl.core.threadgroups)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DslTeardownThreadGroup</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">DslTeardownThreadGroup$CodeBuilder</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/3)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package us.abstracta.jmeter.javadsl.core.threadgroups;
+&nbsp;
+&nbsp;import java.lang.reflect.Method;
+&nbsp;import java.util.List;
+&nbsp;import org.apache.jmeter.threads.AbstractThreadGroup;
+&nbsp;import org.apache.jmeter.threads.PostThreadGroup;
+&nbsp;import org.apache.jmeter.threads.gui.PostThreadGroupGui;
+&nbsp;
+&nbsp;/**
+&nbsp; * A thread group that allows running any logic after any other thread group.
+&nbsp; * &lt;p&gt;
+&nbsp; * Usually this thread group is used to do some clean up in target environment, leave it in a
+&nbsp; * predefined state, or to use some information obtained from the rest of the test.
+&nbsp; * &lt;p&gt;
+&nbsp; * Take into consideration when using information from other thread groups that jmeter variables
+&nbsp; * (which are thread scoped) created or updated in other thread groups are not visible in this
+&nbsp; * thread group. One way of passing information from one thread group to others can be JMeter
+&nbsp; * Properties, or files. But use them with care, taking into consideration potentially parallel
+&nbsp; * execution of threads in same thread group (or other thread groups).
+&nbsp; * &lt;p&gt;
+&nbsp; * Also consider that if you add multiple teardown thread groups in a plan, they will run in
+&nbsp; * parallel, after &quot;regular&quot; thread groups.
+&nbsp; * &lt;p&gt;
+&nbsp; * By default, the thread group will be configured with 1 thread and 1 iteration. You can change
+&nbsp; * this with provided methods.
+&nbsp; *
+&nbsp; * @since 0.33
+&nbsp; */
+&nbsp;public class DslTeardownThreadGroup extends DslSimpleThreadGroup&lt;DslTeardownThreadGroup&gt; {
+&nbsp;
+&nbsp;  private static final String DEFAULT_NAME = &quot;tearDown Thread Group&quot;;
+&nbsp;
+&nbsp;  public DslTeardownThreadGroup(String name, List&lt;ThreadGroupChild&gt; children) {
+<b class="fc">&nbsp;    super(name != null ? name : DEFAULT_NAME, PostThreadGroupGui.class, children);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  protected AbstractThreadGroup buildSimpleThreadGroup() {
+<b class="fc">&nbsp;    return new PostThreadGroup();</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  public static class CodeBuilder extends SimpleThreadGroupCodeBuilder&lt;PostThreadGroup&gt; {
+&nbsp;
+&nbsp;    public CodeBuilder(List&lt;Method&gt; builderMethods) {
+<b class="fc">&nbsp;      super(PostThreadGroup.class, DEFAULT_NAME, builderMethods);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;  }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-03 22:39</div>
+</div>
+</body>
+</html>

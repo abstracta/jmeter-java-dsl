@@ -1,0 +1,255 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=GBK"> 
+  <title>Coverage Report > DslTransactionController</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">us.abstracta.jmeter.javadsl.core.controllers</a>
+</div>
+
+<h1>Coverage Summary for Class: DslTransactionController (us.abstracta.jmeter.javadsl.core.controllers)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DslTransactionController</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (6/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (13/13)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">DslTransactionController$CodeBuilder</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (7/7)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (8/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (20/20)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package us.abstracta.jmeter.javadsl.core.controllers;
+&nbsp;
+&nbsp;import java.lang.reflect.Method;
+&nbsp;import java.util.List;
+&nbsp;import org.apache.jmeter.control.TransactionController;
+&nbsp;import org.apache.jmeter.control.gui.TransactionControllerGui;
+&nbsp;import org.apache.jmeter.testelement.TestElement;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.MethodCall;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.MethodCallContext;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.SingleTestElementCallBuilder;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.TestElementParamBuilder;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.params.ChildrenParam;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.params.StringParam;
+&nbsp;import us.abstracta.jmeter.javadsl.core.threadgroups.BaseThreadGroup.ThreadGroupChild;
+&nbsp;
+&nbsp;/**
+&nbsp; * Allows specifying JMeter transaction controllers which group different samples associated to same
+&nbsp; * transaction.
+&nbsp; * &lt;p&gt;
+&nbsp; * This is usually used when grouping different steps of a flow, for example group requests of login
+&nbsp; * flow, adding item to cart, purchase, etc. It provides aggregate metrics of all it&#39;s samples.
+&nbsp; *
+&nbsp; * @since 0.14
+&nbsp; */
+&nbsp;public class DslTransactionController extends BaseController&lt;DslTransactionController&gt; {
+&nbsp;
+<b class="fc">&nbsp;  protected boolean includeTimers = false;</b>
+<b class="fc">&nbsp;  protected boolean generateParentSample = false;</b>
+&nbsp;
+&nbsp;  public DslTransactionController(String name, List&lt;ThreadGroupChild&gt; children) {
+<b class="fc">&nbsp;    super(name, TransactionControllerGui.class, children);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Specifies to include time spent in timers and pre- and post-processors in sample results.
+&nbsp;   *
+&nbsp;   * @return the controller for further configuration or usage.
+&nbsp;   * @since 1.0
+&nbsp;   */
+&nbsp;  public DslTransactionController includeTimersAndProcessorsTime() {
+<b class="fc">&nbsp;    return includeTimersAndProcessorsTime(true);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Same as {@link #includeTimersAndProcessorsTime()} but allowing to enable or disable it.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * This is helpful when the resolution is taken at runtime.
+&nbsp;   *
+&nbsp;   * @param enable specifies to enable or disable the setting. By default, it is set to false.
+&nbsp;   * @return the controller for further configuration or usage.
+&nbsp;   * @see #includeTimersAndProcessorsTime()
+&nbsp;   * @since 0.29
+&nbsp;   */
+&nbsp;  public DslTransactionController includeTimersAndProcessorsTime(boolean enable) {
+<b class="fc">&nbsp;    includeTimers = enable;</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Specifies to create a sample result as parent of children samplers.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * It is useful in some scenarios to get transaction sample results as parent of children samplers
+&nbsp;   * to focus mainly in transactions and not be concerned about each particular request. Enabling
+&nbsp;   * parent sampler helps in this regard, only reporting the transactions in summary reports, and
+&nbsp;   * not the transaction children results.
+&nbsp;   *
+&nbsp;   * @return the controller for further configuration or usage.
+&nbsp;   * @since 1.0
+&nbsp;   */
+&nbsp;  public DslTransactionController generateParentSample() {
+<b class="fc">&nbsp;    return generateParentSample(true);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Same as {@link #generateParentSample()} but allowing to enable or disable it.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * This is helpful when the resolution is taken at runtime.
+&nbsp;   *
+&nbsp;   * @param enable specifies to enable or disable the setting. By default, it is set to false.
+&nbsp;   * @return the controller for further configuration or usage.
+&nbsp;   * @see #generateParentSample()
+&nbsp;   * @since 0.29
+&nbsp;   */
+&nbsp;  public DslTransactionController generateParentSample(boolean enable) {
+<b class="fc">&nbsp;    generateParentSample = enable;</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  protected TestElement buildTestElement() {
+<b class="fc">&nbsp;    TransactionController ret = new TransactionController();</b>
+<b class="fc">&nbsp;    ret.setGenerateParentSample(generateParentSample);</b>
+&nbsp;    // we can&#39;t use setIncludeTimers since it ignores true values
+<b class="fc">&nbsp;    ret.setProperty(&quot;TransactionController.includeTimers&quot;, includeTimers);</b>
+<b class="fc">&nbsp;    return ret;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  public static class CodeBuilder extends SingleTestElementCallBuilder&lt;TransactionController&gt; {
+&nbsp;
+&nbsp;    public CodeBuilder(List&lt;Method&gt; builderMethods) {
+<b class="fc">&nbsp;      super(TransactionController.class, builderMethods);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected MethodCall buildMethodCall(TransactionController testElement,
+&nbsp;        MethodCallContext context) {
+<b class="fc">&nbsp;      TestElementParamBuilder paramBuilder = new TestElementParamBuilder(testElement,</b>
+&nbsp;          &quot;TransactionController&quot;);
+&nbsp;      /*
+&nbsp;       we use StringParam instead of NameParam to always specify a name (even when empty).
+&nbsp;       Empty names can be generated by recorder when using automatic grouping of requests.
+&nbsp;       */
+<b class="fc">&nbsp;      MethodCall ret = buildMethodCall(new StringParam(testElement.getName()),</b>
+&nbsp;          new ChildrenParam&lt;&gt;(ThreadGroupChild[].class));
+<b class="fc">&nbsp;      if (testElement.getName().isEmpty()) {</b>
+<b class="fc">&nbsp;        ret.headingComment(</b>
+&nbsp;            &quot;TODO you should set a proper transaction name to avoid incorrect metrics reporting&quot;);
+&nbsp;      }
+<b class="fc">&nbsp;      return ret.chain(&quot;generateParentSample&quot;, paramBuilder.boolParam(&quot;parent&quot;, false))</b>
+<b class="fc">&nbsp;          .chain(&quot;includeTimersAndProcessorsTime&quot;, paramBuilder.boolParam(&quot;includeTimers&quot;, false));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;  }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-03 22:39</div>
+</div>
+</body>
+</html>

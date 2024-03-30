@@ -1,0 +1,313 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=GBK"> 
+  <title>Coverage Report > DslJsr223Sampler</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">us.abstracta.jmeter.javadsl.java</a>
+</div>
+
+<h1>Coverage Summary for Class: DslJsr223Sampler (us.abstracta.jmeter.javadsl.java)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DslJsr223Sampler</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (7/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (12/12)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">DslJsr223Sampler$CodeBuilder</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">DslJsr223Sampler$DslLambdaSampler</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    73.7%
+  </span>
+  <span class="absValue">
+    (14/19)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">DslJsr223Sampler$SamplerScript</td>
+  </tr>
+  <tr>
+    <td class="name">DslJsr223Sampler$SamplerVars</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (12/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    85.3%
+  </span>
+  <span class="absValue">
+    (29/34)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package us.abstracta.jmeter.javadsl.java;
+&nbsp;
+&nbsp;import java.lang.reflect.Method;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.List;
+&nbsp;import org.apache.jmeter.protocol.java.sampler.JSR223Sampler;
+&nbsp;import org.apache.jmeter.samplers.Entry;
+&nbsp;import org.apache.jmeter.samplers.SampleResult;
+&nbsp;import org.apache.jmeter.samplers.Sampler;
+&nbsp;import org.apache.jmeter.testelement.TestElement;
+&nbsp;import org.apache.jmeter.threads.JMeterContextService;
+&nbsp;import org.apache.jmeter.util.JSR223TestElement;
+&nbsp;import org.apache.jorphan.collections.HashTree;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;import us.abstracta.jmeter.javadsl.core.BuildTreeContext;
+&nbsp;import us.abstracta.jmeter.javadsl.core.samplers.BaseSampler.SamplerChild;
+&nbsp;import us.abstracta.jmeter.javadsl.core.samplers.DslSampler;
+&nbsp;import us.abstracta.jmeter.javadsl.core.testelements.DslJsr223TestElement;
+&nbsp;import us.abstracta.jmeter.javadsl.java.DslJsr223Sampler.SamplerVars;
+&nbsp;
+&nbsp;/**
+&nbsp; * Allows sampling java APIs and custom logic.
+&nbsp; * &lt;p&gt;
+&nbsp; * This is a very powerful component, but using it makes code harder to maintain. When there is
+&nbsp; * another sampler available that satisfy your needs use it instead of this one.
+&nbsp; * &lt;p&gt;
+&nbsp; * By default, provided script will be interpreted as groovy script, which is the default setting
+&nbsp; * for JMeter. If you need, you can use any of JMeter provided scripting languages (beanshell,
+&nbsp; * javascript, jexl, etc.) by setting the {@link #language(String)} property.
+&nbsp; *
+&nbsp; * @since 0.22
+&nbsp; */
+&nbsp;public class DslJsr223Sampler extends DslJsr223TestElement&lt;DslJsr223Sampler, SamplerVars&gt; implements
+&nbsp;    DslSampler {
+&nbsp;
+&nbsp;  private static final String DEFAULT_NAME = &quot;JSR223 Sampler&quot;;
+&nbsp;
+<b class="fc">&nbsp;  protected final List&lt;SamplerChild&gt; children = new ArrayList&lt;&gt;();</b>
+&nbsp;
+&nbsp;  public DslJsr223Sampler(String name, String script) {
+<b class="fc">&nbsp;    super(name, DEFAULT_NAME, script);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  public DslJsr223Sampler(String name, SamplerScript script) {
+<b class="fc">&nbsp;    super(name, DEFAULT_NAME, script);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  public DslJsr223Sampler(String name, Class&lt;? extends SamplerScript&gt; scriptClass) {
+<b class="fc">&nbsp;    super(name, DEFAULT_NAME, scriptClass);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Allows specifying children test elements for the sampler, which allows for example extracting
+&nbsp;   * information from response, assert response contents, etc.
+&nbsp;   *
+&nbsp;   * @param children list of test elements to add as children of this sampler.
+&nbsp;   * @return the sampler for further configuration or usage.
+&nbsp;   */
+&nbsp;  public DslJsr223Sampler children(SamplerChild... children) {
+<b class="fc">&nbsp;    this.children.addAll(Arrays.asList(children));</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  protected JSR223TestElement buildJsr223TestElement() {
+<b class="fc">&nbsp;    return new JSR223Sampler();</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  protected DslLambdaSampler buildLambdaTestElement() {
+<b class="fc">&nbsp;    name = !DEFAULT_NAME.equals(name) ? name : &quot;Lambda Sampler&quot;;</b>
+<b class="fc">&nbsp;    return new DslLambdaSampler();</b>
+&nbsp;  }
+&nbsp;
+<b class="fc">&nbsp;  public static class DslLambdaSampler extends Jsr223DslLambdaTestElement&lt;SamplerVars&gt; implements</b>
+&nbsp;      Sampler {
+&nbsp;
+<b class="fc">&nbsp;    private static final Logger LOG = LoggerFactory.getLogger(DslLambdaSampler.class);</b>
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public SampleResult sample(Entry entry) {
+<b class="fc">&nbsp;      SampleResult result = new SampleResult();</b>
+<b class="fc">&nbsp;      result.setSampleLabel(getName());</b>
+<b class="fc">&nbsp;      result.setSuccessful(true);</b>
+<b class="fc">&nbsp;      result.setResponseCodeOK();</b>
+<b class="fc">&nbsp;      result.setResponseMessageOK();</b>
+<b class="fc">&nbsp;      result.setSamplerData(&quot;Script: &quot; + getScriptId());</b>
+<b class="fc">&nbsp;      result.setDataType(SampleResult.TEXT);</b>
+<b class="fc">&nbsp;      result.sampleStart();</b>
+&nbsp;      try {
+<b class="fc">&nbsp;        run(new SamplerVars(this, result));</b>
+<b class="nc">&nbsp;      } catch (Exception e) {</b>
+<b class="nc">&nbsp;        LOG.error(&quot;Problem in lambda script {}, message: {}&quot;, getName(), e, e);</b>
+<b class="nc">&nbsp;        result.setSuccessful(false);</b>
+<b class="nc">&nbsp;        result.setResponseCode(&quot;500&quot;);</b>
+<b class="nc">&nbsp;        result.setResponseMessage(e.toString());</b>
+<b class="fc">&nbsp;      }</b>
+<b class="fc">&nbsp;      result.sampleEnd();</b>
+<b class="fc">&nbsp;      return result;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public HashTree buildTreeUnder(HashTree parent, BuildTreeContext context) {
+<b class="fc">&nbsp;    HashTree ret = super.buildTreeUnder(parent, context);</b>
+<b class="fc">&nbsp;    children.forEach(c -&gt; context.buildChild(c, ret));</b>
+<b class="fc">&nbsp;    return ret;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Allows to use any java code as script.
+&nbsp;   *
+&nbsp;   * @see DslJsr223Sampler.SamplerVars for a list of provided variables in script execution
+&nbsp;   */
+&nbsp;  public interface SamplerScript extends
+&nbsp;      DslJsr223TestElement.Jsr223Script&lt;DslJsr223Sampler.SamplerVars&gt; {
+&nbsp;
+&nbsp;  }
+&nbsp;
+&nbsp;  public static class SamplerVars extends DslJsr223TestElement.Jsr223ScriptVars {
+&nbsp;
+&nbsp;    public final SampleResult sampleResult;
+&nbsp;
+&nbsp;    public SamplerVars(TestElement element, SampleResult result) {
+<b class="fc">&nbsp;      super(element, JMeterContextService.getContext());</b>
+<b class="fc">&nbsp;      this.sampleResult = result;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;  }
+&nbsp;
+&nbsp;  public static class CodeBuilder extends Jsr223TestElementCallBuilder&lt;JSR223Sampler&gt; {
+&nbsp;
+&nbsp;    public CodeBuilder(List&lt;Method&gt; builderMethods) {
+<b class="fc">&nbsp;      super(JSR223Sampler.class, DEFAULT_NAME, builderMethods);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;  }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-03 22:39</div>
+</div>
+</body>
+</html>

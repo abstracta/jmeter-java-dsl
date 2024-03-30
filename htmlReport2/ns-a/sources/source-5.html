@@ -1,0 +1,245 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=GBK"> 
+  <title>Coverage Report > AutoStopTestBean</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">us.abstracta.jmeter.javadsl.core.listeners.autostop</a>
+</div>
+
+<h1>Coverage Summary for Class: AutoStopTestBean (us.abstracta.jmeter.javadsl.core.listeners.autostop)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">AutoStopTestBean</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    65%
+  </span>
+  <span class="absValue">
+    (13/20)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    76.5%
+  </span>
+  <span class="absValue">
+    (26/34)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package us.abstracta.jmeter.javadsl.core.listeners.autostop;
+&nbsp;
+&nbsp;import java.time.Clock;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;import java.util.regex.Pattern;
+&nbsp;import org.apache.jmeter.engine.util.NoThreadClone;
+&nbsp;import org.apache.jmeter.reporters.AbstractListenerElement;
+&nbsp;import org.apache.jmeter.samplers.SampleEvent;
+&nbsp;import org.apache.jmeter.samplers.SampleListener;
+&nbsp;import org.apache.jmeter.samplers.SampleResult;
+&nbsp;import org.apache.jmeter.testbeans.TestBean;
+&nbsp;import org.apache.jmeter.testelement.TestStateListener;
+&nbsp;import org.apache.jmeter.visualizers.Visualizer;
+&nbsp;import org.apache.jorphan.documentation.VisibleForTesting;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;import us.abstracta.jmeter.javadsl.core.engines.TestStopper;
+&nbsp;
+&nbsp;/*
+&nbsp; implementing it as a listener instead of an assertion, so it always executes after all defined
+&nbsp; assertions, and is not possible by mistake to not count some failed assertion in errors count.
+&nbsp; Needs to implement Visualizer so that TestBeanGUI can find the correct GUI class
+&nbsp; */
+&nbsp;public class AutoStopTestBean extends AbstractListenerElement implements TestBean,
+&nbsp;    SampleListener, TestStateListener, NoThreadClone, Visualizer {
+&nbsp;
+<b class="fc">&nbsp;  private static final Logger LOG = LoggerFactory.getLogger(AutoStopTestBean.class);</b>
+&nbsp;
+&nbsp;  private Pattern regex;
+&nbsp;  private List&lt;AutoStopConditionElement&gt; conditions;
+&nbsp;  private TestStopper testStopper;
+&nbsp;  private boolean stopped;
+&nbsp;
+&nbsp;  public AutoStopTestBean() {
+<b class="nc">&nbsp;    this(null, new ArrayList&lt;&gt;(), null);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  public AutoStopTestBean(Pattern regex, List&lt;AutoStopConditionElement&gt; conditions,
+<b class="fc">&nbsp;      TestStopper testStopper) {</b>
+<b class="fc">&nbsp;    this.regex = regex;</b>
+<b class="fc">&nbsp;    this.conditions = conditions;</b>
+<b class="fc">&nbsp;    this.testStopper = testStopper;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  public String getRegex() {
+<b class="fc">&nbsp;    return regex != null ? regex.toString() : null;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  public void setRegex(String regex) {
+<b class="fc">&nbsp;    this.regex = regex != null &amp;&amp; !regex.isEmpty() ? Pattern.compile(regex) : null;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  public List&lt;AutoStopConditionElement&gt; getConditions() {
+<b class="fc">&nbsp;    return conditions;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  public void setConditions(List&lt;AutoStopConditionElement&gt; conditions) {
+<b class="fc">&nbsp;    this.conditions = conditions;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  public TestStopper getTestStopper() {
+<b class="fc">&nbsp;    return testStopper;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  public void setTestStopper(TestStopper testStopper) {
+<b class="fc">&nbsp;    this.testStopper = testStopper;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public void add(SampleResult sample) {
+<b class="nc">&nbsp;  }</b>
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public boolean isStats() {
+<b class="nc">&nbsp;    return false;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public synchronized void sampleOccurred(SampleEvent e) {
+<b class="fc">&nbsp;    for (AutoStopConditionElement condition : conditions) {</b>
+<b class="fc">&nbsp;      if (condition.getRegex() == null &amp;&amp; regex != null</b>
+<b class="fc">&nbsp;          &amp;&amp; !regex.matcher(e.getResult().getSampleLabel()).matches()) {</b>
+<b class="fc">&nbsp;        break;</b>
+&nbsp;      }
+&nbsp;      /*
+&nbsp;       Since stop is async, we check that result property is not already set to avoid overriding it
+&nbsp;       and losing the original condition that triggered the stop
+&nbsp;       */
+<b class="fc">&nbsp;      if (!stopped &amp;&amp; condition.eval(e.getResult())) {</b>
+<b class="fc">&nbsp;        stopped = true;</b>
+<b class="fc">&nbsp;        String stopMessage = String.format(&quot;%s: %s%s&quot;, getName(),</b>
+<b class="fc">&nbsp;            buildSamplesMatchingMessage(condition), condition);</b>
+<b class="fc">&nbsp;        if (testStopper == null) {</b>
+<b class="nc">&nbsp;          LOG.error(&quot;{} but no test stopper configured, so is not possible to stop test execution. &quot;</b>
+&nbsp;                  + &quot;This is probably caused by a JMeter DSL engine not supporting autoStop. &quot;
+&nbsp;                  + &quot;Create an issue in the GitHub repository so we can implement proper support.&quot;,
+&nbsp;              stopMessage);
+&nbsp;          return;
+&nbsp;        }
+<b class="fc">&nbsp;        testStopper.stop(stopMessage);</b>
+&nbsp;      }
+<b class="fc">&nbsp;    }</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public void sampleStarted(SampleEvent e) {
+<b class="nc">&nbsp;  }</b>
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public void sampleStopped(SampleEvent e) {
+<b class="nc">&nbsp;  }</b>
+&nbsp;
+&nbsp;  private String buildSamplesMatchingMessage(AutoStopConditionElement condition) {
+<b class="fc">&nbsp;    return condition.getRegex() == null &amp;&amp; regex != null ? &quot;samples matching &#39;&quot; + regex + &quot;&#39; &quot; : &quot;&quot;;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public void testStarted() {
+<b class="fc">&nbsp;    conditions.forEach(AutoStopConditionElement::start);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public void testStarted(String host) {
+<b class="nc">&nbsp;    testStarted();</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public void testEnded() {
+<b class="fc">&nbsp;  }</b>
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public void testEnded(String host) {
+<b class="nc">&nbsp;  }</b>
+&nbsp;
+&nbsp;  @VisibleForTesting
+&nbsp;  public void setClock(Clock clock) {
+<b class="fc">&nbsp;    this.conditions.forEach(c -&gt; c.setClock(clock));</b>
+&nbsp;  }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-03 22:39</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,325 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=GBK"> 
+  <title>Coverage Report > AutoStopConditionElement</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">us.abstracta.jmeter.javadsl.core.listeners.autostop</a>
+</div>
+
+<h1>Coverage Summary for Class: AutoStopConditionElement (us.abstracta.jmeter.javadsl.core.listeners.autostop)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">AutoStopConditionElement</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (33/33)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    87.7%
+  </span>
+  <span class="absValue">
+    (71/81)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package us.abstracta.jmeter.javadsl.core.listeners.autostop;
+&nbsp;
+&nbsp;import java.time.Clock;
+&nbsp;import java.time.Duration;
+&nbsp;import java.time.Instant;
+&nbsp;import java.time.temporal.ChronoUnit;
+&nbsp;import org.apache.jmeter.samplers.SampleResult;
+&nbsp;import org.apache.jmeter.testelement.AbstractTestElement;
+&nbsp;import org.apache.jmeter.testelement.property.DoubleProperty;
+&nbsp;import org.apache.jmeter.testelement.property.JMeterProperty;
+&nbsp;import org.apache.jorphan.documentation.VisibleForTesting;
+&nbsp;import us.abstracta.jmeter.javadsl.core.listeners.autostop.aggregators.AutoStopAggregator;
+&nbsp;
+<b class="fc">&nbsp;public class AutoStopConditionElement extends AbstractTestElement {</b>
+&nbsp;
+&nbsp;  private static final String REGEX_PROP = &quot;regex&quot;;
+&nbsp;  private static final String METRIC_PROP = &quot;metric&quot;;
+&nbsp;  private static final String AGGREGATION_PROP = &quot;aggregation&quot;;
+&nbsp;  private static final String PERCENTILE_PROP = &quot;percentile&quot;;
+&nbsp;  private static final String AGGREGATION_RESET_PERIOD_SECONDS_PROP =
+&nbsp;      &quot;aggregationResetPeriodSeconds&quot;;
+&nbsp;  private static final String COMPARISON_PROP = &quot;comparison&quot;;
+&nbsp;  private static final String VALUE_PROP = &quot;value&quot;;
+&nbsp;  private static final String HOLDS_FOR_SECONDS_PROP = &quot;holdsForSeconds&quot;;
+&nbsp;
+<b class="fc">&nbsp;  private Clock clock = Clock.systemUTC();</b>
+&nbsp;  private Instant slotStart;
+&nbsp;  private AutoStopAggregator&lt;?&gt; aggregator;
+&nbsp;  private Instant matchStart;
+&nbsp;
+&nbsp;  public String getRegex() {
+<b class="fc">&nbsp;    return getPropertyAsString(REGEX_PROP, null);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  public void setRegex(String regex) {
+<b class="fc">&nbsp;    setProperty(REGEX_PROP, regex);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  public String getMetric() {
+<b class="fc">&nbsp;    return getPropertyAsString(METRIC_PROP);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  public void setMetric(String metric) {
+<b class="fc">&nbsp;    setProperty(METRIC_PROP, metric);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  public String getAggregation() {
+<b class="fc">&nbsp;    return getPropertyAsString(AGGREGATION_PROP);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  public void setAggregation(String aggregation) {
+<b class="fc">&nbsp;    setProperty(AGGREGATION_PROP, aggregation);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  public double getPercentile() {
+<b class="fc">&nbsp;    return getPropertyAsDouble(PERCENTILE_PROP);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  public void setPercentile(double percentile) {
+<b class="fc">&nbsp;    setProperty(new DoubleProperty(PERCENTILE_PROP, percentile));</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  public long getAggregationResetPeriodSeconds() {
+<b class="fc">&nbsp;    return getPropertyAsLong(AGGREGATION_RESET_PERIOD_SECONDS_PROP);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  public void setAggregationResetPeriodSeconds(long aggregationResetPeriod) {
+<b class="fc">&nbsp;    setProperty(AGGREGATION_RESET_PERIOD_SECONDS_PROP, aggregationResetPeriod);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  public String getComparison() {
+<b class="fc">&nbsp;    return getPropertyAsString(COMPARISON_PROP);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  public void setComparison(String comparison) {
+<b class="fc">&nbsp;    setProperty(COMPARISON_PROP, comparison);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  public Object getValue() {
+<b class="fc">&nbsp;    JMeterProperty ret = getProperty(VALUE_PROP);</b>
+&nbsp;    // not using ternary operator to avoid long being cast to double
+<b class="fc">&nbsp;    if (ret instanceof DoubleProperty) {</b>
+<b class="fc">&nbsp;      return ret.getDoubleValue();</b>
+&nbsp;    } else {
+<b class="fc">&nbsp;      return ret.getLongValue();</b>
+&nbsp;    }
+&nbsp;  }
+&nbsp;
+&nbsp;  public void setValue(Object value) {
+<b class="fc">&nbsp;    if (value instanceof Double) {</b>
+<b class="fc">&nbsp;      setProperty(new DoubleProperty(VALUE_PROP, (Double) value));</b>
+&nbsp;    } else {
+<b class="fc">&nbsp;      setProperty(VALUE_PROP, (Long) value);</b>
+&nbsp;    }
+&nbsp;  }
+&nbsp;
+&nbsp;  public long getHoldsForSeconds() {
+<b class="fc">&nbsp;    return getPropertyAsLong(HOLDS_FOR_SECONDS_PROP);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  public void setHoldsForSeconds(long holdsFor) {
+<b class="fc">&nbsp;    setProperty(HOLDS_FOR_SECONDS_PROP, holdsFor);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  Clock getClock() {
+<b class="fc">&nbsp;    return clock;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @VisibleForTesting
+&nbsp;  void setClock(Clock clock) {
+<b class="fc">&nbsp;    this.clock = clock;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  public void start() {
+<b class="fc">&nbsp;    slotStart = clock.instant();</b>
+<b class="fc">&nbsp;    aggregator = getAggregationEnumValue().buildAggregator(this);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private AutoStopAggregation getAggregationEnumValue() {
+<b class="fc">&nbsp;    return AutoStopAggregation.valueOf(getAggregation());</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  public boolean eval(SampleResult result) {
+<b class="fc">&nbsp;    if (getRegex() != null &amp;&amp; !result.getSampleLabel().matches(getRegex())) {</b>
+<b class="fc">&nbsp;      return false;</b>
+&nbsp;    }
+<b class="fc">&nbsp;    return getAggregationResetPeriodSeconds() == 0 ? isMatchNow(result) : isMatchSlot(result);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private boolean isMatchNow(SampleResult result) {
+<b class="fc">&nbsp;    aggregator.add(getMetricEnumValue().extractFrom(result));</b>
+<b class="fc">&nbsp;    return isMatchAt(clock.instant());</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private AutoStopMetric getMetricEnumValue() {
+<b class="fc">&nbsp;    return AutoStopMetric.valueOf(getMetric());</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private boolean isMatchAt(Instant matchTime) {
+<b class="fc">&nbsp;    boolean matched = getComparisonEnumValue()</b>
+<b class="fc">&nbsp;        .compare(aggregator.getValue(), (Comparable&lt;?&gt;) getValue());</b>
+<b class="fc">&nbsp;    if (!matched) {</b>
+<b class="fc">&nbsp;      matchStart = null;</b>
+<b class="fc">&nbsp;      return false;</b>
+&nbsp;    }
+<b class="fc">&nbsp;    if (matchStart == null) {</b>
+<b class="fc">&nbsp;      matchStart = matchTime;</b>
+&nbsp;    }
+<b class="fc">&nbsp;    return Duration.between(matchStart, matchTime).compareTo(getHoldsForDuration()) &gt;= 0;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private AutoStopComparison getComparisonEnumValue() {
+<b class="fc">&nbsp;    return AutoStopComparison.valueOf(getComparison());</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private Duration getHoldsForDuration() {
+<b class="fc">&nbsp;    return Duration.ofSeconds(getHoldsForSeconds());</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private boolean isMatchSlot(SampleResult result) {
+<b class="fc">&nbsp;    Instant currentSlotStart = findSlotStart();</b>
+<b class="fc">&nbsp;    while (!slotStart.equals(currentSlotStart)) {</b>
+<b class="fc">&nbsp;      Instant slotEnd = slotStart.plusSeconds(getAggregationResetPeriodSeconds());</b>
+<b class="fc">&nbsp;      if (isMatchAt(slotEnd)) {</b>
+<b class="fc">&nbsp;        return true;</b>
+&nbsp;      }
+<b class="fc">&nbsp;      aggregator = getAggregationEnumValue().buildAggregator(this);</b>
+<b class="fc">&nbsp;      slotStart = slotEnd;</b>
+<b class="fc">&nbsp;    }</b>
+<b class="fc">&nbsp;    aggregator.add(getMetricEnumValue().extractFrom(result));</b>
+<b class="fc">&nbsp;    return false;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private Instant findSlotStart() {
+<b class="fc">&nbsp;    long startMillis = slotStart.toEpochMilli();</b>
+<b class="fc">&nbsp;    long slotMillis = getAggregationResetPeriodSeconds() * 1000;</b>
+<b class="fc">&nbsp;    long nowMillis = clock.instant().toEpochMilli();</b>
+<b class="fc">&nbsp;    return slotStart.plusMillis(((nowMillis - startMillis) / slotMillis) * slotMillis);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public String toString() {
+<b class="fc">&nbsp;    return String.format(&quot;%s%s %s (last value: %s) was %s %s%s&quot;, buildSamplesMatchingMessage(),</b>
+<b class="fc">&nbsp;        getMetricEnumValue().getName(), getAggregationEnumValue().getNameFor(this),</b>
+<b class="fc">&nbsp;        aggregator != null ? aggregator.getValue() : null, getComparisonEnumValue().getName(),</b>
+<b class="fc">&nbsp;        getValue(), buildHoldsForMessage());</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private String buildSamplesMatchingMessage() {
+<b class="fc">&nbsp;    String regex = getRegex();</b>
+<b class="fc">&nbsp;    return regex != null ? &quot;samples matching &#39;&quot; + regex + &quot;&#39; &quot; : &quot;&quot;;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private String buildHoldsForMessage() {
+<b class="fc">&nbsp;    Duration holdsForSeconds = getHoldsForDuration();</b>
+<b class="fc">&nbsp;    return !holdsForSeconds.isZero() ? &quot; for more than &quot; + prettyDuration(holdsForSeconds) : &quot;&quot;;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private String prettyDuration(Duration value) {
+&nbsp;    ChronoUnit outUnit;
+&nbsp;    long outValue;
+<b class="fc">&nbsp;    if (value.getNano() != 0) {</b>
+<b class="nc">&nbsp;      outUnit = ChronoUnit.MILLIS;</b>
+<b class="nc">&nbsp;      outValue = value.toMillis();</b>
+<b class="fc">&nbsp;    } else if (value.toMinutes() * 60 != value.getSeconds()) {</b>
+<b class="fc">&nbsp;      outUnit = ChronoUnit.SECONDS;</b>
+<b class="fc">&nbsp;      outValue = value.getSeconds();</b>
+<b class="nc">&nbsp;    } else if (value.toHours() * 60 != value.toMinutes()) {</b>
+<b class="nc">&nbsp;      outUnit = ChronoUnit.MINUTES;</b>
+<b class="nc">&nbsp;      outValue = value.toMinutes();</b>
+<b class="nc">&nbsp;    } else if (value.toDays() * 24 != value.toHours()) {</b>
+<b class="nc">&nbsp;      outUnit = ChronoUnit.HOURS;</b>
+<b class="nc">&nbsp;      outValue = value.toHours();</b>
+&nbsp;    } else {
+<b class="nc">&nbsp;      outUnit = ChronoUnit.DAYS;</b>
+<b class="nc">&nbsp;      outValue = value.toDays();</b>
+&nbsp;    }
+<b class="fc">&nbsp;    return String.format(outValue + &quot; &quot; + outUnit.toString().toLowerCase());</b>
+&nbsp;  }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-03 20:57</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,338 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=GBK"> 
+  <title>Coverage Report > DslCookieManager</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">us.abstracta.jmeter.javadsl.http</a>
+</div>
+
+<h1>Coverage Summary for Class: DslCookieManager (us.abstracta.jmeter.javadsl.http)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DslCookieManager</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (5/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (13/13)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">DslCookieManager$CodeBuilder</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (10/10)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">DslCookieManager$CookiePolicy</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (10/10)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (11/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (33/33)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package us.abstracta.jmeter.javadsl.http;
+&nbsp;
+&nbsp;import java.lang.reflect.Method;
+&nbsp;import java.util.List;
+&nbsp;import org.apache.jmeter.protocol.http.control.CookieManager;
+&nbsp;import org.apache.jmeter.protocol.http.gui.CookiePanel;
+&nbsp;import org.apache.jmeter.testelement.TestElement;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.MethodCall;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.MethodCallContext;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.MethodParam;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.TestElementParamBuilder;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.params.EnumParam;
+&nbsp;
+&nbsp;/**
+&nbsp; * Allows configuring cookies settings used by HTTP samplers.
+&nbsp; * &lt;p&gt;
+&nbsp; * This element can only be added as child of test plan, and currently allows only to disable HTTP
+&nbsp; * cookies handling which is enabled by default (emulating browser behavior).
+&nbsp; * &lt;p&gt;
+&nbsp; * This element has to be added before any http sampler to be considered, and if you add multiple
+&nbsp; * instances of cookie manager to a test plan, only the first one will be considered.
+&nbsp; *
+&nbsp; * @since 0.17
+&nbsp; */
+&nbsp;public class DslCookieManager extends AutoEnabledHttpConfigElement {
+&nbsp;
+<b class="fc">&nbsp;  protected CookiePolicy cookiePolicy = CookiePolicy.STANDARD;</b>
+<b class="fc">&nbsp;  protected boolean clearEachIteration = true;</b>
+&nbsp;
+<b class="fc">&nbsp;  public enum CookiePolicy implements EnumParam.EnumPropertyValue {</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Compliant with &lt;a href=&quot;https://www.rfc-editor.org/rfc/rfc6265&quot;&gt;RFC 6265&lt;/a&gt; using a relaxed
+&nbsp;     * interpretation of HTTP state management.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * This is the default value, and should work in most cases.
+&nbsp;     *
+&nbsp;     * @see org.apache.http.impl.cookie.RFC6265LaxSpec
+&nbsp;     */
+<b class="fc">&nbsp;    STANDARD(&quot;standard&quot;),</b>
+&nbsp;    /**
+&nbsp;     * Compliant with &lt;a href=&quot;https://www.rfc-editor.org/rfc/rfc6265&quot;&gt;RFC 6265&lt;/a&gt; using strict
+&nbsp;     * adherence to state management of RFC 6265 section 4.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * This might come in handy when you actually want to verify that a service is in strict
+&nbsp;     * adherence to the RFC.
+&nbsp;     *
+&nbsp;     * @see org.apache.http.impl.cookie.RFC6265StrictSpec
+&nbsp;     */
+<b class="fc">&nbsp;    STANDARD_STRICT(&quot;standard-strict&quot;),</b>
+&nbsp;    /**
+&nbsp;     * Selects RFC 2965, RFC 2109 or Netscape draft compliant implementation based on cookies
+&nbsp;     * properties sent with the HTTP response.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * This is helpful to test browser compatibility with old versions of RFCs. In general prefer
+&nbsp;     * using the STANDARD cookie policy.
+&nbsp;     *
+&nbsp;     * @see org.apache.http.impl.cookie.DefaultCookieSpec
+&nbsp;     */
+<b class="fc">&nbsp;    BEST_MATCH(&quot;best-match&quot;),</b>
+&nbsp;    /**
+&nbsp;     * Compliant with &lt;a href=&quot;https://www.rfc-editor.org/rfc/rfc2965&quot;&gt;RFC 2965&lt;/a&gt;.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * This RFC is obsolete and replaced by RFC 6265, so this option should only be used in legacy
+&nbsp;     * applications that use this RFC.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * You may use {@link #BEST_MATCH} as alternative which in general should also be compatible
+&nbsp;     * with RFC 2965.
+&nbsp;     *
+&nbsp;     * @see org.apache.http.impl.cookie.RFC2965Spec
+&nbsp;     */
+<b class="fc">&nbsp;    RFC2965(&quot;rfc2965&quot;),</b>
+&nbsp;    /**
+&nbsp;     * Compliant with &lt;a href=&quot;https://www.rfc-editor.org/rfc/rfc2109&quot;&gt;RFC 2109&lt;/a&gt;.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * This RFC is obsolete and replaced by RFC 6265, so this option should only be used in legacy
+&nbsp;     * applications that use this RFC.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * You may use {@link #BEST_MATCH} as alternative which in general should also be compatible
+&nbsp;     * with RFC 2109.
+&nbsp;     *
+&nbsp;     * @see org.apache.http.impl.cookie.RFC2109Spec
+&nbsp;     */
+<b class="fc">&nbsp;    RFC2109(&quot;rfc2109&quot;),</b>
+&nbsp;    /**
+&nbsp;     * Conforms to the original draft specification published by Netscape Communications.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * This should be in general be avoided, unless is necessary to test legacy applications.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * You may use {@link #BEST_MATCH} as alternative which in general should also be compatible
+&nbsp;     * with Netscape policy.
+&nbsp;     *
+&nbsp;     * @see org.apache.http.impl.cookie.NetscapeDraftSpec
+&nbsp;     */
+<b class="fc">&nbsp;    NETSCAPE(&quot;netscape&quot;);</b>
+&nbsp;
+&nbsp;    private final String propertyValue;
+&nbsp;
+<b class="fc">&nbsp;    CookiePolicy(String cookiePolicy) {</b>
+<b class="fc">&nbsp;      this.propertyValue = cookiePolicy;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String propertyValue() {
+<b class="fc">&nbsp;      return propertyValue;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;  }
+&nbsp;
+&nbsp;  public DslCookieManager() {
+<b class="fc">&nbsp;    super(&quot;HTTP Cookie Manager&quot;, CookiePanel.class);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Disables HTTP cookies handling for the test plan.
+&nbsp;   *
+&nbsp;   * @return the DslCookieManager to allow fluent API usage.
+&nbsp;   */
+&nbsp;  public DslCookieManager disable() {
+<b class="fc">&nbsp;    enabled = false;</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Allows to enable or disable clearing cookies between thread group iterations.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * Cookies are cleared each iteration by default. If this is not desirable, for instance if
+&nbsp;   * logging in once and then iterating through actions multiple times, use this to set to false.
+&nbsp;   *
+&nbsp;   * @param clear boolean to set clearing of cookies. By default, it is set to true.
+&nbsp;   * @return the cookie manager for further configuration or usage.
+&nbsp;   * @since 1.6
+&nbsp;   */
+&nbsp;  public DslCookieManager clearCookiesBetweenIterations(boolean clear) {
+<b class="fc">&nbsp;    this.clearEachIteration = clear;</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Used to set the required cookie policy used to manage cookies.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * You might need to change the &#39;standard&#39; cookie policy if the application under test only
+&nbsp;   * supports a specific cookie implementation.
+&nbsp;   *
+&nbsp;   * @param policy specifies the particular cookie policy to use. By default, it is set to standard
+&nbsp;   *               cookie policy.
+&nbsp;   * @return the cookie manager for further configuration or usage.
+&nbsp;   * @see CookiePolicy
+&nbsp;   * @since 1.6
+&nbsp;   */
+&nbsp;  public DslCookieManager cookiePolicy(DslCookieManager.CookiePolicy policy) {
+<b class="fc">&nbsp;    this.cookiePolicy = policy;</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  protected TestElement buildTestElement() {
+<b class="fc">&nbsp;    CookieManager ret = new CookieManager();</b>
+<b class="fc">&nbsp;    ret.setClearEachIteration(clearEachIteration);</b>
+<b class="fc">&nbsp;    ret.setCookiePolicy(cookiePolicy.propertyValue);</b>
+<b class="fc">&nbsp;    return ret;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  public static class CodeBuilder extends AutoEnabledHttpConfigElement.CodeBuilder&lt;CookieManager&gt; {
+&nbsp;
+&nbsp;    public CodeBuilder(List&lt;Method&gt; builderMethods) {
+<b class="fc">&nbsp;      super(CookieManager.class, builderMethods);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected MethodCall buildMethodCall(MethodCallContext context) {
+<b class="fc">&nbsp;      TestElement testElement = context.getTestElement();</b>
+<b class="fc">&nbsp;      TestElementParamBuilder paramBuilder = new TestElementParamBuilder(testElement,</b>
+&nbsp;          &quot;CookieManager&quot;);
+<b class="fc">&nbsp;      MethodParam clearBetweenIterations = paramBuilder.boolParam(&quot;clearEachIteration&quot;,</b>
+&nbsp;          true);
+<b class="fc">&nbsp;      MethodParam policy = paramBuilder.enumParam(&quot;policy&quot;, CookiePolicy.STANDARD);</b>
+<b class="fc">&nbsp;      if (!clearBetweenIterations.isDefault() || !policy.isDefault()) {</b>
+<b class="fc">&nbsp;        return buildMethodCall()</b>
+<b class="fc">&nbsp;            .chain(&quot;clearCookiesBetweenIterations&quot;, clearBetweenIterations)</b>
+<b class="fc">&nbsp;            .chain(&quot;cookiePolicy&quot;, policy);</b>
+&nbsp;      } else {
+<b class="fc">&nbsp;        return super.buildMethodCall(context);</b>
+&nbsp;      }
+&nbsp;    }
+&nbsp;
+&nbsp;  }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-03 22:39</div>
+</div>
+</body>
+</html>

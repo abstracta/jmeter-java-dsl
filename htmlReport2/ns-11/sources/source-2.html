@@ -1,0 +1,571 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=GBK"> 
+  <title>Coverage Report > DslDefaultThreadGroup</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">us.abstracta.jmeter.javadsl.core.threadgroups</a>
+</div>
+
+<h1>Coverage Summary for Class: DslDefaultThreadGroup (us.abstracta.jmeter.javadsl.core.threadgroups)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DslDefaultThreadGroup</td>
+<td class="coverageStat">
+  <span class="percent">
+    96.2%
+  </span>
+  <span class="absValue">
+    (25/26)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    85.9%
+  </span>
+  <span class="absValue">
+    (67/78)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">DslDefaultThreadGroup$CodeBuilder</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (12/12)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    96.6%
+  </span>
+  <span class="absValue">
+    (28/29)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    87.8%
+  </span>
+  <span class="absValue">
+    (79/90)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package us.abstracta.jmeter.javadsl.core.threadgroups;
+&nbsp;
+&nbsp;import java.lang.reflect.Method;
+&nbsp;import java.time.Duration;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.List;
+&nbsp;import kg.apc.jmeter.threads.UltimateThreadGroup;
+&nbsp;import kg.apc.jmeter.threads.UltimateThreadGroupGui;
+&nbsp;import org.apache.jmeter.testelement.TestElement;
+&nbsp;import org.apache.jmeter.threads.AbstractThreadGroup;
+&nbsp;import org.apache.jmeter.threads.ThreadGroup;
+&nbsp;import org.apache.jmeter.threads.gui.ThreadGroupGui;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.MethodCall;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.MethodCallBuilder;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.MethodCallContext;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.TestElementParamBuilder;
+&nbsp;import us.abstracta.jmeter.javadsl.core.threadgroups.defaultthreadgroup.SimpleThreadGroupHelper;
+&nbsp;import us.abstracta.jmeter.javadsl.core.threadgroups.defaultthreadgroup.Stage;
+&nbsp;import us.abstracta.jmeter.javadsl.core.threadgroups.defaultthreadgroup.UltimateThreadGroupHelper;
+&nbsp;import us.abstracta.jmeter.javadsl.core.util.SingleSeriesTimelinePanel;
+&nbsp;
+&nbsp;/**
+&nbsp; * Represents the standard thread group test element included by JMeter.
+&nbsp; * &lt;p&gt;
+&nbsp; * For complex thread profiles that can&#39;t be mapped to JMeter built-in thread group element, the DSL
+&nbsp; * uses &lt;a href=&quot;https://jmeter-plugins.org/wiki/UltimateThreadGroup/&quot;&gt;Ultimate Thread Group
+&nbsp; * plugin&lt;/a&gt;
+&nbsp; *
+&nbsp; * @since 0.1
+&nbsp; */
+&nbsp;public class DslDefaultThreadGroup extends BaseThreadGroup&lt;DslDefaultThreadGroup&gt; {
+&nbsp;
+<b class="fc">&nbsp;  private static final Integer ZERO = 0;</b>
+<b class="fc">&nbsp;  protected final List&lt;Stage&gt; stages = new ArrayList&lt;&gt;();</b>
+&nbsp;
+&nbsp;  public DslDefaultThreadGroup(String name, int threads, int iterations,
+&nbsp;      List&lt;ThreadGroupChild&gt; children) {
+<b class="fc">&nbsp;    this(name, children);</b>
+<b class="fc">&nbsp;    checkThreadCount(threads);</b>
+<b class="fc">&nbsp;    stages.add(new Stage(threads, Duration.ZERO, null));</b>
+<b class="fc">&nbsp;    stages.add(new Stage(threads, null, iterations));</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private DslDefaultThreadGroup(String name, List&lt;ThreadGroupChild&gt; children) {
+<b class="fc">&nbsp;    super(name != null ? name : &quot;Thread Group&quot;, ThreadGroupGui.class, children);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  public DslDefaultThreadGroup(String name, int threads, Duration duration,
+&nbsp;      List&lt;ThreadGroupChild&gt; children) {
+<b class="fc">&nbsp;    this(name, children);</b>
+<b class="fc">&nbsp;    checkThreadCount(threads);</b>
+<b class="fc">&nbsp;    stages.add(new Stage(threads, Duration.ZERO, null));</b>
+<b class="fc">&nbsp;    stages.add(new Stage(threads, duration, null));</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  public DslDefaultThreadGroup(String name) {
+<b class="fc">&nbsp;    this(name, Collections.emptyList());</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private void checkThreadCount(int threads) {
+<b class="fc">&nbsp;    if (threads &lt;= 0) {</b>
+<b class="nc">&nbsp;      throw new IllegalArgumentException(&quot;Threads count must be &gt;=1&quot;);</b>
+&nbsp;    }
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Allows ramping up or down threads with a given duration.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * It is usually advised to use this method when working with considerable amount of threads to
+&nbsp;   * avoid load of creating all the threads at once to affect test results.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * JMeter will create (or remove) a thread every {@code rampUp.seconds * 1000 / threadCount}
+&nbsp;   * milliseconds.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * If you specify a thread duration time (instead of iterations), take into consideration that
+&nbsp;   * ramp up is not considered as part of thread duration time. For example: if you have a thread
+&nbsp;   * group duration of 10 seconds, and a ramp-up of 10 seconds, the last threads (and the test plan
+&nbsp;   * run) will run at least (duration may vary depending on test plan contents) after 20 seconds of
+&nbsp;   * starting the test.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * You can use this method multiple times in a thread group and in conjunction with
+&nbsp;   * {@link #holdFor(Duration)} and {@link #rampToAndHold(int, Duration, Duration)} to elaborate
+&nbsp;   * complex test plan profiles.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * Eg:
+&nbsp;   * &lt;pre&gt;{@code
+&nbsp;   *  threadGroup()
+&nbsp;   *    .rampTo(10, Duration.ofSeconds(10))
+&nbsp;   *    .rampTo(5, Duration.ofSeconds(10))
+&nbsp;   *    .rampToAndHold(20, Duration.ofSeconds(5), Duration.ofSeconds(10))
+&nbsp;   *    .rampTo(0, Duration.ofSeconds(5))
+&nbsp;   *    .children(...)
+&nbsp;   * }&lt;/pre&gt;
+&nbsp;   *
+&nbsp;   * @param threadCount specifies the final number of threads after the given period.
+&nbsp;   * @param duration    duration taken to reach the given threadCount and move to the next stage or
+&nbsp;   *                    end the test plan. Since JMeter only supports specifying times in seconds,
+&nbsp;   *                    if you specify a smaller granularity (like milliseconds) it will be rounded
+&nbsp;   *                    up to seconds.
+&nbsp;   * @return the thread group for further configuration or usage.
+&nbsp;   * @throws IllegalStateException if used after an iterations stage, since JMeter does not provide
+&nbsp;   *                               built-in thread group to support such scenario.
+&nbsp;   * @since 0.18
+&nbsp;   */
+&nbsp;  public DslDefaultThreadGroup rampTo(int threadCount, Duration duration) {
+<b class="fc">&nbsp;    if (threadCount &lt; 0) {</b>
+<b class="fc">&nbsp;      throw new IllegalArgumentException(&quot;Thread count must be &gt;=0&quot;);</b>
+&nbsp;    }
+<b class="fc">&nbsp;    checkRampNotAfterIterations();</b>
+<b class="fc">&nbsp;    addStage(new Stage(threadCount, duration, null));</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Same as {@link #rampTo(int, Duration)} but allowing to use JMeter expressions (variables or
+&nbsp;   * functions) to solve the actual parameter values.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * This is usually used in combination with properties to define values that change between
+&nbsp;   * environments or different test runs. Eg: &lt;pre&gt;{@code rampTo(&quot;${THREADS}&quot;, &quot;${RAMP}&quot;}&lt;/pre&gt;.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * This method can only be used for simple thread group configurations. Allowed combinations are:
+&nbsp;   * rampTo, rampTo + holdFor, holdFor + rampTo + holdFor, rampTo + holdIterating, holdFor + rampTo
+&nbsp;   * + holdIterating.
+&nbsp;   *
+&nbsp;   * @param threadCount a JMeter expression that returns the number of threads to ramp to.
+&nbsp;   * @param duration    a JMeter expression that returns the number of seconds to take for the
+&nbsp;   *                    ramp.
+&nbsp;   * @return the thread group for further configuration or usage.
+&nbsp;   * @see #rampTo(int, Duration)
+&nbsp;   * @since 0.57
+&nbsp;   */
+&nbsp;  public DslDefaultThreadGroup rampTo(String threadCount, String duration) {
+<b class="fc">&nbsp;    checkRampNotAfterIterations();</b>
+<b class="fc">&nbsp;    addStage(new Stage(threadCount, duration, null));</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private void checkRampNotAfterIterations() {
+<b class="fc">&nbsp;    if (isLastStageHoldingForIterations()) {</b>
+<b class="fc">&nbsp;      throw new IllegalStateException(</b>
+&nbsp;          &quot;Ramping up/down after holding for iterations is not supported. &quot;
+&nbsp;              + &quot;If you used constructor with iterations and some ramp &quot;
+&nbsp;              + &quot;(eg: threadGroup(X, Y, ...).rampTo(X, Z)), consider using &quot;
+&nbsp;              + &quot;threadGroup().rampTo(X, Z).holdIterating(Y) instead&quot;);
+&nbsp;    }
+&nbsp;  }
+&nbsp;
+&nbsp;  private boolean isLastStageHoldingForIterations() {
+<b class="fc">&nbsp;    return !stages.isEmpty() &amp;&amp; getLastStage().iterations() != null;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private Stage getLastStage() {
+<b class="fc">&nbsp;    return stages.get(stages.size() - 1);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private void addStage(Stage stage) {
+<b class="fc">&nbsp;    stages.add(stage);</b>
+<b class="fc">&nbsp;    if (!isSimpleThreadGroup() &amp;&amp; stages.stream().anyMatch(s -&gt; !s.isFixedStage())) {</b>
+<b class="nc">&nbsp;      stages.remove(stages.size() - 1);</b>
+<b class="nc">&nbsp;      throw new UnsupportedOperationException(</b>
+&nbsp;          &quot;The DSL does not yet support configuring multiple thread ramps with ramp or hold &quot;
+&nbsp;              + &quot;parameters using jmeter expressions. If you need this please create an issue in &quot;
+&nbsp;              + &quot;Github repository.&quot;);
+&nbsp;    }
+&nbsp;  }
+&nbsp;
+&nbsp;  private boolean isSimpleThreadGroup() {
+<b class="fc">&nbsp;    return stages.size() &lt;= 1</b>
+<b class="fc">&nbsp;        || stages.size() == 2 &amp;&amp; (ZERO.equals(stages.get(0).threadCount()) || stages.get(0)</b>
+<b class="fc">&nbsp;        .threadCount().equals(stages.get(1).threadCount()))</b>
+<b class="fc">&nbsp;        || stages.size() == 3 &amp;&amp; (ZERO.equals(stages.get(0).threadCount()) &amp;&amp; stages.get(1)</b>
+<b class="fc">&nbsp;        .threadCount().equals(stages.get(2).threadCount()));</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Specifies to keep current number of threads for a given duration.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * This method is usually used in combination with {@link #rampTo(int, Duration)} to define the
+&nbsp;   * profile of the test plan.
+&nbsp;   *
+&nbsp;   * @param duration duration to hold the current number of threads until moving to next stage or
+&nbsp;   *                 ending the test plan. Since JMeter only supports specifying times in seconds,
+&nbsp;   *                 if you specify a smaller granularity (like milliseconds) it will be rounded up
+&nbsp;   *                 to seconds.
+&nbsp;   * @return the thread group for further configuration or usage.
+&nbsp;   * @see #rampTo(int, Duration)
+&nbsp;   * @since 0.18
+&nbsp;   */
+&nbsp;  public DslDefaultThreadGroup holdFor(Duration duration) {
+<b class="fc">&nbsp;    checkHoldNotAfterIterations();</b>
+<b class="fc">&nbsp;    addStage(new Stage(getPrevThreadsCount(), duration, null));</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Same as {@link #holdFor(Duration)} but allowing to use JMeter expressions (variables or
+&nbsp;   * functions) to solve the duration.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * This is usually used in combination with properties to define values that change between
+&nbsp;   * environments or different test runs. Eg: &lt;pre&gt;{@code holdFor(&quot;${DURATION}&quot;}&lt;/pre&gt;.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * This method can only be used for simple thread group configurations. Allowed combinations are:
+&nbsp;   * rampTo, rampTo + holdFor, holdFor + rampTo + holdFor, rampTo + holdIterating, holdFor + rampTo
+&nbsp;   * + holdIterating.
+&nbsp;   *
+&nbsp;   * @param duration a JMeter expression that returns the number of seconds to hold current thread
+&nbsp;   *                 groups.
+&nbsp;   * @return the thread group for further configuration or usage.
+&nbsp;   * @see #holdFor(Duration)
+&nbsp;   * @since 0.57
+&nbsp;   */
+&nbsp;  public DslDefaultThreadGroup holdFor(String duration) {
+<b class="fc">&nbsp;    Object threadsCount = getPrevThreadsCount();</b>
+<b class="fc">&nbsp;    checkHoldNotAfterIterations();</b>
+<b class="fc">&nbsp;    addStage(new Stage(threadsCount, duration, null));</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private void checkHoldNotAfterIterations() {
+<b class="fc">&nbsp;    if (isLastStageHoldingForIterations()) {</b>
+<b class="nc">&nbsp;      throw new IllegalStateException(</b>
+&nbsp;          &quot;Holding for duration after holding for iterations is not supported.&quot;);
+&nbsp;    }
+&nbsp;  }
+&nbsp;
+&nbsp;  private Object getPrevThreadsCount() {
+<b class="fc">&nbsp;    return stages.isEmpty() ? 0 : getLastStage().threadCount();</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Specifies to keep current number of threads until they execute the given number of iterations
+&nbsp;   * each.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * &lt;b&gt;Warning: &lt;/b&gt; holding for iterations can be added to a thread group that has an initial
+&nbsp;   * stage with 0 threads followed by a stage ramping up, or only a stage ramping up, or no stages
+&nbsp;   * at all.
+&nbsp;   *
+&nbsp;   * @param iterations number of iterations to execute the test plan steps each thread.
+&nbsp;   *                   &lt;p&gt;
+&nbsp;   *                   If you specify -1, then threads will iterate until test plan execution is
+&nbsp;   *                   interrupted (you manually stop the running process, there is an error and
+&nbsp;   *                   thread group is configured to stop on error, or some other explicit
+&nbsp;   *                   termination condition).
+&nbsp;   *                   &lt;p&gt;
+&nbsp;   *                   &lt;b&gt;Setting this property to -1 is in general not advised&lt;/b&gt;, since you
+&nbsp;   *                   might inadvertently end up running a test plan without limits consuming
+&nbsp;   *                   unnecessary computing power. Prefer specifying a big value as a safe limit
+&nbsp;   *                   for iterations or duration instead.
+&nbsp;   * @return the thread group for further configuration or usage.
+&nbsp;   * @throws IllegalStateException when adding iterations would result in not supported JMeter
+&nbsp;   *                               thread group.
+&nbsp;   * @since 0.18
+&nbsp;   */
+&nbsp;  public DslDefaultThreadGroup holdIterating(int iterations) {
+<b class="fc">&nbsp;    checkIterationsPreConditions();</b>
+<b class="fc">&nbsp;    addStage(new Stage(getLastStage().threadCount(), null, iterations));</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Same as {@link #holdIterating(int)} but allowing to use JMeter expressions (variables or
+&nbsp;   * functions) to solve the iterations.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * This is usually used in combination with properties to define values that change between
+&nbsp;   * environments or different test runs. Eg: &lt;pre&gt;{@code holdIterating(&quot;${ITERATIONS}&quot;}&lt;/pre&gt;.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * This method can only be used for simple thread group configurations. Allowed combinations are:
+&nbsp;   * rampTo, rampTo + holdFor, holdFor + rampTo + holdFor, rampTo + holdIterating, holdFor + rampTo
+&nbsp;   * + holdIterating.
+&nbsp;   *
+&nbsp;   * @param iterations a JMeter expression that returns the number of iterations for current threads
+&nbsp;   *                   to execute.
+&nbsp;   * @return the thread group for further configuration or usage.
+&nbsp;   * @see #holdIterating(int)
+&nbsp;   * @since 0.57
+&nbsp;   */
+&nbsp;  public DslDefaultThreadGroup holdIterating(String iterations) {
+<b class="fc">&nbsp;    checkIterationsPreConditions();</b>
+<b class="fc">&nbsp;    addStage(new Stage(getLastStage().threadCount(), null, iterations));</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private void checkIterationsPreConditions() {
+<b class="fc">&nbsp;    boolean isJustRamp = stages.size() == 1 &amp;&amp; !ZERO.equals(stages.get(0).threadCount());</b>
+<b class="fc">&nbsp;    boolean isJustDelayAndRamp =</b>
+<b class="fc">&nbsp;        stages.size() == 2 &amp;&amp; ZERO.equals(stages.get(0).threadCount()) &amp;&amp; !ZERO.equals(</b>
+<b class="fc">&nbsp;            stages.get(1).threadCount());</b>
+<b class="fc">&nbsp;    if (!(isJustRamp || isJustDelayAndRamp)) {</b>
+<b class="fc">&nbsp;      throw new IllegalStateException(</b>
+&nbsp;          &quot;Holding for iterations is only supported after initial hold and ramp, or ramp.&quot;);
+&nbsp;    }
+<b class="fc">&nbsp;    if (ZERO.equals(getLastStage().threadCount())) {</b>
+<b class="nc">&nbsp;      throw new IllegalStateException(&quot;Can&#39;t hold for iterations with no threads.&quot;);</b>
+&nbsp;    }
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Specifies to stop thread group if iterations take more than specified duration.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * &lt;b&gt;Note:&lt;/b&gt; This method should only be used after specifying iterations.
+&nbsp;   *
+&nbsp;   * @param duration specifies a maximum duration for thread execution when threads are iterating.
+&nbsp;   * @return the thread group for further configuration or usage.
+&nbsp;   * @since 1.24
+&nbsp;   */
+&nbsp;  public DslDefaultThreadGroup upTo(Duration duration) {
+<b class="fc">&nbsp;    if (stages.isEmpty() || getLastStage().iterations() == null) {</b>
+<b class="fc">&nbsp;      throw new IllegalStateException(&quot;Configuring an upTo duration is only supported after &quot;</b>
+&nbsp;          + &quot;configuring a hold for iterations.&quot;);
+&nbsp;    }
+<b class="fc">&nbsp;    getLastStage().duration(duration);</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * simply combines {@link #rampTo(int, Duration)} and {@link #holdFor(Duration)} which are usually
+&nbsp;   * used in combination.
+&nbsp;   *
+&nbsp;   * @param threads      number of threads to ramp threads up/down to.
+&nbsp;   * @param rampDuration duration taken to reach the given threadCount to start holding that number
+&nbsp;   *                     of threads.
+&nbsp;   * @param holdDuration duration to hold the given number of threads, after the ramp, until moving
+&nbsp;   *                     to next stage or ending the test plan.
+&nbsp;   * @return the thread group for further configuration or usage.
+&nbsp;   * @see #rampTo(int, Duration)
+&nbsp;   * @see #holdFor(Duration)
+&nbsp;   * @since 0.18
+&nbsp;   */
+&nbsp;  public DslDefaultThreadGroup rampToAndHold(int threads, Duration rampDuration,
+&nbsp;      Duration holdDuration) {
+<b class="fc">&nbsp;    return rampTo(threads, rampDuration)</b>
+<b class="fc">&nbsp;        .holdFor(holdDuration);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Same as {@link #rampToAndHold(int, Duration, Duration)} but allowing to use JMeter expressions
+&nbsp;   * (variables or functions) to solve the actual parameter values.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * This is usually used in combination with properties to define values that change between
+&nbsp;   * environments or different test runs. Eg:
+&nbsp;   * &lt;pre&gt;{@code rampToAndHold(&quot;${THREADS}&quot;, &quot;${RAMP}&quot; ,&quot;${DURATION}&quot;}&lt;/pre&gt;.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * This method can only be used for simple thread group configurations. Allowed combinations are:
+&nbsp;   * rampTo, rampTo + holdFor, holdFor + rampTo + holdFor, rampTo + holdIterating, holdFor + rampTo
+&nbsp;   * + holdIterating.
+&nbsp;   *
+&nbsp;   * @param threads      a JMeter expression that returns the number of threads to ramp to.
+&nbsp;   * @param rampDuration a JMeter expression that returns the number of seconds to take for the
+&nbsp;   *                     ramp.
+&nbsp;   * @param holdDuration a JMeter expression that returns the number of seconds to hold current
+&nbsp;   *                     thread groups.
+&nbsp;   * @return the thread group for further configuration or usage.
+&nbsp;   * @see #rampToAndHold(int, Duration, Duration)
+&nbsp;   * @since 0.57
+&nbsp;   */
+&nbsp;  public DslDefaultThreadGroup rampToAndHold(String threads, String rampDuration,
+&nbsp;      String holdDuration) {
+<b class="fc">&nbsp;    return rampTo(threads, rampDuration)</b>
+<b class="fc">&nbsp;        .holdFor(holdDuration);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Allows specifying thread group children elements (samplers, listeners, post processors, etc.).
+&nbsp;   * &lt;p&gt;
+&nbsp;   * This method is just an alternative to the constructor specification of children, and is handy
+&nbsp;   * when you want to keep general thread group settings together and then specify children (instead
+&nbsp;   * of specifying threadCount &amp;amp; duration/iterations, then children, and at the end alternative
+&nbsp;   * settings like ramp-up period).
+&nbsp;   *
+&nbsp;   * @param children list of test elements to add as children of the thread group.
+&nbsp;   * @return the thread group for further configuration or usage.
+&nbsp;   * @since 0.12
+&nbsp;   */
+&nbsp;  @Override
+&nbsp;  public DslDefaultThreadGroup children(ThreadGroupChild... children) {
+<b class="fc">&nbsp;    return super.children(children);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public AbstractThreadGroup buildThreadGroup() {
+<b class="fc">&nbsp;    if (isSimpleThreadGroup()) {</b>
+<b class="fc">&nbsp;      return new SimpleThreadGroupHelper(stages).buildThreadGroup();</b>
+&nbsp;    } else {
+<b class="fc">&nbsp;      guiClass = UltimateThreadGroupGui.class;</b>
+<b class="fc">&nbsp;      return new UltimateThreadGroupHelper(stages).buildThreadGroup();</b>
+&nbsp;    }
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Shows a graph with a timeline of planned threads count execution for this test plan.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * The graph will be displayed in a popup window.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * This method is provided mainly to ease test plan designing when working with complex thread
+&nbsp;   * group profiles (several stages with ramps and holds).
+&nbsp;   *
+&nbsp;   * @since 0.26
+&nbsp;   */
+&nbsp;  public void showTimeline() {
+<b class="nc">&nbsp;    if (stages.stream().anyMatch(s -&gt; !s.isFixedStage())) {</b>
+<b class="nc">&nbsp;      throw new IllegalStateException(</b>
+&nbsp;          &quot;Can&#39;t display timeline when some JMeter expression is used in any ramp or hold.&quot;);
+&nbsp;    }
+<b class="nc">&nbsp;    SingleSeriesTimelinePanel chart = new SingleSeriesTimelinePanel(&quot;Threads&quot;);</b>
+<b class="nc">&nbsp;    chart.add(0, 0);</b>
+<b class="nc">&nbsp;    stages.forEach(s -&gt; chart.add(((Duration) s.duration()).toMillis(), (int) s.threadCount()));</b>
+<b class="nc">&nbsp;    showAndWaitFrameWith(chart, name + &quot; threads timeline&quot;, 800, 300);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  public static class CodeBuilder extends MethodCallBuilder {
+&nbsp;
+&nbsp;    public CodeBuilder(List&lt;Method&gt; builderMethods) {
+<b class="fc">&nbsp;      super(builderMethods);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean matches(MethodCallContext context) {
+<b class="fc">&nbsp;      TestElement testElement = context.getTestElement();</b>
+<b class="fc">&nbsp;      return testElement.getClass() == ThreadGroup.class</b>
+<b class="fc">&nbsp;          || testElement.getClass() == UltimateThreadGroup.class;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected MethodCall buildMethodCall(MethodCallContext context) {
+&nbsp;      MethodCall ret;
+<b class="fc">&nbsp;      TestElement testElement = context.getTestElement();</b>
+<b class="fc">&nbsp;      if (testElement.getClass() == ThreadGroup.class) {</b>
+<b class="fc">&nbsp;        ret = new SimpleThreadGroupHelper.CodeBuilder(builderMethods).buildMethodCall(context);</b>
+&nbsp;      } else {
+<b class="fc">&nbsp;        ret = new UltimateThreadGroupHelper.CodeBuilder(builderMethods).buildMethodCall(context);</b>
+&nbsp;      }
+<b class="fc">&nbsp;      TestElementParamBuilder paramBuilder = new TestElementParamBuilder(testElement);</b>
+<b class="fc">&nbsp;      ret.chain(&quot;sampleErrorAction&quot;,</b>
+<b class="fc">&nbsp;          paramBuilder.enumParam(AbstractThreadGroup.ON_SAMPLE_ERROR, SampleErrorAction.CONTINUE));</b>
+<b class="fc">&nbsp;      return ret;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;  }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-03 22:39</div>
+</div>
+</body>
+</html>

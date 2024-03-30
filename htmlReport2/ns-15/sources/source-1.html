@@ -1,0 +1,376 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=GBK"> 
+  <title>Coverage Report > AutoEnabledHttpConfigElement</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">us.abstracta.jmeter.javadsl.http</a>
+</div>
+
+<h1>Coverage Summary for Class: AutoEnabledHttpConfigElement (us.abstracta.jmeter.javadsl.http)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">AutoEnabledHttpConfigElement</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (12/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    97.4%
+  </span>
+  <span class="absValue">
+    (38/39)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">AutoEnabledHttpConfigElement$1</td>
+  </tr>
+  <tr>
+    <td class="name">AutoEnabledHttpConfigElement$BuildContextEntry</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">AutoEnabledHttpConfigElement$CodeBuilder</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (11/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (35/35)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">AutoEnabledHttpConfigElement$CodeBuilder$CallContextEntry</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (25/25)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    98.7%
+  </span>
+  <span class="absValue">
+    (77/78)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package us.abstracta.jmeter.javadsl.http;
+&nbsp;
+&nbsp;import java.lang.reflect.Method;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.LinkedHashMap;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import org.apache.jmeter.gui.JMeterGUIComponent;
+&nbsp;import org.apache.jmeter.protocol.http.sampler.HTTPSamplerProxy;
+&nbsp;import org.apache.jmeter.testelement.TestElement;
+&nbsp;import org.apache.jorphan.collections.HashTree;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.MethodCall;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.MethodCallContext;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.SingleTestElementCallBuilder;
+&nbsp;import us.abstracta.jmeter.javadsl.core.BuildTreeContext;
+&nbsp;import us.abstracta.jmeter.javadsl.core.BuildTreeContext.TreeContextEndListener;
+&nbsp;import us.abstracta.jmeter.javadsl.core.configs.BaseConfigElement;
+&nbsp;
+&nbsp;public abstract class AutoEnabledHttpConfigElement extends BaseConfigElement {
+&nbsp;
+<b class="fc">&nbsp;  protected boolean enabled = true;</b>
+&nbsp;
+&nbsp;  protected AutoEnabledHttpConfigElement(String name,
+&nbsp;      Class&lt;? extends JMeterGUIComponent&gt; guiClass) {
+<b class="fc">&nbsp;    super(name, guiClass);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  public void registerDependency(BuildTreeContext context) {
+<b class="fc">&nbsp;    registerEndListener(context, getOrCreateContextEntry(context));</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  public BuildContextEntry getOrCreateContextEntry(BuildTreeContext context) {
+<b class="fc">&nbsp;    return context.getOrCreateEntry(getClass().getSimpleName(), BuildContextEntry::new);</b>
+&nbsp;  }
+&nbsp;
+<b class="fc">&nbsp;  private static class BuildContextEntry {</b>
+&nbsp;
+&nbsp;    private Boolean enabled;
+&nbsp;    private boolean registeredListener;
+<b class="fc">&nbsp;    private final Map&lt;HashTree, BuildTreeContext&gt; pendingResolution = new LinkedHashMap&lt;&gt;();</b>
+&nbsp;    private boolean hasDisabledChild;
+&nbsp;
+&nbsp;  }
+&nbsp;
+&nbsp;  private void registerEndListener(BuildTreeContext context, BuildContextEntry entry) {
+<b class="fc">&nbsp;    if (!entry.registeredListener) {</b>
+<b class="fc">&nbsp;      entry.registeredListener = true;</b>
+<b class="fc">&nbsp;      context.addEndListener(buildEndListener());</b>
+&nbsp;    }
+&nbsp;  }
+&nbsp;
+&nbsp;  public TreeContextEndListener buildEndListener() {
+<b class="fc">&nbsp;    return (context, tree) -&gt; {</b>
+<b class="fc">&nbsp;      BuildTreeContext parent = context.getParent();</b>
+<b class="fc">&nbsp;      BuildContextEntry entry = getOrCreateContextEntry(context);</b>
+<b class="fc">&nbsp;      if (parent == null) {</b>
+<b class="fc">&nbsp;        endRootElement(context, tree, entry);</b>
+<b class="fc">&nbsp;      } else if (entry.enabled == null) {</b>
+<b class="fc">&nbsp;        endUnsolvedElement(context, tree, entry, parent);</b>
+<b class="fc">&nbsp;      } else if (entry.enabled) {</b>
+<b class="fc">&nbsp;        endEnabledElement(context, tree, entry);</b>
+&nbsp;      } else {
+<b class="fc">&nbsp;        endDisabledElement(parent);</b>
+&nbsp;      }
+&nbsp;    };
+&nbsp;  }
+&nbsp;
+&nbsp;  private void endRootElement(BuildTreeContext context, HashTree tree,
+&nbsp;      BuildContextEntry contextEntry) {
+<b class="fc">&nbsp;    if (contextEntry.hasDisabledChild) {</b>
+<b class="fc">&nbsp;      addConfigToPendingResolutionChildren(contextEntry);</b>
+<b class="fc">&nbsp;    } else if (contextEntry.enabled == null || contextEntry.enabled) {</b>
+<b class="fc">&nbsp;      super.buildTreeUnder(tree, context);</b>
+&nbsp;    }
+&nbsp;  }
+&nbsp;
+&nbsp;  private void addConfigToPendingResolutionChildren(BuildContextEntry contextEntry) {
+<b class="fc">&nbsp;    contextEntry.pendingResolution.forEach(super::buildTreeUnder);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private void endUnsolvedElement(BuildTreeContext context, HashTree tree,
+&nbsp;      BuildContextEntry entry, BuildTreeContext parent) {
+<b class="fc">&nbsp;    BuildContextEntry parentEntry = getOrCreateContextEntry(parent);</b>
+<b class="fc">&nbsp;    if (entry.hasDisabledChild) {</b>
+<b class="fc">&nbsp;      addConfigToPendingResolutionChildren(entry);</b>
+<b class="fc">&nbsp;      parentEntry.hasDisabledChild = true;</b>
+&nbsp;    } else {
+<b class="fc">&nbsp;      parentEntry.pendingResolution.put(tree, context);</b>
+&nbsp;    }
+<b class="fc">&nbsp;    registerEndListener(parent, parentEntry);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private void endEnabledElement(BuildTreeContext context, HashTree tree, BuildContextEntry entry) {
+<b class="fc">&nbsp;    if (entry.hasDisabledChild) {</b>
+<b class="nc">&nbsp;      addConfigToPendingResolutionChildren(entry);</b>
+&nbsp;    } else {
+<b class="fc">&nbsp;      super.buildTreeUnder(tree, context);</b>
+&nbsp;    }
+&nbsp;  }
+&nbsp;
+&nbsp;  private void endDisabledElement(BuildTreeContext parent) {
+<b class="fc">&nbsp;    BuildContextEntry parentEntry = getOrCreateContextEntry(parent);</b>
+<b class="fc">&nbsp;    parentEntry.hasDisabledChild = true;</b>
+<b class="fc">&nbsp;    registerEndListener(parent, parentEntry);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public HashTree buildTreeUnder(HashTree parent, BuildTreeContext context) {
+<b class="fc">&nbsp;    BuildTreeContext parentContext = context.getParent();</b>
+<b class="fc">&nbsp;    BuildContextEntry entry = getOrCreateContextEntry(parentContext);</b>
+<b class="fc">&nbsp;    entry.enabled = enabled;</b>
+<b class="fc">&nbsp;    registerEndListener(parentContext, entry);</b>
+<b class="fc">&nbsp;    return parent;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  public abstract static class CodeBuilder&lt;T extends TestElement&gt; extends
+&nbsp;      SingleTestElementCallBuilder&lt;T&gt; {
+&nbsp;
+&nbsp;    public CodeBuilder(Class&lt;T&gt; testElementClass,
+&nbsp;        List&lt;Method&gt; builderMethods) {
+<b class="fc">&nbsp;      super(testElementClass, builderMethods);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void registerDependency(MethodCallContext context, MethodCall call) {
+<b class="fc">&nbsp;      if (!findConfigElementInSamplerScope(context)) {</b>
+<b class="fc">&nbsp;        registerPendingDisableConfig(context, call);</b>
+&nbsp;      }
+&nbsp;    }
+&nbsp;
+&nbsp;    private boolean findConfigElementInSamplerScope(MethodCallContext samplerContext) {
+<b class="fc">&nbsp;      MethodCallContext parent = samplerContext.getParent();</b>
+<b class="fc">&nbsp;      return samplerContext.getChildrenTree().list().stream()</b>
+<b class="fc">&nbsp;          .anyMatch(e -&gt; testElementClass.isInstance(e) &amp;&amp; ((TestElement) e).isEnabled())</b>
+<b class="fc">&nbsp;          || parent != null &amp;&amp; findConfigElementInSamplerScope(parent);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void registerPendingDisableConfig(MethodCallContext context, MethodCall call) {
+<b class="fc">&nbsp;      MethodCallContext parentContext = context.getParent();</b>
+<b class="fc">&nbsp;      if (parentContext == null) {</b>
+<b class="fc">&nbsp;        addDisabledChild(call);</b>
+&nbsp;        return;
+&nbsp;      }
+<b class="fc">&nbsp;      CallContextEntry parentEntry = solveContextEntry(parentContext);</b>
+<b class="fc">&nbsp;      parentEntry.pendingDisableConfigs.add(call);</b>
+<b class="fc">&nbsp;      if (parentEntry.endListenerRegistered) {</b>
+&nbsp;        return;
+&nbsp;      }
+<b class="fc">&nbsp;      parentEntry.endListenerRegistered = true;</b>
+<b class="fc">&nbsp;      parentContext.addEndListener((ctx, listenerCall) -&gt; {</b>
+<b class="fc">&nbsp;        if (parentEntry.hasChildWithConfig) {</b>
+<b class="fc">&nbsp;          parentEntry.pendingDisableConfigs.forEach(this::addDisabledChild);</b>
+&nbsp;        } else {
+<b class="fc">&nbsp;          registerPendingDisableConfig(ctx, listenerCall);</b>
+&nbsp;        }
+&nbsp;      });
+&nbsp;    }
+&nbsp;
+&nbsp;    private void addDisabledChild(MethodCall call) {
+<b class="fc">&nbsp;      call.child(buildMethodCall().chain(&quot;disable&quot;));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private CallContextEntry solveContextEntry(MethodCallContext context) {
+<b class="fc">&nbsp;      return context.computeEntryIfAbsent(getClass(), CallContextEntry::new);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected MethodCall buildMethodCall(T testElement, MethodCallContext context) {
+<b class="fc">&nbsp;      if (!testElement.isEnabled()) {</b>
+<b class="fc">&nbsp;        return MethodCall.emptyCall();</b>
+&nbsp;      }
+<b class="fc">&nbsp;      if (findSamplerInConfigScope(context)) {</b>
+<b class="fc">&nbsp;        MethodCallContext parent = context.getParent();</b>
+<b class="fc">&nbsp;        while (parent != null) {</b>
+<b class="fc">&nbsp;          solveContextEntry(parent).hasChildWithConfig = true;</b>
+<b class="fc">&nbsp;          parent = parent.getParent();</b>
+&nbsp;        }
+<b class="fc">&nbsp;        return MethodCall.emptyCall();</b>
+&nbsp;      } else {
+<b class="fc">&nbsp;        return buildMethodCall();</b>
+&nbsp;      }
+&nbsp;    }
+&nbsp;
+&nbsp;    private boolean findSamplerInConfigScope(MethodCallContext context) {
+<b class="fc">&nbsp;      MethodCallContext parent = context.getParent();</b>
+<b class="fc">&nbsp;      return parent.getTestElement() instanceof HTTPSamplerProxy || findSamplerInTree(</b>
+<b class="fc">&nbsp;          parent.getChildrenTree());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private boolean findSamplerInTree(HashTree tree) {
+<b class="fc">&nbsp;      return tree != null &amp;&amp; tree.list().stream()</b>
+<b class="fc">&nbsp;          .anyMatch(c -&gt; ((TestElement) c).isEnabled() &amp;&amp; (c instanceof HTTPSamplerProxy</b>
+<b class="fc">&nbsp;              || findSamplerInTree(tree.getTree(c))));</b>
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    private static class CallContextEntry {</b>
+&nbsp;
+<b class="fc">&nbsp;      private final List&lt;MethodCall&gt; pendingDisableConfigs = new ArrayList&lt;&gt;();</b>
+&nbsp;      private boolean endListenerRegistered;
+&nbsp;      private boolean hasChildWithConfig;
+&nbsp;
+&nbsp;    }
+&nbsp;
+&nbsp;  }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-03 22:39</div>
+</div>
+</body>
+</html>

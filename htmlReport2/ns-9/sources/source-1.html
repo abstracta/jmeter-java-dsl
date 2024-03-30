@@ -1,0 +1,771 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=GBK"> 
+  <title>Coverage Report > AutoStopListener</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">us.abstracta.jmeter.javadsl.core.listeners</a>
+</div>
+
+<h1>Coverage Summary for Class: AutoStopListener (us.abstracta.jmeter.javadsl.core.listeners)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">AutoStopListener</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (5/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (11/11)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">AutoStopListener$1</td>
+  </tr>
+  <tr>
+    <td class="name">AutoStopListener$AggregatedConditionBuilder</td>
+<td class="coverageStat">
+  <span class="percent">
+    71.4%
+  </span>
+  <span class="absValue">
+    (5/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    81.8%
+  </span>
+  <span class="absValue">
+    (9/11)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">AutoStopListener$AutoStopCondition</td>
+<td class="coverageStat">
+  <span class="percent">
+    54.5%
+  </span>
+  <span class="absValue">
+    (6/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    52.4%
+  </span>
+  <span class="absValue">
+    (11/21)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">AutoStopListener$AutoStopConditionBuilder</td>
+<td class="coverageStat">
+  <span class="percent">
+    44.4%
+  </span>
+  <span class="absValue">
+    (4/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (5/10)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">AutoStopListener$BaseAutoStopConditionBuilder</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">AutoStopListener$CountMetricConditionBuilder</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/3)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">AutoStopListener$ErrorsConditionBuilder</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">AutoStopListener$MetricConditionBuilder</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">AutoStopListener$TimeMetricConditionBuilder</td>
+<td class="coverageStat">
+  <span class="percent">
+    40%
+  </span>
+  <span class="absValue">
+    (2/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (3/6)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    65.9%
+  </span>
+  <span class="absValue">
+    (29/44)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    70.6%
+  </span>
+  <span class="absValue">
+    (48/68)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package us.abstracta.jmeter.javadsl.core.listeners;
+&nbsp;
+&nbsp;import java.time.Duration;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;import java.util.regex.Pattern;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;import org.apache.jmeter.testbeans.gui.TestBeanGUI;
+&nbsp;import org.apache.jmeter.testelement.TestElement;
+&nbsp;import org.apache.jorphan.collections.HashTree;
+&nbsp;import us.abstracta.jmeter.javadsl.core.BuildTreeContext;
+&nbsp;import us.abstracta.jmeter.javadsl.core.engines.TestStopper;
+&nbsp;import us.abstracta.jmeter.javadsl.core.listeners.autostop.AutoStopAggregation;
+&nbsp;import us.abstracta.jmeter.javadsl.core.listeners.autostop.AutoStopComparison;
+&nbsp;import us.abstracta.jmeter.javadsl.core.listeners.autostop.AutoStopConditionElement;
+&nbsp;import us.abstracta.jmeter.javadsl.core.listeners.autostop.AutoStopMetric;
+&nbsp;import us.abstracta.jmeter.javadsl.core.listeners.autostop.AutoStopTestBean;
+&nbsp;import us.abstracta.jmeter.javadsl.core.testelements.BaseTestElement;
+&nbsp;
+&nbsp;/**
+&nbsp; * Allows stopping a test plan execution when collected statistics meet some defined criteria.
+&nbsp; *
+&nbsp; * @since 1.19
+&nbsp; */
+&nbsp;public class AutoStopListener extends BaseTestElement implements DslListener {
+&nbsp;
+<b class="fc">&nbsp;  protected final List&lt;AutoStopCondition&gt; conditions = new ArrayList&lt;&gt;();</b>
+&nbsp;  protected Pattern regex;
+&nbsp;  protected TestStopper testStopper;
+&nbsp;
+&nbsp;  public AutoStopListener(String name) {
+<b class="fc">&nbsp;    super(name != null ? name : &quot;AutoStop&quot;, TestBeanGUI.class);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Specifies a regular expression used to filter samples for which specified conditions will be
+&nbsp;   * evaluated.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * If a condition defines another regular expression, then this expression is ignored for such
+&nbsp;   * condition.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * This is handy in case you want to define a set of conditions that apply only to a sub set of
+&nbsp;   * samples that share a common label structure. Eg: to samplers with same name but in different
+&nbsp;   * parts of test plan (e.g.: under different ifControllers).
+&nbsp;   * &lt;p&gt;
+&nbsp;   * For targeting a single sampler or all the samplers contained within a controller or thread
+&nbsp;   * group, prefer just placing the autoStop listener in the correct scope of the test plan.
+&nbsp;   *
+&nbsp;   * @param regex specifies the regular expression to filter samples.
+&nbsp;   * @return the listener for further configuration or usage in a test plan.
+&nbsp;   */
+&nbsp;  public AutoStopListener samplesMatching(String regex) {
+<b class="fc">&nbsp;    this.regex = Pattern.compile(regex);</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Specifies conditions that when met will cause the test plan execution to stop.
+&nbsp;   *
+&nbsp;   * @param condition specifies the condition that samples will be evaluated against.
+&nbsp;   * @return the listener for further configuration or usage in a test plan.
+&nbsp;   */
+&nbsp;  public AutoStopListener when(AutoStopCondition condition) {
+<b class="fc">&nbsp;    conditions.add(condition);</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public HashTree buildTreeUnder(HashTree parent, BuildTreeContext context) {
+<b class="fc">&nbsp;    testStopper = context.getTestStopper();</b>
+<b class="fc">&nbsp;    return super.buildTreeUnder(parent, context);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  protected TestElement buildTestElement() {
+<b class="fc">&nbsp;    return new AutoStopTestBean(regex, conditions.stream()</b>
+<b class="fc">&nbsp;        .map(c -&gt; c.element)</b>
+<b class="fc">&nbsp;        .collect(Collectors.toList()),</b>
+&nbsp;        testStopper);
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Specifies a condition that when met, will make test plan execution to stop.
+&nbsp;   */
+<b class="fc">&nbsp;  public static class AutoStopCondition {</b>
+&nbsp;
+&nbsp;    private final AutoStopConditionElement element;
+&nbsp;
+<b class="fc">&nbsp;    private AutoStopCondition(AutoStopConditionElement element) {</b>
+<b class="fc">&nbsp;      this.element = element;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Specifies a regular expression used to filter samples for which the condition will be
+&nbsp;     * evaluated.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * When the condition defines a regular expression, then the one specified in the autoStop
+&nbsp;     * listener is ignored.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * This is handy in case you want to define a condition that apply only to a sub set of samples
+&nbsp;     * that share a common label structure. Eg: to samplers with same name but in different parts of
+&nbsp;     * test plan (e.g.: under different ifControllers).
+&nbsp;     * &lt;p&gt;
+&nbsp;     * For targeting a single sampler or all the samplers contained within a controller or thread
+&nbsp;     * group, prefer just placing the autoStop listener in the correct scope of the test plan.
+&nbsp;     *
+&nbsp;     * @param regex specifies the regular expression to filter samples.
+&nbsp;     * @return a condition builder to complete the condition definition.
+&nbsp;     */
+&nbsp;    public static AutoStopConditionBuilder samplesMatching(String regex) {
+<b class="fc">&nbsp;      return new AutoStopConditionBuilder()</b>
+<b class="fc">&nbsp;          .samplesMatching(regex);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Specifies to create a condition that evaluates sample time (time between last request byte is
+&nbsp;     * sent to service under test and last response byte is received).
+&nbsp;     *
+&nbsp;     * @return a condition builder to complete the condition definition.
+&nbsp;     */
+&nbsp;    public static TimeMetricConditionBuilder sampleTime() {
+<b class="fc">&nbsp;      return new AutoStopConditionBuilder()</b>
+<b class="fc">&nbsp;          .sampleTime();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Specifies to create a condition that evaluates latency time (time between last request byte
+&nbsp;     * is sent to service under test and first response byte is received).
+&nbsp;     *
+&nbsp;     * @return a condition builder to complete the condition definition.
+&nbsp;     */
+&nbsp;    public static TimeMetricConditionBuilder latencyTime() {
+<b class="nc">&nbsp;      return new AutoStopConditionBuilder()</b>
+<b class="nc">&nbsp;          .latencyTime();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Specifies to create a condition that evaluates connection time (time it takes to establish a
+&nbsp;     * connection with the service under test).
+&nbsp;     *
+&nbsp;     * @return a condition builder to complete the condition definition.
+&nbsp;     */
+&nbsp;    public static TimeMetricConditionBuilder connectionTime() {
+<b class="nc">&nbsp;      return new AutoStopConditionBuilder()</b>
+<b class="nc">&nbsp;          .connectionTime();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Specifies to create a condition that evaluates the number of samples.
+&nbsp;     *
+&nbsp;     * @return a condition builder to complete the condition definition.
+&nbsp;     */
+&nbsp;    public static CountMetricConditionBuilder samples() {
+<b class="nc">&nbsp;      return new AutoStopConditionBuilder()</b>
+<b class="nc">&nbsp;          .samples();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Specifies to create a condition that evaluates the number of not successful samples.
+&nbsp;     *
+&nbsp;     * @return a condition builder to complete the condition definition.
+&nbsp;     */
+&nbsp;    public static ErrorsConditionBuilder errors() {
+<b class="fc">&nbsp;      return new AutoStopConditionBuilder()</b>
+<b class="fc">&nbsp;          .errors();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Specifies to create a condition that evaluates the number bytes sent (request bytes) to the
+&nbsp;     * service under test.
+&nbsp;     *
+&nbsp;     * @return a condition builder to complete the condition definition.
+&nbsp;     */
+&nbsp;    public static CountMetricConditionBuilder sentBytes() {
+<b class="nc">&nbsp;      return new AutoStopConditionBuilder()</b>
+<b class="nc">&nbsp;          .sentBytes();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Specifies to create a condition that evaluates the number bytes (response bytes) received
+&nbsp;     * from the service under test.
+&nbsp;     *
+&nbsp;     * @return a condition builder to complete the condition definition.
+&nbsp;     */
+&nbsp;    public static CountMetricConditionBuilder receivedBytes() {
+<b class="nc">&nbsp;      return new AutoStopConditionBuilder()</b>
+<b class="nc">&nbsp;          .receivedBytes();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Specifies for how long the specified condition has to hold (be met) before the test plan
+&nbsp;     * execution is stopped.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * This is useful to avoid potential short temporal conditions that may need to be ignored.
+&nbsp;     *
+&nbsp;     * @param duration specifies the duration to wait the condition to hold before stopping test
+&nbsp;     *                 plan execution.
+&nbsp;     *                 &lt;p&gt;
+&nbsp;     *                 The granularity of the period has to be seconds or greater (milliseconds are
+&nbsp;     *                 ignored).
+&nbsp;     *                 &lt;p&gt;
+&nbsp;     *                 By default, it is set to 0, which means that it will stop test plan as soon
+&nbsp;     *                 as the condition is met.
+&nbsp;     * @return the condition for its usage.
+&nbsp;     */
+&nbsp;    public AutoStopCondition holdsFor(Duration duration) {
+<b class="fc">&nbsp;      element.setHoldsForSeconds(duration.getSeconds());</b>
+<b class="fc">&nbsp;      return this;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;  }
+&nbsp;
+&nbsp;  public static class AutoStopConditionBuilder extends BaseAutoStopConditionBuilder {
+&nbsp;
+&nbsp;    public AutoStopConditionBuilder() {
+<b class="fc">&nbsp;      super(new AutoStopConditionElement());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @see AutoStopCondition#samplesMatching(String)
+&nbsp;     */
+&nbsp;    public AutoStopConditionBuilder samplesMatching(String regex) {
+<b class="fc">&nbsp;      ret.setRegex(regex);</b>
+<b class="fc">&nbsp;      return this;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @see AutoStopCondition#sampleTime()
+&nbsp;     */
+&nbsp;    public TimeMetricConditionBuilder sampleTime() {
+<b class="fc">&nbsp;      return new TimeMetricConditionBuilder(ret, AutoStopMetric.SAMPLE_TIME);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @see AutoStopCondition#latencyTime()
+&nbsp;     */
+&nbsp;    public TimeMetricConditionBuilder latencyTime() {
+<b class="nc">&nbsp;      return new TimeMetricConditionBuilder(ret, AutoStopMetric.LATENCY);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @see AutoStopCondition#connectionTime()
+&nbsp;     */
+&nbsp;    public TimeMetricConditionBuilder connectionTime() {
+<b class="nc">&nbsp;      return new TimeMetricConditionBuilder(ret, AutoStopMetric.CONNECT_TIME);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @see AutoStopCondition#samples()
+&nbsp;     */
+&nbsp;    public CountMetricConditionBuilder samples() {
+<b class="nc">&nbsp;      return new CountMetricConditionBuilder(ret, AutoStopMetric.SAMPLES);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @see AutoStopCondition#errors()
+&nbsp;     */
+&nbsp;    public ErrorsConditionBuilder errors() {
+<b class="fc">&nbsp;      return new ErrorsConditionBuilder(ret);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @see AutoStopCondition#sentBytes()
+&nbsp;     */
+&nbsp;    public CountMetricConditionBuilder sentBytes() {
+<b class="nc">&nbsp;      return new CountMetricConditionBuilder(ret, AutoStopMetric.SENT_BYTES);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @see AutoStopCondition#receivedBytes()
+&nbsp;     */
+&nbsp;    public CountMetricConditionBuilder receivedBytes() {
+<b class="nc">&nbsp;      return new CountMetricConditionBuilder(ret, AutoStopMetric.RECEIVED_BYTES);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;  }
+&nbsp;
+&nbsp;  public abstract static class BaseAutoStopConditionBuilder {
+&nbsp;
+&nbsp;    protected final AutoStopConditionElement ret;
+&nbsp;
+<b class="fc">&nbsp;    protected BaseAutoStopConditionBuilder(AutoStopConditionElement ret) {</b>
+<b class="fc">&nbsp;      this.ret = ret;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;  }
+&nbsp;
+&nbsp;  public abstract static class MetricConditionBuilder extends BaseAutoStopConditionBuilder {
+&nbsp;
+&nbsp;    protected MetricConditionBuilder(AutoStopConditionElement ret, AutoStopMetric metric) {
+<b class="fc">&nbsp;      super(ret);</b>
+<b class="fc">&nbsp;      ret.setMetric(metric.toString());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;  }
+&nbsp;
+&nbsp;  public static class TimeMetricConditionBuilder extends MetricConditionBuilder {
+&nbsp;
+&nbsp;    protected TimeMetricConditionBuilder(AutoStopConditionElement ret, AutoStopMetric metric) {
+<b class="fc">&nbsp;      super(ret, metric);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Specifies to check the minimum value of the selected condition metric.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * By default, the minimum is not reset during a test plan execution and is evaluated on each
+&nbsp;     * sample result. If you want to change this you can use
+&nbsp;     * {@link AggregatedConditionBuilder#every(Duration)}.
+&nbsp;     *
+&nbsp;     * @return a condition builder to complete the condition definition.
+&nbsp;     */
+&nbsp;    public AggregatedConditionBuilder&lt;Duration&gt; min() {
+<b class="nc">&nbsp;      return new AggregatedConditionBuilder&lt;&gt;(ret, AutoStopAggregation.MIN);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Specifies to check the maximum value of the selected condition metric.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * By default, the maximum is not reset during a test plan execution and is evaluated on each
+&nbsp;     * sample result. If you want to change this you can use
+&nbsp;     * {@link AggregatedConditionBuilder#every(Duration)}.
+&nbsp;     *
+&nbsp;     * @return a condition builder to complete the condition definition.
+&nbsp;     */
+&nbsp;    public AggregatedConditionBuilder&lt;Duration&gt; max() {
+<b class="nc">&nbsp;      return new AggregatedConditionBuilder&lt;&gt;(ret, AutoStopAggregation.MAX);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Specifies to check the mean/average value of the selected condition metric.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * By default, the mean is not reset during a test plan execution and is evaluated on each
+&nbsp;     * sample result. This might lead to the mean value being &quot;stuck&quot; by past sample results. Check
+&nbsp;     * {@link AggregatedConditionBuilder#every(Duration)} for more details.
+&nbsp;     *
+&nbsp;     * @return a condition builder to complete the condition definition.
+&nbsp;     */
+&nbsp;    public AggregatedConditionBuilder&lt;Duration&gt; mean() {
+<b class="nc">&nbsp;      return new AggregatedConditionBuilder&lt;&gt;(ret, AutoStopAggregation.MEAN);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Specifies to check a given percentile value of the selected condition metric.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * By default, the percentile is not reset during a test plan execution and is evaluated on each
+&nbsp;     * sample result. If you want to change this you can use
+&nbsp;     * {@link AggregatedConditionBuilder#every(Duration)}.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * &lt;b&gt;Warning:&lt;/b&gt; as percentiles are calculated with P&lt;SUP&gt;2&lt;/SUP&gt; algorithm, they may not be
+&nbsp;     * accurate when evaluating a few samples. This is specially important when using small
+&nbsp;     * aggregation periods with {@link AggregatedConditionBuilder#every(Duration)}.
+&nbsp;     *
+&nbsp;     * @param percentile specifies the percentile to use. For example to check the median, specify
+&nbsp;     *                   50. To check the 90 percentile, then specify 90.
+&nbsp;     * @return a condition builder to complete the condition definition.
+&nbsp;     */
+&nbsp;    public AggregatedConditionBuilder&lt;Duration&gt; percentile(double percentile) {
+<b class="fc">&nbsp;      ret.setPercentile(percentile);</b>
+<b class="fc">&nbsp;      return new AggregatedConditionBuilder&lt;&gt;(ret, AutoStopAggregation.PERCENTILE);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;  }
+&nbsp;
+&nbsp;  public static class AggregatedConditionBuilder&lt;T extends Comparable&lt;?&gt;&gt; extends
+&nbsp;      BaseAutoStopConditionBuilder {
+&nbsp;
+&nbsp;    protected AggregatedConditionBuilder(AutoStopConditionElement ret,
+&nbsp;        AutoStopAggregation aggregation) {
+<b class="fc">&nbsp;      super(ret);</b>
+<b class="fc">&nbsp;      ret.setAggregation(aggregation.toString());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Specifies the period of time between each aggregation (min, max, etc) evaluation and reset.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Having aggregations being evaluated and reset for every given period of time, avoids the
+&nbsp;     * aggregations to be &quot;stuck&quot; due to historical values and not focusing on the most current
+&nbsp;     * collected metrics. For example if in your first 10 minutes of your test plan you collected
+&nbsp;     * 10k requests with an average sample time of 500ms, but in the last 5 seconds you got 10
+&nbsp;     * samples with an average sample time of 1 minute, you would probably like to stop test plan
+&nbsp;     * execution regardless of the average since the beginning of the test plan being 500ms.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Evaluating aggregations in periods slots is particularly helpful for aggregations like
+&nbsp;     * {@link TimeMetricConditionBuilder#mean}, {@link CountMetricConditionBuilder#perSecond()} and
+&nbsp;     * {@link ErrorsConditionBuilder#percent}.
+&nbsp;     *
+&nbsp;     * @param period specifies the period of time for aggregation evaluation and reset.
+&nbsp;     *               &lt;p&gt;
+&nbsp;     *               The granularity of the period has to be seconds or greater (milliseconds are
+&nbsp;     *               ignored).
+&nbsp;     *               &lt;p&gt;
+&nbsp;     *               By default, is set to 0, which means that aggregations are evaluated for every
+&nbsp;     *               sample and never rest.
+&nbsp;     * @return a condition builder to complete the condition definition.
+&nbsp;     */
+&nbsp;    public AggregatedConditionBuilder&lt;T&gt; every(Duration period) {
+<b class="fc">&nbsp;      ret.setAggregationResetPeriodSeconds(period.getSeconds());</b>
+<b class="fc">&nbsp;      return this;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Specifies to check the aggregated metric value to be less than a provided one.
+&nbsp;     *
+&nbsp;     * @param value specifies the value to check the aggregated value against.
+&nbsp;     * @return a condition builder to complete the condition definition.
+&nbsp;     */
+&nbsp;    public AutoStopCondition lessThan(T value) {
+<b class="nc">&nbsp;      return comparing(AutoStopComparison.LT, value);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private AutoStopCondition comparing(AutoStopComparison comparison, T value) {
+<b class="fc">&nbsp;      ret.setComparison(comparison.toString());</b>
+<b class="fc">&nbsp;      ret.setValue(value instanceof Duration ? ((Duration) value).toMillis() : value);</b>
+<b class="fc">&nbsp;      return new AutoStopCondition(ret);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Specifies to check the aggregated metric value to be less than or equal to a provided one.
+&nbsp;     *
+&nbsp;     * @param value specifies the value to check the aggregated value  against.
+&nbsp;     * @return a condition builder to complete the condition definition.
+&nbsp;     */
+&nbsp;    public AutoStopCondition lessThanOrEqualTo(T value) {
+<b class="nc">&nbsp;      return comparing(AutoStopComparison.LTE, value);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Specifies to check the aggregated metric value to be greater than a provided one.
+&nbsp;     *
+&nbsp;     * @param value specifies the value to check the aggregated value  against.
+&nbsp;     * @return a condition builder to complete the condition definition.
+&nbsp;     */
+&nbsp;    public AutoStopCondition greaterThan(T value) {
+<b class="fc">&nbsp;      return comparing(AutoStopComparison.GT, value);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Specifies to check the aggregated metric value to be greater than or equal to a provided
+&nbsp;     * one.
+&nbsp;     *
+&nbsp;     * @param value specifies the value to check the aggregated value  against.
+&nbsp;     * @return a condition builder to complete the condition definition.
+&nbsp;     */
+&nbsp;    public AutoStopCondition greaterThanOrEqualTo(T value) {
+<b class="fc">&nbsp;      return comparing(AutoStopComparison.GTE, value);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;  }
+&nbsp;
+&nbsp;  public static class CountMetricConditionBuilder extends MetricConditionBuilder {
+&nbsp;
+&nbsp;    protected CountMetricConditionBuilder(AutoStopConditionElement ret, AutoStopMetric metric) {
+<b class="fc">&nbsp;      super(ret, metric);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Specifies to check the total sum of selected condition metric.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * By default, the total is not reset during a test plan execution and is evaluated on each
+&nbsp;     * sample result. If you want to change this you can use
+&nbsp;     * {@link AggregatedConditionBuilder#every(Duration)}.
+&nbsp;     *
+&nbsp;     * @return a condition builder to complete the condition definition.
+&nbsp;     */
+&nbsp;    public AggregatedConditionBuilder&lt;Long&gt; total() {
+<b class="fc">&nbsp;      return new AggregatedConditionBuilder&lt;&gt;(ret, AutoStopAggregation.TOTAL);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Specifies to check the average sum per second of selected condition metric.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * By default, the aggregated value is not reset during a test plan execution and is evaluated
+&nbsp;     * on each sample result. This might lead to the value being &quot;stuck&quot; by past sample results.
+&nbsp;     * Check {@link AggregatedConditionBuilder#every(Duration)} for more details.
+&nbsp;     *
+&nbsp;     * @return a condition builder to complete the condition definition.
+&nbsp;     */
+&nbsp;    public AggregatedConditionBuilder&lt;Double&gt; perSecond() {
+<b class="fc">&nbsp;      return new AggregatedConditionBuilder&lt;&gt;(ret, AutoStopAggregation.PER_SECOND);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;  }
+&nbsp;
+&nbsp;  public static class ErrorsConditionBuilder extends CountMetricConditionBuilder {
+&nbsp;
+&nbsp;    protected ErrorsConditionBuilder(AutoStopConditionElement ret) {
+<b class="fc">&nbsp;      super(ret, AutoStopMetric.ERRORS);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Specifies to check the error percentage.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * By default, the percentage is not reset during a test plan execution and is evaluated on each
+&nbsp;     * sample result. This might lead to the value being &quot;stuck&quot; by past sample results. Check
+&nbsp;     * {@link AggregatedConditionBuilder#every(Duration)} for more details.
+&nbsp;     *
+&nbsp;     * @return a condition builder to complete the condition definition.
+&nbsp;     */
+&nbsp;    public AggregatedConditionBuilder&lt;Double&gt; percent() {
+<b class="fc">&nbsp;      return new AggregatedConditionBuilder&lt;&gt;(ret, AutoStopAggregation.PERCENT);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;  }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-03 22:39</div>
+</div>
+</body>
+</html>

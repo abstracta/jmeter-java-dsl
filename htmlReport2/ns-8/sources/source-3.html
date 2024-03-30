@@ -1,0 +1,401 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=GBK"> 
+  <title>Coverage Report > DistributedJmeterEngine</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">us.abstracta.jmeter.javadsl.core.engines</a>
+</div>
+
+<h1>Coverage Summary for Class: DistributedJmeterEngine (us.abstracta.jmeter.javadsl.core.engines)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DistributedJmeterEngine</td>
+<td class="coverageStat">
+  <span class="percent">
+    90%
+  </span>
+  <span class="absValue">
+    (9/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    87.5%
+  </span>
+  <span class="absValue">
+    (21/24)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">DistributedJmeterEngine$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (1/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (1/2)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">DistributedJmeterEngine$2</td>
+<td class="coverageStat">
+  <span class="percent">
+    66.7%
+  </span>
+  <span class="absValue">
+    (2/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    57.1%
+  </span>
+  <span class="absValue">
+    (4/7)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">DistributedJmeterEngine$EnginesEndListener</td>
+<td class="coverageStat">
+  <span class="percent">
+    77.8%
+  </span>
+  <span class="absValue">
+    (7/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    88.2%
+  </span>
+  <span class="absValue">
+    (15/17)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">DistributedJmeterEngine$StatsCollector</td>
+<td class="coverageStat">
+  <span class="percent">
+    60%
+  </span>
+  <span class="absValue">
+    (3/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    66.7%
+  </span>
+  <span class="absValue">
+    (4/6)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    75.9%
+  </span>
+  <span class="absValue">
+    (22/29)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    80.4%
+  </span>
+  <span class="absValue">
+    (45/56)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package us.abstracta.jmeter.javadsl.core.engines;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.List;
+&nbsp;import java.util.concurrent.CountDownLatch;
+&nbsp;import org.apache.jmeter.engine.DistributedRunner;
+&nbsp;import org.apache.jmeter.engine.JMeterEngine;
+&nbsp;import org.apache.jmeter.samplers.Remoteable;
+&nbsp;import org.apache.jmeter.samplers.SampleEvent;
+&nbsp;import org.apache.jmeter.samplers.SampleListener;
+&nbsp;import org.apache.jmeter.testelement.TestStateListener;
+&nbsp;import org.apache.jmeter.util.JMeterUtils;
+&nbsp;import org.apache.jorphan.collections.HashTree;
+&nbsp;import org.apache.jorphan.documentation.VisibleForTesting;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;import us.abstracta.jmeter.javadsl.core.DslTestPlan;
+&nbsp;import us.abstracta.jmeter.javadsl.core.TestPlanStats;
+&nbsp;
+&nbsp;/**
+&nbsp; * Allows running a JMeter test plan distributed across multiple machines.
+&nbsp; * &lt;p&gt;
+&nbsp; * This engine uses JMeter built-in feature to run tests from one node into remote machines.
+&nbsp; *
+&nbsp; * @since 0.29
+&nbsp; */
+<b class="fc">&nbsp;public class DistributedJmeterEngine extends EmbeddedJmeterEngine {</b>
+&nbsp;
+&nbsp;  private final List&lt;String&gt; hosts;
+&nbsp;  private final DistributedRunner distributedRunner;
+&nbsp;  private int basePort;
+&nbsp;  private boolean stopEngines;
+&nbsp;  private JmeterEnvironment jmeterEnv;
+&nbsp;
+<b class="fc">&nbsp;  public DistributedJmeterEngine(String... hosts) {</b>
+<b class="fc">&nbsp;    this.hosts = Arrays.asList(hosts);</b>
+<b class="fc">&nbsp;    distributedRunner = new DistributedRunner();</b>
+<b class="fc">&nbsp;    distributedRunner.setStdout(System.out);</b>
+<b class="fc">&nbsp;    distributedRunner.setStdErr(System.err);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Allows setting the initial port number used to calculate rest of ports to establish RMI
+&nbsp;   * connections.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * This method allows to have a predefined range of ports to be used, and in consequence, properly
+&nbsp;   * configure firewall rules.
+&nbsp;   *
+&nbsp;   * @param basePort the port number to start creating connections from. 1 port is required for each
+&nbsp;   *                 connection to a remote port, and ports will be assigned incrementally from the
+&nbsp;   *                 given value.
+&nbsp;   * @return the DistributedJMeterEngine instance for further configuration or usage.
+&nbsp;   */
+&nbsp;  public DistributedJmeterEngine localBasePort(int basePort) {
+<b class="nc">&nbsp;    this.basePort = basePort;</b>
+<b class="nc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Specifies to stop remote engines once a test is run and finished.
+&nbsp;   *
+&nbsp;   * @return the DistributedJMeterEngine instance for further configuration or usage.
+&nbsp;   */
+&nbsp;  public DistributedJmeterEngine stopEnginesOnTestEnd() {
+<b class="fc">&nbsp;    return stopEnginesOnTestEnd(true);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Same as {@link #stopEnginesOnTestEnd()} but allowing to enable or disable it.
+&nbsp;   *
+&nbsp;   * @param enable specifies to enable or disable the setting. By default, it is set to false.
+&nbsp;   * @return the DistributedJMeterEngine instance for further configuration or usage.
+&nbsp;   * @see #stopEnginesOnTestEnd()
+&nbsp;   * @since 1.0
+&nbsp;   */
+&nbsp;  public DistributedJmeterEngine stopEnginesOnTestEnd(boolean enable) {
+<b class="fc">&nbsp;    stopEngines = enable;</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @VisibleForTesting
+&nbsp;  protected DistributedJmeterEngine localJMeterEnv(JmeterEnvironment env) {
+<b class="fc">&nbsp;    this.jmeterEnv = env;</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public TestPlanStats run(DslTestPlan testPlan) throws IOException {
+<b class="fc">&nbsp;    if (jmeterEnv != null) {</b>
+<b class="fc">&nbsp;      return runInEnv(testPlan, jmeterEnv);</b>
+&nbsp;    } else {
+<b class="nc">&nbsp;      return runInEnv(testPlan, new JmeterEnvironment());</b>
+&nbsp;    }
+&nbsp;  }
+&nbsp;
+&nbsp;  protected void addStatsCollector(HashTree testPlanTree, TestPlanStats stats) {
+<b class="fc">&nbsp;    testPlanTree.add(new StatsCollector(stats));</b>
+&nbsp;  }
+&nbsp;
+<b class="fc">&nbsp;  private static class StatsCollector implements SampleListener,</b>
+&nbsp;      Remoteable {
+&nbsp;
+&nbsp;    private final TestPlanStats stats;
+&nbsp;
+<b class="fc">&nbsp;    private StatsCollector(TestPlanStats stats) {</b>
+<b class="fc">&nbsp;      this.stats = stats;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void sampleOccurred(SampleEvent e) {
+<b class="fc">&nbsp;      stats.addSampleResult(e.getResult());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void sampleStarted(SampleEvent e) {
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void sampleStopped(SampleEvent e) {
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  protected BaseTestStopper buildTestStopper() {
+<b class="fc">&nbsp;    return new BaseTestStopper() {</b>
+&nbsp;
+&nbsp;      @Override
+&nbsp;      protected void stopTestExecution() {
+<b class="nc">&nbsp;        distributedRunner.stop();</b>
+&nbsp;      }
+&nbsp;
+&nbsp;    };
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  protected TestRunner buildTestRunner(HashTree testPlanTree,
+&nbsp;      HashTree rootTree, TestStopper testStopper) {
+<b class="fc">&nbsp;    JMeterUtils.setProperty(&quot;client.rmi.localport&quot;, String.valueOf(basePort));</b>
+<b class="fc">&nbsp;    EnginesEndListener endListener = new EnginesEndListener(stopEngines);</b>
+<b class="fc">&nbsp;    testPlanTree.add(endListener);</b>
+<b class="fc">&nbsp;    distributedRunner.init(hosts, rootTree);</b>
+<b class="fc">&nbsp;    endListener.setStartedRemoteEngines(new ArrayList&lt;&gt;(distributedRunner.getEngines()));</b>
+<b class="fc">&nbsp;    return new TestRunner() {</b>
+&nbsp;
+&nbsp;      @Override
+&nbsp;      public void runTest() {
+<b class="fc">&nbsp;        distributedRunner.start();</b>
+&nbsp;        try {
+<b class="fc">&nbsp;          endListener.await();</b>
+<b class="nc">&nbsp;        } catch (InterruptedException e) {</b>
+<b class="nc">&nbsp;          Thread.currentThread().interrupt();</b>
+<b class="fc">&nbsp;        }</b>
+&nbsp;      }
+&nbsp;
+&nbsp;      @Override
+&nbsp;      public void stop() {
+<b class="nc">&nbsp;        testStopper.stop(null);</b>
+&nbsp;      }
+&nbsp;
+&nbsp;    };
+&nbsp;  }
+&nbsp;
+<b class="fc">&nbsp;  private static class EnginesEndListener implements TestStateListener, Remoteable {</b>
+&nbsp;
+<b class="fc">&nbsp;    private static final Logger LOG = LoggerFactory.getLogger(EnginesEndListener.class);</b>
+&nbsp;    private final boolean stopEngines;
+&nbsp;    private CountDownLatch runningEngines;
+&nbsp;    private List&lt;JMeterEngine&gt; remoteEngines;
+&nbsp;
+<b class="fc">&nbsp;    private EnginesEndListener(boolean stopEngines) {</b>
+<b class="fc">&nbsp;      this.stopEngines = stopEngines;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setStartedRemoteEngines(List&lt;JMeterEngine&gt; engines) {
+<b class="fc">&nbsp;      remoteEngines = engines;</b>
+<b class="fc">&nbsp;      runningEngines = new CountDownLatch(engines.size());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    // This is called by a daemon RMI thread from the remote host
+&nbsp;    public void testEnded(String host) {
+<b class="fc">&nbsp;      final long now = System.currentTimeMillis();</b>
+<b class="fc">&nbsp;      LOG.info(&quot;Finished remote host: {} ({})&quot;, host, now);</b>
+<b class="fc">&nbsp;      runningEngines.countDown();</b>
+<b class="fc">&nbsp;      if (stopEngines &amp;&amp; runningEngines.getCount() &lt;= 0) {</b>
+<b class="fc">&nbsp;        for (JMeterEngine engine : remoteEngines) {</b>
+<b class="fc">&nbsp;          engine.exit();</b>
+<b class="fc">&nbsp;        }</b>
+&nbsp;      }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void testEnded() {
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void testStarted(String host) {
+<b class="fc">&nbsp;      LOG.info(&quot;Started remote host:  {} ({})&quot;, host, System.currentTimeMillis());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void testStarted() {
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    public void await() throws InterruptedException {
+<b class="fc">&nbsp;      runningEngines.await();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;  }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-03 22:39</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,262 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=GBK"> 
+  <title>Coverage Report > DslCounter</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">us.abstracta.jmeter.javadsl.core.configs</a>
+</div>
+
+<h1>Coverage Summary for Class: DslCounter (us.abstracta.jmeter.javadsl.core.configs)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DslCounter</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (7/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (22/22)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">DslCounter$CodeBuilder</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (8/8)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (9/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (30/30)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package us.abstracta.jmeter.javadsl.core.configs;
+&nbsp;
+&nbsp;import java.lang.reflect.Method;
+&nbsp;import java.util.List;
+&nbsp;import org.apache.jmeter.modifiers.CounterConfig;
+&nbsp;import org.apache.jmeter.modifiers.gui.CounterConfigGui;
+&nbsp;import org.apache.jmeter.testelement.TestElement;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.MethodCall;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.MethodCallContext;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.SingleTestElementCallBuilder;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.TestElementParamBuilder;
+&nbsp;
+&nbsp;/**
+&nbsp; * Allows easy usage of auto incremental values in test plans.
+&nbsp; * &lt;p&gt;
+&nbsp; * This element is handy for generating incremental IDs, positions in certain list, etc.
+&nbsp; *
+&nbsp; * @since 1.10
+&nbsp; */
+&nbsp;public class DslCounter extends BaseConfigElement {
+&nbsp;
+&nbsp;  private final String varName;
+<b class="fc">&nbsp;  private String start = &quot;0&quot;;</b>
+<b class="fc">&nbsp;  private long increment = 1;</b>
+<b class="fc">&nbsp;  private long max = Long.MAX_VALUE;</b>
+<b class="fc">&nbsp;  private boolean perThread = false;</b>
+&nbsp;
+&nbsp;  public DslCounter(String varName) {
+<b class="fc">&nbsp;    super(varName, CounterConfigGui.class);</b>
+<b class="fc">&nbsp;    this.varName = varName;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Allows specifying the starting value of the counter.
+&nbsp;   *
+&nbsp;   * @param start specifies the value to start the counter with. When not specified, 0 will be
+&nbsp;   *              used.
+&nbsp;   * @return the counter for further configuration and usage.
+&nbsp;   */
+&nbsp;  public DslCounter startingValue(long start) {
+<b class="fc">&nbsp;    return startingValue(String.valueOf(start));</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Same as {@link #startingValue(long)} but allowing to use JMeter expressions for starting
+&nbsp;   * value.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * This method allows to extract the initial value of the counter for example from a JMeter
+&nbsp;   * property (eg: ${__P(COUNT_INIT)}).
+&nbsp;   *
+&nbsp;   * @param start specifies a jmeter expression evaluating to a number that specifies the initial
+&nbsp;   *              value for the counter.
+&nbsp;   * @return the counter for further configuration and usage.
+&nbsp;   */
+&nbsp;  public DslCounter startingValue(String start) {
+<b class="fc">&nbsp;    this.start = start;</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Specifies how much the counter will increase in each iteration.
+&nbsp;   *
+&nbsp;   * @param inc specifies how much to increase the counter in each iteration. By default, 1.
+&nbsp;   * @return the counter for further configuration and usage.
+&nbsp;   * @since 1.22
+&nbsp;   */
+&nbsp;  public DslCounter increment(long inc) {
+<b class="fc">&nbsp;    this.increment = inc;</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Specifies the maximum value of the counter.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * When the value exceeds this value, the counter is reset to its starting value.
+&nbsp;   *
+&nbsp;   * @param max specifies the maximum value to use. When not specified, {@link Long#MAX_VALUE} is
+&nbsp;   *            used.
+&nbsp;   * @return the counter for further configuration and usage.
+&nbsp;   * @since 1.22
+&nbsp;   */
+&nbsp;  public DslCounter maximumValue(long max) {
+<b class="fc">&nbsp;    this.max = max;</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Specifies to use a separate counter for each thread.
+&nbsp;   *
+&nbsp;   * @param perThread specifies to use a separate counter for each thread. When not specified, then
+&nbsp;   *                  the counter is shared, and incremented, by all thread group threads. By
+&nbsp;   *                  default, it is set to false.
+&nbsp;   * @return the counter for further configuration and usage.
+&nbsp;   * @since 1.22
+&nbsp;   */
+&nbsp;  public DslCounter perThread(boolean perThread) {
+<b class="fc">&nbsp;    this.perThread = perThread;</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  protected TestElement buildTestElement() {
+<b class="fc">&nbsp;    CounterConfig ret = new CounterConfig();</b>
+<b class="fc">&nbsp;    ret.setVarName(varName);</b>
+<b class="fc">&nbsp;    ret.setStart(start);</b>
+<b class="fc">&nbsp;    ret.setIncrement(increment);</b>
+<b class="fc">&nbsp;    ret.setEnd(max);</b>
+<b class="fc">&nbsp;    ret.setIsPerUser(perThread);</b>
+<b class="fc">&nbsp;    return ret;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  public static class CodeBuilder extends SingleTestElementCallBuilder&lt;CounterConfig&gt; {
+&nbsp;
+&nbsp;    public CodeBuilder(List&lt;Method&gt; builderMethods) {
+<b class="fc">&nbsp;      super(CounterConfig.class, builderMethods);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected MethodCall buildMethodCall(CounterConfig testElement, MethodCallContext context) {
+<b class="fc">&nbsp;      TestElementParamBuilder paramBuilder = new TestElementParamBuilder(testElement,</b>
+&nbsp;          &quot;CounterConfig&quot;);
+<b class="fc">&nbsp;      MethodCall ret = buildMethodCall(paramBuilder.stringParam(&quot;name&quot;));</b>
+<b class="fc">&nbsp;      ret.chain(&quot;startingValue&quot;, paramBuilder.longParam(&quot;start&quot;, 0L));</b>
+<b class="fc">&nbsp;      ret.chain(&quot;increment&quot;, paramBuilder.longParam(&quot;incr&quot;, 1L));</b>
+<b class="fc">&nbsp;      ret.chain(&quot;maximumValue&quot;, paramBuilder.longParam(&quot;end&quot;, Long.MAX_VALUE));</b>
+<b class="fc">&nbsp;      ret.chain(&quot;perThread&quot;, paramBuilder.boolParam(&quot;per_user&quot;, false));</b>
+<b class="fc">&nbsp;      return ret;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;  }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-03 22:39</div>
+</div>
+</body>
+</html>

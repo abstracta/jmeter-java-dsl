@@ -1,0 +1,490 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=GBK"> 
+  <title>Coverage Report > DslBaseHttpSampler</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">us.abstracta.jmeter.javadsl.http</a>
+</div>
+
+<h1>Coverage Summary for Class: DslBaseHttpSampler (us.abstracta.jmeter.javadsl.http)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DslBaseHttpSampler</td>
+<td class="coverageStat">
+  <span class="percent">
+    93.3%
+  </span>
+  <span class="absValue">
+    (14/15)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    95.8%
+  </span>
+  <span class="absValue">
+    (46/48)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">DslBaseHttpSampler$BaseHttpSamplerCodeBuilder</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (6/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (41/41)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    95.2%
+  </span>
+  <span class="absValue">
+    (20/21)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    97.8%
+  </span>
+  <span class="absValue">
+    (87/89)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package us.abstracta.jmeter.javadsl.http;
+&nbsp;
+&nbsp;import java.lang.reflect.Method;
+&nbsp;import java.time.Duration;
+&nbsp;import java.util.List;
+&nbsp;import java.util.function.Function;
+&nbsp;import org.apache.http.entity.ContentType;
+&nbsp;import org.apache.jmeter.gui.JMeterGUIComponent;
+&nbsp;import org.apache.jmeter.protocol.http.control.Header;
+&nbsp;import org.apache.jmeter.protocol.http.control.HeaderManager;
+&nbsp;import org.apache.jmeter.protocol.http.sampler.HTTPSamplerBase;
+&nbsp;import org.apache.jmeter.protocol.http.sampler.HTTPSamplerProxy;
+&nbsp;import org.apache.jmeter.protocol.http.util.HTTPConstants;
+&nbsp;import org.apache.jmeter.testelement.TestElement;
+&nbsp;import org.apache.jmeter.util.JMeterUtils;
+&nbsp;import org.apache.jorphan.collections.HashTree;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.MethodCall;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.MethodCallContext;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.MethodParam;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.SingleGuiClassCallBuilder;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.TestElementParamBuilder;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.params.StringParam;
+&nbsp;import us.abstracta.jmeter.javadsl.core.BuildTreeContext;
+&nbsp;import us.abstracta.jmeter.javadsl.core.preprocessors.DslJsr223PreProcessor.PreProcessorScript;
+&nbsp;import us.abstracta.jmeter.javadsl.core.preprocessors.DslJsr223PreProcessor.PreProcessorVars;
+&nbsp;import us.abstracta.jmeter.javadsl.core.samplers.BaseSampler;
+&nbsp;import us.abstracta.jmeter.javadsl.core.util.PropertyScriptBuilder.PropertyScript;
+&nbsp;
+&nbsp;/**
+&nbsp; * Abstracts common logic used by HTTP based samplers.
+&nbsp; *
+&nbsp; * @param &lt;T&gt; type of the sampler used to provide proper fluent API methods.
+&nbsp; * @since 0.52
+&nbsp; */
+&nbsp;public abstract class DslBaseHttpSampler&lt;T extends DslBaseHttpSampler&lt;T&gt;&gt; extends BaseSampler&lt;T&gt; {
+&nbsp;
+&nbsp;  public static final String RESET_CONNECTIONS_BETWEEN_ITERATIONS_PROP =
+&nbsp;      &quot;httpclient.reset_state_on_thread_group_iteration&quot;;
+&nbsp;
+&nbsp;  protected String path;
+<b class="fc">&nbsp;  protected final HttpHeaders headers = new HttpHeaders();</b>
+&nbsp;  protected String protocol;
+&nbsp;  protected String host;
+&nbsp;  protected String port;
+&nbsp;  protected String proxyUrl;
+&nbsp;  protected String proxyUser;
+&nbsp;  protected String proxyPassword;
+&nbsp;  protected Duration connectionTimeout;
+&nbsp;  protected Duration responseTimeout;
+&nbsp;
+&nbsp;  public DslBaseHttpSampler(String name, String url, Class&lt;? extends JMeterGUIComponent&gt; guiClass) {
+<b class="fc">&nbsp;    super(name, guiClass);</b>
+<b class="fc">&nbsp;    if (url == null) {</b>
+&nbsp;      return;
+&nbsp;    }
+<b class="fc">&nbsp;    JmeterUrl parsedUrl = JmeterUrl.valueOf(url);</b>
+<b class="fc">&nbsp;    protocol = parsedUrl.protocol();</b>
+<b class="fc">&nbsp;    host = parsedUrl.host();</b>
+<b class="fc">&nbsp;    port = parsedUrl.port();</b>
+<b class="fc">&nbsp;    path = parsedUrl.path();</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Specifies the HTTP Sampler protocol to be used in the HTTP request generated by the sampler.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * You can specify entire url when creating a sampler, but this method allows you to override the
+&nbsp;   * protocol if needed. For example, if you have defaults element with url and just need in one
+&nbsp;   * sampler to have a different protocol.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * In general prefer using java variables and methods, to get shorter and more maintainable code,
+&nbsp;   * and use this method sparingly.
+&nbsp;   *
+&nbsp;   * @param protocol contains protocol value to be used (e.g.: http, https, etc).
+&nbsp;   * @return the sampler for further configuration or usage.
+&nbsp;   */
+&nbsp;  public T protocol(String protocol) {
+<b class="fc">&nbsp;    this.protocol = protocol;</b>
+<b class="fc">&nbsp;    return (T) this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Specifies the server host (domain) to be used in the HTTP request generated by the sampler.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * You can specify entire url when creating a sampler, but this method allows you to override the
+&nbsp;   * host if needed. For example, if you have defaults element with url and just need in one sampler
+&nbsp;   * to have a different host.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * In general prefer using java variables and methods, to get shorter and more maintainable code,
+&nbsp;   * and use this method sparingly.
+&nbsp;   *
+&nbsp;   * @param host contains server name without protocol (no http/https) and path.
+&nbsp;   * @return the sampler for further configuration or usage.
+&nbsp;   */
+&nbsp;  public T host(String host) {
+<b class="fc">&nbsp;    this.host = host;</b>
+<b class="fc">&nbsp;    return (T) this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Specifies the HTTP Sampler port to be used in the HTTP request generated by the sampler.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * You can specify entire url when creating a sampler, but this method allows you to override the
+&nbsp;   * port if needed. For example, if you have defaults element with url and just need in one sampler
+&nbsp;   * to have a different port.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * In general prefer using java variables and methods, to get shorter and more maintainable code,
+&nbsp;   * and use this method sparingly.
+&nbsp;   *
+&nbsp;   * @param port contains port value to be used.
+&nbsp;   * @return the sampler for further configuration or usage.
+&nbsp;   */
+&nbsp;  public T port(int port) {
+<b class="fc">&nbsp;    this.port = String.valueOf(port);</b>
+<b class="fc">&nbsp;    return (T) this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Specifies an HTTP header to be sent by the sampler.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * To specify multiple headers just invoke this method several times with the different header
+&nbsp;   * names and values.
+&nbsp;   *
+&nbsp;   * @param name  of the HTTP header.
+&nbsp;   * @param value of the HTTP header.
+&nbsp;   * @return the sampler for further configuration or usage.
+&nbsp;   */
+&nbsp;  public T header(String name, String value) {
+<b class="fc">&nbsp;    headers.header(name, value);</b>
+<b class="fc">&nbsp;    return (T) this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Same as {@link #header(String, String)} but allows using dynamically calculated HTTP header
+&nbsp;   * value.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * This method is just an abstraction that uses jexl2 function as HTTP header value.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * &lt;b&gt;WARNING:&lt;/b&gt; This only works when using embedded jmeter engine.
+&nbsp;   * Check &lt;a href=&quot;https://abstracta.github.io/jmeter-java-dsl/guide/#lambdas&quot;&gt;the user guide&lt;/a&gt;
+&nbsp;   * for details on some alternative.
+&nbsp;   *
+&nbsp;   * @param name          of the HTTP header.
+&nbsp;   * @param valueSupplier builds the header value.
+&nbsp;   * @return the altered sampler to allow for fluent API usage.
+&nbsp;   */
+&nbsp;  public T header(String name, Function&lt;PreProcessorVars, String&gt; valueSupplier) {
+<b class="fc">&nbsp;    headers.header(name,</b>
+<b class="fc">&nbsp;        scriptVars -&gt; valueSupplier.apply(new PreProcessorVars(scriptVars.sampler)));</b>
+<b class="fc">&nbsp;    return (T) this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Same as {@link #header(String, Function)} but with support for running at scale in a remote
+&nbsp;   * engine.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * Check &lt;a href=&quot;https://abstracta.github.io/jmeter-java-dsl/guide/#lambdas&quot;&gt;the user guide&lt;/a&gt;
+&nbsp;   * for details on additional steps required to run them at scale in a remote engine.
+&nbsp;   *
+&nbsp;   * @see PreProcessorScript
+&nbsp;   * @see #header(String, Function)
+&nbsp;   * @since 1.14
+&nbsp;   */
+&nbsp;  public T header(String name, Class&lt;? extends PropertyScript&lt;String&gt;&gt; valueSupplierClass) {
+<b class="nc">&nbsp;    headers.header(name, valueSupplierClass);</b>
+<b class="nc">&nbsp;    return (T) this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Allows to easily specify the Content-Type HTTP header to be used by the sampler.
+&nbsp;   *
+&nbsp;   * @param contentType value to send as Content-Type header.
+&nbsp;   * @return the sampler for further configuration or usage.
+&nbsp;   */
+&nbsp;  public T contentType(ContentType contentType) {
+<b class="fc">&nbsp;    headers.contentType(contentType);</b>
+<b class="fc">&nbsp;    return (T) this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Allows to set the maximum amount of time to wait for an HTTP connection to be established.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * If the connection is not established within the specified timeout, then the request will fail
+&nbsp;   * and sample result will be marked as failed with proper response message.
+&nbsp;   *
+&nbsp;   * @param timeout specifies the duration to be used as connection timeout. When set to 0 it
+&nbsp;   *                specifies to not timeout (wait indefinitely), which is not recommended. When set
+&nbsp;   *                to a negative number the operating system default is used. By default, is set to
+&nbsp;   *                -1.
+&nbsp;   * @return the sampler for further configuration or usage.
+&nbsp;   * @since 1.4
+&nbsp;   */
+&nbsp;  public T connectionTimeout(Duration timeout) {
+<b class="fc">&nbsp;    connectionTimeout = timeout;</b>
+<b class="fc">&nbsp;    return (T) this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Allows to set the maximum amount of time to wait for a response to an HTTP request.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * If the response takes more than specified time, then the request will fail and sample result
+&nbsp;   * will be marked as failed with proper response message.
+&nbsp;   *
+&nbsp;   * @param timeout specifies the duration to be used as response timeout. When set to 0 it
+&nbsp;   *                specifies to not timeout (wait indefinitely), which is not recommended. When set
+&nbsp;   *                to a negative number the operating system default is used. By default, is set to
+&nbsp;   *                -1.
+&nbsp;   * @return the sampler for further configuration or usage.
+&nbsp;   * @since 1.4
+&nbsp;   */
+&nbsp;  public T responseTimeout(Duration timeout) {
+<b class="fc">&nbsp;    responseTimeout = timeout;</b>
+<b class="fc">&nbsp;    return (T) this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Allows specifying a proxy through which all http requests will be sent to their final
+&nbsp;   * destination.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * This is usually helpful when you need to use a proxy to access the internet when all access is
+&nbsp;   * behind and enterprise proxy (due to security measures) or when you want to intercept requests
+&nbsp;   * for further analysis or modification by other tools like fiddler or mitmproxy.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * If your proxy requires authentication check {@link #proxy(String, String, String)}.
+&nbsp;   *
+&nbsp;   * @param url specifies the proxy url. For example http://myproxy:8181.
+&nbsp;   * @return the sampler for further configuration or usage.
+&nbsp;   */
+&nbsp;  public T proxy(String url) {
+<b class="fc">&nbsp;    proxyUrl = url;</b>
+<b class="fc">&nbsp;    return (T) this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Same as {@link #proxy(String)} but allowing also to specify proxy credentials.
+&nbsp;   *
+&nbsp;   * @param url      specifies the proxy url. For example http://myproxy:8181.
+&nbsp;   * @param username specifies the username used to authenticate with the proxy.
+&nbsp;   * @param password specifies the password used to authenticate with the proxy.
+&nbsp;   * @return the sampler for further configuration or usage.
+&nbsp;   * @see #proxy(String)
+&nbsp;   */
+&nbsp;  public T proxy(String url, String username, String password) {
+<b class="fc">&nbsp;    proxyUrl = url;</b>
+<b class="fc">&nbsp;    proxyUser = username;</b>
+<b class="fc">&nbsp;    proxyPassword = password;</b>
+<b class="fc">&nbsp;    return (T) this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  protected TestElement buildTestElement() {
+<b class="fc">&nbsp;    if (JMeterUtils.getProperty(RESET_CONNECTIONS_BETWEEN_ITERATIONS_PROP) == null) {</b>
+<b class="fc">&nbsp;      JMeterUtils.setProperty(RESET_CONNECTIONS_BETWEEN_ITERATIONS_PROP, String.valueOf(false));</b>
+&nbsp;    }
+<b class="fc">&nbsp;    HTTPSamplerProxy ret = new HTTPSamplerProxy();</b>
+<b class="fc">&nbsp;    HttpElementHelper.modifyTestElementUrl(ret, protocol, host, port, path);</b>
+&nbsp;    // We need to use this logic since setPath method triggers additional logic
+<b class="fc">&nbsp;    if (path != null) {</b>
+<b class="fc">&nbsp;      ret.setPath(path);</b>
+&nbsp;    }
+<b class="fc">&nbsp;    HttpElementHelper.modifyTestElementTimeouts(ret, connectionTimeout, responseTimeout);</b>
+<b class="fc">&nbsp;    HttpElementHelper.modifyTestElementProxy(ret, proxyUrl, proxyUser, proxyPassword);</b>
+<b class="fc">&nbsp;    return configureHttpTestElement(ret);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  protected abstract HTTPSamplerProxy configureHttpTestElement(HTTPSamplerProxy elem);
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public HashTree buildTreeUnder(HashTree parent, BuildTreeContext context) {
+<b class="fc">&nbsp;    HashTree ret = super.buildTreeUnder(parent, context);</b>
+<b class="fc">&nbsp;    if (!headers.isEmpty()) {</b>
+<b class="fc">&nbsp;      context.buildChild(headers, ret);</b>
+&nbsp;    }
+<b class="fc">&nbsp;    new DslCookieManager().registerDependency(context);</b>
+<b class="fc">&nbsp;    new DslCacheManager().registerDependency(context);</b>
+<b class="fc">&nbsp;    return ret;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  protected abstract static class BaseHttpSamplerCodeBuilder extends SingleGuiClassCallBuilder {
+&nbsp;
+&nbsp;    private final String defaultName;
+&nbsp;
+&nbsp;    protected BaseHttpSamplerCodeBuilder(String defaultName,
+&nbsp;        Class&lt;? extends JMeterGUIComponent&gt; guiClass, List&lt;Method&gt; builderMethods) {
+<b class="fc">&nbsp;      super(guiClass, builderMethods);</b>
+<b class="fc">&nbsp;      this.defaultName = defaultName;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected MethodCall buildMethodCall(MethodCallContext context) {
+<b class="fc">&nbsp;      HTTPSamplerProxy testElement = (HTTPSamplerProxy) context.getTestElement();</b>
+<b class="fc">&nbsp;      TestElementParamBuilder paramBuilder = new TestElementParamBuilder(testElement);</b>
+<b class="fc">&nbsp;      MethodParam name = paramBuilder.nameParam(defaultName);</b>
+<b class="fc">&nbsp;      MethodParam protocol = paramBuilder.stringParam(HTTPSamplerBase.PROTOCOL);</b>
+<b class="fc">&nbsp;      MethodParam domain = paramBuilder.stringParam(HTTPSamplerBase.DOMAIN);</b>
+<b class="fc">&nbsp;      MethodParam port = paramBuilder.intParam(HTTPSamplerBase.PORT);</b>
+<b class="fc">&nbsp;      MethodParam path = paramBuilder.stringParam(HTTPSamplerBase.PATH, &quot;/&quot;);</b>
+<b class="fc">&nbsp;      MethodParam url = buildUrlParam(protocol, domain,</b>
+<b class="fc">&nbsp;          new StringParam(port.isDefault() ? &quot;&quot; : &quot;&quot; + port.getExpression()), path);</b>
+<b class="fc">&nbsp;      MethodCall ret = buildBaseHttpMethodCall(name, url, paramBuilder);</b>
+<b class="fc">&nbsp;      context.findBuilder(DslHttpDefaults.CodeBuilder.class)</b>
+<b class="fc">&nbsp;          .registerDependency(context);</b>
+<b class="fc">&nbsp;      context.findBuilder(DslCacheManager.CodeBuilder.class)</b>
+<b class="fc">&nbsp;          .registerDependency(context, ret);</b>
+<b class="fc">&nbsp;      context.findBuilder(DslCookieManager.CodeBuilder.class)</b>
+<b class="fc">&nbsp;          .registerDependency(context, ret);</b>
+<b class="fc">&nbsp;      if (url.equals(path)) {</b>
+<b class="fc">&nbsp;        ret.chain(&quot;protocol&quot;, protocol)</b>
+<b class="fc">&nbsp;            .chain(&quot;host&quot;, domain)</b>
+<b class="fc">&nbsp;            .chain(&quot;port&quot;, port);</b>
+&nbsp;      }
+<b class="fc">&nbsp;      chainRequestCalls(ret, testElement, context);</b>
+<b class="fc">&nbsp;      chainAdditionalOptions(ret, paramBuilder);</b>
+<b class="fc">&nbsp;      HttpElementHelper.chainConnectionOptionsToMethodCall(ret, paramBuilder);</b>
+<b class="fc">&nbsp;      return ret;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    protected abstract MethodCall buildBaseHttpMethodCall(MethodParam name, MethodParam url,
+&nbsp;        TestElementParamBuilder paramBuilder);
+&nbsp;
+&nbsp;    public static MethodParam buildUrlParam(MethodParam protocol, MethodParam domain,
+&nbsp;        MethodParam port, MethodParam path) {
+<b class="fc">&nbsp;      if (!domain.isDefault()) {</b>
+<b class="fc">&nbsp;        return new StringParam(</b>
+<b class="fc">&nbsp;            new JmeterUrl(protocol.getExpression(), domain.getExpression(), port.getExpression(),</b>
+<b class="fc">&nbsp;                path.isDefault() ? &quot;&quot; : path.getExpression()).toString());</b>
+&nbsp;      } else {
+<b class="fc">&nbsp;        return path;</b>
+&nbsp;      }
+&nbsp;    }
+&nbsp;
+&nbsp;    protected abstract void chainRequestCalls(MethodCall ret, HTTPSamplerProxy testElement,
+&nbsp;        MethodCallContext context);
+&nbsp;
+&nbsp;    protected String removeContentTypeHeader(MethodCallContext context) {
+<b class="fc">&nbsp;      if (context == null) {</b>
+<b class="fc">&nbsp;        return null;</b>
+&nbsp;      }
+<b class="fc">&nbsp;      String headerName = HTTPConstants.HEADER_CONTENT_TYPE;</b>
+<b class="fc">&nbsp;      HeaderManager headers = (HeaderManager) context.getTestElement();</b>
+<b class="fc">&nbsp;      Header header = headers.getFirstHeaderNamed(headerName);</b>
+<b class="fc">&nbsp;      headers.removeHeaderNamed(headerName);</b>
+<b class="fc">&nbsp;      return header == null ? null : header.getValue();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    protected void chainContentType(MethodCall ret, String contentType) {
+<b class="fc">&nbsp;      ret.chain(&quot;contentType&quot;, new ContentTypeParam(contentType));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    protected void chainHeaders(MethodCall ret, MethodCallContext headersContext) {
+<b class="fc">&nbsp;      if (headersContext != null) {</b>
+<b class="fc">&nbsp;        ret.reChain(headersContext.buildMethodCall());</b>
+&nbsp;      }
+&nbsp;    }
+&nbsp;
+&nbsp;    protected abstract void chainAdditionalOptions(MethodCall ret,
+&nbsp;        TestElementParamBuilder paramBuilder);
+&nbsp;
+&nbsp;  }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-03 22:39</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,360 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=GBK"> 
+  <title>Coverage Report > SimpleThreadGroupHelper</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">us.abstracta.jmeter.javadsl.core.threadgroups.defaultthreadgroup</a>
+</div>
+
+<h1>Coverage Summary for Class: SimpleThreadGroupHelper (us.abstracta.jmeter.javadsl.core.threadgroups.defaultthreadgroup)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SimpleThreadGroupHelper</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (8/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    95.8%
+  </span>
+  <span class="absValue">
+    (68/71)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">SimpleThreadGroupHelper$CodeBuilder</td>
+<td class="coverageStat">
+  <span class="percent">
+    80%
+  </span>
+  <span class="absValue">
+    (4/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    90.2%
+  </span>
+  <span class="absValue">
+    (37/41)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    92.3%
+  </span>
+  <span class="absValue">
+    (12/13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    93.8%
+  </span>
+  <span class="absValue">
+    (105/112)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package us.abstracta.jmeter.javadsl.core.threadgroups.defaultthreadgroup;
+&nbsp;
+&nbsp;import java.lang.reflect.Method;
+&nbsp;import java.time.Duration;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.List;
+&nbsp;import org.apache.jmeter.control.LoopController;
+&nbsp;import org.apache.jmeter.testelement.TestElement;
+&nbsp;import org.apache.jmeter.threads.AbstractThreadGroup;
+&nbsp;import org.apache.jmeter.threads.ThreadGroup;
+&nbsp;import org.apache.jmeter.threads.gui.ThreadGroupGui;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.MethodCall;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.MethodCallBuilder;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.MethodCallContext;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.MethodParam;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.TestElementParamBuilder;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.params.ChildrenParam;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.params.DurationParam;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.params.IntParam;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.params.StringParam;
+&nbsp;import us.abstracta.jmeter.javadsl.core.threadgroups.BaseThreadGroup;
+&nbsp;import us.abstracta.jmeter.javadsl.core.threadgroups.DslDefaultThreadGroup;
+&nbsp;import us.abstracta.jmeter.javadsl.core.util.JmeterFunction;
+&nbsp;
+&nbsp;public class SimpleThreadGroupHelper extends BaseThreadGroup&lt;DslDefaultThreadGroup&gt; {
+&nbsp;
+<b class="fc">&nbsp;  private static final Integer ZERO = 0;</b>
+&nbsp;  private final List&lt;Stage&gt; stages;
+&nbsp;
+&nbsp;  public SimpleThreadGroupHelper(List&lt;Stage&gt; stages) {
+<b class="fc">&nbsp;    super(null, ThreadGroupGui.class, Collections.emptyList());</b>
+<b class="fc">&nbsp;    this.stages = stages;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public AbstractThreadGroup buildThreadGroup() {
+<b class="fc">&nbsp;    Object threads = 1;</b>
+<b class="fc">&nbsp;    Object iterations = 1;</b>
+<b class="fc">&nbsp;    Object rampUpPeriod = null;</b>
+<b class="fc">&nbsp;    Object duration = null;</b>
+<b class="fc">&nbsp;    Object delay = null;</b>
+<b class="fc">&nbsp;    if (!stages.isEmpty()) {</b>
+<b class="fc">&nbsp;      Stage firstStage = stages.get(0);</b>
+<b class="fc">&nbsp;      if (ZERO.equals(firstStage.threadCount())) {</b>
+<b class="fc">&nbsp;        delay = firstStage.duration();</b>
+&nbsp;      } else {
+<b class="fc">&nbsp;        threads = firstStage.threadCount();</b>
+<b class="fc">&nbsp;        iterations = firstStage.iterations();</b>
+<b class="fc">&nbsp;        if (firstStage.iterations() == null) {</b>
+<b class="fc">&nbsp;          rampUpPeriod = firstStage.duration();</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;          duration = firstStage.duration();</b>
+&nbsp;        }
+&nbsp;      }
+<b class="fc">&nbsp;      if (stages.size() &gt; 1) {</b>
+<b class="fc">&nbsp;        Stage secondStage = stages.get(1);</b>
+<b class="fc">&nbsp;        threads = secondStage.threadCount();</b>
+<b class="fc">&nbsp;        iterations = secondStage.iterations();</b>
+<b class="fc">&nbsp;        if (ZERO.equals(firstStage.threadCount())) {</b>
+<b class="fc">&nbsp;          rampUpPeriod = secondStage.duration();</b>
+<b class="fc">&nbsp;          if (stages.size() &gt; 2) {</b>
+<b class="fc">&nbsp;            Stage lastStage = stages.get(2);</b>
+<b class="fc">&nbsp;            duration = lastStage.duration();</b>
+<b class="fc">&nbsp;            iterations = lastStage.iterations();</b>
+<b class="fc">&nbsp;          }</b>
+&nbsp;        } else {
+<b class="fc">&nbsp;          duration = secondStage.duration();</b>
+&nbsp;        }
+&nbsp;      }
+&nbsp;    }
+<b class="fc">&nbsp;    if (rampUpPeriod != null &amp;&amp; !Duration.ZERO.equals(rampUpPeriod) &amp;&amp;</b>
+&nbsp;        (iterations == null || duration != null)) {
+<b class="fc">&nbsp;      duration = duration != null ? sumDurations(duration, rampUpPeriod) : rampUpPeriod;</b>
+&nbsp;    }
+<b class="fc">&nbsp;    return buildSimpleThreadGroupFrom(threads, iterations, rampUpPeriod, duration, delay);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private Object sumDurations(Object duration, Object rampUpPeriod) {
+<b class="fc">&nbsp;    if (duration instanceof Duration &amp;&amp; rampUpPeriod instanceof Duration) {</b>
+<b class="fc">&nbsp;      return ((Duration) duration).plus((Duration) rampUpPeriod);</b>
+&nbsp;    } else {
+<b class="fc">&nbsp;      if (duration instanceof Duration) {</b>
+<b class="nc">&nbsp;        duration = String.valueOf(durationToSeconds((Duration) duration));</b>
+<b class="fc">&nbsp;      } else if (rampUpPeriod instanceof Duration) {</b>
+<b class="nc">&nbsp;        rampUpPeriod = String.valueOf(durationToSeconds((Duration) rampUpPeriod));</b>
+&nbsp;      }
+<b class="fc">&nbsp;      return JmeterFunction.groovy(buildGroovySolvingIntExpression((String) duration) + &quot; + &quot;</b>
+<b class="fc">&nbsp;          + buildGroovySolvingIntExpression((String) rampUpPeriod));</b>
+&nbsp;    }
+&nbsp;  }
+&nbsp;
+&nbsp;  private static String buildGroovySolvingIntExpression(String expr) {
+&nbsp;    /*
+&nbsp;     * Replacing $ with # (or alternative, depending on level of nesting of groovy expression)
+&nbsp;     * to avoid Jmeter to interpret this property, and delegate evaluation to CompoundVariable for
+&nbsp;     * proper calculation.
+&nbsp;     */
+<b class="fc">&nbsp;    StringBuilder altPlaceHolder = new StringBuilder(&quot;#&quot;);</b>
+<b class="fc">&nbsp;    while (expr.contains(altPlaceHolder + &quot;{&quot;)) {</b>
+<b class="fc">&nbsp;      altPlaceHolder.append(&quot;#&quot;);</b>
+&nbsp;    }
+<b class="fc">&nbsp;    return &quot;(new org.apache.jmeter.engine.util.CompoundVariable(&#39;&quot;</b>
+<b class="fc">&nbsp;        + expr.replace(&quot;${&quot;, altPlaceHolder + &quot;{&quot;)</b>
+&nbsp;        // Escape chars that are unescaped by groovy script
+<b class="fc">&nbsp;        .replace(&quot;\\&quot;, &quot;\\\\&quot;)</b>
+<b class="fc">&nbsp;        .replace(&quot;&#39;&quot;, &quot;\\&#39;&quot;)</b>
+&nbsp;        + &quot;&#39;.replace(&#39;&quot; + altPlaceHolder + &quot;&#39;,&#39;$&#39;)).execute() as int)&quot;;
+&nbsp;  }
+&nbsp;
+&nbsp;  private ThreadGroup buildSimpleThreadGroupFrom(Object threads, Object iterations,
+&nbsp;      Object rampUpPeriod, Object duration, Object delay) {
+<b class="fc">&nbsp;    ThreadGroup ret = new ThreadGroup();</b>
+<b class="fc">&nbsp;    setIntProperty(ret, ThreadGroup.NUM_THREADS, threads);</b>
+<b class="fc">&nbsp;    setIntProperty(ret, ThreadGroup.RAMP_TIME, rampUpPeriod == null ? Duration.ZERO : rampUpPeriod);</b>
+<b class="fc">&nbsp;    LoopController loopController = new LoopController();</b>
+<b class="fc">&nbsp;    ret.setSamplerController(loopController);</b>
+<b class="fc">&nbsp;    if (iterations == null) {</b>
+<b class="fc">&nbsp;      loopController.setLoops(-1);</b>
+&nbsp;    } else {
+<b class="fc">&nbsp;      setIntProperty(loopController, LoopController.LOOPS, iterations);</b>
+&nbsp;    }
+<b class="fc">&nbsp;    if (duration != null) {</b>
+<b class="fc">&nbsp;      setLongProperty(ret, ThreadGroup.DURATION, duration);</b>
+&nbsp;    }
+<b class="fc">&nbsp;    if (delay != null) {</b>
+<b class="fc">&nbsp;      setLongProperty(ret, ThreadGroup.DELAY, delay);</b>
+&nbsp;    }
+<b class="fc">&nbsp;    if (duration != null || delay != null) {</b>
+<b class="fc">&nbsp;      ret.setScheduler(true);</b>
+&nbsp;    }
+<b class="fc">&nbsp;    ret.setIsSameUserOnNextIteration(false);</b>
+<b class="fc">&nbsp;    return ret;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private void setIntProperty(TestElement ret, String propName, Object value) {
+<b class="fc">&nbsp;    if (value instanceof Duration) {</b>
+<b class="fc">&nbsp;      ret.setProperty(propName, (int) durationToSeconds((Duration) value));</b>
+<b class="fc">&nbsp;    } else if (value instanceof Integer) {</b>
+<b class="fc">&nbsp;      ret.setProperty(propName, (Integer) value);</b>
+&nbsp;    } else {
+<b class="fc">&nbsp;      ret.setProperty(propName, (String) value);</b>
+&nbsp;    }
+&nbsp;  }
+&nbsp;
+&nbsp;  private void setLongProperty(TestElement ret, String propName, Object value) {
+<b class="fc">&nbsp;    if (value instanceof Duration) {</b>
+<b class="fc">&nbsp;      ret.setProperty(propName, durationToSeconds((Duration) value));</b>
+&nbsp;    } else {
+<b class="fc">&nbsp;      ret.setProperty(propName, (String) value);</b>
+&nbsp;    }
+&nbsp;  }
+&nbsp;
+&nbsp;  public static class CodeBuilder extends MethodCallBuilder {
+&nbsp;
+&nbsp;    public CodeBuilder(List&lt;Method&gt; builderMethods) {
+<b class="fc">&nbsp;      super(builderMethods);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean matches(MethodCallContext context) {
+<b class="nc">&nbsp;      return false;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public MethodCall buildMethodCall(MethodCallContext context) {
+<b class="fc">&nbsp;      TestElementParamBuilder testElement = new TestElementParamBuilder(context.getTestElement());</b>
+<b class="fc">&nbsp;      MethodParam name = testElement.nameParam(&quot;Thread Group&quot;);</b>
+<b class="fc">&nbsp;      MethodParam threads = testElement.intParam(ThreadGroup.NUM_THREADS);</b>
+<b class="fc">&nbsp;      MethodParam rampTime = testElement.durationParam(ThreadGroup.RAMP_TIME,</b>
+<b class="fc">&nbsp;          Duration.ofSeconds(1));</b>
+<b class="fc">&nbsp;      MethodParam duration = testElement.durationParam(ThreadGroup.DURATION);</b>
+<b class="fc">&nbsp;      MethodParam delay = testElement.durationParam(ThreadGroup.DELAY);</b>
+<b class="fc">&nbsp;      MethodParam iterations = testElement.intParam(</b>
+<b class="fc">&nbsp;          ThreadGroup.MAIN_CONTROLLER + &quot;/&quot; + LoopController.LOOPS, -1);</b>
+<b class="fc">&nbsp;      if (threads instanceof IntParam &amp;&amp; duration instanceof DurationParam</b>
+<b class="fc">&nbsp;          &amp;&amp; iterations instanceof IntParam &amp;&amp; isDefaultOrZeroDuration(rampTime)</b>
+<b class="fc">&nbsp;          &amp;&amp; isDefaultOrZeroDuration(delay) &amp;&amp; (isDefaultOrZeroDuration(duration)</b>
+<b class="fc">&nbsp;          || iterations.isDefault())) {</b>
+<b class="fc">&nbsp;        return buildMethodCall(name, threads,</b>
+<b class="fc">&nbsp;            isDefaultOrZeroDuration(duration) ? iterations : duration,</b>
+&nbsp;            new ChildrenParam&lt;&gt;(ThreadGroupChild[].class));
+&nbsp;      } else {
+<b class="fc">&nbsp;        if (!(threads instanceof IntParam) || !(rampTime instanceof DurationParam)</b>
+&nbsp;            || !(duration instanceof DurationParam)) {
+<b class="fc">&nbsp;          threads = new StringParam(threads.getExpression());</b>
+<b class="fc">&nbsp;          rampTime = new StringParam(rampTime.getExpression());</b>
+<b class="fc">&nbsp;          duration = new StringParam(duration.getExpression());</b>
+&nbsp;        }
+<b class="fc">&nbsp;        MethodCall ret = buildMethodCall(name);</b>
+<b class="fc">&nbsp;        if (!isDefaultOrZeroDuration(delay)) {</b>
+<b class="fc">&nbsp;          ret.chain(&quot;holdFor&quot;, delay);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        if (!iterations.isDefault() || isDefaultOrZeroDuration(duration)) {</b>
+<b class="fc">&nbsp;          ret.chain(&quot;rampTo&quot;, threads, rampTime)</b>
+<b class="fc">&nbsp;              .chain(&quot;holdIterating&quot;, !iterations.isDefault() ? iterations : new IntParam(-1));</b>
+<b class="fc">&nbsp;          if (!isDefaultOrZeroDuration(duration)) {</b>
+<b class="fc">&nbsp;            duration = buildDurationParam(duration, rampTime, ret);</b>
+<b class="fc">&nbsp;            ret.chain(&quot;upTo&quot;, duration);</b>
+&nbsp;          }
+&nbsp;        } else {
+<b class="fc">&nbsp;          duration = buildDurationParam(duration, rampTime, ret);</b>
+<b class="fc">&nbsp;          ret.chain(&quot;rampToAndHold&quot;, threads, rampTime, duration);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        return ret;</b>
+&nbsp;      }
+&nbsp;    }
+&nbsp;
+&nbsp;    private boolean isDefaultOrZeroDuration(MethodParam duration) {
+<b class="fc">&nbsp;      return duration.isDefault()</b>
+<b class="fc">&nbsp;          || duration instanceof DurationParam &amp;&amp; ((DurationParam) duration).getValue().isZero();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private MethodParam buildDurationParam(MethodParam duration, MethodParam rampTime,
+&nbsp;        MethodCall ret) {
+<b class="fc">&nbsp;      if (duration instanceof DurationParam &amp;&amp; rampTime instanceof DurationParam) {</b>
+<b class="fc">&nbsp;        return new DurationParam(rampTime.isDefault() ? ((DurationParam) duration).getValue()</b>
+<b class="fc">&nbsp;            : ((DurationParam) duration).getValue().minus(((DurationParam) rampTime).getValue()));</b>
+&nbsp;      } else {
+<b class="nc">&nbsp;        if (!isDefaultOrZeroDuration(rampTime)) {</b>
+<b class="nc">&nbsp;          ret.chainComment(&quot;To keep generated DSL simple, the original duration is used as hold &quot;</b>
+&nbsp;              + &quot;for time. But, you should use as hold for time the original duration - ramp up &quot;
+&nbsp;              + &quot;period.&quot;);
+&nbsp;        }
+<b class="nc">&nbsp;        return duration;</b>
+&nbsp;      }
+&nbsp;    }
+&nbsp;
+&nbsp;  }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-03 20:57</div>
+</div>
+</body>
+</html>

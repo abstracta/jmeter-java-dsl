@@ -1,0 +1,328 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=GBK"> 
+  <title>Coverage Report > DslDummySampler</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">us.abstracta.jmeter.javadsl.core.samplers</a>
+</div>
+
+<h1>Coverage Summary for Class: DslDummySampler (us.abstracta.jmeter.javadsl.core.samplers)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DslDummySampler</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (10/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (35/35)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">DslDummySampler$CodeBuilder</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (12/12)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (12/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (47/47)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package us.abstracta.jmeter.javadsl.core.samplers;
+&nbsp;
+&nbsp;import java.lang.reflect.Method;
+&nbsp;import java.time.Duration;
+&nbsp;import java.util.List;
+&nbsp;import kg.apc.jmeter.dummy.DummyElement;
+&nbsp;import kg.apc.jmeter.samplers.DummySampler;
+&nbsp;import kg.apc.jmeter.samplers.DummySamplerGui;
+&nbsp;import org.apache.jmeter.testelement.TestElement;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.MethodCall;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.MethodCallContext;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.SingleTestElementCallBuilder;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.TestElementParamBuilder;
+&nbsp;import us.abstracta.jmeter.javadsl.core.util.JmeterFunction;
+&nbsp;
+&nbsp;/**
+&nbsp; * Allows using JMeter Dummy Sampler plugin to emulate other samples and ease testing post
+&nbsp; * processors and other parts of a test plan.
+&nbsp; * &lt;p&gt;
+&nbsp; * By default, this element is set with no request, url, response code=200, response message = OK,
+&nbsp; * and response time with random value between 50 and 500 milliseconds. Additionally, emulation of
+&nbsp; * response times (through sleeps) is disabled to speed up testing.
+&nbsp; *
+&nbsp; * @since 0.46
+&nbsp; */
+&nbsp;public class DslDummySampler extends BaseSampler&lt;DslDummySampler&gt; {
+&nbsp;
+&nbsp;  private static final String DEFAULT_NAME = &quot;jp@gc - Dummy Sampler&quot;;
+&nbsp;  private static final String DEFAULT_RESPONSE_CODE = &quot;200&quot;;
+&nbsp;  private static final String DEFAULT_RESPONSE_MESSAGE = &quot;OK&quot;;
+&nbsp;
+&nbsp;  protected String responseBody;
+<b class="fc">&nbsp;  protected boolean successful = true;</b>
+<b class="fc">&nbsp;  protected String responseCode = DEFAULT_RESPONSE_CODE;</b>
+<b class="fc">&nbsp;  protected String responseMessage = DEFAULT_RESPONSE_MESSAGE;</b>
+<b class="fc">&nbsp;  protected String responseTime = JmeterFunction.from(&quot;__Random&quot;, 50, 500);</b>
+&nbsp;  protected boolean simulateResponseTime;
+<b class="fc">&nbsp;  protected String url = &quot;&quot;;</b>
+<b class="fc">&nbsp;  protected String requestBody = &quot;&quot;;</b>
+&nbsp;
+&nbsp;  public DslDummySampler(String name, String responseBody) {
+<b class="fc">&nbsp;    super(name == null ? DEFAULT_NAME : name, DummySamplerGui.class);</b>
+<b class="fc">&nbsp;    this.responseBody = responseBody;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Allows generating successful or unsuccessful sample results for this sampler.
+&nbsp;   *
+&nbsp;   * @param successful when true, generated sample result will be successful, otherwise it will be
+&nbsp;   *                   marked as failure. When not specified, successful sample results are
+&nbsp;   *                   generated.
+&nbsp;   * @return the sampler for further configuration or usage.
+&nbsp;   */
+&nbsp;  public DslDummySampler successful(boolean successful) {
+<b class="fc">&nbsp;    this.successful = successful;</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Specifies the response code included in generated sample results.
+&nbsp;   *
+&nbsp;   * @param code defines the response code included in sample results. When not set, 200 is used.
+&nbsp;   * @return the sampler for further configuration or usage.
+&nbsp;   */
+&nbsp;  public DslDummySampler responseCode(String code) {
+<b class="fc">&nbsp;    this.responseCode = code;</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Specifies the response message included in generated sample results.
+&nbsp;   *
+&nbsp;   * @param message defines the response message included in sample results. When not set, OK is
+&nbsp;   *                used.
+&nbsp;   * @return the sampler for further configuration or usage.
+&nbsp;   */
+&nbsp;  public DslDummySampler responseMessage(String message) {
+<b class="fc">&nbsp;    this.responseMessage = message;</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Specifies the response time used in generated sample results.
+&nbsp;   *
+&nbsp;   * @param responseTime defines the response time associated to the sample results. When not set, a
+&nbsp;   *                     randomly calculated value between 50 and 500 milliseconds is used.
+&nbsp;   * @return the sampler for further configuration or usage.
+&nbsp;   */
+&nbsp;  public DslDummySampler responseTime(Duration responseTime) {
+<b class="fc">&nbsp;    this.responseTime = String.valueOf(responseTime.toMillis());</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Same as {@link #responseTime(Duration)} but allowing to specify a JMeter expression for
+&nbsp;   * evaluation.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * This is useful when you want response time to be calculated dynamically. For example,
+&nbsp;   * &lt;pre&gt;{@code ${__Random(50, 500)}}&lt;/pre&gt;
+&nbsp;   *
+&nbsp;   * @param responseTime specifies the JMeter expression to be used to calculate response times,
+&nbsp;   *                     in milliseconds, for the sampler.
+&nbsp;   * @return the sampler for further configuration or usage.
+&nbsp;   * @see #responseTime(Duration)
+&nbsp;   * @since 1.0
+&nbsp;   */
+&nbsp;  public DslDummySampler responseTime(String responseTime) {
+<b class="fc">&nbsp;    this.responseTime = responseTime;</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Specifies if used response time should be simulated (the sample will sleep for the given
+&nbsp;   * duration) or not.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * Having simulation disabled allows for really fast emulation and trial of test plan, which is
+&nbsp;   * very handy when debugging. If you need a more accurate emulation in more advanced cases, like
+&nbsp;   * you don&#39;t want to generate too many requests per second, and you want a behavior closer to the
+&nbsp;   * real thing, then consider enabling response time simulation.
+&nbsp;   *
+&nbsp;   * @param simulate when true enables simulation of response times, when false no wait is done
+&nbsp;   *                 speeding up test plan execution. By default, simulation is disabled.
+&nbsp;   * @return the sampler for further configuration or usage.
+&nbsp;   */
+&nbsp;  public DslDummySampler simulateResponseTime(boolean simulate) {
+<b class="fc">&nbsp;    this.simulateResponseTime = simulate;</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Specifies the URL used in generated sample results.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * This might be helpful in scenarios where extractors, pre-processors or other test plan elements
+&nbsp;   * depend on the URL.
+&nbsp;   *
+&nbsp;   * @param url defines the URL associated to generated sample results. When not set, an empty URL
+&nbsp;   *            is used.
+&nbsp;   * @return the sampler for further configuration or usage.
+&nbsp;   */
+&nbsp;  public DslDummySampler url(String url) {
+<b class="fc">&nbsp;    this.url = url;</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Specifies the request body used in generated sample results.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * This might be helpful in scenarios where extractors, pre-processors or other test plan elements
+&nbsp;   * depend on the request body.
+&nbsp;   *
+&nbsp;   * @param requestBody defines the request body associated to generated sample results. When not
+&nbsp;   *                    set, an empty body is used.
+&nbsp;   * @return the sampler for further configuration or usage.
+&nbsp;   */
+&nbsp;  public DslDummySampler requestBody(String requestBody) {
+<b class="fc">&nbsp;    this.requestBody = requestBody;</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  protected TestElement buildTestElement() {
+<b class="fc">&nbsp;    DummySampler ret = new DummySampler();</b>
+<b class="fc">&nbsp;    DummyElement dummy = ret.getDummy();</b>
+<b class="fc">&nbsp;    dummy.setResponseData(responseBody);</b>
+<b class="fc">&nbsp;    dummy.setSuccessful(successful);</b>
+<b class="fc">&nbsp;    dummy.setResponseCode(responseCode);</b>
+<b class="fc">&nbsp;    dummy.setResponseMessage(responseMessage);</b>
+<b class="fc">&nbsp;    dummy.setResponseTime(responseTime);</b>
+<b class="fc">&nbsp;    dummy.setSimulateWaiting(simulateResponseTime);</b>
+<b class="fc">&nbsp;    dummy.setURL(url);</b>
+<b class="fc">&nbsp;    dummy.setRequestData(requestBody);</b>
+<b class="fc">&nbsp;    return ret;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  public static class CodeBuilder extends SingleTestElementCallBuilder&lt;DummySampler&gt; {
+&nbsp;
+&nbsp;    public CodeBuilder(List&lt;Method&gt; builderMethods) {
+<b class="fc">&nbsp;      super(DummySampler.class, builderMethods);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected MethodCall buildMethodCall(DummySampler testElement, MethodCallContext context) {
+<b class="fc">&nbsp;      TestElementParamBuilder paramBuilder = new TestElementParamBuilder(testElement);</b>
+<b class="fc">&nbsp;      return buildMethodCall(paramBuilder.nameParam(DEFAULT_NAME),</b>
+<b class="fc">&nbsp;          paramBuilder.stringParam(&quot;RESPONSE_DATA&quot;))</b>
+<b class="fc">&nbsp;          .chain(&quot;successful&quot;, paramBuilder.boolParam(&quot;SUCCESFULL&quot;, true))</b>
+<b class="fc">&nbsp;          .chain(&quot;responseCode&quot;, paramBuilder.stringParam(&quot;RESPONSE_CODE&quot;, DEFAULT_RESPONSE_CODE))</b>
+<b class="fc">&nbsp;          .chain(&quot;responseMessage&quot;,</b>
+<b class="fc">&nbsp;              paramBuilder.stringParam(&quot;RESPONSE_MESSAGE&quot;, DEFAULT_RESPONSE_MESSAGE))</b>
+<b class="fc">&nbsp;          .chain(&quot;responseTime&quot;, paramBuilder.durationParamMillis(&quot;RESPONSE_TIME&quot;, null))</b>
+<b class="fc">&nbsp;          .chain(&quot;simulateResponseTime&quot;, paramBuilder.boolParam(&quot;WAITING&quot;, false))</b>
+<b class="fc">&nbsp;          .chain(&quot;url&quot;, paramBuilder.stringParam(&quot;URL&quot;))</b>
+<b class="fc">&nbsp;          .chain(&quot;requestBody&quot;, paramBuilder.stringParam(&quot;REQUEST_DATA&quot;));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;  }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-03 22:39</div>
+</div>
+</body>
+</html>

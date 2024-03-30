@@ -1,0 +1,429 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=GBK"> 
+  <title>Coverage Report > DslWeightedSwitchController</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">us.abstracta.jmeter.javadsl.core.controllers</a>
+</div>
+
+<h1>Coverage Summary for Class: DslWeightedSwitchController (us.abstracta.jmeter.javadsl.core.controllers)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DslWeightedSwitchController</td>
+<td class="coverageStat">
+  <span class="percent">
+    90.9%
+  </span>
+  <span class="absValue">
+    (10/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    96.3%
+  </span>
+  <span class="absValue">
+    (26/27)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">DslWeightedSwitchController$1</td>
+  </tr>
+  <tr>
+    <td class="name">DslWeightedSwitchController$ChildParam</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (2/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (3/6)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">DslWeightedSwitchController$CodeBuilder</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (6/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (31/31)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">DslWeightedSwitchController$WeightedChild</td>
+<td class="coverageStat">
+  <span class="percent">
+    75%
+  </span>
+  <span class="absValue">
+    (3/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    83.3%
+  </span>
+  <span class="absValue">
+    (5/6)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    84%
+  </span>
+  <span class="absValue">
+    (21/25)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    92.9%
+  </span>
+  <span class="absValue">
+    (65/70)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package us.abstracta.jmeter.javadsl.core.controllers;
+&nbsp;
+&nbsp;import com.blazemeter.jmeter.control.WeightedSwitchController;
+&nbsp;import com.blazemeter.jmeter.control.WeightedSwitchControllerGui;
+&nbsp;import java.lang.reflect.Method;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Set;
+&nbsp;import kg.apc.jmeter.JMeterPluginsUtils;
+&nbsp;import org.apache.jmeter.gui.util.PowerTableModel;
+&nbsp;import org.apache.jmeter.testelement.TestElement;
+&nbsp;import org.apache.jmeter.testelement.property.CollectionProperty;
+&nbsp;import org.apache.jmeter.testelement.property.JMeterProperty;
+&nbsp;import org.apache.jorphan.collections.HashTree;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.MethodCall;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.MethodCallContext;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.MethodParam;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.SingleTestElementCallBuilder;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.TestElementParamBuilder;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.params.ChildrenParam;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.params.LongParam;
+&nbsp;import us.abstracta.jmeter.javadsl.core.BuildTreeContext;
+&nbsp;import us.abstracta.jmeter.javadsl.core.samplers.DslSampler;
+&nbsp;import us.abstracta.jmeter.javadsl.core.threadgroups.BaseThreadGroup.ThreadGroupChild;
+&nbsp;
+&nbsp;/**
+&nbsp; * Selects a child in each iteration according to specified relative weights.
+&nbsp; * &lt;p&gt;
+&nbsp; * Internally this uses &lt;a
+&nbsp; * href=&quot;https://github.com/Blazemeter/jmeter-bzm-plugins/blob/master/wsc/WeightedSwitchController.md&quot;&gt;
+&nbsp; * BlazeMeter Weighted Switch Controller plugin&lt;/a&gt;.
+&nbsp; * &lt;p&gt;
+&nbsp; * This controller is handy when you want part of the test plan to act in a probabilistic manner
+&nbsp; * switching between different alternatives.
+&nbsp; * &lt;p&gt;
+&nbsp; * If you configure for example children weights with (50, child1), (100, child2), (50, child3) and
+&nbsp; * 10 iterations, then you will get this execution: child2, child1, child3, child2, child2, child1,
+&nbsp; * child3, child2, child2, child1.
+&nbsp; *
+&nbsp; * @since 0.53
+&nbsp; */
+<b class="fc">&nbsp;public class DslWeightedSwitchController extends BaseController&lt;DslWeightedSwitchController&gt; {</b>
+&nbsp;
+&nbsp;  public static final long DEFAULT_WEIGHT = 100;
+&nbsp;
+&nbsp;  public DslWeightedSwitchController() {
+<b class="fc">&nbsp;    super(&quot;Weighted Switch Controller&quot;, WeightedSwitchControllerGui.class, new ArrayList&lt;&gt;());</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /* we provide two separate methods instead of one just for ThreadGroupChild to only allow users
+&nbsp;  specifying weights for elements that make sense */
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Adds a child to the controller with a configured weight for selecting it in iterations.
+&nbsp;   *
+&nbsp;   * @param weight is the weight to assign to this particular element for execution in iterations.
+&nbsp;   *               Keep in mind that if you use {@link #children(ThreadGroupChild...)} to add
+&nbsp;   *               samplers or controllers, their default assigned weight will be 100.
+&nbsp;   * @param child  is the element to add as controller child that will be selected for execution
+&nbsp;   *               during iterations according to given weight.
+&nbsp;   * @return the controller for further configuration and usage.
+&nbsp;   */
+&nbsp;  public DslWeightedSwitchController child(long weight, DslController child) {
+<b class="nc">&nbsp;    return addWeightedChild(weight, child);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Adds a child to the controller with a configured weight for selecting it in iterations.
+&nbsp;   *
+&nbsp;   * @param weight is the weight to assign to this particular element for execution in iterations.
+&nbsp;   *               Keep in mind that if you use {@link #children(ThreadGroupChild...)} to add
+&nbsp;   *               samplers or controllers, their default assigned weight will be 100.
+&nbsp;   * @param child  is the element to add as controller child that will be selected for execution
+&nbsp;   *               during iterations according to given weight.
+&nbsp;   * @return the controller for further configuration and usage.
+&nbsp;   */
+&nbsp;  public DslWeightedSwitchController child(long weight, DslSampler child) {
+<b class="fc">&nbsp;    return addWeightedChild(weight, child);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private DslWeightedSwitchController addWeightedChild(long weight, ThreadGroupChild child) {
+<b class="fc">&nbsp;    children.add(new WeightedChild(weight, child));</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+<b class="fc">&nbsp;  private static class WeightedChild implements ThreadGroupChild {</b>
+&nbsp;
+&nbsp;    private final long weight;
+&nbsp;    private final ThreadGroupChild element;
+&nbsp;
+&nbsp;    private WeightedChild(long weight,
+<b class="fc">&nbsp;        ThreadGroupChild element) {</b>
+<b class="fc">&nbsp;      this.weight = weight;</b>
+<b class="fc">&nbsp;      this.element = element;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public HashTree buildTreeUnder(HashTree parent, BuildTreeContext context) {
+<b class="fc">&nbsp;      return element.buildTreeUnder(parent, context);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void showInGui() {
+<b class="nc">&nbsp;      element.showInGui();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Allows specifying children test elements which don&#39;t have an explicit weight associated.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * This is method should mainly be used to add elements which weight does not affect like
+&nbsp;   * listeners, timers, assertions, pre- and post-processors and config elements.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * &lt;b&gt;Note:&lt;/b&gt; If a sampler or controller is added with this method, it&#39;s weight will default to
+&nbsp;   * 100.
+&nbsp;   *
+&nbsp;   * @param children list of test elements to add as children of this controller.
+&nbsp;   * @return the controller for further configuration and usage.
+&nbsp;   */
+&nbsp;  public DslWeightedSwitchController children(ThreadGroupChild... children) {
+<b class="fc">&nbsp;    return super.children(children);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public TestElement buildTestElement() {
+<b class="fc">&nbsp;    return new WeightedSwitchController();</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public HashTree buildTreeUnder(HashTree parent, BuildTreeContext context) {
+<b class="fc">&nbsp;    WeightedSwitchController controller = (WeightedSwitchController) buildConfiguredTestElement();</b>
+<b class="fc">&nbsp;    HashTree ret = parent.add(controller);</b>
+<b class="fc">&nbsp;    PowerTableModel model = buildTableModel();</b>
+<b class="fc">&nbsp;    for (ThreadGroupChild child : children) {</b>
+<b class="fc">&nbsp;      HashTree childTree = context.buildChild(child, ret);</b>
+<b class="fc">&nbsp;      if (child instanceof WeightedChild) {</b>
+<b class="fc">&nbsp;        addWeightedChildToModel(getChildName(ret, childTree), ((WeightedChild) child).weight,</b>
+&nbsp;            model);
+<b class="fc">&nbsp;      } else if (child instanceof DslSampler || child instanceof DslController) {</b>
+<b class="fc">&nbsp;        addWeightedChildToModel(getChildName(ret, childTree), DEFAULT_WEIGHT, model);</b>
+&nbsp;      }
+<b class="fc">&nbsp;    }</b>
+<b class="fc">&nbsp;    controller.setData(model);</b>
+<b class="fc">&nbsp;    return ret;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private String getChildName(HashTree tree, HashTree child) {
+<b class="fc">&nbsp;    return tree.list().stream()</b>
+<b class="fc">&nbsp;        .filter(t -&gt; tree.getTree(t) == child)</b>
+<b class="fc">&nbsp;        .map(t -&gt; ((TestElement) t).getName())</b>
+<b class="fc">&nbsp;        .findAny()</b>
+<b class="fc">&nbsp;        .orElseThrow(IllegalStateException::new);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private static PowerTableModel buildTableModel() {
+<b class="fc">&nbsp;    return new PowerTableModel(</b>
+&nbsp;        new String[]{&quot;Name&quot;, WeightedSwitchController.WEIGHTS, &quot;Enabled&quot;},
+&nbsp;        new Class[]{String.class, String.class, String.class}
+&nbsp;    );
+&nbsp;  }
+&nbsp;
+&nbsp;  private void addWeightedChildToModel(String name, long weight, PowerTableModel model) {
+<b class="fc">&nbsp;    model.addRow(new String[]{name, String.valueOf(weight), &quot;true&quot;});</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  public static class CodeBuilder extends SingleTestElementCallBuilder&lt;WeightedSwitchController&gt; {
+&nbsp;
+&nbsp;    public CodeBuilder(List&lt;Method&gt; builderMethods) {
+<b class="fc">&nbsp;      super(WeightedSwitchController.class, builderMethods);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected MethodCall buildMethodCall(WeightedSwitchController testElement,
+&nbsp;        MethodCallContext context) {
+<b class="fc">&nbsp;      MethodCall ret = buildMethodCall();</b>
+<b class="fc">&nbsp;      Map&lt;String, Long&gt; weights = extractSamplersWeights(testElement);</b>
+<b class="fc">&nbsp;      chainChildren(ret, context, weights);</b>
+<b class="fc">&nbsp;      return ret;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void chainChildren(MethodCall ret, MethodCallContext context,
+&nbsp;        Map&lt;String, Long&gt; weights) {
+<b class="fc">&nbsp;      List&lt;MethodCall&gt; childrenCalls = new ArrayList&lt;&gt;();</b>
+<b class="fc">&nbsp;      List&lt;Object&gt; children = new ArrayList&lt;&gt;(context.getChildrenTree().list());</b>
+<b class="fc">&nbsp;      for (Object child : children) {</b>
+<b class="fc">&nbsp;        String childName = ((TestElement) child).getName();</b>
+<b class="fc">&nbsp;        MethodCall childCall = context.removeChild(t -&gt; t == child).buildMethodCall();</b>
+<b class="fc">&nbsp;        if (weights.containsKey(childName)) {</b>
+<b class="fc">&nbsp;          appendChildrenCalls(childrenCalls, ret);</b>
+<b class="fc">&nbsp;          childrenCalls = new ArrayList&lt;&gt;();</b>
+<b class="fc">&nbsp;          ret.chain(&quot;child&quot;, new LongParam(weights.get(childName)), new ChildParam(childCall));</b>
+&nbsp;        } else {
+<b class="fc">&nbsp;          childrenCalls.add(childCall);</b>
+&nbsp;        }
+<b class="fc">&nbsp;      }</b>
+<b class="fc">&nbsp;      appendChildrenCalls(childrenCalls, ret);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void appendChildrenCalls(List&lt;MethodCall&gt; children, MethodCall ret) {
+<b class="fc">&nbsp;      if (!children.isEmpty()) {</b>
+<b class="fc">&nbsp;        ret.chain(&quot;children&quot;, new ChildrenParam&lt;&gt;(ThreadGroupChild[].class, children));</b>
+&nbsp;      }
+&nbsp;    }
+&nbsp;
+&nbsp;    public Map&lt;String, Long&gt; extractSamplersWeights(WeightedSwitchController testElement) {
+<b class="fc">&nbsp;      TestElementParamBuilder paramBuilder = new TestElementParamBuilder(testElement);</b>
+<b class="fc">&nbsp;      CollectionProperty weightsProp = (CollectionProperty) paramBuilder.prop(</b>
+&nbsp;          WeightedSwitchController.WEIGHTS);
+<b class="fc">&nbsp;      PowerTableModel tableModel = buildTableModel();</b>
+<b class="fc">&nbsp;      JMeterPluginsUtils.collectionPropertyToTableModelRows(weightsProp, tableModel);</b>
+<b class="fc">&nbsp;      Map&lt;String, Long&gt; ret = new HashMap&lt;&gt;();</b>
+<b class="fc">&nbsp;      for (int i = 0; i &lt; tableModel.getRowCount(); i++) {</b>
+<b class="fc">&nbsp;        Object[] rowData = tableModel.getRowData(i);</b>
+<b class="fc">&nbsp;        long weight = Long.parseLong(stringProp(rowData[1]));</b>
+<b class="fc">&nbsp;        if (weight != DEFAULT_WEIGHT) {</b>
+<b class="fc">&nbsp;          ret.put(stringProp(rowData[0]), weight);</b>
+&nbsp;        }
+&nbsp;      }
+<b class="fc">&nbsp;      return ret;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String stringProp(Object val) {
+<b class="fc">&nbsp;      return ((JMeterProperty) val).getStringValue();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;  }
+&nbsp;
+&nbsp;  private static class ChildParam extends MethodParam {
+&nbsp;
+&nbsp;    private final MethodCall child;
+&nbsp;
+&nbsp;    protected ChildParam(MethodCall child) {
+<b class="fc">&nbsp;      super(DslSampler.class.isAssignableFrom(child.getReturnType()) ? DslSampler.class</b>
+<b class="nc">&nbsp;          : DslController.class, null);</b>
+<b class="fc">&nbsp;      this.child = child;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Set&lt;String&gt; getStaticImports() {
+<b class="nc">&nbsp;      return child.getStaticImports();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Set&lt;String&gt; getImports() {
+<b class="nc">&nbsp;      return child.getImports();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String buildCode(String indent) {
+<b class="fc">&nbsp;      return child.buildCode(indent);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;  }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-03 22:39</div>
+</div>
+</body>
+</html>

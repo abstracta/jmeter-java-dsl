@@ -1,0 +1,217 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=GBK"> 
+  <title>Coverage Report > DslIncludeController</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">us.abstracta.jmeter.javadsl.core.controllers</a>
+</div>
+
+<h1>Coverage Summary for Class: DslIncludeController (us.abstracta.jmeter.javadsl.core.controllers)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DslIncludeController</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">DslIncludeController$CodeBuilder</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (7/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    83.3%
+  </span>
+  <span class="absValue">
+    (25/30)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    87.5%
+  </span>
+  <span class="absValue">
+    (7/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    80.6%
+  </span>
+  <span class="absValue">
+    (25/31)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package us.abstracta.jmeter.javadsl.core.controllers;
+&nbsp;
+&nbsp;import java.io.File;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.Map;
+&nbsp;import org.apache.jmeter.control.IncludeController;
+&nbsp;import org.apache.jmeter.testelement.TestElement;
+&nbsp;import org.apache.jorphan.collections.HashTree;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.MethodCall;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.MethodCallContext;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.SingleTestElementCallBuilder;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.params.ChildrenParam;
+&nbsp;import us.abstracta.jmeter.javadsl.core.threadgroups.BaseThreadGroup.ThreadGroupChild;
+&nbsp;
+&nbsp;/*
+&nbsp; Since include controller will not be provided in dsl nor be included in saved or executed test plan
+&nbsp; there is no need to extend from BaseTestElement, and only CodeBuilder is provided for proper jmx
+&nbsp; conversion.
+&nbsp; */
+<b class="nc">&nbsp;public class DslIncludeController {</b>
+&nbsp;
+&nbsp;  public static class CodeBuilder extends SingleTestElementCallBuilder&lt;IncludeController&gt; {
+&nbsp;
+<b class="fc">&nbsp;    private static final Logger LOG = LoggerFactory.getLogger(CodeBuilder.class);</b>
+&nbsp;
+&nbsp;    public CodeBuilder() {
+<b class="fc">&nbsp;      super(IncludeController.class, Collections.emptyList());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected MethodCall buildMethodCall(IncludeController testElement, MethodCallContext context) {
+<b class="fc">&nbsp;      File includeFile = new File(testElement.getIncludePath().trim());</b>
+<b class="fc">&nbsp;      if (!includeFile.exists()) {</b>
+<b class="nc">&nbsp;        LOG.warn(&quot;Included file ({}) could not be found. Make sure is properly located taking &quot;</b>
+&nbsp;            + &quot;into consideration current working directory.&quot;, includeFile);
+<b class="nc">&nbsp;        return null;</b>
+&nbsp;      }
+<b class="fc">&nbsp;      TestElement includeByFile = computeIncludeByFile(includeFile, testElement, context);</b>
+<b class="fc">&nbsp;      if (includeByFile != testElement) {</b>
+<b class="fc">&nbsp;        return new FragmentMethodCall(includeByFile, null, context);</b>
+&nbsp;      }
+<b class="fc">&nbsp;      MethodCall fragment = buildMethodDefinitionBody(testElement, context);</b>
+<b class="fc">&nbsp;      testElement.setName(solveElementName(includeFile));</b>
+<b class="fc">&nbsp;      return new FragmentMethodCall(testElement, fragment, context);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private TestElement computeIncludeByFile(File includeFile, IncludeController testElement,
+&nbsp;        MethodCallContext context) {
+<b class="fc">&nbsp;      Map&lt;String, TestElement&gt; includedFragments = context.getRoot()</b>
+<b class="fc">&nbsp;          .computeEntryIfAbsent(getClass(), HashMap::new);</b>
+<b class="fc">&nbsp;      return includedFragments.computeIfAbsent(includeFile.toString(), k -&gt; testElement);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static MethodCall buildMethodDefinitionBody(IncludeController testElement,
+&nbsp;        MethodCallContext context) {
+<b class="fc">&nbsp;      testElement.resolveReplacementSubTree(null);</b>
+<b class="fc">&nbsp;      HashTree children = testElement.getReplacementSubTree();</b>
+<b class="fc">&nbsp;      MethodCall fragment = buildFragmentMethodCall();</b>
+<b class="fc">&nbsp;      children.list().stream()</b>
+<b class="fc">&nbsp;          .map(e -&gt; context.child((TestElement) e, children.getTree(e)).buildMethodCall())</b>
+<b class="fc">&nbsp;          .forEach(fragment::child);</b>
+<b class="fc">&nbsp;      return fragment;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static MethodCall buildFragmentMethodCall() {
+&nbsp;      try {
+<b class="fc">&nbsp;        return MethodCall.fromBuilderMethod(DslTestFragmentController.class.getMethod(&quot;fragment&quot;,</b>
+&nbsp;            ThreadGroupChild[].class), new ChildrenParam&lt;&gt;(ThreadGroupChild[].class));
+<b class="nc">&nbsp;      } catch (NoSuchMethodException e) {</b>
+<b class="nc">&nbsp;        throw new RuntimeException(e);</b>
+&nbsp;      }
+&nbsp;    }
+&nbsp;
+&nbsp;    private String solveElementName(File includeFile) {
+<b class="fc">&nbsp;      String ret = includeFile.getName().toLowerCase();</b>
+<b class="fc">&nbsp;      String jmxExtension = &quot;.jmx&quot;;</b>
+<b class="fc">&nbsp;      return ret.endsWith(jmxExtension)</b>
+<b class="fc">&nbsp;          ? ret.substring(0, ret.length() - jmxExtension.length())</b>
+<b class="nc">&nbsp;          : ret;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;  }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-03 22:39</div>
+</div>
+</body>
+</html>

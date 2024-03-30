@@ -1,0 +1,194 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=GBK"> 
+  <title>Coverage Report > DslFlowControlAction</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">us.abstracta.jmeter.javadsl.core.samplers</a>
+</div>
+
+<h1>Coverage Summary for Class: DslFlowControlAction (us.abstracta.jmeter.javadsl.core.samplers)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DslFlowControlAction</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (8/8)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">DslFlowControlAction$CodeBuilder</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    85.7%
+  </span>
+  <span class="absValue">
+    (6/7)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (5/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    93.3%
+  </span>
+  <span class="absValue">
+    (14/15)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package us.abstracta.jmeter.javadsl.core.samplers;
+&nbsp;
+&nbsp;import java.lang.reflect.Method;
+&nbsp;import java.util.List;
+&nbsp;import org.apache.jmeter.sampler.TestAction;
+&nbsp;import org.apache.jmeter.sampler.gui.TestActionGui;
+&nbsp;import org.apache.jmeter.testelement.TestElement;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.MethodCall;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.MethodCallContext;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.MethodParam;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.SingleTestElementCallBuilder;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.TestElementParamBuilder;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.params.IntParam;
+&nbsp;
+&nbsp;/**
+&nbsp; * Uses JMeter Flow Control Action to allow taking different actions (stop, pause, interrupt).
+&nbsp; *
+&nbsp; * @since 1.25
+&nbsp; */
+&nbsp;public class DslFlowControlAction extends BaseSampler&lt;DslFlowControlAction&gt; {
+&nbsp;
+&nbsp;  private final String duration;
+&nbsp;
+&nbsp;  protected DslFlowControlAction(String duration) {
+<b class="fc">&nbsp;    super(&quot;Flow Control Action&quot;, TestActionGui.class);</b>
+<b class="fc">&nbsp;    this.duration = duration;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  public static DslFlowControlAction pauseThread(String duration) {
+<b class="fc">&nbsp;    return new DslFlowControlAction(duration);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  protected TestElement buildTestElement() {
+<b class="fc">&nbsp;    TestAction ret = new TestAction();</b>
+<b class="fc">&nbsp;    ret.setAction(TestAction.PAUSE);</b>
+<b class="fc">&nbsp;    ret.setTarget(TestAction.THREAD);</b>
+<b class="fc">&nbsp;    ret.setDuration(duration);</b>
+<b class="fc">&nbsp;    return ret;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  public static class CodeBuilder extends SingleTestElementCallBuilder&lt;TestAction&gt; {
+&nbsp;
+&nbsp;    public CodeBuilder(List&lt;Method&gt; builderMethods) {
+<b class="fc">&nbsp;      super(TestAction.class, builderMethods);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected MethodCall buildMethodCall(TestAction testElement, MethodCallContext context) {
+<b class="fc">&nbsp;      TestElementParamBuilder paramBuilder = new TestElementParamBuilder(testElement,</b>
+&nbsp;          &quot;ActionProcessor&quot;);
+<b class="fc">&nbsp;      MethodParam action = paramBuilder.intParam(&quot;action&quot;);</b>
+<b class="fc">&nbsp;      MethodParam duration = paramBuilder.durationParamMillis(&quot;duration&quot;, null);</b>
+<b class="fc">&nbsp;      if (((IntParam) action).getValue() != TestAction.PAUSE) {</b>
+<b class="nc">&nbsp;        throw new UnsupportedOperationException(</b>
+&nbsp;            &quot;Only pause action is currently supported for conversion. &quot;
+&nbsp;                + &quot;If you need support for converting other types of actions, please create an &quot;
+&nbsp;                + &quot;issue in JMeter DSL GitHub repository.&quot;);
+&nbsp;      }
+<b class="fc">&nbsp;      return buildMethodCall(duration);</b>
+&nbsp;    }
+&nbsp;  }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-03 22:39</div>
+</div>
+</body>
+</html>

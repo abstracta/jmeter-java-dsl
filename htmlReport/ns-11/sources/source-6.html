@@ -1,0 +1,450 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=GBK"> 
+  <title>Coverage Report > RpsThreadGroup</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">us.abstracta.jmeter.javadsl.core.threadgroups</a>
+</div>
+
+<h1>Coverage Summary for Class: RpsThreadGroup (us.abstracta.jmeter.javadsl.core.threadgroups)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">RpsThreadGroup</td>
+<td class="coverageStat">
+  <span class="percent">
+    76.5%
+  </span>
+  <span class="absValue">
+    (13/17)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    78%
+  </span>
+  <span class="absValue">
+    (46/59)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">RpsThreadGroup$1</td>
+  </tr>
+  <tr>
+    <td class="name">RpsThreadGroup$EventType</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (5/5)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">RpsThreadGroup$TimerSchedule</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (7/7)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    82.6%
+  </span>
+  <span class="absValue">
+    (19/23)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    81.7%
+  </span>
+  <span class="absValue">
+    (58/71)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package us.abstracta.jmeter.javadsl.core.threadgroups;
+&nbsp;
+&nbsp;import com.blazemeter.jmeter.threads.AbstractDynamicThreadGroup;
+&nbsp;import com.blazemeter.jmeter.threads.concurrency.ConcurrencyThreadGroup;
+&nbsp;import com.blazemeter.jmeter.threads.concurrency.ConcurrencyThreadGroupGui;
+&nbsp;import java.time.Duration;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.List;
+&nbsp;import kg.apc.jmeter.JMeterPluginsUtils;
+&nbsp;import kg.apc.jmeter.timers.VariableThroughputTimer;
+&nbsp;import kg.apc.jmeter.timers.VariableThroughputTimerGui;
+&nbsp;import org.apache.jmeter.gui.util.PowerTableModel;
+&nbsp;import org.apache.jmeter.sampler.TestAction;
+&nbsp;import org.apache.jmeter.sampler.gui.TestActionGui;
+&nbsp;import org.apache.jmeter.testelement.TestElement;
+&nbsp;import org.apache.jmeter.testelement.property.CollectionProperty;
+&nbsp;import org.apache.jmeter.threads.AbstractThreadGroup;
+&nbsp;import org.apache.jorphan.collections.HashTree;
+&nbsp;import us.abstracta.jmeter.javadsl.core.BuildTreeContext;
+&nbsp;import us.abstracta.jmeter.javadsl.core.util.JmeterFunction;
+&nbsp;import us.abstracta.jmeter.javadsl.core.util.SingleSeriesTimelinePanel;
+&nbsp;
+&nbsp;/**
+&nbsp; * Configures a thread group which dynamically adapts the number of threads and pauses to match a
+&nbsp; * given rps.
+&nbsp; * &lt;p&gt;
+&nbsp; * &lt;b&gt;Warning:&lt;/b&gt; by default the thread group uses unbounded maximum number of threads, but this
+&nbsp; * is not a good practice since it might impose unexpected load on load generator (CPU or memory may
+&nbsp; * run out). It is advisable to always set a maximum number of threads. Check
+&nbsp; * {@link #maxThreads(int)}.
+&nbsp; * &lt;p&gt;
+&nbsp; * Internally this element uses
+&nbsp; * &lt;a href=&quot;https://jmeter-plugins.org/wiki/ConcurrencyThreadGroup/&quot;&gt;Concurrency Thread Group&lt;/a&gt;
+&nbsp; * in combination with &lt;a href=&quot;https://jmeter-plugins.org/wiki/ThroughputShapingTimer/&quot;&gt;Throughput
+&nbsp; * Shaping Timer&lt;/a&gt;.
+&nbsp; * &lt;p&gt;
+&nbsp; * By default, the thread group will control the number of requests per second, but this can be
+&nbsp; * changed to iterations per second with {@link #counting(EventType)}.
+&nbsp; *
+&nbsp; * @since 0.26
+&nbsp; */
+<b class="fc">&nbsp;public class RpsThreadGroup extends BaseThreadGroup&lt;RpsThreadGroup&gt; {</b>
+&nbsp;
+<b class="fc">&nbsp;  private static int timerId = 1;</b>
+<b class="fc">&nbsp;  protected final List&lt;TimerSchedule&gt; schedules = new ArrayList&lt;&gt;();</b>
+<b class="fc">&nbsp;  protected double lastRps = 1;</b>
+<b class="fc">&nbsp;  protected EventType counting = EventType.REQUESTS;</b>
+<b class="fc">&nbsp;  protected int initThreads = 1;</b>
+<b class="fc">&nbsp;  protected int maxThreads = Integer.MAX_VALUE;</b>
+<b class="fc">&nbsp;  protected double spareThreads = 0.1;</b>
+&nbsp;
+<b class="fc">&nbsp;  public static class TimerSchedule {</b>
+&nbsp;
+&nbsp;    public final double fromRps;
+&nbsp;    public final double toRps;
+&nbsp;    public final long durationSecs;
+&nbsp;
+<b class="fc">&nbsp;    private TimerSchedule(double fromRps, double toRps, Duration durationSecs) {</b>
+<b class="fc">&nbsp;      this.fromRps = fromRps;</b>
+<b class="fc">&nbsp;      this.toRps = toRps;</b>
+<b class="fc">&nbsp;      this.durationSecs = durationToSeconds(durationSecs);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Object[] buildTableRow() {
+<b class="fc">&nbsp;      return new Object[]{String.valueOf(fromRps), String.valueOf(toRps),</b>
+<b class="fc">&nbsp;          String.valueOf(durationSecs)};</b>
+&nbsp;    }
+&nbsp;
+&nbsp;  }
+&nbsp;
+<b class="fc">&nbsp;  public enum EventType {</b>
+<b class="fc">&nbsp;    REQUESTS(&quot;Requests&quot;),</b>
+<b class="fc">&nbsp;    ITERATIONS(&quot;Iterations&quot;);</b>
+&nbsp;
+&nbsp;    private final String label;
+&nbsp;
+<b class="fc">&nbsp;    EventType(String label) {</b>
+<b class="fc">&nbsp;      this.label = label;</b>
+&nbsp;    }
+&nbsp;  }
+&nbsp;
+&nbsp;  public RpsThreadGroup(String name) {
+<b class="fc">&nbsp;    super(name != null ? name : &quot;RPS Thread Group&quot;, ConcurrencyThreadGroupGui.class,</b>
+<b class="fc">&nbsp;        Collections.emptyList());</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Allows ramping up or down RPS with a given duration.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * JMeter will automatically create or remove threads from thread group and add time pauses to
+&nbsp;   * match provided RPS.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * You can use this method multiple times in a thread group and in conjunction with
+&nbsp;   * {@link #holdFor(Duration)} and {@link #rampToAndHold(double, Duration, Duration)} to elaborate
+&nbsp;   * complex test plan profiles.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * Eg:
+&nbsp;   * &lt;pre&gt;{@code
+&nbsp;   *  rpsThreadGroup()
+&nbsp;   *    .maxThreads(10)
+&nbsp;   *    .rampTo(10, Duration.ofSeconds(10))
+&nbsp;   *    .rampTo(5, Duration.ofSeconds(10))
+&nbsp;   *    .rampToAndHold(20, Duration.ofSeconds(5), Duration.ofSeconds(10))
+&nbsp;   *    .rampTo(0, Duration.ofSeconds(5))
+&nbsp;   *    .children(...)
+&nbsp;   * }&lt;/pre&gt;
+&nbsp;   *
+&nbsp;   * @param rps      specifies the final RPS (requests/iterations per second) after the given
+&nbsp;   *                 period. This value directly affects how often threads and pauses are adjusted.
+&nbsp;   *                 For example, if you configure a ramp from 0.01 to 10 RPS with 10 seconds
+&nbsp;   *                 duration, after 1 request it will wait 100 seconds and then reevaluate, not
+&nbsp;   *                 honoring configured ramp. A value greater than 1 should at least re adjust
+&nbsp;   *                 every second.
+&nbsp;   * @param duration duration taken to reach the given RPS and move to the next stage or end the
+&nbsp;   *                 test plan. Since JMeter only supports specifying times in seconds, if you
+&nbsp;   *                 specify a smaller granularity (like milliseconds) it will be rounded up to
+&nbsp;   *                 seconds.
+&nbsp;   * @return the thread group for further configuration and usage.
+&nbsp;   */
+&nbsp;  public RpsThreadGroup rampTo(double rps, Duration duration) {
+<b class="fc">&nbsp;    if (rps &lt; 0) {</b>
+<b class="nc">&nbsp;      throw new IllegalArgumentException(&quot;RPS must be &gt;=0&quot;);</b>
+&nbsp;    }
+<b class="fc">&nbsp;    if (!Duration.ZERO.equals(duration)) {</b>
+<b class="nc">&nbsp;      schedules.add(new TimerSchedule(lastRps, rps, duration));</b>
+&nbsp;    }
+<b class="fc">&nbsp;    lastRps = rps;</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Specifies to keep current RPS for a given duration.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * This method is usually used in combination with {@link #rampTo(double, Duration)} to define the
+&nbsp;   * profile of the test plan.
+&nbsp;   *
+&nbsp;   * @param duration duration to hold the current RPS until moving to next stage or ending the test
+&nbsp;   *                 plan. Since JMeter only supports specifying times in seconds, if you specify a
+&nbsp;   *                 smaller granularity (like milliseconds) it will be rounded up to seconds.
+&nbsp;   * @return the thread group for further configuration and usage.
+&nbsp;   * @see #rampTo(double, Duration)
+&nbsp;   */
+&nbsp;  public RpsThreadGroup holdFor(Duration duration) {
+<b class="fc">&nbsp;    if (!Duration.ZERO.equals(duration)) {</b>
+<b class="fc">&nbsp;      schedules.add(new TimerSchedule(lastRps, lastRps, duration));</b>
+&nbsp;    }
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Simply combines {@link #rampTo(double, Duration)} and {@link #holdFor(Duration)} which are
+&nbsp;   * usually used in combination.
+&nbsp;   *
+&nbsp;   * @param rps          target RPS to ramp up/down to. This value directly affects how often
+&nbsp;   *                     threads and pauses are adjusted. For example, if you configure a ramp from
+&nbsp;   *                     0.01 to 10 RPS with 10 seconds duration, after 1 request it will wait 100
+&nbsp;   *                     seconds and then reevaluate, not honoring configured ramp. A value greater
+&nbsp;   *                     than 1 should at least re adjust every second.
+&nbsp;   * @param rampDuration duration taken to reach the given RPS.
+&nbsp;   * @param holdDuration duration to hold the given RPS after the ramp, until moving to next stage
+&nbsp;   *                     or ending the test plan.
+&nbsp;   * @return the thread group for further configuration and usage.
+&nbsp;   * @see #rampTo(double, Duration)
+&nbsp;   * @see #holdFor(Duration)
+&nbsp;   */
+&nbsp;  public RpsThreadGroup rampToAndHold(double rps, Duration rampDuration, Duration holdDuration) {
+<b class="fc">&nbsp;    return rampTo(rps, rampDuration)</b>
+<b class="fc">&nbsp;        .holdFor(holdDuration);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Specifies to either control requests or iterations per second.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * If you are only concerned on controlling the number of requests per second, then there is no
+&nbsp;   * need to use this method since this is the default behavior. On the other hand, if you actually
+&nbsp;   * want to control how many times per second the flow inside the thread group executes, then you
+&nbsp;   * can use this method counting iterations.
+&nbsp;   *
+&nbsp;   * @param counting specifies what event type to use to control the RPS. When not specified
+&nbsp;   *                 requests are counted.
+&nbsp;   * @return the thread group for further configuration and usage.
+&nbsp;   */
+&nbsp;  public RpsThreadGroup counting(EventType counting) {
+<b class="fc">&nbsp;    this.counting = counting;</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Specifies the maximum number of threads to use.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * &lt;b&gt;Warning:&lt;/b&gt; this value should be big enough to be able to reach the maximum desired RPS,
+&nbsp;   * otherwise the maximum RPS will not be able to be met. If you have requests that have maximum
+&nbsp;   * response time (or iteration time, if you are counting iteration instead of requests, see:
+&nbsp;   * {@link #counting(EventType)}) R seconds, and need to reach T maximum RPS, then you should set
+&nbsp;   * this value to R*T.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * &lt;b&gt;Warning:&lt;/b&gt; by default, maximum threads are unbounded, but this means that you may run out
+&nbsp;   * of memory or consume too much CPU. Is a good practice to always set this value to avoid
+&nbsp;   * unexpected load on generator that may affect performance test in some undesired ways.
+&nbsp;   *
+&nbsp;   * @param maxThreads specifies the maximum threads to use by the thread group. By default, is
+&nbsp;   *                   unbounded.
+&nbsp;   * @return the thread group for further configuration and usage.
+&nbsp;   */
+&nbsp;  public RpsThreadGroup maxThreads(int maxThreads) {
+<b class="nc">&nbsp;    this.maxThreads = maxThreads;</b>
+<b class="nc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Specifies the initial number of threads to use.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * Use this method to start with a bigger pool if you know beforehand that for inital RPS 1 thread
+&nbsp;   * would not be enough.
+&nbsp;   *
+&nbsp;   * @param initThreads specifies the initial number of threads to use by the thread group. By
+&nbsp;   *                    default, is 1.
+&nbsp;   * @return the thread group for further configuration and usage.
+&nbsp;   */
+&nbsp;  public RpsThreadGroup initThreads(int initThreads) {
+<b class="nc">&nbsp;    this.initThreads = initThreads;</b>
+<b class="nc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Specifies the number of spare (not used) threads to keep in the thread group.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * When thread group identifies that can use less threads, it can still keep them in pool to avoid
+&nbsp;   * the cost to re-create them later on if needed. This method controls how many threads to keep.
+&nbsp;   *
+&nbsp;   * @param spareThreads specifies either the number of spare threads (if the value is greater than
+&nbsp;   *                     1) or the percent (if &amp;lt;= 1) from the current active threads count. By
+&nbsp;   *                     default, is 0.1 (10% of active threads).
+&nbsp;   * @return the thread group for further configuration and usage.
+&nbsp;   */
+&nbsp;  public RpsThreadGroup spareThreads(double spareThreads) {
+<b class="nc">&nbsp;    this.spareThreads = spareThreads;</b>
+<b class="nc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public HashTree buildTreeUnder(HashTree parent, BuildTreeContext context) {
+<b class="fc">&nbsp;    HashTree ret = parent.add(buildConfiguredTestElement());</b>
+<b class="fc">&nbsp;    HashTree timerParent = counting == EventType.ITERATIONS ? ret.add(buildTestAction()) : ret;</b>
+<b class="fc">&nbsp;    timerParent.add(buildTimer());</b>
+<b class="fc">&nbsp;    children.forEach(c -&gt; context.buildChild(c, ret));</b>
+<b class="fc">&nbsp;    return ret;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private TestElement buildTestAction() {
+<b class="fc">&nbsp;    TestAction ret = new TestAction();</b>
+<b class="fc">&nbsp;    ret.setAction(TestAction.PAUSE);</b>
+<b class="fc">&nbsp;    ret.setDuration(&quot;0&quot;);</b>
+<b class="fc">&nbsp;    configureTestElement(ret, &quot;Flow Control Action&quot;, TestActionGui.class);</b>
+<b class="fc">&nbsp;    return ret;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private TestElement buildTimer() {
+<b class="fc">&nbsp;    VariableThroughputTimer ret = new VariableThroughputTimer();</b>
+<b class="fc">&nbsp;    ret.setData(buildTimerSchedulesData());</b>
+<b class="fc">&nbsp;    configureTestElement(ret, buildTimerName(timerId++), VariableThroughputTimerGui.class);</b>
+<b class="fc">&nbsp;    return ret;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private String buildTimerName(int id) {
+<b class="fc">&nbsp;    return &quot;rpsTimer&quot; + id;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private CollectionProperty buildTimerSchedulesData() {
+<b class="fc">&nbsp;    PowerTableModel table = new PowerTableModel(</b>
+&nbsp;        new String[]{&quot;Start RPS&quot;, &quot;End RPS&quot;, &quot;Duration, sec&quot;},
+&nbsp;        new Class[]{String.class, String.class, String.class});
+<b class="fc">&nbsp;    schedules.forEach(s -&gt; table.addRow(s.buildTableRow()));</b>
+<b class="fc">&nbsp;    return JMeterPluginsUtils.tableModelRowsToCollectionProperty(table, &quot;load_profile&quot;);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  protected AbstractThreadGroup buildThreadGroup() {
+<b class="fc">&nbsp;    ConcurrencyThreadGroup ret = new ConcurrencyThreadGroup();</b>
+<b class="fc">&nbsp;    ret.setTargetLevel(</b>
+<b class="fc">&nbsp;        JmeterFunction.from(&quot;__tstFeedback&quot;, buildTimerName(timerId), initThreads, maxThreads,</b>
+<b class="fc">&nbsp;            spareThreads));</b>
+<b class="fc">&nbsp;    ret.setHold(String.valueOf(schedules.stream().mapToLong(s -&gt; s.durationSecs).sum()));</b>
+<b class="fc">&nbsp;    ret.setUnit(AbstractDynamicThreadGroup.UNIT_SECONDS);</b>
+<b class="fc">&nbsp;    return ret;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  public void showTimeline() {
+<b class="nc">&nbsp;    SingleSeriesTimelinePanel chart = new SingleSeriesTimelinePanel(counting.label + &quot; per second&quot;);</b>
+<b class="nc">&nbsp;    if (!schedules.isEmpty()) {</b>
+<b class="nc">&nbsp;      chart.add(0, schedules.get(0).fromRps);</b>
+<b class="nc">&nbsp;      schedules.forEach(s -&gt; chart.add(s.durationSecs * 1000, s.toRps));</b>
+&nbsp;    }
+<b class="nc">&nbsp;    showAndWaitFrameWith(chart, name + &quot; timeline&quot;, 800, 300);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-03 20:57</div>
+</div>
+</body>
+</html>

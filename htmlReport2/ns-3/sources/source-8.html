@@ -1,0 +1,153 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=GBK"> 
+  <title>Coverage Report > FixedParam</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">us.abstracta.jmeter.javadsl.codegeneration.params</a>
+</div>
+
+<h1>Coverage Summary for Class: FixedParam (us.abstracta.jmeter.javadsl.codegeneration.params)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">FixedParam</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (5/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (9/9)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package us.abstracta.jmeter.javadsl.codegeneration.params;
+&nbsp;
+&nbsp;import java.util.function.Function;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.MethodParam;
+&nbsp;
+&nbsp;/**
+&nbsp; * Is a parameter with a fixed value.
+&nbsp; *
+&nbsp; * @param &lt;T&gt; The type of the parameter value.
+&nbsp; * @since 0.57
+&nbsp; */
+&nbsp;public abstract class FixedParam&lt;T&gt; extends MethodParam {
+&nbsp;
+&nbsp;  protected final T value;
+&nbsp;  protected final T defaultValue;
+&nbsp;
+&nbsp;  protected FixedParam(Class&lt;T&gt; paramType, String expression, Function&lt;String, T&gt; parser,
+&nbsp;      T defaultValue) {
+<b class="fc">&nbsp;    super(paramType, expression);</b>
+<b class="fc">&nbsp;    this.value = this.expression != null ? parser.apply(expression) : null;</b>
+<b class="fc">&nbsp;    this.defaultValue = defaultValue;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  protected FixedParam(Class&lt;T&gt; paramType, T value, T defaultValue) {
+<b class="fc">&nbsp;    super(paramType, value == null ? null : value.toString());</b>
+<b class="fc">&nbsp;    this.value = value;</b>
+<b class="fc">&nbsp;    this.defaultValue = defaultValue;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public boolean isDefault() {
+<b class="fc">&nbsp;    return super.isDefault() || defaultValue != null &amp;&amp; defaultValue.equals(value);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Gets the value associated to the parameter.
+&nbsp;   *
+&nbsp;   * @return the value.
+&nbsp;   */
+&nbsp;  public T getValue() {
+<b class="fc">&nbsp;    return value;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public String buildCode(String indent) {
+<b class="fc">&nbsp;    return String.valueOf(value);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-03 22:39</div>
+</div>
+</body>
+</html>

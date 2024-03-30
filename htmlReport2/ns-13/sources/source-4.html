@@ -1,0 +1,389 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=GBK"> 
+  <title>Coverage Report > DslThroughputTimer</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">us.abstracta.jmeter.javadsl.core.timers</a>
+</div>
+
+<h1>Coverage Summary for Class: DslThroughputTimer (us.abstracta.jmeter.javadsl.core.timers)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DslThroughputTimer</td>
+<td class="coverageStat">
+  <span class="percent">
+    83.3%
+  </span>
+  <span class="absValue">
+    (5/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    93.8%
+  </span>
+  <span class="absValue">
+    (15/16)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">DslThroughputTimer$CodeBuilder</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (11/11)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">DslThroughputTimer$ThroughputMode</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (7/7)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    90.9%
+  </span>
+  <span class="absValue">
+    (10/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    97.1%
+  </span>
+  <span class="absValue">
+    (33/34)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package us.abstracta.jmeter.javadsl.core.timers;
+&nbsp;
+&nbsp;import java.lang.reflect.Method;
+&nbsp;import java.util.List;
+&nbsp;import org.apache.jmeter.testbeans.gui.TestBeanGUI;
+&nbsp;import org.apache.jmeter.testelement.TestElement;
+&nbsp;import org.apache.jmeter.testelement.TestPlan;
+&nbsp;import org.apache.jmeter.timers.ConstantThroughputTimer;
+&nbsp;import org.apache.jmeter.timers.ConstantThroughputTimer.Mode;
+&nbsp;import org.apache.jorphan.collections.HashTree;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.MethodCall;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.MethodCallContext;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.SingleTestElementCallBuilder;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.TestElementParamBuilder;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.params.EnumParam.EnumPropertyValue;
+&nbsp;import us.abstracta.jmeter.javadsl.core.BuildTreeContext;
+&nbsp;import us.abstracta.jmeter.javadsl.core.DslTestPlan;
+&nbsp;
+&nbsp;/**
+&nbsp; * Allows using JMeter Constant Throughput Timers which pauses samplers under its control to limit
+&nbsp; * the maximum number of samples per minute.
+&nbsp; * &lt;p&gt;
+&nbsp; * If you want the general throughput to be close to the specified number, and not significantly
+&nbsp; * lower, then you have to make sure that the number of threads must be sufficient according to
+&nbsp; * expected sampler response times.
+&nbsp; * &lt;p&gt;
+&nbsp; * The positioning of the timer determines its scope (as any other timer). I.e. at test plan level
+&nbsp; * to control the pacing of multiple samples across multiple thread groups, under a Thread Group to
+&nbsp; * just influence samplers in that Thread Group, or as a child of a sampler to only control that
+&nbsp; * sampler.
+&nbsp; * &lt;p&gt;
+&nbsp; * When located at test plan level, this timer will use  by default JMeter Constant Throughput Timer
+&nbsp; * All active threads with non-sharing calculation mode. Which means that it will control that the
+&nbsp; * total throughput for all requests in the test plan, across different thread groups, is at maximum
+&nbsp; * the given one. If you locate inside a thread group (or sampler), it will use All active threads
+&nbsp; * in current thread group with non-sharing mode. Avoiding potential problem of having two timers in
+&nbsp; * separate thread group interfering with each other. Additionally, default calculation modes don&#39;t
+&nbsp; * use shared modes since we have detected unexpected behaviors when using multiple timers.
+&nbsp; * Basically, timers delays calculations interfering with each other due to single test plan or
+&nbsp; * thread group mark used in calculation (instead of one per timer).
+&nbsp; * &lt;p&gt;
+&nbsp; * If you want to change the default calculation method, then you can use
+&nbsp; * {@link #calculation(ThroughputMode)} method. But in general avoid using it since may lead to
+&nbsp; * unexpected behaviors.
+&nbsp; *
+&nbsp; * @since 1.5
+&nbsp; */
+&nbsp;public class DslThroughputTimer extends BaseTimer {
+&nbsp;
+&nbsp;  protected double throughput;
+&nbsp;  protected ThroughputMode calculation;
+&nbsp;
+&nbsp;  public DslThroughputTimer(double samplesPerMinute) {
+<b class="fc">&nbsp;    super(&quot;Constant Throughput Timer&quot;, TestBeanGUI.class);</b>
+<b class="fc">&nbsp;    this.throughput = samplesPerMinute;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Allows specifying that configured throughput should be counted per thread.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * I.e: if you have 10 active threads and configure throughput of 10 per thread, then the total
+&nbsp;   * maximum throughput will be 10 * 10 = 100 requests per minute.
+&nbsp;   *
+&nbsp;   * @return the timer for further configuration or usage.
+&nbsp;   */
+&nbsp;  public DslThroughputTimer perThread() {
+<b class="fc">&nbsp;    calculation = ThroughputMode.PER_THREAD;</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Allows specifying the exact method of calculation of throughput regardless of the location of
+&nbsp;   * the timer.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * This method should only be used when you actually need such control, since may lead to
+&nbsp;   * unexpected behaviors when not used correctly. Eg: when there are two timers, each in different
+&nbsp;   * thread group, and both of them using ALL_THREADS_ACCURATE.
+&nbsp;   *
+&nbsp;   * @param calculation specifies the way of calculating/control the throughput. When not specified,
+&nbsp;   *                    the timer will use {@link ThroughputMode#ALL_THREADS_EVEN} if timer is at
+&nbsp;   *                    test plan level, {@link ThroughputMode#THREAD_GROUP_EVEN} if timer is inside
+&nbsp;   *                    a thread group and {@link ThroughputMode#PER_THREAD} if {@link #perThread()}
+&nbsp;   *                    was specified.
+&nbsp;   * @return the timer for further configuration or usage.
+&nbsp;   * @see ThroughputMode
+&nbsp;   */
+&nbsp;  public DslThroughputTimer calculation(ThroughputMode calculation) {
+<b class="fc">&nbsp;    this.calculation = calculation;</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Specifies the calculation/control method to control the configured throughput.
+&nbsp;   */
+<b class="fc">&nbsp;  public enum ThroughputMode implements EnumPropertyValue {</b>
+&nbsp;    /**
+&nbsp;     * The configured throughput specifies the maximum throughput for each thread. E.g.: if you
+&nbsp;     * configured 10tpm, and you have 10 active threads, then the total throughput might be
+&nbsp;     * 10*10=100 tpm.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * This is the same as JMeter option &quot;this thread only&quot;.
+&nbsp;     */
+<b class="fc">&nbsp;    PER_THREAD,</b>
+&nbsp;    /**
+&nbsp;     * The configured throughput will be divided among active threads (across thread groups) and
+&nbsp;     * each thread will control that part of the throughput regardless if other threads were far
+&nbsp;     * from expected throughput. E.g.: if you place the timer at test plan level, configure 10 tpm,
+&nbsp;     * have 2 thread groups with 5 active threads each, then each thread will try to achieve 1tpm.
+&nbsp;     * If one thread is slower than the rest, the other threads will not take that into account to
+&nbsp;     * adjust their throughput to try to achieve the expected total throughput.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Check {@link #ALL_THREADS_ACCURATE} as an alternative.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * In general use this mode only on test plan level timers, otherwise it might lead to confusion
+&nbsp;     * or unexpected behavior. E.g.: avoid having timers inside thread groups with ALL_THREADS_EVEN.
+&nbsp;     * Prefer in such scenarios {@link #THREAD_GROUP_EVEN}).
+&nbsp;     * &lt;p&gt;
+&nbsp;     * This is the same as Jmeter option &quot;all active threads&quot;.
+&nbsp;     */
+<b class="fc">&nbsp;    ALL_THREADS_EVEN,</b>
+&nbsp;    /**
+&nbsp;     * The configured throughput will be divided among active threads of the current thread group
+&nbsp;     * (ignoring other thread groups) and each thread will control that part of the throughput
+&nbsp;     * regardless if other threads in the same thread group were far from expected throughput. E.g.:
+&nbsp;     * if you place the timer inside a thread group, configure 10 tpm, and 10 active threads in the
+&nbsp;     * thread group, each thread in the thread group will try to achieve 1tpm. If one thread in the
+&nbsp;     * thread group is slower than the rest, the other threads in the thread group will not take
+&nbsp;     * that into account to adjust their throughput to try to achieve the expected total
+&nbsp;     * throughput.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * If you place the timer at test plan level, then each thread group in the test plan will try
+&nbsp;     * to achieve configured throughput.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Check {@link #THREAD_GROUP_ACCURATE} as an alternative.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * This is the same as Jmeter option &quot;all active threads in current thread group&quot;.
+&nbsp;     */
+<b class="fc">&nbsp;    THREAD_GROUP_EVEN,</b>
+&nbsp;    /**
+&nbsp;     * The configured throughput is controlled checking the last time each active thread executed.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * This avoids not achieving the configured throughput when one thread is particularly slow,
+&nbsp;     * making the timer behavior more accurate with expected behavior (than
+&nbsp;     * {@link #ALL_THREADS_EVEN}). BUT, this timer uses only one mark for last thread execution,
+&nbsp;     * shared across all timers using same calculation mode, which means that one timer calculation
+&nbsp;     * might/will affect other timers calculations. So, if you use this method, make sure you only
+&nbsp;     * use one timer with such method.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * To avoid this issue you might use {@link #ALL_THREADS_EVEN}, but total throughput would not
+&nbsp;     * adjust when some threads are slower than others.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * In general use this mode only on test plan level timers, otherwise it might lead to confusion
+&nbsp;     * or unexpected behavior. E.g.: avoid having timers inside thread groups with
+&nbsp;     * ALL_THREADS_ACCURATE. Prefer in such scenarios {@link #THREAD_GROUP_ACCURATE}).
+&nbsp;     * &lt;p&gt;
+&nbsp;     * This is the same as Jmeter option &quot;all active threads (shared)&quot;.
+&nbsp;     */
+<b class="fc">&nbsp;    ALL_THREADS_ACCURATE,</b>
+&nbsp;    /**
+&nbsp;     * The configured throughput is controlled checking the last time each active thread, in the
+&nbsp;     * thread group, executed.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * This avoids not achieving the configured throughput when one thread is particularly slow,
+&nbsp;     * making the timer behavior more accurate with expected behavior (than
+&nbsp;     * {@link #THREAD_GROUP_EVEN}). BUT, this timer uses only one mark per thread group for last
+&nbsp;     * thread execution, shared across all timers in same thread group using same calculation mode,
+&nbsp;     * which means that one timer calculation might/will affect other timers calculations in same
+&nbsp;     * thread group. So, if you use this method, make sure you only use one timer per thread group
+&nbsp;     * with such method.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * To avoid this issue you might use {@link #THREAD_GROUP_EVEN}, but total throughput would not
+&nbsp;     * adjust when some threads are slower than others.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * If you place the timer at test plan level, then each thread group in the test plan will try
+&nbsp;     * to achieve configured throughput.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * This is the same as Jmeter option &quot;all active threads in current thread group (shared)&quot;.
+&nbsp;     */
+<b class="fc">&nbsp;    THREAD_GROUP_ACCURATE;</b>
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String propertyValue() {
+<b class="fc">&nbsp;      return String.valueOf(ordinal());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public HashTree buildTreeUnder(HashTree parent, BuildTreeContext context) {
+<b class="fc">&nbsp;    ConstantThroughputTimer ret = new ConstantThroughputTimer();</b>
+<b class="fc">&nbsp;    ret.setThroughput(throughput);</b>
+<b class="fc">&nbsp;    ThroughputMode calcMode = calculation;</b>
+<b class="fc">&nbsp;    if (calcMode == null) {</b>
+<b class="fc">&nbsp;      calcMode = parentIsTestPlan(context) ? ThroughputMode.ALL_THREADS_EVEN</b>
+<b class="fc">&nbsp;          : ThroughputMode.THREAD_GROUP_EVEN;</b>
+&nbsp;    }
+<b class="fc">&nbsp;    ret.setCalcMode(calcMode.ordinal());</b>
+<b class="fc">&nbsp;    return parent.add(configureTestElement(ret, name, guiClass));</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private boolean parentIsTestPlan(BuildTreeContext context) {
+<b class="fc">&nbsp;    return context.getParent().getTestElement() instanceof DslTestPlan;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  protected TestElement buildTestElement() {
+&nbsp;    /*
+&nbsp;     We just return null since the element is built in buldTreeUnder, and this method is never
+&nbsp;     invoked.
+&nbsp;     */
+<b class="nc">&nbsp;    return null;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  public static class CodeBuilder extends SingleTestElementCallBuilder&lt;ConstantThroughputTimer&gt; {
+&nbsp;
+&nbsp;    public CodeBuilder(List&lt;Method&gt; builderMethods) {
+<b class="fc">&nbsp;      super(ConstantThroughputTimer.class, builderMethods);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected MethodCall buildMethodCall(ConstantThroughputTimer testElement,
+&nbsp;        MethodCallContext context) {
+<b class="fc">&nbsp;      TestElementParamBuilder paramBuilder = new TestElementParamBuilder(testElement);</b>
+<b class="fc">&nbsp;      MethodCall ret = buildMethodCall(paramBuilder.doubleParam(&quot;throughput&quot;));</b>
+<b class="fc">&nbsp;      TestElement parent = context.getParent().getTestElement();</b>
+<b class="fc">&nbsp;      int calcMode = testElement.getCalcMode();</b>
+<b class="fc">&nbsp;      if (calcMode == Mode.ThisThreadOnly.ordinal()) {</b>
+<b class="fc">&nbsp;        ret.chain(&quot;perThread&quot;);</b>
+<b class="fc">&nbsp;      } else if (!(calcMode == Mode.AllActiveThreads.ordinal() &amp;&amp; parent instanceof TestPlan</b>
+<b class="fc">&nbsp;          || calcMode == Mode.AllActiveThreadsInCurrentThreadGroup.ordinal()</b>
+&nbsp;          &amp;&amp; !(parent instanceof TestPlan))) {
+&nbsp;        // using PER_THREAD as default, only because we know is not the case here
+<b class="fc">&nbsp;        ret.chain(&quot;calculation&quot;, paramBuilder.enumParam(&quot;calcMode&quot;, ThroughputMode.PER_THREAD));</b>
+&nbsp;      }
+<b class="fc">&nbsp;      return ret;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;  }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-03 22:39</div>
+</div>
+</body>
+</html>

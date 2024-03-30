@@ -1,0 +1,715 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=GBK"> 
+  <title>Coverage Report > MethodCall</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">us.abstracta.jmeter.javadsl.codegeneration</a>
+</div>
+
+<h1>Coverage Summary for Class: MethodCall (us.abstracta.jmeter.javadsl.codegeneration)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">MethodCall</td>
+<td class="coverageStat">
+  <span class="percent">
+    92.5%
+  </span>
+  <span class="absValue">
+    (37/40)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    91.8%
+  </span>
+  <span class="absValue">
+    (157/171)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">MethodCall$ChildrenMethodCall</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/4)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">MethodCall$EmptyMethodCall</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/3)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    93.3%
+  </span>
+  <span class="absValue">
+    (42/45)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    92.1%
+  </span>
+  <span class="absValue">
+    (164/178)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package us.abstracta.jmeter.javadsl.codegeneration;
+&nbsp;
+&nbsp;import java.lang.reflect.Method;
+&nbsp;import java.lang.reflect.Modifier;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.HashSet;
+&nbsp;import java.util.LinkedHashMap;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;import java.util.stream.Stream;
+&nbsp;import org.apache.http.entity.ContentType;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.params.BoolParam;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.params.ChildrenParam;
+&nbsp;import us.abstracta.jmeter.javadsl.core.DslTestPlan;
+&nbsp;import us.abstracta.jmeter.javadsl.core.testelements.MultiLevelTestElement;
+&nbsp;
+&nbsp;/**
+&nbsp; * Represents a method call, it&#39;s parameters and chained invocations.
+&nbsp; * &lt;p&gt;
+&nbsp; * It&#39;s main purpose is to generate the code for the method call, parameters and chained methods
+&nbsp; * invocations.
+&nbsp; *
+&nbsp; * @since 0.45
+&nbsp; */
+&nbsp;public class MethodCall implements CodeSegment {
+&nbsp;
+&nbsp;  /**
+&nbsp;   * As of 1.3 use {@link Indentation#INDENT} instead.
+&nbsp;   */
+&nbsp;  @Deprecated
+&nbsp;  public static final String INDENT = Indentation.INDENT;
+<b class="fc">&nbsp;  private static final MethodCall EMPTY_METHOD_CALL = new EmptyMethodCall();</b>
+&nbsp;
+&nbsp;  protected final String methodName;
+&nbsp;  private final Class&lt;?&gt; returnType;
+&nbsp;  private MethodCall childrenMethod;
+&nbsp;  private ChildrenParam&lt;?&gt; childrenParam;
+&nbsp;  private final List&lt;MethodParam&gt; params;
+<b class="fc">&nbsp;  private List&lt;CodeSegment&gt; chain = new ArrayList&lt;&gt;();</b>
+<b class="fc">&nbsp;  private final Set&lt;String&gt; requiredStaticImports = new HashSet&lt;&gt;();</b>
+&nbsp;  private boolean commented;
+&nbsp;  private String headingComment;
+&nbsp;
+<b class="fc">&nbsp;  public MethodCall(String methodName, Class&lt;?&gt; returnType, MethodParam... params) {</b>
+<b class="fc">&nbsp;    this.methodName = methodName;</b>
+<b class="fc">&nbsp;    this.returnType = returnType;</b>
+<b class="fc">&nbsp;    this.params = Arrays.asList(params);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  public static MethodCall fromBuilderMethod(Method method, MethodParam... params) {
+<b class="fc">&nbsp;    MethodCall ret = from(method, params);</b>
+<b class="fc">&nbsp;    ret.requiredStaticImports.add(method.getDeclaringClass().getName());</b>
+<b class="fc">&nbsp;    return ret;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private static MethodCall from(Method method, MethodParam... params) {
+<b class="fc">&nbsp;    return new MethodCall(method.getName(), method.getReturnType(), params);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Generates a new instance for a static method within a given class that is applicable to a given
+&nbsp;   * set of parameters.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * This is usually used to get clas factory methods calls. Eg: Duration.ofSeconds.
+&nbsp;   *
+&nbsp;   * @param methodClass the class that contains the static method.
+&nbsp;   * @param methodName  the name of the method to search for in the given class.
+&nbsp;   * @param params      the parameters used to search the method in the given class and to associate
+&nbsp;   *                    to the method call.
+&nbsp;   * @return the newly created instance
+&nbsp;   */
+&nbsp;  public static MethodCall forStaticMethod(Class&lt;?&gt; methodClass, String methodName,
+&nbsp;      MethodParam... params) {
+<b class="fc">&nbsp;    Class&lt;?&gt;[] paramsTypes = Arrays.stream(params)</b>
+<b class="fc">&nbsp;        .map(MethodParam::getType)</b>
+<b class="fc">&nbsp;        .toArray(Class[]::new);</b>
+<b class="fc">&nbsp;    Method method = MethodCall.findRequiredStaticMethod(methodClass, methodName, paramsTypes);</b>
+<b class="fc">&nbsp;    return new MethodCall(methodClass.getSimpleName() + &quot;.&quot; + method.getName(),</b>
+<b class="fc">&nbsp;        method.getReturnType(), params);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private static Method findRequiredStaticMethod(Class&lt;?&gt; methodClass, String methodName,
+&nbsp;      Class&lt;?&gt;... paramsTypes) {
+&nbsp;    try {
+<b class="fc">&nbsp;      Method ret = methodClass.getDeclaredMethod(methodName, paramsTypes);</b>
+<b class="fc">&nbsp;      if (!Modifier.isPublic(ret.getModifiers()) || !Modifier.isStatic(ret.getModifiers())) {</b>
+<b class="nc">&nbsp;        throw new RuntimeException(</b>
+&nbsp;            &quot;Can&#39;t access method &quot; + ret + &quot; which is no longer static or public. &quot;
+&nbsp;                + &quot;Check that no dependencies or APIs have been changed.&quot;);
+&nbsp;      }
+<b class="fc">&nbsp;      return ret;</b>
+<b class="nc">&nbsp;    } catch (NoSuchMethodException e) {</b>
+<b class="nc">&nbsp;      throw new RuntimeException(</b>
+<b class="nc">&nbsp;          &quot;Can&#39;t find method &quot; + methodClass.getName() + &quot;.&quot; + methodName</b>
+<b class="nc">&nbsp;              + &quot; for parameter types &quot; + Arrays.toString(paramsTypes)</b>
+&nbsp;              + &quot;. Check that no dependencies or APIs have been changed.&quot;, e);
+&nbsp;    }
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Allows to build a special method call used when some conversion is not supported.
+&nbsp;   *
+&nbsp;   * @return the special method call to include as child of other method calls.
+&nbsp;   */
+&nbsp;  public static MethodCall buildUnsupported() {
+<b class="nc">&nbsp;    return new MethodCall(&quot;unsupported&quot;, MultiLevelTestElement.class);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Marks or un-marks this method call as to be commented out.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * This is mainly used when you want to provide users with an easy way to enable an existing part
+&nbsp;   * of a test plan that is currently not enabled or used.
+&nbsp;   *
+&nbsp;   * @param commented specifies to comment or uncomment this method call.
+&nbsp;   * @since 1.3
+&nbsp;   */
+&nbsp;  public void setCommented(boolean commented) {
+<b class="fc">&nbsp;    this.commented = commented;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Allows to check if this method call is marked to be commented out.
+&nbsp;   *
+&nbsp;   * @return true if the method call is marked to be commented out, false otherwise.
+&nbsp;   * @since 1.3
+&nbsp;   */
+&nbsp;  public boolean isCommented() {
+<b class="fc">&nbsp;    return commented;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Allow to add a heading comment to the method call.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * This is helpful to add some note or comment on created element. Mainly comments that require
+&nbsp;   * users attention, like reviewing and/or changing a particular part of test plan.
+&nbsp;   *
+&nbsp;   * @param comment specifies the comment to add before the method call.
+&nbsp;   * @since 1.8
+&nbsp;   */
+&nbsp;  public void headingComment(String comment) {
+<b class="fc">&nbsp;    headingComment = comment;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Generates a method call that should be ignored (no code should be generated).
+&nbsp;   * &lt;p&gt;
+&nbsp;   * This is helpful when some MethodCallBuilder supports a given test element conversion, but no
+&nbsp;   * associated generated DSL code should be included.
+&nbsp;   *
+&nbsp;   * @return the empty method call.
+&nbsp;   */
+&nbsp;  public static MethodCall emptyCall() {
+<b class="fc">&nbsp;    return EMPTY_METHOD_CALL;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private static class EmptyMethodCall extends MethodCall {
+&nbsp;
+&nbsp;    protected EmptyMethodCall() {
+<b class="fc">&nbsp;      super(null, MultiLevelTestElement.class);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public MethodCall child(MethodCall child) {
+&nbsp;      // Just ignoring children
+<b class="fc">&nbsp;      return this;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String buildCode(String indent) {
+<b class="fc">&nbsp;      return &quot;&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public Set&lt;String&gt; getStaticImports() {
+<b class="fc">&nbsp;    Set&lt;String&gt; ret = new HashSet&lt;&gt;(requiredStaticImports);</b>
+<b class="fc">&nbsp;    params.stream()</b>
+<b class="fc">&nbsp;        .filter(p -&gt; !p.isIgnored())</b>
+<b class="fc">&nbsp;        .forEach(p -&gt; ret.addAll(p.getStaticImports()));</b>
+<b class="fc">&nbsp;    chain.forEach(c -&gt; ret.addAll(c.getStaticImports()));</b>
+<b class="fc">&nbsp;    getMethodDefinitions().values()</b>
+<b class="fc">&nbsp;        .forEach(m -&gt; ret.addAll(m.getStaticImports()));</b>
+<b class="fc">&nbsp;    return ret;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public Set&lt;String&gt; getImports() {
+<b class="fc">&nbsp;    Set&lt;String&gt; ret = new HashSet&lt;&gt;();</b>
+<b class="fc">&nbsp;    params.stream()</b>
+<b class="fc">&nbsp;        .filter(p -&gt; !p.isIgnored())</b>
+<b class="fc">&nbsp;        .forEach(p -&gt; ret.addAll(p.getImports()));</b>
+<b class="fc">&nbsp;    chain.forEach(c -&gt; ret.addAll(c.getImports()));</b>
+<b class="fc">&nbsp;    getMethodDefinitions().values()</b>
+<b class="fc">&nbsp;        .forEach(m -&gt; {</b>
+<b class="fc">&nbsp;          ret.add(m.getReturnType().getName());</b>
+<b class="fc">&nbsp;          ret.addAll(m.getImports());</b>
+&nbsp;        });
+<b class="fc">&nbsp;    return ret;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public Map&lt;String, MethodCall&gt; getMethodDefinitions() {
+<b class="fc">&nbsp;    Map&lt;String, MethodCall&gt; ret = new LinkedHashMap&lt;&gt;();</b>
+<b class="fc">&nbsp;    params.stream()</b>
+<b class="fc">&nbsp;        .filter(p -&gt; !p.isIgnored())</b>
+<b class="fc">&nbsp;        .forEach(p -&gt; ret.putAll(p.getMethodDefinitions()));</b>
+<b class="fc">&nbsp;    chain.forEach(c -&gt; ret.putAll(c.getMethodDefinitions()));</b>
+<b class="fc">&nbsp;    return ret;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  public Class&lt;?&gt; getReturnType() {
+<b class="fc">&nbsp;    return returnType;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Allows adding a child call to this call.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * This method should only be used in seldom scenarios where you need to manually add children
+&nbsp;   * calls. In most of the cases this is not necessary, since DSL framework automatically takes care
+&nbsp;   * of JMeter children conversion.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * If the call defines a {@link ChildrenParam} parameter, then children are just added as
+&nbsp;   * parameters of the call. Otherwise, a children method will be looked into the class retunrned by
+&nbsp;   * this method, and if there is, then chained into this call and used to register provided child
+&nbsp;   * element.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * &lt;b&gt;Warning:&lt;/b&gt; You should only use this method after applying any required chaining.
+&nbsp;   *
+&nbsp;   * @param child specifies the method call to be added as child call of this call.
+&nbsp;   * @return the current call instance for further configuration.
+&nbsp;   */
+&nbsp;  public MethodCall child(MethodCall child) {
+<b class="fc">&nbsp;    solveChildrenParam().addChild(child);</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private ChildrenParam&lt;?&gt; solveChildrenParam() {
+<b class="fc">&nbsp;    if (childrenMethod == null) {</b>
+<b class="fc">&nbsp;      MethodParam lastParam = params.isEmpty() ? null : params.get(params.size() - 1);</b>
+<b class="fc">&nbsp;      if (lastParam instanceof ChildrenParam &amp;&amp; chain.isEmpty()) {</b>
+<b class="fc">&nbsp;        childrenMethod = this;</b>
+<b class="fc">&nbsp;        childrenParam = (ChildrenParam&lt;?&gt;) lastParam;</b>
+&nbsp;      } else {
+<b class="fc">&nbsp;        childrenMethod = findChildrenMethod();</b>
+<b class="fc">&nbsp;        chain.add(childrenMethod);</b>
+<b class="fc">&nbsp;        childrenParam = (ChildrenParam&lt;?&gt;) childrenMethod.params.get(0);</b>
+&nbsp;      }
+&nbsp;    }
+<b class="fc">&nbsp;    return childrenParam;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private MethodCall findChildrenMethod() {
+<b class="fc">&nbsp;    Method childrenMethod = null;</b>
+<b class="fc">&nbsp;    Class&lt;?&gt; methodHolder = returnType;</b>
+<b class="fc">&nbsp;    while (childrenMethod == null &amp;&amp; methodHolder != Object.class) {</b>
+<b class="fc">&nbsp;      childrenMethod = Arrays.stream(methodHolder.getDeclaredMethods())</b>
+<b class="fc">&nbsp;          .filter(m -&gt; Modifier.isPublic(m.getModifiers()) &amp;&amp; &quot;children&quot;.equals(m.getName())</b>
+<b class="fc">&nbsp;              &amp;&amp; m.getParameterCount() == 1)</b>
+<b class="fc">&nbsp;          .findAny()</b>
+<b class="fc">&nbsp;          .orElse(null);</b>
+<b class="fc">&nbsp;      methodHolder = methodHolder.getSuperclass();</b>
+&nbsp;    }
+<b class="fc">&nbsp;    if (childrenMethod == null) {</b>
+<b class="nc">&nbsp;      throw new IllegalStateException(&quot;No children method found for &quot; + returnType + &quot;. &quot;</b>
+&nbsp;          + &quot;This might be due to unexpected test plan structure or missing method in test element&quot;
+&nbsp;          + &quot;. Please create an issue in GitHub repository if you find any of these cases.&quot;);
+&nbsp;    }
+<b class="fc">&nbsp;    return new ChildrenMethodCall(childrenMethod);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private static class ChildrenMethodCall extends MethodCall {
+&nbsp;
+&nbsp;    protected ChildrenMethodCall(Method method) {
+<b class="fc">&nbsp;      super(method.getName(), method.getReturnType(),</b>
+<b class="fc">&nbsp;          new ChildrenParam&lt;&gt;(method.getParameterTypes()[0]));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String buildCode(String indent) {
+<b class="fc">&nbsp;      String paramsCode = buildParamsCode(indent + INDENT);</b>
+<b class="fc">&nbsp;      return paramsCode.isEmpty() ? &quot;&quot; : methodName + &quot;(&quot; + paramsCode + indent + &quot;)&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Allows replacing a child method call with another.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * This is useful when some element has to alter an already built method call, for example when
+&nbsp;   * replacing module controllers by test fragment method calls.
+&nbsp;   *
+&nbsp;   * @param original    the method call to be replaced.
+&nbsp;   * @param replacement the method call to be used instead of the original one.
+&nbsp;   * @since 1.3
+&nbsp;   */
+&nbsp;  public void replaceChild(MethodCall original, MethodCall replacement) {
+<b class="fc">&nbsp;    solveChildrenParam().replaceChild(original, replacement);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Allows adding a child method at the beginning of children methods.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * This is mainly useful when in need to add configuration elements, that are usually added at the
+&nbsp;   * beginning of children calls.
+&nbsp;   *
+&nbsp;   * @param child the child method to add at the beginning of children methods.
+&nbsp;   * @since 1.8
+&nbsp;   */
+&nbsp;  public void prependChild(MethodCall child) {
+<b class="fc">&nbsp;    solveChildrenParam().prependChild(child);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Allows chaining a method call to this call.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * This method is useful when adding property configuration methods (like
+&nbsp;   * {@link DslTestPlan#sequentialThreadGroups()}) or other chained methods that further configure
+&nbsp;   * the element (like
+&nbsp;   * {@link us.abstracta.jmeter.javadsl.http.DslHttpSampler#post(String, ContentType)}.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * This method abstracts some common logic regarding chaining. For example: if chained method only
+&nbsp;   * contains a parameter and its value is the default one, then method is not chained, since it is
+&nbsp;   * not necessary. It also takes care of handling boolean parameters which chained method may or
+&nbsp;   * may not include a boolean parameter.
+&nbsp;   *
+&nbsp;   * @param methodName is the name of the method contained in the returned instance of this method
+&nbsp;   *                   call, which has to be chained to this method call.
+&nbsp;   * @param params     is the list of parameters used to find the method and associated to the
+&nbsp;   *                   chained method call. Take into consideration that the exact same number and
+&nbsp;   *                   type of parameters must be specified for the method to be found, otherwise an
+&nbsp;   *                   exception will be generated.
+&nbsp;   * @return this call instance for further chaining or addition of children elements.
+&nbsp;   * @throws UnsupportedOperationException when no method with given names and/or parameters can be
+&nbsp;   *                                       found to be chained in current method call.
+&nbsp;   */
+&nbsp;  public MethodCall chain(String methodName, MethodParam... params) {
+&nbsp;    // this eases chaining don&#39;t having to check in client code for this condition
+<b class="fc">&nbsp;    if (params.length &gt; 0 &amp;&amp; Arrays.stream(params).allMatch(MethodParam::isDefault)) {</b>
+<b class="fc">&nbsp;      return this;</b>
+&nbsp;    }
+&nbsp;    /*
+&nbsp;    when chaining methods with booleans in some cases the parameter is required, and in some others
+&nbsp;    is not.
+&nbsp;     */
+<b class="fc">&nbsp;    Method method = null;</b>
+<b class="fc">&nbsp;    if (params.length == 1 &amp;&amp; params[0] instanceof BoolParam) {</b>
+<b class="fc">&nbsp;      method = findMethodInClassHierarchyMatchingParams(methodName, returnType, new MethodParam[0]);</b>
+<b class="fc">&nbsp;      if (method != null) {</b>
+<b class="fc">&nbsp;        params = new MethodParam[0];</b>
+&nbsp;      }
+&nbsp;    }
+<b class="fc">&nbsp;    if (method == null) {</b>
+<b class="fc">&nbsp;      method = findMethodInClassHierarchyMatchingParams(methodName, returnType, params);</b>
+&nbsp;    }
+<b class="fc">&nbsp;    if (method == null) {</b>
+<b class="nc">&nbsp;      throw buildNoMatchingMethodFoundException(</b>
+<b class="nc">&nbsp;          &quot;public &#39;&quot; + methodName + &quot;&#39; method in &quot; + returnType.getName(), params);</b>
+&nbsp;    }
+<b class="fc">&nbsp;    chain.add(MethodCall.from(method, params));</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Allows to chain a method call in current method call.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * This method is handy when you want to chain a method that actually currently is not available.
+&nbsp;   * Mainly as a marker of a feature that could be implemented in the future but still isn&#39;t (like
+&nbsp;   * authentication methods still not implemented).
+&nbsp;   * &lt;p&gt;
+&nbsp;   * In general cases {@link #chain(String, MethodParam...)} should be used instead.
+&nbsp;   *
+&nbsp;   * @param methodCall specifies the method call to chain
+&nbsp;   * @return current method call for further usage.
+&nbsp;   * @since 1.5
+&nbsp;   */
+&nbsp;  public MethodCall chain(MethodCall methodCall) {
+<b class="nc">&nbsp;    chain.add(methodCall);</b>
+<b class="nc">&nbsp;    return methodCall;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private Method findMethodInClassHierarchyMatchingParams(String methodName, Class&lt;?&gt; methodClass,
+&nbsp;      MethodParam[] params) {
+<b class="fc">&nbsp;    Method ret = null;</b>
+<b class="fc">&nbsp;    while (ret == null &amp;&amp; methodClass != Object.class) {</b>
+<b class="fc">&nbsp;      ret = findMethodInClassMatchingParams(methodName, methodClass, params);</b>
+<b class="fc">&nbsp;      methodClass = methodClass.getSuperclass();</b>
+&nbsp;    }
+<b class="fc">&nbsp;    return ret;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private Method findMethodInClassMatchingParams(String methodName, Class&lt;?&gt; methodClass,
+&nbsp;      MethodParam[] params) {
+<b class="fc">&nbsp;    Stream&lt;Method&gt; chainableMethods = Arrays.stream(methodClass.getDeclaredMethods())</b>
+<b class="fc">&nbsp;        .filter(m -&gt; methodName.equals(m.getName()) &amp;&amp; Modifier.isPublic(m.getModifiers())</b>
+<b class="fc">&nbsp;            &amp;&amp; m.getReturnType().isAssignableFrom(methodClass));</b>
+<b class="fc">&nbsp;    return findParamsMatchingMethod(chainableMethods, params);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  protected static Method findParamsMatchingMethod(Stream&lt;Method&gt; methods,
+&nbsp;      MethodParam[] params) {
+<b class="fc">&nbsp;    List&lt;MethodParam&gt; finalParams = Arrays.stream(params)</b>
+<b class="fc">&nbsp;        .filter(p -&gt; !p.isIgnored())</b>
+<b class="fc">&nbsp;        .collect(Collectors.toList());</b>
+<b class="fc">&nbsp;    return methods</b>
+<b class="fc">&nbsp;        .filter(m -&gt; methodMatchesParameters(m, finalParams))</b>
+<b class="fc">&nbsp;        .findAny()</b>
+<b class="fc">&nbsp;        .orElse(null);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private static boolean methodMatchesParameters(Method m, List&lt;MethodParam&gt; params) {
+<b class="fc">&nbsp;    if (m.getParameterCount() != params.size()) {</b>
+<b class="fc">&nbsp;      return false;</b>
+&nbsp;    }
+<b class="fc">&nbsp;    Class&lt;?&gt;[] paramTypes = m.getParameterTypes();</b>
+<b class="fc">&nbsp;    for (int i = 0; i &lt; params.size(); i++) {</b>
+<b class="fc">&nbsp;      if (!params.get(i).getType().isAssignableFrom(paramTypes[i])) {</b>
+<b class="fc">&nbsp;        return false;</b>
+&nbsp;      }
+&nbsp;    }
+<b class="fc">&nbsp;    return true;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Allows to add a comment as part of the chain of commands.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * This is useful to add notes to drive user attention to some particular chained method. For
+&nbsp;   * example, when parameters passed to a chained method need to be reviewed or changed.
+&nbsp;   *
+&nbsp;   * @param comment the comment to chain.
+&nbsp;   * @return the method call for further usage.
+&nbsp;   * @since 1.5
+&nbsp;   */
+&nbsp;  public MethodCall chainComment(String comment) {
+<b class="fc">&nbsp;    chain.add(new Comment(comment));</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  protected static UnsupportedOperationException buildNoMatchingMethodFoundException(
+&nbsp;      String methodCondition, MethodParam[] params) {
+<b class="nc">&nbsp;    return new UnsupportedOperationException(</b>
+<b class="nc">&nbsp;        &quot;No &quot; + methodCondition + &quot; method was found for parameters &quot; + Arrays.toString(params)</b>
+&nbsp;            + &quot;. This is probably due to some change in DSL not reflected in associated code &quot;
+&nbsp;            + &quot;builder.&quot;);
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Allows extracting from a given call the list of chained method calls and re assign them to this
+&nbsp;   * call.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * This is usually helpful when you provide in a DSL element alias methods for children elements.
+&nbsp;   * Eg: {@link us.abstracta.jmeter.javadsl.http.DslHttpSampler#header(String, String)}.
+&nbsp;   *
+&nbsp;   * @param other is the call to extract the chained methods from.
+&nbsp;   */
+&nbsp;  public void reChain(MethodCall other) {
+<b class="fc">&nbsp;    this.chain.addAll(other.chain);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Allows to remove an existing chained method call.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * This is useful when you need to alter an already created method call, for example, when
+&nbsp;   * optimizing a conversion and removing settings that are already covered by some other
+&nbsp;   * configuration element (eg: httpDefaults).
+&nbsp;   *
+&nbsp;   * @param methodName specifies the name of the chained method to be removed. If there are multiple
+&nbsp;   *                   methods chained with same name, then all of them will be removed.
+&nbsp;   * @since 1.8
+&nbsp;   */
+&nbsp;  public void unchain(String methodName) {
+<b class="fc">&nbsp;    chain = chain.stream()</b>
+<b class="fc">&nbsp;        .filter(m -&gt; !(m instanceof MethodCall &amp;&amp; methodName.equals(((MethodCall) m).methodName)))</b>
+<b class="fc">&nbsp;        .collect(Collectors.toList());</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Allows to check the number of method calls chained into current method call.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * This is useful to check, for example, if a particular test element has any non default
+&nbsp;   * settings.
+&nbsp;   *
+&nbsp;   * @return the number chained method calls.
+&nbsp;   * @since 1.8
+&nbsp;   */
+&nbsp;  public int chainSize() {
+<b class="fc">&nbsp;    return chain.size();</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Generates the code for this method call and all associated parameters, children elements and
+&nbsp;   * chained methods.
+&nbsp;   *
+&nbsp;   * @return the generated code.
+&nbsp;   */
+&nbsp;  public String buildCode() {
+<b class="fc">&nbsp;    return buildCode(&quot;&quot;);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public String buildCode(String indent) {
+<b class="fc">&nbsp;    StringBuilder ret = new StringBuilder();</b>
+<b class="fc">&nbsp;    if (headingComment != null) {</b>
+<b class="fc">&nbsp;      ret.append(&quot;// &quot;)</b>
+<b class="fc">&nbsp;          .append(headingComment)</b>
+<b class="fc">&nbsp;          .append(&quot;\n&quot;)</b>
+<b class="fc">&nbsp;          .append(indent);</b>
+&nbsp;    }
+<b class="fc">&nbsp;    ret.append(methodName)</b>
+<b class="fc">&nbsp;        .append(&quot;(&quot;);</b>
+<b class="fc">&nbsp;    String childIndent = indent + INDENT;</b>
+<b class="fc">&nbsp;    String paramsCode = buildParamsCode(childIndent);</b>
+<b class="fc">&nbsp;    ret.append(paramsCode);</b>
+<b class="fc">&nbsp;    boolean hasChildren = paramsCode.endsWith(&quot;\n&quot;);</b>
+<b class="fc">&nbsp;    if (hasChildren) {</b>
+<b class="fc">&nbsp;      ret.append(indent);</b>
+&nbsp;    }
+<b class="fc">&nbsp;    ret.append(&quot;)&quot;);</b>
+<b class="fc">&nbsp;    String chainedCode = buildChainedCode(childIndent);</b>
+<b class="fc">&nbsp;    if (!chainedCode.isEmpty() &amp;&amp; hasChildren) {</b>
+<b class="nc">&nbsp;      chainedCode = chainedCode.substring(1 + childIndent.length());</b>
+&nbsp;    }
+<b class="fc">&nbsp;    ret.append(chainedCode);</b>
+<b class="fc">&nbsp;    return commented ? commented(ret.toString(), indent) : ret.toString();</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private String commented(String str, String indent) {
+<b class="fc">&nbsp;    return &quot;//&quot; + str.replace(&quot;\n&quot; + indent, &quot;\n&quot; + indent + &quot;//&quot;);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  public String buildAssignmentCode(String indent) {
+<b class="fc">&nbsp;    String ret = buildCode(indent);</b>
+<b class="fc">&nbsp;    String indentedParenthesis = INDENT + &quot;)&quot;;</b>
+<b class="fc">&nbsp;    return chain.isEmpty() &amp;&amp; ret.endsWith(indentedParenthesis)</b>
+<b class="fc">&nbsp;        ? ret.substring(0, ret.length() - indentedParenthesis.length()) + &quot;)&quot;</b>
+<b class="fc">&nbsp;        : ret;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  protected String buildParamsCode(String indent) {
+<b class="fc">&nbsp;    String ret = params.stream()</b>
+<b class="fc">&nbsp;        .filter(p -&gt; !p.isIgnored())</b>
+<b class="fc">&nbsp;        .map(p -&gt; p.buildCode(indent))</b>
+<b class="fc">&nbsp;        .filter(s -&gt; !s.isEmpty())</b>
+<b class="fc">&nbsp;        .collect(Collectors.joining(&quot;, &quot;));</b>
+<b class="fc">&nbsp;    return ret.replace(&quot;, \n&quot;, &quot;,\n&quot;).replaceAll(&quot;\n\\s*\n&quot;, &quot;\n&quot;);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private String buildChainedCode(String indent) {
+<b class="fc">&nbsp;    StringBuilder ret = new StringBuilder();</b>
+<b class="fc">&nbsp;    for (CodeSegment seg : chain) {</b>
+<b class="fc">&nbsp;      String segCode = seg.buildCode(indent);</b>
+<b class="fc">&nbsp;      if (!segCode.isEmpty()) {</b>
+<b class="fc">&nbsp;        ret.append(&quot;\n&quot;)</b>
+<b class="fc">&nbsp;            .append(indent)</b>
+<b class="fc">&nbsp;            .append(seg instanceof MethodCall ? &quot;.&quot; : &quot;&quot;)</b>
+<b class="fc">&nbsp;            .append(segCode);</b>
+&nbsp;      }
+<b class="fc">&nbsp;    }</b>
+<b class="fc">&nbsp;    return ret.toString();</b>
+&nbsp;  }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-03 22:39</div>
+</div>
+</body>
+</html>

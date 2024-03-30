@@ -1,0 +1,143 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=GBK"> 
+  <title>Coverage Report > EncodingParam</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">us.abstracta.jmeter.javadsl.codegeneration.params</a>
+</div>
+
+<h1>Coverage Summary for Class: EncodingParam (us.abstracta.jmeter.javadsl.codegeneration.params)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">EncodingParam</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (5/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    90.9%
+  </span>
+  <span class="absValue">
+    (10/11)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package us.abstracta.jmeter.javadsl.codegeneration.params;
+&nbsp;
+&nbsp;import java.nio.charset.Charset;
+&nbsp;import java.nio.charset.StandardCharsets;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Set;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.MethodCall;
+&nbsp;
+&nbsp;/**
+&nbsp; * Is a parameter with an encoding (Charset) value.
+&nbsp; *
+&nbsp; * @since 0.62
+&nbsp; */
+&nbsp;public class EncodingParam extends FixedParam&lt;Charset&gt; {
+&nbsp;
+<b class="fc">&nbsp;  private static final Map&lt;Charset, String&gt; STANDARD_CHARSETS_NAMES =</b>
+<b class="fc">&nbsp;      findConstantNamesMap(StandardCharsets.class, Charset.class, s -&gt; true);</b>
+&nbsp;
+&nbsp;  public EncodingParam(String expression, Charset defaultValue) {
+<b class="fc">&nbsp;    super(Charset.class, expression, Charset::forName, defaultValue);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public Set&lt;String&gt; getImports() {
+<b class="fc">&nbsp;    return Collections.singleton((STANDARD_CHARSETS_NAMES.get(value) != null</b>
+<b class="fc">&nbsp;        ? StandardCharsets.class</b>
+<b class="nc">&nbsp;        : Charset.class).getName());</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  public String buildCode(String indent) {
+<b class="fc">&nbsp;    String standardCharsetName = STANDARD_CHARSETS_NAMES.get(value);</b>
+<b class="fc">&nbsp;    return standardCharsetName != null</b>
+<b class="fc">&nbsp;        ? StandardCharsets.class.getSimpleName() + &quot;.&quot; + standardCharsetName</b>
+<b class="fc">&nbsp;        : MethodCall.forStaticMethod(Charset.class, &quot;forName&quot;, new StringParam(getValue().name()))</b>
+<b class="fc">&nbsp;            .buildCode();</b>
+&nbsp;  }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-03 20:57</div>
+</div>
+</body>
+</html>

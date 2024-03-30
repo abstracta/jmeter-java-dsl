@@ -1,0 +1,244 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=GBK"> 
+  <title>Coverage Report > ChildrenParam</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">us.abstracta.jmeter.javadsl.codegeneration.params</a>
+</div>
+
+<h1>Coverage Summary for Class: ChildrenParam (us.abstracta.jmeter.javadsl.codegeneration.params)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ChildrenParam</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    93.3%
+  </span>
+  <span class="absValue">
+    (14/15)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    92.3%
+  </span>
+  <span class="absValue">
+    (36/39)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package us.abstracta.jmeter.javadsl.codegeneration.params;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.Comparator;
+&nbsp;import java.util.LinkedHashMap;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Map.Entry;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.MethodCall;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.MethodParam;
+&nbsp;import us.abstracta.jmeter.javadsl.core.assertions.DslAssertion;
+&nbsp;import us.abstracta.jmeter.javadsl.core.configs.DslConfig;
+&nbsp;import us.abstracta.jmeter.javadsl.core.configs.DslVariables;
+&nbsp;import us.abstracta.jmeter.javadsl.core.controllers.DslController;
+&nbsp;import us.abstracta.jmeter.javadsl.core.listeners.DslListener;
+&nbsp;import us.abstracta.jmeter.javadsl.core.postprocessors.DslPostProcessor;
+&nbsp;import us.abstracta.jmeter.javadsl.core.preprocessors.DslPreProcessor;
+&nbsp;import us.abstracta.jmeter.javadsl.core.samplers.DslSampler;
+&nbsp;import us.abstracta.jmeter.javadsl.core.threadgroups.DslThreadGroup;
+&nbsp;import us.abstracta.jmeter.javadsl.core.timers.DslTimer;
+&nbsp;
+&nbsp;/**
+&nbsp; * Is a parameter used to specify DSL test element children methods.
+&nbsp; * &lt;p&gt;
+&nbsp; * This is usually used in TestElementContainer instances which usually provide a builder method
+&nbsp; * with basic required parameters and children elements (eg: thread groups &amp;amp; controllers).
+&nbsp; *
+&nbsp; * @param &lt;T&gt; The type of the children DSl test elements.
+&nbsp; * @since 0.45
+&nbsp; */
+&nbsp;public class ChildrenParam&lt;T&gt; extends MethodParam {
+&nbsp;
+<b class="fc">&nbsp;  private static final Class&lt;?&gt;[][] EXECUTION_ORDERS = new Class[][]{</b>
+&nbsp;      {DslVariables.class},
+&nbsp;      {DslConfig.class},
+&nbsp;      {DslPreProcessor.class},
+&nbsp;      {DslTimer.class},
+&nbsp;      {DslThreadGroup.class, DslController.class, DslSampler.class},
+&nbsp;      {DslPostProcessor.class},
+&nbsp;      {DslAssertion.class},
+&nbsp;      {DslListener.class}
+&nbsp;  };
+&nbsp;
+&nbsp;  private final List&lt;MethodCall&gt; children;
+&nbsp;
+&nbsp;  public ChildrenParam(Class&lt;T&gt; childrenClass) {
+<b class="fc">&nbsp;    this(childrenClass, new ArrayList&lt;&gt;());</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  public ChildrenParam(Class&lt;T&gt; childrenClass, List&lt;MethodCall&gt; children) {
+<b class="fc">&nbsp;    super(checkChildrenType(childrenClass), null);</b>
+<b class="fc">&nbsp;    this.children = children;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private static &lt;T&gt; Class&lt;T&gt; checkChildrenType(Class&lt;T&gt; childrenClass) {
+<b class="fc">&nbsp;    if (!childrenClass.isArray()) {</b>
+<b class="nc">&nbsp;      throw new RuntimeException(&quot;You need always to provide an array class and not the raw &quot;</b>
+&nbsp;          + &quot;class for the children. Eg use TestPlanChild[].class&quot;);
+&nbsp;    }
+<b class="fc">&nbsp;    return childrenClass;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public boolean isDefault() {
+<b class="fc">&nbsp;    return children.isEmpty();</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public Set&lt;String&gt; getStaticImports() {
+<b class="fc">&nbsp;    return children.stream()</b>
+<b class="fc">&nbsp;        .flatMap(c -&gt; c.getStaticImports().stream())</b>
+<b class="fc">&nbsp;        .collect(Collectors.toSet());</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public Set&lt;String&gt; getImports() {
+<b class="fc">&nbsp;    return children.stream()</b>
+<b class="fc">&nbsp;        .flatMap(c -&gt; c.getImports().stream())</b>
+<b class="fc">&nbsp;        .collect(Collectors.toSet());</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  public Map&lt;String, MethodCall&gt; getMethodDefinitions() {
+<b class="fc">&nbsp;    return children.stream()</b>
+<b class="fc">&nbsp;        .flatMap(c -&gt; c.getMethodDefinitions().entrySet().stream())</b>
+<b class="fc">&nbsp;        .collect(Collectors.toMap(Entry::getKey, Entry::getValue,</b>
+&nbsp;            (u, v) -&gt; {
+<b class="nc">&nbsp;              throw new IllegalStateException(&quot;Duplicate key &quot; + u);</b>
+&nbsp;            },
+&nbsp;            LinkedHashMap::new));
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public String buildCode(String indent) {
+<b class="fc">&nbsp;    List&lt;MethodCall&gt; childrenCalls = children.stream()</b>
+&nbsp;        // order elements to provide the most intuitive representation and ease tests
+<b class="fc">&nbsp;        .sorted(Comparator.comparing(c -&gt; findExecutionOrder(c.getReturnType())))</b>
+<b class="fc">&nbsp;        .collect(Collectors.toList());</b>
+<b class="fc">&nbsp;    String ret = childrenCalls.stream()</b>
+<b class="fc">&nbsp;        .map(c -&gt; c.buildCode(indent))</b>
+<b class="fc">&nbsp;        .filter(s -&gt; !s.isEmpty())</b>
+<b class="fc">&nbsp;        .collect(Collectors.joining(&quot;,\n&quot; + indent));</b>
+<b class="fc">&nbsp;    ret = commentLastUncommentedComma(ret);</b>
+<b class="fc">&nbsp;    return ret.isEmpty() ? ret : &quot;\n&quot; + indent + ret + &quot;\n&quot;;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private String commentLastUncommentedComma(String ret) {
+<b class="fc">&nbsp;    return ret.replaceAll(&quot;(?s),((?:\n\\s*//[^\n]+)+)$&quot;, &quot;//,$1&quot;);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private static int findExecutionOrder(Class&lt;?&gt; returnType) {
+<b class="fc">&nbsp;    for (int i = 0; i &lt; EXECUTION_ORDERS.length; i++) {</b>
+<b class="fc">&nbsp;      if (Arrays.stream(EXECUTION_ORDERS[i])</b>
+<b class="fc">&nbsp;          .anyMatch(c -&gt; c.isAssignableFrom(returnType))) {</b>
+<b class="fc">&nbsp;        return i;</b>
+&nbsp;      }
+&nbsp;    }
+<b class="fc">&nbsp;    return -1;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  public void addChild(MethodCall child) {
+<b class="fc">&nbsp;    Class&lt;?&gt; childrenType = paramType.getComponentType();</b>
+<b class="fc">&nbsp;    if (!childrenType.isAssignableFrom(child.getReturnType())) {</b>
+<b class="nc">&nbsp;      throw new IllegalArgumentException(&quot;Trying to add a child of type &quot; + child.getReturnType()</b>
+&nbsp;          + &quot; that is not compatible with the declared ones : &quot; + childrenType);
+&nbsp;    }
+<b class="fc">&nbsp;    children.add(child);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  public void replaceChild(MethodCall original, MethodCall replacement) {
+<b class="fc">&nbsp;    children.replaceAll(c -&gt; c == original ? replacement : c);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  public void prependChild(MethodCall child) {
+<b class="fc">&nbsp;    children.add(0, child);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-03 20:57</div>
+</div>
+</body>
+</html>

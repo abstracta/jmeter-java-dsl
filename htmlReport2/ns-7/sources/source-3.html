@@ -1,0 +1,200 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=GBK"> 
+  <title>Coverage Report > DslIfController</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">us.abstracta.jmeter.javadsl.core.controllers</a>
+</div>
+
+<h1>Coverage Summary for Class: DslIfController (us.abstracta.jmeter.javadsl.core.controllers)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DslIfController</td>
+<td class="coverageStat">
+  <span class="percent">
+    80%
+  </span>
+  <span class="absValue">
+    (4/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    90%
+  </span>
+  <span class="absValue">
+    (9/10)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">DslIfController$CodeBuilder</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/3)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    85.7%
+  </span>
+  <span class="absValue">
+    (6/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    92.3%
+  </span>
+  <span class="absValue">
+    (12/13)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package us.abstracta.jmeter.javadsl.core.controllers;
+&nbsp;
+&nbsp;import java.lang.reflect.Method;
+&nbsp;import java.util.List;
+&nbsp;import org.apache.jmeter.control.IfController;
+&nbsp;import org.apache.jmeter.control.gui.IfControllerPanel;
+&nbsp;import org.apache.jmeter.testelement.TestElement;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.MethodCall;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.MethodCallContext;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.SingleTestElementCallBuilder;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.TestElementParamBuilder;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.params.ChildrenParam;
+&nbsp;import us.abstracta.jmeter.javadsl.core.threadgroups.BaseThreadGroup.ThreadGroupChild;
+&nbsp;import us.abstracta.jmeter.javadsl.core.util.PropertyScriptBuilder;
+&nbsp;import us.abstracta.jmeter.javadsl.core.util.PropertyScriptBuilder.PropertyScript;
+&nbsp;
+&nbsp;/**
+&nbsp; * Allows to conditionally run part of a test plan according to certain condition.
+&nbsp; *
+&nbsp; * @since 0.27
+&nbsp; */
+&nbsp;public class DslIfController extends BaseController&lt;DslIfController&gt; {
+&nbsp;
+&nbsp;  protected PropertyScriptBuilder&lt;Boolean&gt; conditionBuilder;
+&nbsp;
+&nbsp;  public DslIfController(String condition, List&lt;ThreadGroupChild&gt; children) {
+<b class="fc">&nbsp;    this(new PropertyScriptBuilder&lt;&gt;(condition), children);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private DslIfController(PropertyScriptBuilder&lt;Boolean&gt; conditionBuilder,
+&nbsp;      List&lt;ThreadGroupChild&gt; children) {
+<b class="fc">&nbsp;    super(&quot;If Controller&quot;, IfControllerPanel.class, children);</b>
+<b class="fc">&nbsp;    this.conditionBuilder = conditionBuilder;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  public DslIfController(PropertyScript&lt;Boolean&gt; script, List&lt;ThreadGroupChild&gt; children) {
+<b class="fc">&nbsp;    this(new PropertyScriptBuilder&lt;&gt;(script), children);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  public DslIfController(Class&lt;? extends PropertyScript&lt;Boolean&gt;&gt; conditionClass,
+&nbsp;      List&lt;ThreadGroupChild&gt; children) {
+<b class="nc">&nbsp;    this(new PropertyScriptBuilder&lt;&gt;(conditionClass), children);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  protected TestElement buildTestElement() {
+<b class="fc">&nbsp;    IfController ret = new IfController();</b>
+<b class="fc">&nbsp;    ret.setUseExpression(true);</b>
+<b class="fc">&nbsp;    String condition = conditionBuilder.build();</b>
+<b class="fc">&nbsp;    ret.setCondition(condition);</b>
+<b class="fc">&nbsp;    return ret;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  public static class CodeBuilder extends SingleTestElementCallBuilder&lt;IfController&gt; {
+&nbsp;
+&nbsp;    public CodeBuilder(List&lt;Method&gt; builderMethods) {
+<b class="fc">&nbsp;      super(IfController.class, builderMethods);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected MethodCall buildMethodCall(IfController testElement, MethodCallContext context) {
+<b class="fc">&nbsp;      TestElementParamBuilder paramBuilder = new TestElementParamBuilder(testElement,</b>
+&nbsp;          &quot;IfController&quot;);
+<b class="fc">&nbsp;      return buildMethodCall(paramBuilder.stringParam(&quot;condition&quot;),</b>
+&nbsp;          new ChildrenParam&lt;&gt;(ThreadGroupChild[].class));
+&nbsp;    }
+&nbsp;
+&nbsp;  }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-03 22:39</div>
+</div>
+</body>
+</html>

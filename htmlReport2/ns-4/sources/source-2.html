@@ -1,0 +1,421 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=GBK"> 
+  <title>Coverage Report > DslTestPlan</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">us.abstracta.jmeter.javadsl.core</a>
+</div>
+
+<h1>Coverage Summary for Class: DslTestPlan (us.abstracta.jmeter.javadsl.core)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DslTestPlan</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (13/13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    87.2%
+  </span>
+  <span class="absValue">
+    (41/47)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">DslTestPlan$1</td>
+  </tr>
+  <tr>
+    <td class="name">DslTestPlan$CodeBuilder</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (7/7)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">DslTestPlan$JmxTestPlan</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (7/7)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">DslTestPlan$TestPlanChild</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (18/18)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    90.2%
+  </span>
+  <span class="absValue">
+    (55/61)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package us.abstracta.jmeter.javadsl.core;
+&nbsp;
+&nbsp;import java.io.File;
+&nbsp;import java.io.FileOutputStream;
+&nbsp;import java.io.IOException;
+&nbsp;import java.lang.reflect.InvocationTargetException;
+&nbsp;import java.lang.reflect.Method;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.List;
+&nbsp;import java.util.concurrent.CompletableFuture;
+&nbsp;import java.util.concurrent.ExecutionException;
+&nbsp;import java.util.concurrent.TimeoutException;
+&nbsp;import javax.swing.SwingUtilities;
+&nbsp;import org.apache.jmeter.config.Arguments;
+&nbsp;import org.apache.jmeter.control.gui.TestPlanGui;
+&nbsp;import org.apache.jmeter.exceptions.IllegalUserActionException;
+&nbsp;import org.apache.jmeter.testelement.TestElement;
+&nbsp;import org.apache.jmeter.testelement.TestPlan;
+&nbsp;import org.apache.jorphan.collections.HashTree;
+&nbsp;import org.apache.jorphan.collections.ListedHashTree;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.MethodCall;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.MethodCallContext;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.SingleTestElementCallBuilder;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.TestElementParamBuilder;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.params.ChildrenParam;
+&nbsp;import us.abstracta.jmeter.javadsl.core.DslTestPlan.TestPlanChild;
+&nbsp;import us.abstracta.jmeter.javadsl.core.engines.EmbeddedJmeterEngine;
+&nbsp;import us.abstracta.jmeter.javadsl.core.engines.EmbeddedJmeterEngine.EmbeddedJMeterEngineStopper;
+&nbsp;import us.abstracta.jmeter.javadsl.core.engines.JmeterEnvironment;
+&nbsp;import us.abstracta.jmeter.javadsl.core.engines.JmeterGui;
+&nbsp;import us.abstracta.jmeter.javadsl.core.testelements.TestElementContainer;
+&nbsp;import us.abstracta.jmeter.javadsl.core.threadgroups.DslDefaultThreadGroup;
+&nbsp;
+&nbsp;/**
+&nbsp; * Represents a JMeter test plan, with associated thread groups and other children elements.
+&nbsp; *
+&nbsp; * @since 0.1
+&nbsp; */
+&nbsp;public class DslTestPlan extends TestElementContainer&lt;DslTestPlan, TestPlanChild&gt; {
+&nbsp;
+&nbsp;  private static final String DEFAULT_NAME = &quot;Test Plan&quot;;
+<b class="fc">&nbsp;  protected boolean serializeThreadGroups = false;</b>
+<b class="fc">&nbsp;  protected boolean tearDownOnlyAfterMainThreadsDone = false;</b>
+&nbsp;
+&nbsp;  public DslTestPlan(List&lt;TestPlanChild&gt; children) {
+<b class="fc">&nbsp;    super(DEFAULT_NAME, TestPlanGui.class, children);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Specifies to run thread groups one after the other, instead of running them in parallel.
+&nbsp;   *
+&nbsp;   * @return this instance for fluent API usage.
+&nbsp;   * @since 0.40
+&nbsp;   */
+&nbsp;  public DslTestPlan sequentialThreadGroups() {
+<b class="fc">&nbsp;    return sequentialThreadGroups(true);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Specifies to run thread groups one after the other, instead of running them in parallel.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * Same as {@link #sequentialThreadGroups()} but allowing to enable/disable the setting during
+&nbsp;   * runtime.
+&nbsp;   *
+&nbsp;   * @param enable specifies to run thread groups one after the other when set to true, or in
+&nbsp;   *               parallel when false. By default, is set to false.
+&nbsp;   * @return the test plan for further configuration or usage.
+&nbsp;   * @since 0.65
+&nbsp;   */
+&nbsp;  public DslTestPlan sequentialThreadGroups(boolean enable) {
+<b class="fc">&nbsp;    this.serializeThreadGroups = enable;</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Allows running tear down thread groups only after main thread groups ends cleanly (due to
+&nbsp;   * iterations or time limit).
+&nbsp;   * &lt;p&gt;
+&nbsp;   * By default, JMeter automatically executes tear down thread groups when a test plan stops due to
+&nbsp;   * unscheduled event like sample error when stop test is configured in thread group, invocation of
+&nbsp;   * `ctx.getEngine().askThreadsToStop()` in jsr223 element, etc. This method allows to disable such
+&nbsp;   * behavior not running teardown thread groups in such cases, which might be helpful if teardown
+&nbsp;   * thread group has only to run on clean test plan completion.
+&nbsp;   *
+&nbsp;   * @return the test plan for further configuration or usage.
+&nbsp;   * @since 0.40
+&nbsp;   */
+&nbsp;  public DslTestPlan tearDownOnlyAfterMainThreadsDone() {
+<b class="fc">&nbsp;    return tearDownOnlyAfterMainThreadsDone(true);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Allows running tear down thread groups only after main thread groups ends cleanly (due to
+&nbsp;   * iterations or time limit).
+&nbsp;   * &lt;p&gt;
+&nbsp;   * By default, JMeter automatically executes tear down thread groups when a test plan stops due to
+&nbsp;   * unscheduled event like sample error when stop test is configured in thread group, invocation of
+&nbsp;   * `ctx.getEngine().askThreadsToStop()` in jsr223 element, etc. This method allows to disable such
+&nbsp;   * behavior not running teardown thread groups in such cases, which might be helpful if teardown
+&nbsp;   * thread group has only to run on clean test plan completion.
+&nbsp;   *
+&nbsp;   * @return this instance for fluent API usage.
+&nbsp;   * @since 0.65
+&nbsp;   */
+&nbsp;  public DslTestPlan tearDownOnlyAfterMainThreadsDone(boolean enabled) {
+<b class="fc">&nbsp;    this.tearDownOnlyAfterMainThreadsDone = enabled;</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  protected TestElement buildTestElement() {
+<b class="fc">&nbsp;    TestPlan ret = new TestPlan();</b>
+<b class="fc">&nbsp;    ret.setUserDefinedVariables(new Arguments());</b>
+<b class="fc">&nbsp;    ret.setTearDownOnShutdown(!this.tearDownOnlyAfterMainThreadsDone);</b>
+<b class="fc">&nbsp;    ret.setSerialized(this.serializeThreadGroups);</b>
+<b class="fc">&nbsp;    return ret;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Uses {@link EmbeddedJmeterEngine} to run the test plan.
+&nbsp;   *
+&nbsp;   * @return {@link TestPlanStats} containing all statistics of the test plan execution.
+&nbsp;   * @throws IOException thrown when there is some problem running the plan.
+&nbsp;   */
+&nbsp;  public TestPlanStats run() throws IOException {
+<b class="fc">&nbsp;    return new EmbeddedJmeterEngine().run(this);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Allows to run the test plan in a given engine.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * This method is just a simple method which provides fluent API to run the test plans in a given
+&nbsp;   * engine.
+&nbsp;   *
+&nbsp;   * @see DslJmeterEngine#run(DslTestPlan)
+&nbsp;   */
+&nbsp;  public TestPlanStats runIn(DslJmeterEngine engine)
+&nbsp;      throws IOException, InterruptedException, TimeoutException {
+<b class="fc">&nbsp;    return engine.run(this);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  public void showInGui() {
+&nbsp;    try {
+<b class="fc">&nbsp;      JmeterEnvironment env = new JmeterEnvironment();</b>
+<b class="fc">&nbsp;      env.initLocale();</b>
+<b class="fc">&nbsp;      CompletableFuture&lt;JmeterGui&gt; guiFuture = new CompletableFuture&lt;&gt;();</b>
+&nbsp;      /*
+&nbsp;       Need to invoke this logic in swing event queue for proper order of execution of events
+&nbsp;       and avoid NPE while updating RSyntaxTextArea in test plan load (e.g.: when test plan contains
+&nbsp;       an ifController).
+&nbsp;       */
+<b class="fc">&nbsp;      SwingUtilities.invokeAndWait(() -&gt; {</b>
+&nbsp;        try {
+<b class="fc">&nbsp;          JmeterGui gui = new JmeterGui();</b>
+<b class="fc">&nbsp;          guiFuture.complete(gui);</b>
+<b class="fc">&nbsp;          HashTree tree = new ListedHashTree();</b>
+<b class="fc">&nbsp;          new BuildTreeContext().buildTreeFor(this, tree);</b>
+<b class="fc">&nbsp;          env.updateSearchPath(tree);</b>
+<b class="fc">&nbsp;          gui.load(tree);</b>
+<b class="nc">&nbsp;        } catch (IllegalUserActionException | IOException e) {</b>
+<b class="nc">&nbsp;          throw new RuntimeException(e);</b>
+<b class="fc">&nbsp;        }</b>
+&nbsp;      });
+<b class="fc">&nbsp;      guiFuture.get().awaitClose();</b>
+<b class="nc">&nbsp;    } catch (IOException | ExecutionException | InvocationTargetException e) {</b>
+<b class="nc">&nbsp;      throw new RuntimeException(e);</b>
+<b class="nc">&nbsp;    } catch (InterruptedException e) {</b>
+<b class="nc">&nbsp;      Thread.currentThread().interrupt();</b>
+<b class="fc">&nbsp;    }</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Saves the given test plan as JMX, which allows it to be loaded in JMeter GUI.
+&nbsp;   *
+&nbsp;   * @param filePath specifies where to store the JMX of the test plan.
+&nbsp;   * @throws IOException when there is a problem saving to the file.
+&nbsp;   */
+&nbsp;  public void saveAsJmx(String filePath) throws IOException {
+<b class="fc">&nbsp;    JmeterEnvironment env = new JmeterEnvironment();</b>
+<b class="fc">&nbsp;    try (FileOutputStream output = new FileOutputStream(filePath)) {</b>
+<b class="fc">&nbsp;      HashTree tree = new ListedHashTree();</b>
+<b class="fc">&nbsp;      BuildTreeContext context = new BuildTreeContext();</b>
+<b class="fc">&nbsp;      context.setTestStopper(new EmbeddedJMeterEngineStopper());</b>
+<b class="fc">&nbsp;      context.buildTreeFor(this, tree);</b>
+<b class="fc">&nbsp;      env.saveTree(tree, output);</b>
+<b class="fc">&nbsp;    }</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Loads a test plan from the given JMX to be able to run it in embedded engine.
+&nbsp;   *
+&nbsp;   * @param filePath specifies the path where the JMX file is located.
+&nbsp;   * @return loaded test plan.
+&nbsp;   * @throws IOException when there is a problem loading to the file.
+&nbsp;   * @since 0.3
+&nbsp;   */
+&nbsp;  public static DslTestPlan fromJmx(String filePath) throws IOException {
+<b class="fc">&nbsp;    JmeterEnvironment env = new JmeterEnvironment();</b>
+<b class="fc">&nbsp;    HashTree tree = env.loadTree(new File(filePath));</b>
+<b class="fc">&nbsp;    return new JmxTestPlan(tree);</b>
+&nbsp;  }
+&nbsp;
+<b class="fc">&nbsp;  private static class JmxTestPlan extends DslTestPlan {</b>
+&nbsp;
+&nbsp;    private final HashTree tree;
+&nbsp;
+&nbsp;    private JmxTestPlan(HashTree tree) {
+<b class="fc">&nbsp;      super(Collections.emptyList());</b>
+<b class="fc">&nbsp;      this.tree = tree;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public HashTree buildTreeUnder(HashTree parent, BuildTreeContext context) {
+<b class="fc">&nbsp;      parent.putAll(tree);</b>
+<b class="fc">&nbsp;      HashTree testPlanTree = parent.values().iterator().next();</b>
+<b class="fc">&nbsp;      children.forEach(c -&gt; context.buildChild(c, testPlanTree));</b>
+<b class="fc">&nbsp;      return testPlanTree;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Allows adding additional children elements to a test plan.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * This might be helpful for adding elements to a test plan loaded from a JMX file (like adding
+&nbsp;   * htmlReport, resultsTreeVisualizer or dashboard) or if you want to create a test plan and then
+&nbsp;   * incrementally adding children to it.
+&nbsp;   *
+&nbsp;   * @param children elements to add to the test plan.
+&nbsp;   * @return the test plan for further usage (run, show, etc).
+&nbsp;   * @since 0.56
+&nbsp;   */
+&nbsp;  public DslTestPlan children(TestPlanChild... children) {
+<b class="fc">&nbsp;    return super.children(children);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Test elements that can be added directly as test plan children in JMeter should implement this
+&nbsp;   * interface.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * Check {@link DslDefaultThreadGroup} for an example.
+&nbsp;   */
+&nbsp;  public interface TestPlanChild extends DslTestElement {
+&nbsp;
+&nbsp;  }
+&nbsp;
+&nbsp;  public static class CodeBuilder extends SingleTestElementCallBuilder&lt;TestPlan&gt; {
+&nbsp;
+&nbsp;    public CodeBuilder(List&lt;Method&gt; builderMethods) {
+<b class="fc">&nbsp;      super(TestPlan.class, builderMethods);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected MethodCall buildMethodCall(TestPlan testElement, MethodCallContext context) {
+<b class="fc">&nbsp;      TestElementParamBuilder paramBuilder = new TestElementParamBuilder(testElement, &quot;TestPlan&quot;);</b>
+<b class="fc">&nbsp;      return buildMethodCall(new ChildrenParam&lt;&gt;(TestPlanChild[].class))</b>
+<b class="fc">&nbsp;          .chain(&quot;sequentialThreadGroups&quot;,</b>
+<b class="fc">&nbsp;              paramBuilder.boolParam(&quot;serialize_threadgroups&quot;, false))</b>
+<b class="fc">&nbsp;          .chain(&quot;tearDownOnlyAfterMainThreadsDone&quot;,</b>
+<b class="fc">&nbsp;              paramBuilder.boolParam(&quot;tearDown_on_shutdown&quot;, true));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;  }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-03 22:39</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,131 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=GBK"> 
+  <title>Coverage Report > BoolParam</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">us.abstracta.jmeter.javadsl.codegeneration.params</a>
+</div>
+
+<h1>Coverage Summary for Class: BoolParam (us.abstracta.jmeter.javadsl.codegeneration.params)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">BoolParam</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    83.3%
+  </span>
+  <span class="absValue">
+    (5/6)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package us.abstracta.jmeter.javadsl.codegeneration.params;
+&nbsp;
+&nbsp;/**
+&nbsp; * Is a parameter with a boolean (true/false) value.
+&nbsp; *
+&nbsp; * @since 0.45
+&nbsp; */
+&nbsp;public class BoolParam extends FixedParam&lt;Boolean&gt; {
+&nbsp;
+&nbsp;  public BoolParam(String expression, Boolean defaultValue) {
+<b class="fc">&nbsp;    super(boolean.class,</b>
+<b class="fc">&nbsp;        expression != null &amp;&amp; expression.isEmpty() ? Boolean.FALSE.toString() : expression,</b>
+&nbsp;        us.abstracta.jmeter.javadsl.codegeneration.params.BoolParam::parseBool, defaultValue);
+&nbsp;  }
+&nbsp;
+&nbsp;  public BoolParam(Boolean value, Boolean defaultValue) {
+<b class="fc">&nbsp;    super(boolean.class, value, defaultValue);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private static Boolean parseBool(String value) {
+<b class="fc">&nbsp;    if (!String.valueOf(true).equals(value) &amp;&amp; !String.valueOf(false).equals(value)) {</b>
+<b class="nc">&nbsp;      throw new IllegalArgumentException();</b>
+&nbsp;    }
+<b class="fc">&nbsp;    return Boolean.valueOf(value);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-03 22:39</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,245 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=GBK"> 
+  <title>Coverage Report > DslAuthManager</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">us.abstracta.jmeter.javadsl.http</a>
+</div>
+
+<h1>Coverage Summary for Class: DslAuthManager (us.abstracta.jmeter.javadsl.http)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DslAuthManager</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (12/12)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">DslAuthManager$CodeBuilder</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    78.6%
+  </span>
+  <span class="absValue">
+    (11/14)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (6/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    88.5%
+  </span>
+  <span class="absValue">
+    (23/26)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package us.abstracta.jmeter.javadsl.http;
+&nbsp;
+&nbsp;import java.lang.reflect.Method;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Locale;
+&nbsp;import org.apache.jmeter.protocol.http.control.AuthManager;
+&nbsp;import org.apache.jmeter.protocol.http.control.AuthManager.Mechanism;
+&nbsp;import org.apache.jmeter.protocol.http.control.Authorization;
+&nbsp;import org.apache.jmeter.protocol.http.gui.AuthPanel;
+&nbsp;import org.apache.jmeter.testelement.TestElement;
+&nbsp;import org.apache.jmeter.testelement.property.CollectionProperty;
+&nbsp;import org.apache.jmeter.testelement.property.JMeterProperty;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.MethodCall;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.MethodCallContext;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.SingleTestElementCallBuilder;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.params.StringParam;
+&nbsp;import us.abstracta.jmeter.javadsl.core.configs.BaseConfigElement;
+&nbsp;
+&nbsp;/**
+&nbsp; * Allows specifying HTTP authentication to be automatically included in HTTP requests.
+&nbsp; * &lt;p&gt;
+&nbsp; * This is a handy way of specifying HTTP authentication without having to worry about particular
+&nbsp; * requests or HTTP header handling.
+&nbsp; * &lt;p&gt;
+&nbsp; * When specifying multiple authentications, consider that the first matching authentication will be
+&nbsp; * applied. So, if you have two urls with different authentication which one is contained by the
+&nbsp; * other, define the longest one first and then the shorter one to get expected behavior. E.g:
+&nbsp; *
+&nbsp; * &lt;pre&gt;{@code
+&nbsp; *  httpAuth()
+&nbsp; *    .basicAuth(&quot;http://myservice/user&quot;, &quot;user1&quot;, &quot;pass1&quot;)
+&nbsp; *    .basicAuth(&quot;http://myservice&quot;, &quot;user2&quot;, &quot;pass2&quot;)
+&nbsp; * }&lt;/pre&gt;
+&nbsp; *
+&nbsp; * @since 1.5
+&nbsp; */
+&nbsp;public class DslAuthManager extends BaseConfigElement {
+&nbsp;
+<b class="fc">&nbsp;  private final List&lt;Authorization&gt; authorizations = new ArrayList&lt;&gt;();</b>
+&nbsp;
+&nbsp;  public DslAuthManager() {
+<b class="fc">&nbsp;    super(&quot;HTTP Authorization Manager&quot;, AuthPanel.class);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Specifies authentication credentials to use with HTTP Basic authentication for a given base
+&nbsp;   * url.
+&nbsp;   *
+&nbsp;   * @param baseUrl  allows filtering requests to which HTTP Basic authentication should be sent.
+&nbsp;   *                 All requests with a URL starting with this given base url will include Basic
+&nbsp;   *                 authentication.
+&nbsp;   *                 &lt;p&gt;
+&nbsp;   *                 Even though you can use empty string to match any URL and simplify
+&nbsp;   *                 configuration, this is not advised since it may lead to sending the
+&nbsp;   *                 authentication credentials to an unexpected URL and cause a security leak.
+&nbsp;   * @param user specifies the username for the basic authentication.
+&nbsp;   * @param password specifies the password for the basic authentication.
+&nbsp;   * @return the test element for further configuration and usage.
+&nbsp;   */
+&nbsp;  public DslAuthManager basicAuth(String baseUrl, String user, String password) {
+<b class="fc">&nbsp;    Authorization auth = new Authorization();</b>
+<b class="fc">&nbsp;    auth.setURL(baseUrl);</b>
+<b class="fc">&nbsp;    auth.setUser(user);</b>
+<b class="fc">&nbsp;    auth.setPass(password);</b>
+<b class="fc">&nbsp;    authorizations.add(auth);</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  protected TestElement buildTestElement() {
+<b class="fc">&nbsp;    AuthManager ret = new AuthManager();</b>
+<b class="fc">&nbsp;    ret.setClearEachIteration(true);</b>
+<b class="fc">&nbsp;    authorizations.forEach(ret::addAuth);</b>
+<b class="fc">&nbsp;    return ret;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  public static class CodeBuilder extends SingleTestElementCallBuilder&lt;AuthManager&gt; {
+&nbsp;
+&nbsp;    public CodeBuilder(List&lt;Method&gt; builderMethods) {
+<b class="fc">&nbsp;      super(AuthManager.class, builderMethods);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected MethodCall buildMethodCall(AuthManager testElement, MethodCallContext context) {
+<b class="fc">&nbsp;      MethodCall ret = buildMethodCall();</b>
+<b class="fc">&nbsp;      CollectionProperty auths = testElement.getAuthObjects();</b>
+<b class="fc">&nbsp;      for (JMeterProperty authProp : auths) {</b>
+<b class="fc">&nbsp;        chainAuth((Authorization) authProp.getObjectValue(), ret);</b>
+<b class="fc">&nbsp;      }</b>
+<b class="fc">&nbsp;      return ret;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void chainAuth(Authorization auth, MethodCall ret) {
+<b class="fc">&nbsp;      if (auth.getMechanism() == Mechanism.BASIC) {</b>
+<b class="fc">&nbsp;        ret.chainComment(</b>
+&nbsp;                &quot;TODO including passwords in code repositories may lead to security leaks. &quot;
+&nbsp;                    + &quot;Review generated code and consider externalizing any credentials. &quot;
+&nbsp;                    + &quot;Eg: System.getenv(\&quot;AUTH_PASSWORD\&quot;)&quot;)
+<b class="fc">&nbsp;            .chain(&quot;basicAuth&quot;, new StringParam(auth.getURL()), new StringParam(auth.getUser()),</b>
+<b class="fc">&nbsp;                new StringParam(auth.getPass()));</b>
+&nbsp;      } else {
+&nbsp;        /*
+&nbsp;         This will generate a method that will not compile. We consider it a good way to report to
+&nbsp;         the user about something that is still not supported, so they can report an issue in
+&nbsp;         the repository, and we can accordingly prioritize and later support
+&nbsp;         */
+<b class="nc">&nbsp;        ret.chain(new MethodCall(auth.getMechanism().name().toLowerCase(Locale.US) + &quot;Auth&quot;,</b>
+<b class="nc">&nbsp;            DslAuthManager.class, new StringParam(auth.getURL()),</b>
+<b class="nc">&nbsp;            new StringParam(auth.getUser())));</b>
+&nbsp;      }
+&nbsp;    }
+&nbsp;  }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-03 22:39</div>
+</div>
+</body>
+</html>

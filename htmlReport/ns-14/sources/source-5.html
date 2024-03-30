@@ -1,0 +1,230 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=GBK"> 
+  <title>Coverage Report > StringTemplate</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">us.abstracta.jmeter.javadsl.core.util</a>
+</div>
+
+<h1>Coverage Summary for Class: StringTemplate (us.abstracta.jmeter.javadsl.core.util)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">StringTemplate</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    90%
+  </span>
+  <span class="absValue">
+    (9/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    89.6%
+  </span>
+  <span class="absValue">
+    (43/48)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package us.abstracta.jmeter.javadsl.core.util;
+&nbsp;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.function.Function;
+&nbsp;import java.util.regex.Matcher;
+&nbsp;import java.util.regex.Pattern;
+&nbsp;
+&nbsp;/**
+&nbsp; * String template engine allowing easy string regex matching and usual template engine resolution.
+&nbsp; * &lt;p&gt;
+&nbsp; * This engine uses a syntax inspired in mustache using {@code {{}}} as basic indicator of special
+&nbsp; * treatment/replacement.
+&nbsp; * &lt;p&gt;
+&nbsp; * To check fo string regex matching you can have a template like
+&nbsp; * &lt;pre&gt;&amp;lt;root version=&quot;1.2&quot;&amp;gt;{{\d+}}&amp;lt;/root&amp;gt;&lt;/pre&gt;
+&nbsp; * and use {@link #matches(String)}. No need to escape regex special characters outside of
+&nbsp; * {@code {{}} }.
+&nbsp; * &lt;p&gt;
+&nbsp; * To use regular string template resolution you can use templates like
+&nbsp; * &lt;pre&gt;&amp;lt;root version=&quot;1.2&quot;&amp;gt;{{value}}&amp;lt;/root&amp;gt;&lt;/pre&gt;
+&nbsp; * and use {@link #bind(String, Object)} and {@link #solve()} to get the resulting string of
+&nbsp; * replacing each occurrence of {@code {{}} } with the bound value. Additionally, you can define
+&nbsp; * default values for each replacement expression. In this example
+&nbsp; * &lt;pre&gt;&amp;lt;root version=&quot;1.2&quot;&amp;gt;{{value:3}}&amp;lt;/root&amp;gt;&lt;/pre&gt;
+&nbsp; * it will solve &quot;value&quot; to string &quot;3&quot; if no value is bound to &quot;value&quot; or if bound value is null. If
+&nbsp; * a replacement has no binding value different from null and no default value is specified, then an
+&nbsp; * exception will be generated. You can always specify an empty default value (like
+&nbsp; * {@code {{value:}}}) which avoids the exception and generates an empty string instead.
+&nbsp; * &lt;p&gt;
+&nbsp; * You can even use one template for both regex matching or string template solving. Eg:
+&nbsp; * &lt;pre&gt;&amp;lt;root version=&quot;1.2&quot;&amp;gt;{{value:3~\d+}}&amp;lt;/root&amp;gt;&lt;/pre&gt;
+&nbsp; * can be used with {@link #matches(String)} or with {@link #bind(String, Object)} and
+&nbsp; * {@link #solve()}.
+&nbsp; */
+&nbsp;public class StringTemplate {
+&nbsp;
+&nbsp;  public static final String EXPRESSION_START_MARKER = &quot;{{&quot;;
+&nbsp;  public static final String EXPRESSION_END_MARKER = &quot;}}&quot;;
+<b class="fc">&nbsp;  private static final Pattern EXPRESSION_PATTERN = Pattern.compile(</b>
+<b class="fc">&nbsp;      Pattern.quote(EXPRESSION_START_MARKER) + &quot;(.*?)&quot; + Pattern.quote(EXPRESSION_END_MARKER));</b>
+<b class="fc">&nbsp;  private static final Pattern EXPRESSION_WITH_VAR_NAME_PATTERN = Pattern.compile(</b>
+&nbsp;      &quot;^(\\w+)?(:[^~]*)?(~.*)?$&quot;);
+&nbsp;  private final String template;
+<b class="fc">&nbsp;  private final Map&lt;String, Object&gt; bindings = new HashMap&lt;&gt;();</b>
+&nbsp;  private boolean ignoreMissingBindings;
+&nbsp;
+<b class="fc">&nbsp;  public StringTemplate(String template) {</b>
+<b class="fc">&nbsp;    this.template = template;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  public boolean matches(String string) {
+<b class="fc">&nbsp;    Pattern templatePattern = Pattern.compile(</b>
+<b class="fc">&nbsp;        processTemplate(Pattern::quote, this::getExpressionPattern));</b>
+<b class="fc">&nbsp;    return templatePattern.matcher(string).matches();</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private String processTemplate(Function&lt;String, String&gt; literalProcessor,
+&nbsp;      Function&lt;String, String&gt; expressionProcessor) {
+<b class="fc">&nbsp;    StringBuilder ret = new StringBuilder();</b>
+<b class="fc">&nbsp;    int currentIndex = 0;</b>
+<b class="fc">&nbsp;    Matcher matcher = EXPRESSION_PATTERN.matcher(template);</b>
+<b class="fc">&nbsp;    while (matcher.find()) {</b>
+<b class="fc">&nbsp;      ret.append(literalProcessor.apply(template.substring(currentIndex, matcher.start())));</b>
+<b class="fc">&nbsp;      String expression = template.substring(matcher.start() + EXPRESSION_START_MARKER.length(),</b>
+<b class="fc">&nbsp;          matcher.end() - EXPRESSION_END_MARKER.length());</b>
+<b class="fc">&nbsp;      ret.append(expressionProcessor.apply(expression));</b>
+<b class="fc">&nbsp;      currentIndex = matcher.end();</b>
+<b class="fc">&nbsp;    }</b>
+<b class="fc">&nbsp;    if (currentIndex &lt; template.length()) {</b>
+<b class="fc">&nbsp;      ret.append(literalProcessor.apply(template.substring(currentIndex)));</b>
+&nbsp;    }
+<b class="fc">&nbsp;    return ret.toString();</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private String getExpressionPattern(String expression) {
+<b class="fc">&nbsp;    Matcher varExpressionMatcher = EXPRESSION_WITH_VAR_NAME_PATTERN.matcher(expression);</b>
+<b class="fc">&nbsp;    if (!varExpressionMatcher.matches()) {</b>
+<b class="fc">&nbsp;      return expression;</b>
+&nbsp;    }
+<b class="fc">&nbsp;    String regex = varExpressionMatcher.group(3);</b>
+<b class="fc">&nbsp;    if (regex != null) {</b>
+<b class="fc">&nbsp;      return regex.substring(1);</b>
+&nbsp;    }
+<b class="fc">&nbsp;    String defaultVal = varExpressionMatcher.group(2);</b>
+<b class="fc">&nbsp;    return defaultVal == null ? &quot;.*&quot; : Pattern.quote(defaultVal.substring(1));</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  public StringTemplate bind(String key, Object value) {
+<b class="fc">&nbsp;    bindings.put(key, value);</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  public StringTemplate ignoreMissingBindings() {
+<b class="fc">&nbsp;    ignoreMissingBindings = true;</b>
+<b class="fc">&nbsp;    return this;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  public String solve() {
+<b class="fc">&nbsp;    return processTemplate(s -&gt; s, this::solveExpression);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private String solveExpression(String expression) {
+<b class="fc">&nbsp;    Matcher varExpressionMatcher = EXPRESSION_WITH_VAR_NAME_PATTERN.matcher(expression);</b>
+<b class="fc">&nbsp;    if (!varExpressionMatcher.matches()) {</b>
+<b class="nc">&nbsp;      Object bind = bindings.get(expression);</b>
+<b class="nc">&nbsp;      return bind != null ? bind.toString() : handleMissingBinding(expression);</b>
+&nbsp;    }
+<b class="fc">&nbsp;    String varName = varExpressionMatcher.group(1);</b>
+<b class="fc">&nbsp;    Object bind = bindings.get(varName);</b>
+<b class="fc">&nbsp;    if (bind != null) {</b>
+<b class="fc">&nbsp;      return bind.toString();</b>
+&nbsp;    }
+<b class="fc">&nbsp;    String defaultVal = varExpressionMatcher.group(2);</b>
+<b class="fc">&nbsp;    return defaultVal != null ? defaultVal.substring(1) : handleMissingBinding(varName);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private String handleMissingBinding(String expression) {
+<b class="nc">&nbsp;    if (ignoreMissingBindings) {</b>
+<b class="nc">&nbsp;      return EXPRESSION_START_MARKER + expression + EXPRESSION_END_MARKER;</b>
+&nbsp;    }
+<b class="nc">&nbsp;    throw new IllegalStateException(&quot;No binding was found for: &quot; + expression);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;}
+&nbsp;
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-03 20:57</div>
+</div>
+</body>
+</html>

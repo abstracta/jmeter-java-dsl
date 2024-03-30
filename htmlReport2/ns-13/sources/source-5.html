@@ -1,0 +1,206 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=GBK"> 
+  <title>Coverage Report > DslUniformRandomTimer</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">us.abstracta.jmeter.javadsl.core.timers</a>
+</div>
+
+<h1>Coverage Summary for Class: DslUniformRandomTimer (us.abstracta.jmeter.javadsl.core.timers)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DslUniformRandomTimer</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (7/7)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">DslUniformRandomTimer$CodeBuilder</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    88.9%
+  </span>
+  <span class="absValue">
+    (8/9)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    93.8%
+  </span>
+  <span class="absValue">
+    (15/16)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package us.abstracta.jmeter.javadsl.core.timers;
+&nbsp;
+&nbsp;import java.lang.reflect.Method;
+&nbsp;import java.time.Duration;
+&nbsp;import java.util.List;
+&nbsp;import org.apache.jmeter.testelement.TestElement;
+&nbsp;import org.apache.jmeter.timers.RandomTimer;
+&nbsp;import org.apache.jmeter.timers.UniformRandomTimer;
+&nbsp;import org.apache.jmeter.timers.gui.UniformRandomTimerGui;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.MethodCall;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.MethodCallContext;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.MethodParam;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.SingleTestElementCallBuilder;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.TestElementParamBuilder;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.params.DoubleParam;
+&nbsp;import us.abstracta.jmeter.javadsl.codegeneration.params.DurationParam;
+&nbsp;
+&nbsp;/**
+&nbsp; * Allows specifying JMeter Uniform Random Timers which pause the thread with a random time with
+&nbsp; * uniform distribution.
+&nbsp; * &lt;p&gt;
+&nbsp; * The pause calculated by the timer will be applied after samplers pre-processors execution and
+&nbsp; * before actual sampling.
+&nbsp; * &lt;p&gt;
+&nbsp; * Take into consideration that timers applies to all samplers in their scope: if added at test plan
+&nbsp; * level, it will apply to all samplers in test plan; if added at thread group level, it will apply
+&nbsp; * only to samples in such thread group; if added as child of a sampler, it will only apply to that
+&nbsp; * sampler.
+&nbsp; *
+&nbsp; * @since 0.16
+&nbsp; */
+&nbsp;public class DslUniformRandomTimer extends BaseTimer {
+&nbsp;
+&nbsp;  protected Duration minimum;
+&nbsp;  protected Duration maximum;
+&nbsp;
+&nbsp;  public DslUniformRandomTimer(Duration minimum, Duration maximum) {
+<b class="fc">&nbsp;    super(&quot;Uniform Random Timer&quot;, UniformRandomTimerGui.class);</b>
+<b class="fc">&nbsp;    this.minimum = minimum;</b>
+<b class="fc">&nbsp;    this.maximum = maximum;</b>
+&nbsp;
+&nbsp;  }
+&nbsp;
+&nbsp;  @Override
+&nbsp;  protected TestElement buildTestElement() {
+<b class="fc">&nbsp;    UniformRandomTimer urt = new UniformRandomTimer();</b>
+<b class="fc">&nbsp;    urt.setRange(maximum.minus(minimum).toMillis());</b>
+<b class="fc">&nbsp;    urt.setDelay(String.valueOf(minimum.toMillis()));</b>
+<b class="fc">&nbsp;    return urt;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  public static class CodeBuilder extends SingleTestElementCallBuilder&lt;UniformRandomTimer&gt; {
+&nbsp;
+&nbsp;    public CodeBuilder(List&lt;Method&gt; builderMethods) {
+<b class="fc">&nbsp;      super(UniformRandomTimer.class, builderMethods);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected MethodCall buildMethodCall(UniformRandomTimer testElement,
+&nbsp;        MethodCallContext context) {
+<b class="fc">&nbsp;      TestElementParamBuilder paramBuilder = new TestElementParamBuilder(testElement);</b>
+<b class="fc">&nbsp;      MethodParam delay = paramBuilder.durationParamMillis(RandomTimer.DELAY, null);</b>
+<b class="fc">&nbsp;      MethodParam range = paramBuilder.doubleParam(RandomTimer.RANGE);</b>
+<b class="fc">&nbsp;      if (!(delay instanceof DurationParam) || !(range instanceof DoubleParam)) {</b>
+<b class="nc">&nbsp;        throw new UnsupportedOperationException(&quot;Using JMeter expressions in timer properties is &quot;</b>
+&nbsp;            + &quot;still not supported. Request it in the GitHub repository as an issue and we will &quot;
+&nbsp;            + &quot;add support for it.&quot;);
+&nbsp;      }
+<b class="fc">&nbsp;      Duration rangeDuration = Duration.ofMillis(Math.round(((DoubleParam) range).getValue()));</b>
+<b class="fc">&nbsp;      return buildMethodCall(delay,</b>
+<b class="fc">&nbsp;          new DurationParam(((DurationParam) delay).getValue().plus(rangeDuration)));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;  }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-03 22:39</div>
+</div>
+</body>
+</html>

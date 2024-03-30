@@ -8,6 +8,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.verify;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.httpDefaults;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.httpSampler;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.testPlan;
@@ -32,6 +33,17 @@ import us.abstracta.jmeter.javadsl.core.DslTestPlan;
 import us.abstracta.jmeter.javadsl.http.DslHttpSampler.HttpClientImpl;
 
 public class DslHttpDefaultsTest extends JmeterDslTest {
+
+  @Test
+  public void connectionsTtl_SetsSystemPropertyCorrectly() {
+    DslHttpDefaults httpDefaults = new DslHttpDefaults();
+    Duration ttl = Duration.ofSeconds(10);
+
+    httpDefaults.connectionsTtl(ttl);
+
+    assertEquals("10000", System.getProperty("httpclient4.time_to_live"));
+  }
+
 
   @Test
   public void shouldUseDefaultSettingsWhenHttpDefaultAndNoOverwrites() throws Exception {

@@ -1,0 +1,237 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=GBK"> 
+  <title>Coverage Report > JmeterEnvironment</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">us.abstracta.jmeter.javadsl.core.engines</a>
+</div>
+
+<h1>Coverage Summary for Class: JmeterEnvironment (us.abstracta.jmeter.javadsl.core.engines)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">JmeterEnvironment</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (9/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    89.8%
+  </span>
+  <span class="absValue">
+    (44/49)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package us.abstracta.jmeter.javadsl.core.engines;
+&nbsp;
+&nbsp;import java.io.File;
+&nbsp;import java.io.FileOutputStream;
+&nbsp;import java.io.IOException;
+&nbsp;import java.net.URISyntaxException;
+&nbsp;import java.nio.file.FileSystem;
+&nbsp;import java.nio.file.FileSystems;
+&nbsp;import java.nio.file.Files;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.HashSet;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.regex.Pattern;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;import kg.apc.jmeter.samplers.DummySampler;
+&nbsp;import kg.apc.jmeter.timers.functions.TSTFeedback;
+&nbsp;import org.apache.jmeter.functions.EvalFunction;
+&nbsp;import org.apache.jmeter.save.SaveService;
+&nbsp;import org.apache.jmeter.util.JMeterUtils;
+&nbsp;import org.apache.jmeter.visualizers.backend.BackendListener;
+&nbsp;import org.apache.jmeter.visualizers.backend.BackendListenerClient;
+&nbsp;import org.apache.jorphan.collections.HashTree;
+&nbsp;
+&nbsp;/**
+&nbsp; * Allows configuring a local JMeter environment required for getting resource messages, running
+&nbsp; * test plans, saving test plans, etc.
+&nbsp; *
+&nbsp; * @since 0.29
+&nbsp; */
+&nbsp;public class JmeterEnvironment {
+&nbsp;
+&nbsp;  private static final String BIN_DIR = &quot;bin&quot;;
+&nbsp;  private static final String JMETER_PROPS_FILE_NAME = &quot;jmeter.properties&quot;;
+&nbsp;
+<b class="fc">&nbsp;  public JmeterEnvironment() throws IOException {</b>
+<b class="fc">&nbsp;    File homeDir = Files.createTempDirectory(&quot;jmeter-java-dsl&quot;).toFile();</b>
+<b class="fc">&nbsp;    homeDir.deleteOnExit();</b>
+<b class="fc">&nbsp;    JMeterUtils.setJMeterHome(homeDir.getPath());</b>
+<b class="fc">&nbsp;    File binDir = new File(homeDir, BIN_DIR);</b>
+<b class="fc">&nbsp;    binDir.deleteOnExit();</b>
+<b class="fc">&nbsp;    installConfig(binDir);</b>
+<b class="fc">&nbsp;    JMeterUtils.getProperties(new File(binDir, JMETER_PROPS_FILE_NAME).getPath());</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  public void updateSearchPath(HashTree tree) {
+<b class="fc">&nbsp;    Set&lt;Class&lt;?&gt;&gt; classes = findTestElementClasses(tree);</b>
+&nbsp;    /*
+&nbsp;    This is required since test plans don&#39;t directly reference function classes which are in a
+&nbsp;    separate jar
+&nbsp;     */
+<b class="fc">&nbsp;    classes.add(EvalFunction.class);</b>
+&nbsp;    /*
+&nbsp;    This is required since JMeter loads functions in static instance only once, and if a test does
+&nbsp;    not use this function but a later one does, then the function will not be loaded for later one.
+&nbsp;     */
+<b class="fc">&nbsp;    classes.add(TSTFeedback.class);</b>
+&nbsp;    /*
+&nbsp;    This is required since JMeter GUI breaks when it doesn&#39;t find a loaded timer, assertion, etc.
+&nbsp;    And BackendListenerClient components jar contains main JMeter components which avoid this issue.
+&nbsp;     */
+<b class="fc">&nbsp;    classes.add(BackendListenerClient.class);</b>
+&nbsp;    /*
+&nbsp;    This is required since no sampler is included in core jmeter package that has no order,
+&nbsp;    and such condition breaks JMeter GUI
+&nbsp;     */
+<b class="fc">&nbsp;    classes.add(DummySampler.class);</b>
+<b class="fc">&nbsp;    Set&lt;String&gt; jarPaths = classes.stream()</b>
+<b class="fc">&nbsp;        .map(this::getClassJarPath)</b>
+<b class="fc">&nbsp;        .collect(Collectors.toSet());</b>
+<b class="fc">&nbsp;    JMeterUtils.getJMeterProperties().setProperty(&quot;search_paths&quot;, String.join(&quot;;&quot;, jarPaths));</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private Set&lt;Class&lt;?&gt;&gt; findTestElementClasses(HashTree tree) {
+<b class="fc">&nbsp;    Set&lt;Class&lt;?&gt;&gt; ret = new HashSet&lt;&gt;();</b>
+<b class="fc">&nbsp;    for (Object elem : tree.list()) {</b>
+<b class="fc">&nbsp;      ret.add(getTestElementClass(elem));</b>
+<b class="fc">&nbsp;      ret.addAll(findTestElementClasses(tree.getTree(elem)));</b>
+<b class="fc">&nbsp;    }</b>
+<b class="fc">&nbsp;    return ret;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private Class&lt;?&gt; getTestElementClass(Object elem) {
+&nbsp;    try {
+<b class="fc">&nbsp;      return elem instanceof BackendListener</b>
+<b class="fc">&nbsp;          ? Class.forName(((BackendListener) elem).getClassname())</b>
+<b class="fc">&nbsp;          : elem.getClass();</b>
+<b class="nc">&nbsp;    } catch (ClassNotFoundException e) {</b>
+<b class="nc">&nbsp;      throw new RuntimeException(e);</b>
+&nbsp;    }
+&nbsp;  }
+&nbsp;
+&nbsp;  private String getClassJarPath(Class&lt;?&gt; theClass) {
+&nbsp;    try {
+<b class="fc">&nbsp;      return new File(</b>
+<b class="fc">&nbsp;          theClass.getProtectionDomain().getCodeSource().getLocation().toURI()).getPath();</b>
+<b class="nc">&nbsp;    } catch (URISyntaxException e) {</b>
+<b class="nc">&nbsp;      throw new RuntimeException(e);</b>
+&nbsp;    }
+&nbsp;  }
+&nbsp;
+&nbsp;  private void installConfig(File binDir) throws IOException {
+<b class="fc">&nbsp;    Pattern whiteListPattern = Pattern.compile(</b>
+&nbsp;        &quot;/&quot; + BIN_DIR + &quot;(?:/(?:report-template.*|.*\\.properties))?&quot;);
+<b class="fc">&nbsp;    try (FileSystem fs = FileSystems</b>
+<b class="fc">&nbsp;        .newFileSystem(getClass().getResource(&quot;/&quot; + BIN_DIR + &quot;/&quot; + JMETER_PROPS_FILE_NAME).toURI(),</b>
+<b class="fc">&nbsp;            Collections.emptyMap())) {</b>
+<b class="fc">&nbsp;      Path configBinDir = fs.getPath(&quot;/&quot; + BIN_DIR);</b>
+<b class="fc">&nbsp;      for (Path p : (Iterable&lt;Path&gt;) Files.walk(configBinDir)::iterator) {</b>
+<b class="fc">&nbsp;        if (whiteListPattern.matcher(p.toString()).matches()) {</b>
+<b class="fc">&nbsp;          Path targetPath = binDir.toPath().resolve(configBinDir.relativize(p).toString());</b>
+<b class="fc">&nbsp;          Files.copy(p, targetPath);</b>
+<b class="fc">&nbsp;          targetPath.toFile().deleteOnExit();</b>
+&nbsp;        }
+<b class="fc">&nbsp;      }</b>
+<b class="fc">&nbsp;    } catch (URISyntaxException e) {</b>
+<b class="nc">&nbsp;      throw new RuntimeException(e);</b>
+<b class="fc">&nbsp;    }</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  public void saveTree(HashTree tree, FileOutputStream output) throws IOException {
+<b class="fc">&nbsp;    SaveService.saveTree(tree, output);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  public HashTree loadTree(File file) throws IOException {
+<b class="fc">&nbsp;    return SaveService.loadTree(file);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  public void initLocale() {
+<b class="fc">&nbsp;    JMeterUtils.initLocale();</b>
+&nbsp;  }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2024-03-03 22:39</div>
+</div>
+</body>
+</html>
