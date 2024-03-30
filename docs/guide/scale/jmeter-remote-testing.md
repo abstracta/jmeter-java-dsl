@@ -33,6 +33,20 @@ public class PerformanceTest {
 This will run 200 users for 10 minutes on each server/slave (`host1` and `host2`) and aggregate all the results in returned stats.
 
 ::: warning
+Use same version used by JMeter DSL when setting up the cluster to avoid any potential issues. 
+
+For instance, JMeter 5.6 has introduced some changes that currently break some plugins using by JMeter DSL, or change default behavior for test plans.
+
+To find out the current version of JMeter DSL you can check JMeter jars version in your project dependency tree. E.g.:
+
+```bash
+mvn dependency:tree -Dincludes=org.apache.jmeter:ApacheJMeter_core
+```
+
+Or check JMeter DSL [pom.xml property `jmeter.version`](https://github.com/abstracta/jmeter-java-dsl/blob/8a8eb303d1013676bf669116ddc8f056e8a445d8/pom.xml#L51).
+:::
+
+::: warning
 To be able to run the test you require the `rmi_keystore.jks` file in the working directory of the test. For the time being, we couldn't find a way to allow setting any arbitrary path for the file.
 :::
 

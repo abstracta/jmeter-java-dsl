@@ -13,7 +13,7 @@ java -jar jmdsl.jar jmx2dsl test-plan.jmx
 
 ::: code-group-item Jbang
 ```bash
-jbang us.abstracta.jmeter:jmeter-java-dsl-cli:1.25.3 jmx2dsl test-plan.jmx
+jbang us.abstracta.jmeter:jmeter-java-dsl-cli:1.26 jmx2dsl test-plan.jmx
 ```
 :::
 ::::
@@ -29,7 +29,7 @@ executable (eg: chmod +x ./PerformanceTest.java) and just executing it with ./Pe
 //DEPS org.assertj:assertj-core:3.23.1
 //DEPS org.junit.jupiter:junit-jupiter-engine:5.9.1
 //DEPS org.junit.platform:junit-platform-launcher:1.9.1
-//DEPS us.abstracta.jmeter:jmeter-java-dsl:1.25.3
+//DEPS us.abstracta.jmeter:jmeter-java-dsl:1.26
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.*;
@@ -75,6 +75,12 @@ public class PerformanceTest {
 
 }
 ```
+
+::: warning
+Unlike the rest of JMeter DSL which is compiled with Java 8, `jmdsl.jar` and `us.abstracta.jmeter:jmeter-java-dsl-cli` are compiled with Java 11 due to some dependencies requirement (latest Selenium drivers mainly).
+
+So, to run above commands, you will need Java 11 or newer.
+:::
 
 ::: tip
 Review and try generated code before executing it as is. I.e: tune thread groups and iterations to 1 to give it a try.

@@ -37,5 +37,5 @@ public class PerformanceTest {
 ::: tip
 JMeter automatically URL encodes parameters, so you don't need to worry about special characters in parameter names or values.
 
-If you want to use some custom encoding or have an already encoded value that you want to use, then you can use `encodedParam` method instead which does not apply any encoding to the parameter name or value, and send it as is.
+If you want to use some custom encoding or have an already encoded value that you want to use, then you can use `rawParam` method instead which does not apply any encoding to the parameter name or value, and send it as is.
 :::

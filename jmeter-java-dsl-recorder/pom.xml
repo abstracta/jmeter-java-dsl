@@ -6,7 +6,7 @@
   <parent>
     <groupId>us.abstracta.jmeter</groupId>
     <artifactId>jmeter-java-dsl-parent</artifactId>
-    <version>1.26-SNAPSHOT</version>
+    <version>1.27-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <artifactId>jmeter-java-dsl-recorder</artifactId>
@@ -15,6 +15,12 @@
   <description>This module includes DSL recorder classes that can be reused by other modules or
     projects (ej: jmeter-java-dsl-cli)
   </description>
+
+  <properties>
+    <!-- Using java 11 since last version of selenium driver with java 8 does not have support for latest version of chrome driver. -->
+    <maven.compiler.source>11</maven.compiler.source>
+    <maven.compiler.target>11</maven.compiler.target>
+  </properties>
 
   <dependencies>
     <dependency>

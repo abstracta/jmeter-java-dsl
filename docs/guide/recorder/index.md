@@ -10,16 +10,22 @@ Here is a small demo using it:
 You can use [jbang](https://www.jbang.dev/documentation/guide/latest/index.html) to easily execute the recorder with the latest version available. E.g.:
 
 ```bash
-jbang us.abstracta.jmeter:jmeter-java-dsl-cli:1.25.3 recorder http://retailstore.test
+jbang us.abstracta.jmeter:jmeter-java-dsl-cli:1.26 recorder http://retailstore.test
 ```
 :::
 
 ::: tip
-Use `java -jar jmdsl.jar recorder --help` to see the list of options to customize your recording.
+Use `java -jar jmdsl.jar help recorder` to see the list of options to customize your recording.
 :::
 
 ::: tip
 In general use `---url-includes` to ignore URLs that are not relevant to the performance test.
+:::
+
+::: warning
+Unlike the rest of JMeter DSL, which is compiled with Java 8, `jmdsl.jar` and `us.abstracta.jmeter:jmeter-java-dsl-cli` are compiled with Java 11 due to some dependencies requirement (latest Selenium drivers mainly).
+
+So, to run above commands, you will need Java 11 or newer.
 :::
 
 ### Correlations
@@ -52,7 +58,7 @@ executable (eg: chmod +x ./PerformanceTest.java) and just executing it with ./Pe
 //DEPS org.assertj:assertj-core:3.23.1
 //DEPS org.junit.jupiter:junit-jupiter-engine:5.9.1
 //DEPS org.junit.platform:junit-platform-launcher:1.9.1
-//DEPS us.abstracta.jmeter:jmeter-java-dsl:1.25.3
+//DEPS us.abstracta.jmeter:jmeter-java-dsl:1.26
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.*;
