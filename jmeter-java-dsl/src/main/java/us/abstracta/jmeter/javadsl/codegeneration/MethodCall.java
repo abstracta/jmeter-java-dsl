@@ -25,6 +25,7 @@ import us.abstracta.jmeter.javadsl.core.testelements.MultiLevelTestElement;
  *
  * @since 0.45
  */
+
 public class MethodCall implements CodeSegment {
 
   /**
@@ -43,6 +44,8 @@ public class MethodCall implements CodeSegment {
   private final Set<String> requiredStaticImports = new HashSet<>();
   private boolean commented;
   private String headingComment;
+
+  private MethodChainHandler chainHandler = new MethodChainHandler();
 
   public MethodCall(String methodName, Class<?> returnType, MethodParam... params) {
     this.methodName = methodName;
@@ -255,22 +258,40 @@ public class MethodCall implements CodeSegment {
   }
 
   private MethodCall findChildrenMethod() {
-    Method childrenMethod = null;
-    Class<?> methodHolder = returnType;
-    while (childrenMethod == null && methodHolder != Object.class) {
-      childrenMethod = Arrays.stream(methodHolder.getDeclaredMethods())
-          .filter(m -> Modifier.isPublic(m.getModifiers()) && "children".equals(m.getName())
-              && m.getParameterCount() == 1)
-          .findAny()
-          .orElse(null);
-      methodHolder = methodHolder.getSuperclass();
+    Method method = findMethodInHierarchy(returnType);
+    if (method == null) {
+      String errorMessage = String.format(
+              "No children method found for %s. This might be due to unexpected test plan " +
+                      "structure or missing method in test element." +
+                      "Please create an issue in GitHub " +
+                      "repository if you find any of these cases.", returnType
+      );
+      throw new IllegalStateException(errorMessage);
     }
-    if (childrenMethod == null) {
-      throw new IllegalStateException("No children method found for " + returnType + ". "
-          + "This might be due to unexpected test plan structure or missing method in test element"
-          + ". Please create an issue in GitHub repository if you find any of these cases.");
+    return new ChildrenMethodCall(method);
+  }
+
+  /**
+   * Searches for a public method with the specified name
+   * and parameter count in the given class and its superclasses.
+   *
+   * @param startClass The class to start the search from.
+   * @return The found Method, or null if no such method exists.
+   */
+  private static Method findMethodInHierarchy(Class<?> startClass) {
+    Class<?> currentClass = startClass;
+    while (currentClass != null && currentClass != Object.class) {
+      Method method = Arrays.stream(currentClass.getDeclaredMethods())
+              .filter(m -> Modifier.isPublic(m.getModifiers()) && "children".equals(m.getName())
+                      && m.getParameterCount() == 1)
+              .findAny()
+              .orElse(null);
+      if (method != null) {
+        return method;
+      }
+      currentClass = currentClass.getSuperclass();
     }
-    return new ChildrenMethodCall(childrenMethod);
+    return null;
   }
 
   private static class ChildrenMethodCall extends MethodCall {
@@ -339,29 +360,18 @@ public class MethodCall implements CodeSegment {
    *                                       found to be chained in current method call.
    */
   public MethodCall chain(String methodName, MethodParam... params) {
-    // this eases chaining don't having to check in client code for this condition
-    if (params.length > 0 && Arrays.stream(params).allMatch(MethodParam::isDefault)) {
+    if (shouldSkipChaining(params)) {
       return this;
     }
-    /*
-    when chaining methods with booleans in some cases the parameter is required, and in some others
-    is not.
-     */
-    Method method = null;
-    if (params.length == 1 && params[0] instanceof BoolParam) {
-      method = findMethodInClassHierarchyMatchingParams(methodName, returnType, new MethodParam[0]);
-      if (method != null) {
-        params = new MethodParam[0];
-      }
-    }
+
+    MethodParam[] effectiveParams = adjustParamsForBoolParam(methodName, params);
+    Method method = findMethodForChaining(methodName, effectiveParams);
+
     if (method == null) {
-      method = findMethodInClassHierarchyMatchingParams(methodName, returnType, params);
+      throw noMatchingMethodFoundException(methodName, params);
     }
-    if (method == null) {
-      throw buildNoMatchingMethodFoundException(
-          "public '" + methodName + "' method in " + returnType.getName(), params);
-    }
-    chain.add(MethodCall.from(method, params));
+
+    chain.add(MethodCall.from(method, effectiveParams));
     return this;
   }
 
@@ -379,7 +389,7 @@ public class MethodCall implements CodeSegment {
    * @since 1.5
    */
   public MethodCall chain(MethodCall methodCall) {
-    chain.add(methodCall);
+    chainHandler.add(methodCall);
     return methodCall;
   }
 
@@ -391,6 +401,35 @@ public class MethodCall implements CodeSegment {
       methodClass = methodClass.getSuperclass();
     }
     return ret;
+  }
+
+  private boolean shouldSkipChaining(MethodParam... params) {
+    return params.length > 0 && Arrays.stream(params).allMatch(MethodParam::isDefault);
+  }
+
+  private MethodParam[] adjustParamsForBoolParam(String methodName, MethodParam[] params) {
+    if (params.length == 1 && params[0] instanceof BoolParam) {
+      Method method = findMethodInClassHierarchyMatchingParams(
+              methodName, returnType, new MethodParam[0]);
+      if (method != null) {
+        return new MethodParam[0];
+      }
+    }
+    return params;
+  }
+
+  private Method findMethodForChaining(String methodName, MethodParam[] params) {
+    return findMethodInClassHierarchyMatchingParams(methodName, returnType, params);
+  }
+
+  private UnsupportedOperationException noMatchingMethodFoundException(
+          String methodName, MethodParam[] params) {
+    return new UnsupportedOperationException(
+            "No public '" + methodName + "' method found in " + returnType.getName() +
+                    " for parameters " + Arrays.toString(params) +
+                    ". This might be due to a missing method or a mismatch in parameters. " +
+                    "Please check the method name and parameters."
+    );
   }
 
   private Method findMethodInClassMatchingParams(String methodName, Class<?> methodClass,

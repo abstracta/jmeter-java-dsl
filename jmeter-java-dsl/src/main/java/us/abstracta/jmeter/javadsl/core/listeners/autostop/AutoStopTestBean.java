@@ -79,28 +79,42 @@ public class AutoStopTestBean extends AbstractListenerElement implements TestBea
   @Override
   public synchronized void sampleOccurred(SampleEvent e) {
     for (AutoStopConditionElement condition : conditions) {
-      if (condition.getRegex() == null && regex != null
-          && !regex.matcher(e.getResult().getSampleLabel()).matches()) {
+      if (shouldSkipCondition(e, condition)) {
+        continue;
+      }
+      if (evaluateAndStop(e, condition)) {
         break;
       }
-      /*
-       Since stop is async, we check that result property is not already set to avoid overriding it
-       and losing the original condition that triggered the stop
-       */
-      if (!stopped && condition.eval(e.getResult())) {
-        stopped = true;
-        String stopMessage = String.format("%s: %s%s", getName(),
-            buildSamplesMatchingMessage(condition), condition);
-        if (testStopper == null) {
-          LOG.error("{} but no test stopper configured, so is not possible to stop test execution. "
-                  + "This is probably caused by a JMeter DSL engine not supporting autoStop. "
-                  + "Create an issue in the GitHub repository so we can implement proper support.",
-              stopMessage);
-          return;
-        }
-        testStopper.stop(stopMessage);
-      }
     }
+  }
+
+  private boolean shouldSkipCondition(SampleEvent e, AutoStopConditionElement condition) {
+    boolean conditionMatches = condition.getRegex() == null && regex != null;
+    conditionMatches = conditionMatches && !regex.matcher(e.getResult().getSampleLabel()).matches();
+    return conditionMatches;
+  }
+
+  private boolean evaluateAndStop(SampleEvent e, AutoStopConditionElement condition) {
+    if (!stopped && condition.eval(e.getResult())) {
+      stopped = true;
+      issueStopCommand(condition);
+      return true;
+    }
+    return false;
+  }
+
+  private void issueStopCommand(AutoStopConditionElement condition) {
+    String stopMessage = String.format("%s: %s%s", getName(),
+            buildSamplesMatchingMessage(condition), condition);
+    if (testStopper == null) {
+      LOG.error("{} but no test stopper configured, so is not possible to stop test execution. "
+                      + "This is probably caused by a JMeter DSL engine not supporting autoStop. "
+                      + "Create an issue in the GitHub "
+              + "repository so we can implement proper support.",
+              stopMessage);
+      return;
+    }
+    testStopper.stop(stopMessage);
   }
 
   @Override

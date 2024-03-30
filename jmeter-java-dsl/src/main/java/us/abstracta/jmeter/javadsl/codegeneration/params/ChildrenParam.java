@@ -121,12 +121,16 @@ public class ChildrenParam<T> extends MethodParam {
   }
 
   public void addChild(MethodCall child) {
+    validateChildType(child);
+    children.add(child);
+  }
+
+  private void validateChildType(MethodCall child) {
     Class<?> childrenType = paramType.getComponentType();
     if (!childrenType.isAssignableFrom(child.getReturnType())) {
       throw new IllegalArgumentException("Trying to add a child of type " + child.getReturnType()
           + " that is not compatible with the declared ones : " + childrenType);
     }
-    children.add(child);
   }
 
   public void replaceChild(MethodCall original, MethodCall replacement) {
