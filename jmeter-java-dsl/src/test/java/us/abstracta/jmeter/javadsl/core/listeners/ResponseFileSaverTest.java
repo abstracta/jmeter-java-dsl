@@ -36,6 +36,37 @@ public class ResponseFileSaverTest extends JmeterDslTest {
   }
 
   @Test
+  public void shouldWriteFileWithNoAddedNumberWithResponseContentWhenResponseFileSaverInPlanAndSkipAutoNumberTrue(@TempDir Path tempDir) throws Exception {
+    String body = "TEST BODY";
+    ResponseFileSaver fileSaver = responseFileSaver(tempDir.resolve(RESPONSE_FILE_PREFIX).toString());
+    fileSaver.setSkipAutoNumber(true);
+    stubFor(any(anyUrl()).willReturn(aResponse().withBody(body)));
+    testPlan(
+            threadGroup(1, 1,
+                    httpSampler(wiremockUri)
+            ),
+            fileSaver
+    ).run();
+    assertThat(tempDir.resolve("response.unknown")).hasContent(body);
+  }
+
+  @Test
+  public void shouldWriteFileWithNoAddedFileExtensionWithResponseContentWhenResponseFileSaverInPlanAndSkipAutoNumberTrue(@TempDir Path tempDir) throws Exception {
+    String body = "TEST BODY";
+    ResponseFileSaver fileSaver = responseFileSaver(tempDir.resolve(RESPONSE_FILE_PREFIX).toString());
+    fileSaver.setSkipSuffix(true);
+    stubFor(any(anyUrl()).willReturn(aResponse().withBody(body)));
+    testPlan(
+            threadGroup(1, 1,
+                    httpSampler(wiremockUri)
+            ),
+            fileSaver
+    ).run();
+    assertThat(tempDir.resolve("response1")).hasContent(body);
+  }
+
+
+  @Test
   public void shouldWriteOneFileForEachResponseWhenResponseFileSaverInPlan(@TempDir Path tempDir) throws Exception {
     testPlan(
         threadGroup(1, TEST_ITERATIONS,

@@ -20,7 +20,8 @@ import us.abstracta.jmeter.javadsl.codegeneration.TestElementParamBuilder;
  * <p>
  * By default, it will generate one file for each response using the given (which might include the
  * directory location) prefix to create the files and adding an incremental number to each response
- * and an extension according to the response mime type.
+ * and an extension according to the response mime type. Both the incremental number and the
+ * extension can be set manually if skipAutoNumber and skipSuffix are set to true respectively.
  *
  * @since 0.13
  */
