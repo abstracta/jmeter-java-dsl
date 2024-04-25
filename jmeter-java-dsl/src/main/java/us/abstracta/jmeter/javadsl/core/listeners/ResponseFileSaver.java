@@ -27,6 +27,8 @@ import us.abstracta.jmeter.javadsl.codegeneration.TestElementParamBuilder;
 public class ResponseFileSaver extends BaseListener {
 
   protected String fileNamePrefix;
+  protected boolean skipAutoNumber = false;
+  protected boolean skipSuffix = false;
 
   public ResponseFileSaver(String fileNamePrefix) {
     super("Save Responses to a file", ResultSaverGui.class);
@@ -37,7 +39,17 @@ public class ResponseFileSaver extends BaseListener {
   protected TestElement buildTestElement() {
     ResultSaver ret = new ResultSaver();
     ret.setFilename(fileNamePrefix);
+    ret.setSkipAutoNumber(skipAutoNumber);
+    ret.setSkipSuffix(skipSuffix);
     return ret;
+  }
+
+  public void setSkipAutoNumber(boolean skipAutoNumber) {
+    this.skipAutoNumber = skipAutoNumber;
+  }
+
+  public void setSkipSuffix(boolean  skipSuffix) {
+    this.skipSuffix = skipSuffix;
   }
 
   public static class CodeBuilder extends SingleTestElementCallBuilder<ResultSaver> {
@@ -49,7 +61,7 @@ public class ResponseFileSaver extends BaseListener {
     @Override
     protected MethodCall buildMethodCall(ResultSaver testElement, MethodCallContext context) {
       return buildMethodCall(
-          new TestElementParamBuilder(testElement).stringParam(ResultSaver.FILENAME));
+              new TestElementParamBuilder(testElement).stringParam(ResultSaver.FILENAME));
     }
 
   }
