@@ -45,12 +45,34 @@ public class ResponseFileSaver extends BaseListener {
     return ret;
   }
 
-  public void setSkipAutoNumber(boolean skipAutoNumber) {
+
+  /**
+   * Allows specifying whether the ResponseFileSaver appends a number to the end of the generated file.
+   * <p>
+   * By default, the ResponseFileSaver will add a number based on the samplers in the scope of the 
+   * ResponseFileSaver test element. If set to true then no number will be appended.
+   *
+   * @param skipAutoNumber Boolean determining whether the number is added.
+   * @return the ResponseFileSaver for further configuration or usage.
+   */
+  public ResponseFileSaver setSkipAutoNumber(boolean skipAutoNumber) {
     this.skipAutoNumber = skipAutoNumber;
+    return this;
   }
 
-  public void setSkipSuffix(boolean  skipSuffix) {
+
+  /**
+   * Allows specifying whether the ResponseFileSaver will append the file type to the file name.
+   * <p>
+   * By default, the ResponseFileSaver will use the MIME type to append the file type to the end of the
+   * generated file. If this is set to true then no file type will be appended.
+   * 
+   * @param skipSuffix Boolean determining whether a file type is added.
+   * @return the ResponseFileSaver for further configuration or usage.
+   */
+  public ResponseFileSaver setSkipSuffix(boolean  skipSuffix) {
     this.skipSuffix = skipSuffix;
+    return this;
   }
 
   public static class CodeBuilder extends SingleTestElementCallBuilder<ResultSaver> {
