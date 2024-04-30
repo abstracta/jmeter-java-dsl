@@ -98,7 +98,8 @@ For detailed support information, visit our [Support](https://abstracta.github.i
 * [pymeter announcement](https://www.linkedin.com/feed/update/urn:li:activity:6987704015933304832/): Announcement of a python API, built on top JMeter DSL, which eases JMeter test plan creation and execution for python devs by Eldad Uzman. 
 * [Evolve Your Selenium Scripts Into Performance Scripts](https://www.youtube.com/watch?v=YZhCPXfMuqo): SeleniumConf 2023 talk showing generation of performance scripts from Selenium scripts, using JMeter DSL recorder. [Here](https://github.com/abstracta/selenium-jmeter-dsl-demo) is demo repository.
 * [Developer-Friendly JMeter DSL for Authoring JMeter Scripts](https://techcommunity.microsoft.com/t5/apps-on-azure-blog/developer-friendly-jmeter-dsl-for-authoring-jmeter-scripts/ba-p/3834565): Azure Load Testing article on integration between JMeter DSL and Azure Load Testing.
-* [JMeter DSL: Un giro emocionante en las pruebas de rendimiento](https://www.freerangetesters.com/post/jmeter-dsl-un-giro-emocionante-en-las-pruebas-de-rendimiento): Short Spanish article that highlights some of the benefits and differentiators of using JMeter DSL and included recorder.  
+* [JMeter DSL: Un giro emocionante en las pruebas de rendimiento](https://www.freerangetesters.com/blog/jmeter-dsl-un-giro-latino-en-las-pruebas-de-rendimiento): Short Spanish article that highlights some of the benefits and differentiators of using JMeter DSL and included recorder. 
+* [Performance testing simple y escalable con JMeter DSL](https://www.youtube.com/watch?v=VrM4EDoFja8): Another short intro in Spanish to JMeter DSL with integration with Azure Load Testing and GitHub Action.
 
 ## Ecosystem
 
