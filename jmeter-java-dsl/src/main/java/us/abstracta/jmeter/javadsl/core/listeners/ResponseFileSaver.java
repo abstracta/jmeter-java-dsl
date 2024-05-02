@@ -7,8 +7,10 @@ import org.apache.jmeter.reporters.gui.ResultSaverGui;
 import org.apache.jmeter.testelement.TestElement;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodCall;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodCallContext;
+import us.abstracta.jmeter.javadsl.codegeneration.MethodParam;
 import us.abstracta.jmeter.javadsl.codegeneration.SingleTestElementCallBuilder;
 import us.abstracta.jmeter.javadsl.codegeneration.TestElementParamBuilder;
+import us.abstracta.jmeter.javadsl.codegeneration.params.BoolParam;
 
 /**
  * Generates one file for each response of a sample/request.
@@ -19,17 +21,22 @@ import us.abstracta.jmeter.javadsl.codegeneration.TestElementParamBuilder;
  * generate files only for the associated sampler.
  * <p>
  * By default, it will generate one file for each response using the given (which might include the
- * directory location) prefix to create the files and adding an incremental number to each response
- * and an extension according to the response mime type. Both the incremental number and the
- * extension can be set manually if skipAutoNumber and skipSuffix are set to true respectively.
+ * directory location) prefix to create the files and adding an incremental number and an extension
+ * according to the response mime type.
+ * <p>
+ * Eg: <pre>{@code responseFileSaver("responses/resp")}</pre> will generate files like
+ * "responses/resp1.json".
+ * <p>
+ * Both the incremental number and the file extension can be disabled setting
+ * {@link #autoNumber(boolean)} and {@link #autoFileExtension(boolean)} to false.
  *
  * @since 0.13
  */
 public class ResponseFileSaver extends BaseListener {
 
   protected String fileNamePrefix;
-  protected boolean skipAutoNumber = false;
-  protected boolean skipSuffix = false;
+  protected boolean autoNumber = true;
+  protected boolean autoFileExtension = true;
 
   public ResponseFileSaver(String fileNamePrefix) {
     super("Save Responses to a file", ResultSaverGui.class);
@@ -40,38 +47,40 @@ public class ResponseFileSaver extends BaseListener {
   protected TestElement buildTestElement() {
     ResultSaver ret = new ResultSaver();
     ret.setFilename(fileNamePrefix);
-    ret.setSkipAutoNumber(skipAutoNumber);
-    ret.setSkipSuffix(skipSuffix);
+    ret.setSkipAutoNumber(!autoNumber);
+    ret.setSkipSuffix(!autoFileExtension);
     return ret;
   }
 
-
   /**
-   * Allows specifying whether the ResponseFileSaver appends a number to the end of the generated file.
+   * Specifies whether, or not, to append an auto incremental number to each generated response file
+   * name.
    * <p>
-   * By default, the ResponseFileSaver will add a number based on the samplers in the scope of the 
-   * ResponseFileSaver test element. If set to true then no number will be appended.
+   * <b>WARNING:</b> if you disable this feature you might not get the files for all generated
+   * responses (due to potential file name collision and file rewrite). Consider using some jmeter
+   * expression in file name to avoid file name collisions and overrides (eg:
+   * "responses/${__threadNum}-${__jm__Thread Group__idx}").
    *
-   * @param skipAutoNumber Boolean determining whether the number is added.
+   * @param autoNumber specifies to add the auto incremental numbers to the  file when set to true.
+   *                   By default, this is set to true.
    * @return the ResponseFileSaver for further configuration or usage.
    */
-  public ResponseFileSaver setSkipAutoNumber(boolean skipAutoNumber) {
-    this.skipAutoNumber = skipAutoNumber;
+  public ResponseFileSaver autoNumber(boolean autoNumber) {
+    this.autoNumber = autoNumber;
     return this;
   }
 
-
   /**
-   * Allows specifying whether the ResponseFileSaver will append the file type to the file name.
+   * Specifies whether, or not, to append an automatic file extension to the file name.
    * <p>
-   * By default, the ResponseFileSaver will use the MIME type to append the file type to the end of the
-   * generated file. If this is set to true then no file type will be appended.
-   * 
-   * @param skipSuffix Boolean determining whether a file type is added.
+   * The automatic file extension is solved according to the response MIME type.
+   *
+   * @param autoFileExtension specifies to use the automatic file type extension when set to true.
+   *                          By default, is set ti true.
    * @return the ResponseFileSaver for further configuration or usage.
    */
-  public ResponseFileSaver setSkipSuffix(boolean  skipSuffix) {
-    this.skipSuffix = skipSuffix;
+  public ResponseFileSaver autoFileExtension(boolean autoFileExtension) {
+    this.autoFileExtension = autoFileExtension;
     return this;
   }
 
@@ -83,8 +92,17 @@ public class ResponseFileSaver extends BaseListener {
 
     @Override
     protected MethodCall buildMethodCall(ResultSaver testElement, MethodCallContext context) {
-      return buildMethodCall(
-              new TestElementParamBuilder(testElement).stringParam(ResultSaver.FILENAME));
+      TestElementParamBuilder paramBuilder = new TestElementParamBuilder(testElement);
+      MethodCall ret = buildMethodCall(paramBuilder.stringParam(ResultSaver.FILENAME));
+      MethodParam skipAutoNumber = paramBuilder.boolParam(ResultSaver.SKIP_AUTO_NUMBER, false);
+      if (!skipAutoNumber.isDefault()) {
+        ret.chain("autoNumber", new BoolParam(false, true));
+      }
+      MethodParam skipSuffix = paramBuilder.boolParam(ResultSaver.SKIP_SUFFIX, false);
+      if (!skipSuffix.isDefault()) {
+        ret.chain("autoFileExtension", new BoolParam(false, true));
+      }
+      return ret;
     }
 
   }
