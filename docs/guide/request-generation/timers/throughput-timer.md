@@ -16,7 +16,7 @@ public class PerformanceTest {
 
   @Test
   public void testPerformance() throws Exception {
-    TestPlanStats stats = testPlan(
+    testPlan(
         threadGroup(10, Duration.ofSeconds(10),
             throughputTimer(120),
             httpSampler("http://my.service")

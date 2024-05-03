@@ -29,18 +29,17 @@ import us.abstracta.jmeter.javadsl.core.DslTestPlan;
  * just influence samplers in that Thread Group, or as a child of a sampler to only control that
  * sampler.
  * <p>
- * When located at test plan level, this timer will use  by default JMeter Constant Throughput Timer
- * All active threads with non-sharing calculation mode. Which means that it will control that the
- * total throughput for all requests in the test plan, across different thread groups, is at maximum
- * the given one. If you locate inside a thread group (or sampler), it will use All active threads
- * in current thread group with non-sharing mode. Avoiding potential problem of having two timers in
- * separate thread group interfering with each other. Additionally, default calculation modes don't
- * use shared modes since we have detected unexpected behaviors when using multiple timers.
- * Basically, timers delays calculations interfering with each other due to single test plan or
- * thread group mark used in calculation (instead of one per timer).
+ * When located at test plan level, this timer will use by default the
+ * {@link ThroughputMode#ALL_THREADS_EVEN} calculation mode. If you locate it inside a thread group
+ * (or sampler), it will use {@link ThroughputMode#THREAD_GROUP_EVEN} calculation mode, avoiding
+ * potential problem of having two timers in separate thread group interfering with each other.
+ * Additionally, default calculation modes don't use shared modes since we have detected unexpected
+ * behaviors when using multiple timers. Basically, timers delays calculations interfering with each
+ * other due to single test plan or thread group mark used in calculation (instead of one per
+ * timer).
  * <p>
  * If you want to change the default calculation method, then you can use
- * {@link #calculation(ThroughputMode)} method. But in general avoid using it since may lead to
+ * {@link #calculation(ThroughputMode)} method. But in general, avoid using it, since may lead to
  * unexpected behaviors.
  *
  * @since 1.5

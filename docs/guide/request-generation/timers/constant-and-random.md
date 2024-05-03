@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test;
 public class PerformanceTest {
 
   @Test
-  public void testTransactions() throws IOException {
+  public void test() throws IOException {
     testPlan(
         threadGroup(2, 10,
             httpSampler("http://my.service/items"),

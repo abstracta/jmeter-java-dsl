@@ -1672,7 +1672,7 @@ public class JmeterDsl {
   }
 
   /**
-   * Sames as {@link #threadPause(Duration)} but allowing to use JMeter expressions for the
+   * Same as {@link #threadPause(Duration)} but allowing to use JMeter expressions for the
    * duration.
    * <p>
    * For example, you can set a delay depending on the amount of time taken in last sample with
@@ -1699,7 +1699,7 @@ public class JmeterDsl {
   }
 
   /**
-   * Sames as {@link #constantTimer(Duration)} but allowing tu use a JMeter expression.
+   * Same as {@link #constantTimer(Duration)} but allowing tu use a JMeter expression.
    * <p>
    * For example, you can set a delay depending on the amount of time taken in last sample with
    * something like <pre>{@code ${__groovy(5000 - prev.time)}}</pre>.
@@ -1716,19 +1716,15 @@ public class JmeterDsl {
   /**
    * Builds a Uniform Random Timer which pauses the thread with a random time with uniform
    * distribution.
-   *
    * <p>
    * The timer uses the minimum and maximum durations to define the range of values to be used in
    * the uniformly distributed selected value. These values differ from the parameters used in
    * JMeter Uniform Random Timer element to make it simpler for general users to use. The generated
    * JMeter test element uses as "constant delay offset" the minimum value, and as "maximum random
    * delay" (maximum - minimum) value.
-   * </p>
-   *
    * <p>
    * EXAMPLE: wait at least 3 seconds and maximum of 10 seconds
    * {@code uniformRandomTimer(Duration.ofSeconds(3), Duration.ofSeconds(10))}
-   * <p>
    *
    * @param minimum is used to set the constant delay of the Uniform Random Timer.
    * @param maximum is used to set the maximum time the timer will be paused and will be used to
