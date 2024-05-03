@@ -5,7 +5,6 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.time.Duration;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -36,8 +35,30 @@ public class BridgedObjectConstruct extends BaseBridgedObjectConstruct {
     this.constructor = constructor;
     this.tag = tag;
     this.builders = builders;
-    builders.sort(
-        Comparator.<BuilderMethod, Integer>comparing(b -> b.getParameters().length).reversed());
+    builders.sort((b1, b2) -> {
+      int ret = compareMoreParametersFirst(b1, b2);
+      return ret != 0 ? ret : compareFirstStringParameters(b1, b2);
+    });
+  }
+
+  private int compareMoreParametersFirst(BuilderMethod b1, BuilderMethod b2) {
+    return b2.getParameters().length - b1.getParameters().length;
+  }
+
+  // prefer methods with string parameters (JMeter expressions) over specific types
+  private int compareFirstStringParameters(BuilderMethod b1, BuilderMethod b2) {
+    Parameter[] params1 = b1.getParameters();
+    Parameter[] params2 = b2.getParameters();
+    for (int i = 0; i < params1.length; i++) {
+      if (params1[i].getType().equals(String.class) && !params2[i].getType()
+          .equals(String.class)) {
+        return -1;
+      } else if (params2[i].getType().equals(String.class) && !params1[i].getType()
+          .equals(String.class)) {
+        return 1;
+      }
+    }
+    return 0;
   }
 
   private static Map<Class<?>, Function<String, Object>> solveParsers() {
