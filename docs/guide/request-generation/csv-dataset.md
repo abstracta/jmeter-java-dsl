@@ -42,6 +42,16 @@ public class PerformanceTest {
 }
 ```
 
+::: tip
+To properly format the data in your CSV, a general rule you can apply is to replace each double quotes with two double quotes and add double quotes to the beginning and end of each CSV value.
+
+E.g.: if you want one CSV field to contain the value `{"field": "value"}`, then use `"{""field:"": ""value""}"`.
+
+This way, with a simple search and replace, you can include in a CSV field any format like JSON, XML, etc.
+
+Note: JMeter uses should be aware that JMeter DSL `csvDataSet` sets `Allowed quoted data?` flag, in associated `Csv Data Set Config` element, to `true`.
+:::
+
 By default, the CSV file will be opened once and shared by all threads. This means that when one thread reads a CSV line in one iteration, then the following thread reading a line will continue with the following line.
 
 If you want to change this (to share the file per thread group or use one file per thread), then you can use the provided `sharedIn` method like in the following example:
