@@ -78,6 +78,7 @@
     <module>jmeter-java-dsl-azure</module>
     <module>jmeter-java-dsl-datadog</module>
     <module>jmeter-java-dsl-bridge</module>
+    <module>jmeter-java-dsl-prometheus</module>
   </modules>
 
   <dependencyManagement>

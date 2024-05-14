@@ -5,4 +5,5 @@ When running tests with JMeter (and in particular with jmeter-java-dsl) a usual 
 <!-- @include: influxdb.md -->
 <!-- @include: graphite.md -->
 <!-- @include: elasticsearch.md -->
+<!-- @include: prometheus.md -->
 <!-- @include: datadog.md -->
