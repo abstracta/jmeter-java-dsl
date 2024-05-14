@@ -64,6 +64,7 @@ public class ResponseFileSaver extends BaseListener {
    * @param autoNumber specifies to add the auto incremental numbers to the  file when set to true.
    *                   By default, this is set to true.
    * @return the ResponseFileSaver for further configuration or usage.
+   * @since 1.27
    */
   public ResponseFileSaver autoNumber(boolean autoNumber) {
     this.autoNumber = autoNumber;
@@ -78,6 +79,7 @@ public class ResponseFileSaver extends BaseListener {
    * @param autoFileExtension specifies to use the automatic file type extension when set to true.
    *                          By default, is set ti true.
    * @return the ResponseFileSaver for further configuration or usage.
+   * @since 1.27
    */
   public ResponseFileSaver autoFileExtension(boolean autoFileExtension) {
     this.autoFileExtension = autoFileExtension;

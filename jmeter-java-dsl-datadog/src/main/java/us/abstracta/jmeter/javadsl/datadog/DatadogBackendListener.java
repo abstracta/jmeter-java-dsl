@@ -17,6 +17,10 @@ import us.abstracta.jmeter.javadsl.core.listeners.DslBackendListener;
 
 /**
  * Test element which publishes all test run metrics to DataDog.
+ * <p>
+ * This element uses <a
+ * href="https://github.com/DataDog/jmeter-datadog-backend-listener">jmeter-datadog-backend-listener
+ * JMeter plugin</a>.
  *
  * @since 1.13
  */

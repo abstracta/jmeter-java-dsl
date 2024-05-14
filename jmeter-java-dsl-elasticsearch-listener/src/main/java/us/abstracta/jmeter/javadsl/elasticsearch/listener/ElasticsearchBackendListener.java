@@ -13,6 +13,10 @@ import us.abstracta.jmeter.javadsl.http.JmeterUrl;
 
 /**
  * Test element which publishes all test run metrics to an Elasticsearch instance.
+ * <p>
+ * This element uses <a
+ * href="https://github.com/anthonygauthier/jmeter-elasticsearch-backend-listener">jmeter-elasticsearch-backend-listener
+ * JMeter Plugin</a>.
  *
  * @since 0.20
  */
