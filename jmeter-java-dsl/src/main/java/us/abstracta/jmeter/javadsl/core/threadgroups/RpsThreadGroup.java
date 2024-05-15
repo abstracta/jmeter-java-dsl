@@ -19,7 +19,6 @@ import org.apache.jmeter.threads.AbstractThreadGroup;
 import org.apache.jorphan.collections.HashTree;
 import us.abstracta.jmeter.javadsl.core.BuildTreeContext;
 import us.abstracta.jmeter.javadsl.core.util.JmeterFunction;
-import us.abstracta.jmeter.javadsl.core.util.SingleSeriesTimelinePanel;
 
 /**
  * Configures a thread group which dynamically adapts the number of threads and pauses to match a
@@ -286,13 +285,28 @@ public class RpsThreadGroup extends BaseThreadGroup<RpsThreadGroup> {
     return ret;
   }
 
-  public void showTimeline() {
-    SingleSeriesTimelinePanel chart = new SingleSeriesTimelinePanel(counting.label + " per second");
+  @Override
+  public LoadTimeLine buildLoadTimeline() {
+    LoadTimeLine ret = new LoadTimeLine(name, counting.label + " per second");
     if (!schedules.isEmpty()) {
-      chart.add(0, schedules.get(0).fromRps);
-      schedules.forEach(s -> chart.add(s.durationSecs * 1000, s.toRps));
+      ret.add(0, schedules.get(0).fromRps);
+      schedules.forEach(s -> ret.add(s.durationSecs * 1000, s.toRps));
     }
-    showAndWaitFrameWith(chart, name + " timeline", 800, 300);
+    return ret;
+  }
+
+  /**
+   * Shows a graph with a timeline of planned rps count execution for this test plan.
+   * <p>
+   * The graph will be displayed in a popup window.
+   * <p>
+   * This method is provided mainly to ease test plan designing when working with complex thread
+   * group profiles (several stages with ramps and holds).
+   *
+   * @since 0.26
+   */
+  public void showTimeline() {
+    showAndWaitFrameWith(buildLoadTimeline().buildChart(), name + " timeline", 800, 300);
   }
 
 }

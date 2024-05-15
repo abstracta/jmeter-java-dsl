@@ -7,6 +7,7 @@ import org.apache.jmeter.testelement.property.StringProperty;
 import org.apache.jmeter.threads.AbstractThreadGroup;
 import us.abstracta.jmeter.javadsl.codegeneration.params.EnumParam.EnumPropertyValue;
 import us.abstracta.jmeter.javadsl.core.DslTestElement;
+import us.abstracta.jmeter.javadsl.core.DslTestPlan;
 import us.abstracta.jmeter.javadsl.core.testelements.TestElementContainer;
 import us.abstracta.jmeter.javadsl.core.threadgroups.BaseThreadGroup.ThreadGroupChild;
 
@@ -60,6 +61,17 @@ public abstract class BaseThreadGroup<T extends BaseThreadGroup<T>> extends
   }
 
   protected abstract AbstractThreadGroup buildThreadGroup();
+
+  /**
+   * This method is used by {@link DslTestPlan#showTimeline()} to get the timeline chart for
+   * this thread group.
+   *
+   * @return the timeline chart for this thread group or null if it is not supported.
+   * @since 1.28
+   */
+  public LoadTimeLine buildLoadTimeline() {
+    return null;
+  }
 
   /**
    * Test elements that can be added as direct children of a thread group in jmeter should implement

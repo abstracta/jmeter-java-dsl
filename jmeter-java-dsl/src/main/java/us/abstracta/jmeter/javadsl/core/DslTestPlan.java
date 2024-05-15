@@ -1,5 +1,8 @@
 package us.abstracta.jmeter.javadsl.core;
 
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Font;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -10,7 +13,14 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
+import java.util.stream.Collectors;
+import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
+import javax.swing.JComponent;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
+import javax.swing.border.TitledBorder;
 import org.apache.jmeter.config.Arguments;
 import org.apache.jmeter.control.gui.TestPlanGui;
 import org.apache.jmeter.exceptions.IllegalUserActionException;
@@ -29,7 +39,9 @@ import us.abstracta.jmeter.javadsl.core.engines.EmbeddedJmeterEngine.EmbeddedJMe
 import us.abstracta.jmeter.javadsl.core.engines.JmeterEnvironment;
 import us.abstracta.jmeter.javadsl.core.engines.JmeterGui;
 import us.abstracta.jmeter.javadsl.core.testelements.TestElementContainer;
+import us.abstracta.jmeter.javadsl.core.threadgroups.BaseThreadGroup;
 import us.abstracta.jmeter.javadsl.core.threadgroups.DslDefaultThreadGroup;
+import us.abstracta.jmeter.javadsl.core.threadgroups.LoadTimeLine;
 
 /**
  * Represents a JMeter test plan, with associated thread groups and other children elements.
@@ -168,6 +180,73 @@ public class DslTestPlan extends TestElementContainer<DslTestPlan, TestPlanChild
     } catch (InterruptedException e) {
       Thread.currentThread().interrupt();
     }
+  }
+
+  /**
+   * For each thread group shows a graph with a timeline of planned load (threads or rps) to be
+   * generated.
+   * <p>
+   * Graphs will be displayed in a popup window.
+   * <p>
+   * This method eases test plan design when working with complex thread group profiles (several
+   * stages with ramps and holds).
+   *
+   * @since 1.28
+   */
+  public void showTimeline() {
+    List<LoadTimeLine> timeLines = buildThreadGroupTimeLines();
+    normalizeTimelines(timeLines);
+    JPanel panel = buildChartsContainerPanel();
+    int chartWidth = 800;
+    int chartHeight = timeLines.size() > 2 ? 200 : 300;
+    timeLines.forEach(tl -> panel.add(buildChart(tl, chartWidth, chartHeight)));
+    showAndWaitFrameWith(buildScrollPane(panel), "Load timeline", chartWidth + 20,
+        (chartHeight) * Math.min(3, timeLines.size()));
+  }
+
+  private List<LoadTimeLine> buildThreadGroupTimeLines() {
+    return children.stream()
+        .filter(c -> c instanceof BaseThreadGroup)
+        .map(c -> ((BaseThreadGroup<?>) c).buildLoadTimeline())
+        .collect(Collectors.toList());
+  }
+
+  private void normalizeTimelines(List<LoadTimeLine> timeLines) {
+    long maxTime = timeLines.stream()
+        .mapToLong(LoadTimeLine::getMaxTime)
+        .max()
+        .orElse(0L);
+    timeLines.forEach(tl -> {
+      tl.add(1, 0);
+      long chartMaxTime = tl.getMaxTime();
+      if (chartMaxTime < maxTime) {
+        tl.add(maxTime - chartMaxTime + 1, 0);
+      }
+    });
+  }
+
+  private JPanel buildChartsContainerPanel() {
+    JPanel ret = new JPanel();
+    ret.setLayout(new BoxLayout(ret, BoxLayout.Y_AXIS));
+    return ret;
+  }
+
+  private JComponent buildChart(LoadTimeLine timeLine, int width, int height) {
+    JComponent ret = timeLine.buildChart();
+    TitledBorder border = BorderFactory.createTitledBorder(timeLine.getName());
+    border.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+    border.setTitleFont(new Font("Arial", Font.BOLD, 14));
+    border.setTitleJustification(TitledBorder.CENTER);
+    ret.setBorder(border);
+    ret.setPreferredSize(new Dimension(width, height));
+    return ret;
+  }
+
+  private JScrollPane buildScrollPane(Component component) {
+    JScrollPane ret = new JScrollPane(component);
+    ret.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+    ret.getVerticalScrollBar().setUnitIncrement(8); // makes scroll faster
+    return ret;
   }
 
   /**

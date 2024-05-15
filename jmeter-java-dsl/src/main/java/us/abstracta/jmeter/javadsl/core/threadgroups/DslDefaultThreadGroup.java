@@ -18,7 +18,6 @@ import us.abstracta.jmeter.javadsl.codegeneration.TestElementParamBuilder;
 import us.abstracta.jmeter.javadsl.core.threadgroups.defaultthreadgroup.SimpleThreadGroupHelper;
 import us.abstracta.jmeter.javadsl.core.threadgroups.defaultthreadgroup.Stage;
 import us.abstracta.jmeter.javadsl.core.threadgroups.defaultthreadgroup.UltimateThreadGroupHelper;
-import us.abstracta.jmeter.javadsl.core.util.SingleSeriesTimelinePanel;
 
 /**
  * Represents the standard thread group test element included by JMeter.
@@ -398,14 +397,24 @@ public class DslDefaultThreadGroup extends BaseThreadGroup<DslDefaultThreadGroup
    * @since 0.26
    */
   public void showTimeline() {
+    showAndWaitFrameWith(buildLoadTimeline().buildChart(), name + " threads timeline", 800, 300);
+  }
+
+  @Override
+  public LoadTimeLine buildLoadTimeline() {
     if (stages.stream().anyMatch(s -> !s.isFixedStage())) {
       throw new IllegalStateException(
           "Can't display timeline when some JMeter expression is used in any ramp or hold.");
+    } else if (stages.size() == 1 && stages.get(0).iterations() != null
+        || stages.size() == 2 && stages.get(1).iterations() != null
+        || stages.size() == 3 && stages.get(2).iterations() != null) {
+      throw new IllegalStateException(
+          "Can't display timeline when thread group is configured with iterations.");
     }
-    SingleSeriesTimelinePanel chart = new SingleSeriesTimelinePanel("Threads");
-    chart.add(0, 0);
-    stages.forEach(s -> chart.add(((Duration) s.duration()).toMillis(), (int) s.threadCount()));
-    showAndWaitFrameWith(chart, name + " threads timeline", 800, 300);
+    LoadTimeLine ret = new LoadTimeLine(name, "Threads");
+    ret.add(0, 0);
+    stages.forEach(s -> ret.add(((Duration) s.duration()).toMillis(), (int) s.threadCount()));
+    return ret;
   }
 
   public static class CodeBuilder extends MethodCallBuilder {

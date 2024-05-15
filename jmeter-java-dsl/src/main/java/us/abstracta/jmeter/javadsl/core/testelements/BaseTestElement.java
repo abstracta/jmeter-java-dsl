@@ -1,6 +1,7 @@
 package us.abstracta.jmeter.javadsl.core.testelements;
 
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.beans.BeanInfo;
@@ -138,6 +139,7 @@ public abstract class BaseTestElement implements DslTestElement {
 
   protected void showFrameWith(Component content, String title, int width, int height,
       Runnable closeListener) {
+    content.setPreferredSize(new Dimension(width, height));
     JFrame frame = new JFrame(title);
     frame.setDefaultCloseOperation(
         closeListener != null ? WindowConstants.DISPOSE_ON_CLOSE : WindowConstants.EXIT_ON_CLOSE);
@@ -151,8 +153,8 @@ public abstract class BaseTestElement implements DslTestElement {
       });
     }
     frame.setLocation(200, 200);
-    frame.setSize(width, height);
     frame.add(content);
+    frame.pack();
     frame.setVisible(true);
   }
 
