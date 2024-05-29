@@ -985,6 +985,19 @@ public class JmeterDsl {
   }
 
   /**
+   * Same as {@link #vars()} but allowing to set a name on the element.
+   * <p>
+   * The name is used to easily identify what the variables are being used for in the jmx.
+   *
+   * @see #vars() (String)
+   * @since 0.22
+   **/
+
+  public static DslVariables vars(String name) {
+    return new DslVariables(name);
+  }
+
+  /**
    * Builds a JSR223 Sampler which allows sampling any Java API or custom logic.
    * <p>
    *

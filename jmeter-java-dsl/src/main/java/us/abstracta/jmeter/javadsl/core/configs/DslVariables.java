@@ -42,6 +42,10 @@ public class DslVariables extends BaseConfigElement {
     super("User Defined Variables", ArgumentsPanel.class);
   }
 
+  public DslVariables(String name) {
+    super(name, ArgumentsPanel.class);
+  }
+
   /**
    * Allows setting a JMeter thread variable.
    * <p>
