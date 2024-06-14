@@ -15,6 +15,6 @@ update_file_versions() {
 
 update_file_versions ${VERSION} README.md
 
-find docs -name "*.md" -not -path "*/node_modules/*" | while read DOC_FILE; do
+find docs -name "*.md" -o -name "*.xml" -not -path "*/node_modules/*" | while read DOC_FILE; do
   update_file_versions ${VERSION} ${DOC_FILE}
 done
