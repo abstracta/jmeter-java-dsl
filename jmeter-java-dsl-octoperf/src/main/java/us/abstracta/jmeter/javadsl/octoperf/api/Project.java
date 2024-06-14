@@ -64,7 +64,7 @@ public class Project {
 
   @JsonIgnore
   public String getUrl() {
-    return getBaseUrl() + "/design";
+    return getBaseUrl() + "/design/virtual-user";
   }
 
 }

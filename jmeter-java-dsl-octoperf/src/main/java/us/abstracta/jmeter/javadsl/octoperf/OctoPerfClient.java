@@ -40,7 +40,7 @@ public class OctoPerfClient extends BaseRemoteEngineApiClient {
 
   private static final Logger LOG = LoggerFactory.getLogger(OctoPerfClient.class);
   private static final String BASE_URL = "https://api.octoperf.com";
-  private static final String BASE_APP_URL = BASE_URL + "/app/#/app";
+  private static final String BASE_APP_URL = BASE_URL + "/ui";
 
   private final OctoPerfApi api;
   private final String apiKey;

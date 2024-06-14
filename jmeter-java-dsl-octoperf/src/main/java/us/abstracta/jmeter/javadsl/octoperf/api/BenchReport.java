@@ -37,7 +37,7 @@ public class BenchReport {
   }
 
   public void setProject(Project project) {
-    this.url = project.getBaseUrl() + "/analysis/" + id;
+    this.url = project.getBaseUrl() + "/analysis/report/" + id;
   }
 
   public String getUrl() {

@@ -64,7 +64,7 @@ public class Scenario {
 
   @JsonIgnore
   public String getUrl() {
-    return project.getBaseUrl() + "/runtime/" + id;
+    return project.getBaseUrl() + "/runtime/scenario/" + id;
   }
 
   public static class BackendListenerSettings {
