@@ -10,7 +10,7 @@ Here is a small demo using it:
 You can use [jbang](https://www.jbang.dev/documentation/guide/latest/index.html) to easily execute the recorder with the latest version available. E.g.:
 
 ```bash
-jbang us.abstracta.jmeter:jmeter-java-dsl-cli:1.28.1 recorder http://retailstore.test
+jbang us.abstracta.jmeter:jmeter-java-dsl-cli:1.29 recorder http://retailstore.test
 ```
 :::
 
@@ -58,7 +58,7 @@ executable (eg: chmod +x ./PerformanceTest.java) and just executing it with ./Pe
 //DEPS org.assertj:assertj-core:3.23.1
 //DEPS org.junit.jupiter:junit-jupiter-engine:5.9.1
 //DEPS org.junit.platform:junit-platform-launcher:1.9.1
-//DEPS us.abstracta.jmeter:jmeter-java-dsl:1.28.1
+//DEPS us.abstracta.jmeter:jmeter-java-dsl:1.29
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.*;

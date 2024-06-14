@@ -10,7 +10,7 @@ To use the module, you will need to include the following dependency in your pro
 <dependency>
   <groupId>us.abstracta.jmeter</groupId>
   <artifactId>jmeter-java-dsl-elasticsearch-listener</artifactId>
-  <version>1.28.1</version>
+  <version>1.29</version>
   <scope>test</scope>
 </dependency>
 ```
@@ -24,7 +24,7 @@ repositories {
 
 dependencies {
     ...
-    testImplementation 'us.abstracta.jmeter:jmeter-java-dsl-elasticsearch-listener:1.28.1'
+    testImplementation 'us.abstracta.jmeter:jmeter-java-dsl-elasticsearch-listener:1.29'
 }
 ```
 :::
