@@ -94,6 +94,8 @@ public class EmbeddedJmeterEngine implements DslJmeterEngine {
   }
 
   protected TestPlanStats runInEnv(DslTestPlan testPlan, JmeterEnvironment env) throws IOException {
+    // Avoid warning in java 11
+    System.setProperty("nashorn.args", "--no-deprecation-warning");
     Properties jmeterProps = JMeterUtils.getJMeterProperties();
     if (propsFile != null) {
       try (FileInputStream is = new FileInputStream(propsFile)) {
