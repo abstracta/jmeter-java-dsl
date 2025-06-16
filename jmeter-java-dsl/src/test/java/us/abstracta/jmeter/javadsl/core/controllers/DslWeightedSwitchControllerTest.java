@@ -44,6 +44,29 @@ public class DslWeightedSwitchControllerTest extends JmeterDslTest {
             new WeightedLabel(label3, weight2)));
   }
 
+  @Test
+  public void shouldHandleRandomChoiceWhenInPlan() throws Exception {
+    int threads = 1;
+    int iterations = 20;
+    long weight1 = 60;
+    long weight2 = 30;
+    String label3 = "sample3";
+
+    TestPlanStats stats = testPlan(
+            threadGroup(threads, iterations,
+                    weightedSwitchController()
+                            .child(weight1, httpSampler(SAMPLE_1_LABEL, wiremockUri))
+                            .children(httpSampler(SAMPLE_2_LABEL, wiremockUri))
+                            .child(weight2, httpSampler(label3, wiremockUri))
+                            .isRandomChoice()
+            )
+    ).run();
+
+    Map<String, Long> sampleCounts = buildSampleCountsMap(stats);
+    assertThat(sampleCounts.keySet()).containsExactlyInAnyOrder(SAMPLE_1_LABEL, SAMPLE_2_LABEL, label3);
+  }
+
+
   private Map<String, Long> buildSampleCountsMap(TestPlanStats stats) {
     return stats.labels().stream()
         .collect(Collectors.toMap(s -> s, s -> stats.byLabel(s).samplesCount()));

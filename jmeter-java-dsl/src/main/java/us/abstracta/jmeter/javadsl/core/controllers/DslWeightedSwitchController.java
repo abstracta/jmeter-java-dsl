@@ -44,6 +44,7 @@ import us.abstracta.jmeter.javadsl.core.threadgroups.BaseThreadGroup.ThreadGroup
 public class DslWeightedSwitchController extends BaseController<DslWeightedSwitchController> {
 
   public static final long DEFAULT_WEIGHT = 100;
+  private boolean isRandomChoice = false;
 
   public DslWeightedSwitchController() {
     super("Weighted Switch Controller", WeightedSwitchControllerGui.class, new ArrayList<>());
@@ -78,6 +79,11 @@ public class DslWeightedSwitchController extends BaseController<DslWeightedSwitc
    */
   public DslWeightedSwitchController child(long weight, DslSampler child) {
     return addWeightedChild(weight, child);
+  }
+
+  public DslWeightedSwitchController isRandomChoice(){
+    this.isRandomChoice = true;
+    return this;
   }
 
   private DslWeightedSwitchController addWeightedChild(long weight, ThreadGroupChild child) {
@@ -144,6 +150,7 @@ public class DslWeightedSwitchController extends BaseController<DslWeightedSwitc
       }
     }
     controller.setData(model);
+    controller.setIsRandomChoice(isRandomChoice);
     return ret;
   }
 
