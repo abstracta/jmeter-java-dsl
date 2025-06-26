@@ -54,7 +54,7 @@ public class TestResource {
    * <p>
    * This is the same as {@code file().getPath()}.
    * <p>
-   * This handy when you need the file path, and avoid previously mentioned boilerplate code.
+   * This is handy when you need the file path, and avoid previously mentioned boilerplate code.
    *
    * @return the associated file path.
    */
