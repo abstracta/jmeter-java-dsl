@@ -58,7 +58,7 @@ public class DslWeightedSwitchControllerTest extends JmeterDslTest {
                             .child(weight1, httpSampler(SAMPLE_1_LABEL, wiremockUri))
                             .children(httpSampler(SAMPLE_2_LABEL, wiremockUri))
                             .child(weight2, httpSampler(label3, wiremockUri))
-                            .isRandomChoice()
+                            .randomChoice(true)
             )
     ).run();
 

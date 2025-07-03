@@ -81,8 +81,18 @@ public class DslWeightedSwitchController extends BaseController<DslWeightedSwitc
     return addWeightedChild(weight, child);
   }
 
-  public DslWeightedSwitchController isRandomChoice(){
-    this.isRandomChoice = true;
+  /**
+   * Sets the random choice mode for child elements.
+   * <p>
+   * When random choice mode is enabled (randomChoice = true), the controller will select child elements
+   * randomly, according to their weights. When disabled (randomChoice = false), selection will occur
+   * sequentially based on weights.
+   *
+   * @param randomChoice true - to enable random selection, false - for sequential selection
+   * @return current controller instance for method chaining
+   */
+  public DslWeightedSwitchController randomChoice(boolean randomChoice){
+    this.isRandomChoice = randomChoice;
     return this;
   }
 
