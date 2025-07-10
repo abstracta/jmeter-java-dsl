@@ -14,6 +14,7 @@ Here we show some of them, but check [JmeterDsl](/jmeter-java-dsl/src/main/java/
 <!-- @include: connections.md -->
 <!-- @include: embedded-resources.md -->
 <!-- @include: redirects.md -->
+<!-- @include: keepAlive.md -->
 <!-- @include: defaults.md -->
 <!-- @include: override-defaults.md -->
 <!-- @include: proxy.md -->
