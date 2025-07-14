@@ -7,6 +7,8 @@ import static com.github.tomakehurst.wiremock.client.WireMock.getRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.verify;
+import static com.github.tomakehurst.wiremock.client.WireMock.anyUrl;
+import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
 import static org.assertj.core.api.Assertions.assertThat;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.httpDefaults;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.httpSampler;
@@ -203,6 +205,19 @@ public class DslHttpDefaultsTest extends JmeterDslTest {
     stubFor(get("/").willReturn(
         aResponse().withStatus(HttpStatus.SC_MOVED_PERMANENTLY)
             .withHeader("Location", wiremockUri + redirectPath)));
+  }
+
+  @Test
+  public void shouldNotSendConnectionKeepAliveWhenDisabledInDefaultsAndNotSettingInSampler()
+          throws Exception {
+    testPlan(
+       httpDefaults()
+           .useKeepAlive(false),
+       threadGroup(1, 1,
+           httpSampler(wiremockUri)
+       )
+    ).run();
+    verify(getRequestedFor(anyUrl()).withHeader("Connection", equalTo("close")));
   }
 
   @Test

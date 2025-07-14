@@ -53,6 +53,7 @@ public class DslHttpDefaults extends BaseConfigElement {
   protected String proxyUser;
   protected String proxyPassword;
   protected HttpClientImpl clientImpl;
+  protected Boolean useKeepAlive;
   protected Boolean followRedirects;
 
   public DslHttpDefaults() {
@@ -186,6 +187,18 @@ public class DslHttpDefaults extends BaseConfigElement {
    */
   public DslHttpDefaults followRedirects(boolean enable) {
     this.followRedirects = enable;
+    return this;
+  }
+
+  /**
+   * Specifies if by default HTTP connection should be kept alive.
+   *
+   * @param enable sets either to enable or disable persistent connection
+   * @return the config element for further configuration or usage.
+   * @since 1.30
+   */
+  public DslHttpDefaults useKeepAlive(boolean enable) {
+    this.useKeepAlive = enable;
     return this;
   }
 
@@ -430,6 +443,9 @@ public class DslHttpDefaults extends BaseConfigElement {
     if (followRedirects != null) {
       buildEndListener(context.getParent()).followRedirects = followRedirects;
     }
+    if (useKeepAlive != null) {
+      buildEndListener(context.getParent()).useKeepAlive = useKeepAlive;
+    }
     return ret;
   }
 
@@ -445,10 +461,18 @@ public class DslHttpDefaults extends BaseConfigElement {
     buildEndListener(context.getRoot()).pendingFollowRedirectsElements.add(element);
   }
 
+  protected static void addPendingUseKeepAliveElement(HTTPSamplerProxy element,
+      BuildTreeContext context) {
+    buildEndListener(context.getRoot()).pendingUseKeepAliveElements.add(element);
+  }
+
   private static class DefaultsTreeContextEndListener implements TreeContextEndListener {
 
     private Boolean followRedirects;
     private final List<HTTPSamplerProxy> pendingFollowRedirectsElements = new ArrayList<>();
+
+    private Boolean useKeepAlive;
+    private final List<HTTPSamplerProxy> pendingUseKeepAliveElements = new ArrayList<>();
 
     private DefaultsTreeContextEndListener(BuildTreeContext context) {
       context.addEndListener(this);
@@ -463,6 +487,14 @@ public class DslHttpDefaults extends BaseConfigElement {
             .filter(e -> e.getPropertyAsString(HTTPSamplerBase.FOLLOW_REDIRECTS).isEmpty())
             .forEach(e -> e.setFollowRedirects(true));
       }
+
+      if (useKeepAlive != null) {
+        setChildrenToUseKeepAlive(tree);
+      } else {
+        pendingUseKeepAliveElements.stream()
+            .filter(e -> e.getPropertyAsString(HTTPSamplerBase.USE_KEEPALIVE).isEmpty())
+            .forEach(e -> e.setUseKeepAlive(true));
+      }
     }
 
     private void setChildrenToFollowRedirects(HashTree tree) {
@@ -474,6 +506,19 @@ public class DslHttpDefaults extends BaseConfigElement {
           }
         } else {
           setChildrenToFollowRedirects(value);
+        }
+      });
+    }
+
+    private void setChildrenToUseKeepAlive(HashTree tree) {
+      tree.forEach((key, value) -> {
+        if (key instanceof HTTPSamplerProxy) {
+          HTTPSamplerProxy sampler = (HTTPSamplerProxy) key;
+          if (sampler.getPropertyAsString(HTTPSamplerBase.USE_KEEPALIVE).isEmpty()) {
+            sampler.setUseKeepAlive(useKeepAlive);
+          }
+        } else {
+          setChildrenToUseKeepAlive(value);
         }
       });
     }
@@ -524,12 +569,16 @@ public class DslHttpDefaults extends BaseConfigElement {
       boolean followRedirects =
           isDefaultCandidate || testElement.getPropertyAsBoolean(HTTPSamplerBase.FOLLOW_REDIRECTS);
       endListener.registerFollowRedirect(followRedirects, context, isDefaultCandidate);
+      boolean useKeepAlive =
+              isDefaultCandidate || testElement.getPropertyAsBoolean(HTTPSamplerBase.USE_KEEPALIVE);
+      endListener.registerUseKeepAlive(useKeepAlive, context, isDefaultCandidate);
     }
 
     private static class DefaultsMethodContextEndListener implements MethodCallContextEndListener {
 
       private final List<EncodedCall> encodedCalls = new ArrayList<>();
       private final List<RedirectableCall> redirectableCalls = new ArrayList<>();
+      private final List<UseKeepAliveCall> useKeepAliveCalls = new ArrayList<>();
 
       private DefaultsMethodContextEndListener(MethodCallContext parentCtx) {
         parentCtx.addEndListener(this);
@@ -545,10 +594,16 @@ public class DslHttpDefaults extends BaseConfigElement {
         redirectableCalls.add(new RedirectableCall(followRedirects, ret, isDefaultCandidate));
       }
 
+      public void registerUseKeepAlive(boolean useKeepAlive, MethodCallContext ret,
+          boolean isDefaultCandidate) {
+        useKeepAliveCalls.add(new UseKeepAliveCall(useKeepAlive, ret, isDefaultCandidate));
+      }
+
       @Override
       public void execute(MethodCallContext ctx, MethodCall ret) {
         solveDefaultEncoding(ctx);
         solveDefaultFollowRedirects(ctx);
+        solveDefaultUseKeepAlive(ctx);
       }
 
       private void solveDefaultEncoding(MethodCallContext ctx) {
@@ -623,6 +678,21 @@ public class DslHttpDefaults extends BaseConfigElement {
         }
       }
 
+      private void solveDefaultUseKeepAlive(MethodCallContext ctx) {
+        UseKeepAliveCall defaultsCall = findDefaultUseKeepAliveCall(ctx);
+        if (defaultsCall != null) {
+          useKeepAliveCalls.stream()
+                  .filter(c -> c != defaultsCall)
+                  .forEach(UseKeepAliveCall::removeUseKeepAlive);
+        }
+        DefaultsMethodContextEndListener parentListener = buildParentContextEndListener(ctx);
+        if (parentListener != null) {
+          parentListener.registerUseKeepAlive(
+                  defaultsCall == null || defaultsCall.useKeepAlive,
+                  defaultsCall != null ? defaultsCall.ctx : null, false);
+        }
+      }
+
       private RedirectableCall findDefaultRedirectableCall(MethodCallContext ctx) {
         if (redirectableCalls.size() == 1) {
           return redirectableCalls.get(0);
@@ -636,6 +706,24 @@ public class DslHttpDefaults extends BaseConfigElement {
             ret = new RedirectableCall(false, buildDefaultsCall(ctx), true);
           }
           ret.setFollowRedirects(false);
+          return ret;
+        }
+        return null;
+      }
+
+      private UseKeepAliveCall findDefaultUseKeepAliveCall(MethodCallContext ctx) {
+        if (useKeepAliveCalls.size() == 1) {
+          return useKeepAliveCalls.get(0);
+        }
+        if (useKeepAliveCalls.stream().allMatch(c -> c.isDefaultCandidate || !c.useKeepAlive)) {
+          UseKeepAliveCall ret = useKeepAliveCalls.stream()
+                  .filter(c -> c.isDefaultCandidate)
+                  .findAny()
+                  .orElse(null);
+          if (ret == null) {
+            ret = new UseKeepAliveCall(false, buildDefaultsCall(ctx), true);
+          }
+          ret.setUseKeepAlive(false);
           return ret;
         }
         return null;
@@ -697,6 +785,31 @@ public class DslHttpDefaults extends BaseConfigElement {
 
     public void removeFollowRedirects() {
       ctx.getMethodCall().unchain("followRedirects");
+      removeEmptyDefaultsCall(ctx);
+    }
+
+  }
+
+  private static class UseKeepAliveCall {
+
+    private boolean useKeepAlive;
+    private final MethodCallContext ctx;
+    private final boolean isDefaultCandidate;
+
+    private UseKeepAliveCall(boolean useKeepAlive, MethodCallContext ctx,
+                             boolean isDefaultCandidate) {
+      this.useKeepAlive = useKeepAlive;
+      this.ctx = ctx;
+      this.isDefaultCandidate = isDefaultCandidate;
+    }
+
+    public void setUseKeepAlive(boolean useKeepAlive) {
+      this.useKeepAlive = useKeepAlive;
+      ctx.getMethodCall().chain("useKeepAlive", new BoolParam(useKeepAlive, true));
+    }
+
+    public void removeUseKeepAlive() {
+      ctx.getMethodCall().unchain("useKeepAlive");
       removeEmptyDefaultsCall(ctx);
     }
 

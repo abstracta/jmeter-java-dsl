@@ -113,6 +113,18 @@ public class DslHttpSamplerTest extends JmeterDslTest {
   }
 
   @Test
+  public void shouldNotSendConnectionKeepAliveWhenHttpSamplerWithDisabledKeepAlive()
+      throws Exception {
+    testPlan(
+        threadGroup(1, 1,
+            httpSampler(wiremockUri)
+                .useKeepAlive(false)
+        )
+    ).run();
+    verify(getRequestedFor(anyUrl()).withHeader("Connection", equalTo("close")));
+  }
+
+  @Test
   public void shouldSendHeadersWhenHttpSamplerWithHeaders() throws Exception {
     testPlan(
         threadGroup(1, 1,
@@ -642,6 +654,15 @@ public class DslHttpSamplerTest extends JmeterDslTest {
           threadGroup(1, 1,
               httpSampler("http://localhost")
                   .followRedirects(false)
+          )
+      );
+    }
+
+    public DslTestPlan testPlanWithHttpGetNotUsingKeepAlive() {
+      return testPlan(
+          threadGroup(1, 1,
+              httpSampler("http://localhost")
+                  .useKeepAlive(false)
           )
       );
     }

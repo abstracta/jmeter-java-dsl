@@ -50,6 +50,7 @@ public class DslHttpSampler extends DslBaseHttpSampler<DslHttpSampler> {
   protected final List<HTTPFileArg> files = new ArrayList<>();
   protected Charset encoding;
   protected Boolean followRedirects;
+  protected Boolean useKeepAlive;
   protected boolean downloadEmbeddedResources;
   protected String embeddedResourcesMatchRegex;
   protected String embeddedResourcesNotMatchRegex;
@@ -300,6 +301,23 @@ public class DslHttpSampler extends DslBaseHttpSampler<DslHttpSampler> {
   }
 
   /**
+   * Allows to close http connection or keep it alive.
+   * <p>
+   * By default, JMeter sends `Connection: keep-alive` header to enable persistent connection.
+   * To change default behavior and close every connection
+   * http client should send `Connection: close` header.
+   * This method allows enabling/disabling such behavior.
+   *
+   * @param useKeepAlive sets either to enable or disable persistent connection
+   * @return the sampler for further configuration or usage.
+   * @since 1.30
+   */
+  public DslHttpSampler useKeepAlive(boolean useKeepAlive) {
+    this.useKeepAlive = useKeepAlive;
+    return this;
+  }
+
+  /**
    * Allows enabling automatic download of HTML embedded resources (images, iframes, etc).
    * <p>
    * When enabled JMeter will automatically parse HTMLs and download any found embedded resources
@@ -422,7 +440,9 @@ public class DslHttpSampler extends DslBaseHttpSampler<DslHttpSampler> {
     if (followRedirects != null) {
       elem.setFollowRedirects(followRedirects);
     }
-    elem.setUseKeepAlive(true);
+    if (useKeepAlive != null) {
+      elem.setUseKeepAlive(useKeepAlive);
+    }
     HttpElementHelper.modifyTestElementEmbeddedResources(elem, downloadEmbeddedResources,
         embeddedResourcesMatchRegex, embeddedResourcesNotMatchRegex);
     if (clientImpl != null) {
@@ -444,6 +464,13 @@ public class DslHttpSampler extends DslBaseHttpSampler<DslHttpSampler> {
       httpDefaults to define follow redirect behavior for elements that have not specified a value.
        */
       DslHttpDefaults.addPendingFollowRedirectsElement(element, context);
+    }
+    if (useKeepAlive == null) {
+      /*
+      Not setting keep alive default value in buildTestElement and differing it, allows for
+      httpDefaults to define connection behavior for elements that have not specified a value.
+       */
+      DslHttpDefaults.addPendingUseKeepAliveElement(element, context);
     }
     return ret;
   }
@@ -511,6 +538,7 @@ public class DslHttpSampler extends DslBaseHttpSampler<DslHttpSampler> {
     protected void chainAdditionalOptions(MethodCall ret, TestElementParamBuilder paramBuilder) {
       HttpElementHelper.chainEncodingToMethodCall(ret, paramBuilder);
       ret.chain("followRedirects", buildFollowRedirectsParam(paramBuilder));
+      ret.chain("useKeepAlive", buildUseKeepAliveParam(paramBuilder));
       HttpElementHelper.chainEmbeddedResourcesOptionsToMethodCall(ret, paramBuilder);
       HttpElementHelper.chainClientImplToMethodCall(ret, paramBuilder);
     }
@@ -597,6 +625,10 @@ public class DslHttpSampler extends DslBaseHttpSampler<DslHttpSampler> {
             ? new BoolParam(true, true)
             : follow;
       }
+    }
+
+    private MethodParam buildUseKeepAliveParam(TestElementParamBuilder paramBuilder) {
+      return paramBuilder.boolParam(HTTPSamplerBase.USE_KEEPALIVE, true);
     }
 
     private static class HttpMethodParam extends StringParam {
