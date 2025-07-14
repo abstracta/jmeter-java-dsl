@@ -107,6 +107,17 @@ public class DslWeightedSwitchControllerTest extends JmeterDslTest {
       );
     }
 
+    public DslTestPlan testPlanWithWeightedSwitchControllerAndRandomChoice() {
+      return testPlan(
+          threadGroup(1, 1,
+              weightedSwitchController()
+                  .randomChoice(true)
+                  .child(2, httpSampler("sample1", "http://localhost"))
+                  .child(3, httpSampler("sample2", "http://localhost"))
+          )
+      );
+    }
+
     public DslTestPlan testPlanWithWeightedSwitchControllerAndUnweightedElements() {
       return testPlan(
           threadGroup(1, 1,

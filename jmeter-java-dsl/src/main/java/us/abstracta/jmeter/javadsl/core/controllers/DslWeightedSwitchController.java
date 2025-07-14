@@ -29,7 +29,8 @@ import us.abstracta.jmeter.javadsl.core.threadgroups.BaseThreadGroup.ThreadGroup
  * Selects a child in each iteration according to specified relative weights.
  * <p>
  * Internally this uses <a
- * href="https://github.com/Blazemeter/jmeter-bzm-plugins/blob/master/wsc/WeightedSwitchController.md">
+ * href="https://github.com/Blazemeter/jmeter-bzm-plugins/blob/master/wsc
+ * /WeightedSwitchController.md">
  * BlazeMeter Weighted Switch Controller plugin</a>.
  * <p>
  * This controller is handy when you want part of the test plan to act in a probabilistic manner
@@ -57,10 +58,10 @@ public class DslWeightedSwitchController extends BaseController<DslWeightedSwitc
    * Adds a child to the controller with a configured weight for selecting it in iterations.
    *
    * @param weight is the weight to assign to this particular element for execution in iterations.
-   *               Keep in mind that if you use {@link #children(ThreadGroupChild...)} to add
-   *               samplers or controllers, their default assigned weight will be 100.
-   * @param child  is the element to add as controller child that will be selected for execution
-   *               during iterations according to given weight.
+   * Keep in mind that if you use {@link #children(ThreadGroupChild...)} to add samplers or
+   * controllers, their default assigned weight will be 100.
+   * @param child is the element to add as controller child that will be selected for execution
+   * during iterations according to given weight.
    * @return the controller for further configuration and usage.
    */
   public DslWeightedSwitchController child(long weight, DslController child) {
@@ -71,10 +72,10 @@ public class DslWeightedSwitchController extends BaseController<DslWeightedSwitc
    * Adds a child to the controller with a configured weight for selecting it in iterations.
    *
    * @param weight is the weight to assign to this particular element for execution in iterations.
-   *               Keep in mind that if you use {@link #children(ThreadGroupChild...)} to add
-   *               samplers or controllers, their default assigned weight will be 100.
-   * @param child  is the element to add as controller child that will be selected for execution
-   *               during iterations according to given weight.
+   * Keep in mind that if you use {@link #children(ThreadGroupChild...)} to add samplers or
+   * controllers, their default assigned weight will be 100.
+   * @param child is the element to add as controller child that will be selected for execution
+   * during iterations according to given weight.
    * @return the controller for further configuration and usage.
    */
   public DslWeightedSwitchController child(long weight, DslSampler child) {
@@ -84,14 +85,17 @@ public class DslWeightedSwitchController extends BaseController<DslWeightedSwitc
   /**
    * Sets the random choice mode for child elements.
    * <p>
-   * When random choice mode is enabled (randomChoice = true), the controller will select child elements
-   * randomly, according to their weights. When disabled (randomChoice = false), selection will occur
-   * sequentially based on weights.
+   * When random choice mode is enabled (randomChoice = true), the controller will select child
+   * elements randomly, according to their weights. When disabled (randomChoice = false), selection
+   * will occur sequentially based on weights.
+   * <p>
+   * The randomChoice(true) method cannot guarantee that the actual execution percentages of its
+   * child elements will exactly match the expected distribution.
    *
    * @param randomChoice true - to enable random selection, false - for sequential selection
    * @return current controller instance for method chaining
    */
-  public DslWeightedSwitchController randomChoice(boolean randomChoice){
+  public DslWeightedSwitchController randomChoice(boolean randomChoice) {
     this.isRandomChoice = randomChoice;
     return this;
   }
@@ -192,7 +196,10 @@ public class DslWeightedSwitchController extends BaseController<DslWeightedSwitc
     @Override
     protected MethodCall buildMethodCall(WeightedSwitchController testElement,
         MethodCallContext context) {
+      TestElementParamBuilder paramBuilder = new TestElementParamBuilder(testElement);
       MethodCall ret = buildMethodCall();
+      ret.chain("randomChoice",
+          paramBuilder.boolParam(WeightedSwitchController.IS_RANDOM_CHOICE, false));
       Map<String, Long> weights = extractSamplersWeights(testElement);
       chainChildren(ret, context, weights);
       return ret;
