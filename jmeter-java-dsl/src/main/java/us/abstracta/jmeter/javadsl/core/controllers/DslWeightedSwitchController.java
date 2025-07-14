@@ -44,6 +44,7 @@ import us.abstracta.jmeter.javadsl.core.threadgroups.BaseThreadGroup.ThreadGroup
 public class DslWeightedSwitchController extends BaseController<DslWeightedSwitchController> {
 
   public static final long DEFAULT_WEIGHT = 100;
+  private boolean isRandomChoice = false;
 
   public DslWeightedSwitchController() {
     super("Weighted Switch Controller", WeightedSwitchControllerGui.class, new ArrayList<>());
@@ -78,6 +79,21 @@ public class DslWeightedSwitchController extends BaseController<DslWeightedSwitc
    */
   public DslWeightedSwitchController child(long weight, DslSampler child) {
     return addWeightedChild(weight, child);
+  }
+
+  /**
+   * Sets the random choice mode for child elements.
+   * <p>
+   * When random choice mode is enabled (randomChoice = true), the controller will select child elements
+   * randomly, according to their weights. When disabled (randomChoice = false), selection will occur
+   * sequentially based on weights.
+   *
+   * @param randomChoice true - to enable random selection, false - for sequential selection
+   * @return current controller instance for method chaining
+   */
+  public DslWeightedSwitchController randomChoice(boolean randomChoice){
+    this.isRandomChoice = randomChoice;
+    return this;
   }
 
   private DslWeightedSwitchController addWeightedChild(long weight, ThreadGroupChild child) {
@@ -144,6 +160,7 @@ public class DslWeightedSwitchController extends BaseController<DslWeightedSwitc
       }
     }
     controller.setData(model);
+    controller.setIsRandomChoice(isRandomChoice);
     return ret;
   }
 
