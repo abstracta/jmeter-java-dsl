@@ -192,6 +192,8 @@ public class DslHttpDefaults extends BaseConfigElement {
 
   /**
    * Specifies if by default HTTP connection should be kept alive.
+   * <p>
+   * This can be overwritten by {@link DslHttpSampler#useKeepAlive(boolean)}.
    *
    * @param enable sets either to enable or disable persistent connection
    * @return the config element for further configuration or usage.
