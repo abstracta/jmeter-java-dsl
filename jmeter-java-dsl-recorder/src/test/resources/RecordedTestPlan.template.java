@@ -2,7 +2,8 @@ testPlan(
         threadGroup(1, 1,
           httpDefaults()
             .encoding(StandardCharsets.UTF_8)
-            .followRedirects(false),
+            .followRedirects(false)
+            .useKeepAlive(false),
           httpSampler("/-{{\d+}}", "http://localhost:{{\d+}}"),
           httpSampler("/home-{{\d+}}", "http://localhost:{{\d+}}/home")
             .children(
