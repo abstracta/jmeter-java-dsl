@@ -29,8 +29,7 @@ import us.abstracta.jmeter.javadsl.core.threadgroups.BaseThreadGroup.ThreadGroup
  * Selects a child in each iteration according to specified relative weights.
  * <p>
  * Internally this uses <a
- * href="https://github.com/Blazemeter/jmeter-bzm-plugins/blob/master/wsc
- * /WeightedSwitchController.md">
+ * href="https://github.com/Blazemeter/jmeter-bzm-plugins/blob/master/wsc/WeightedSwitchController.md">
  * BlazeMeter Weighted Switch Controller plugin</a>.
  * <p>
  * This controller is handy when you want part of the test plan to act in a probabilistic manner
