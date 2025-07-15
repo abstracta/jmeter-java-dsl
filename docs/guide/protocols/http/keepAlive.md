@@ -4,7 +4,7 @@ By default, **JMeter Java DSL** uses a persistent HTTP connection (sending the `
 
 To force server to close the connection after each request, you can disable keep-alive with `.useKeepAlive(false)` either on an individual `httpSampler` or globally on `httpDefaults`.
 
-This can be useful when you’re load-testing an API that enforces a strict limit on the number of simultaneous sockets per client. If you leave keep-alive enabled, each virtual user will hold its socket open for the duration of the test, consuming the gateway’s connection pool.
+This can be useful when you’re load-testing an API that enforces a strict limit on the number of simultaneous sockets per client. If you leave keep-alive enabled, each thread will hold its socket open for the duration of the test, consuming the server's connection resources.
 
 ```java
 import static us.abstracta.jmeter.javadsl.JmeterDsl.*;
