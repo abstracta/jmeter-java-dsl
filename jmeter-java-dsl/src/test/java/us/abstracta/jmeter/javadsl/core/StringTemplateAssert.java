@@ -43,7 +43,7 @@ public abstract class StringTemplateAssert<SELF extends StringTemplateAssert<SEL
   protected abstract ErrorMessageFactory getErrorMessageFactory(List<Delta<String>> diffs);
 
   public SELF matches(TestResource template) throws IOException {
-    return matches(template.rawContents());
+    return matches(template.rawContents().replace("\r\n", "\n"));
   }
 
   public SELF matches(String templateContents) throws IOException {

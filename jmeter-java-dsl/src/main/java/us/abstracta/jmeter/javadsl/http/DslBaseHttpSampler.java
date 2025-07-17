@@ -253,10 +253,7 @@ public abstract class DslBaseHttpSampler<T extends DslBaseHttpSampler<T>> extend
     }
     HTTPSamplerProxy ret = new HTTPSamplerProxy();
     HttpElementHelper.modifyTestElementUrl(ret, protocol, host, port, path);
-    // We need to use this logic since setPath method triggers additional logic
-    if (path != null) {
-      ret.setPath(path);
-    }
+
     HttpElementHelper.modifyTestElementTimeouts(ret, connectionTimeout, responseTimeout);
     HttpElementHelper.modifyTestElementProxy(ret, proxyUrl, proxyUser, proxyPassword);
     return configureHttpTestElement(ret);
