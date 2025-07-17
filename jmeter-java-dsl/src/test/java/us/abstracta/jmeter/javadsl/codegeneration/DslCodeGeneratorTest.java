@@ -24,7 +24,7 @@ public class DslCodeGeneratorTest {
       throws Exception {
     File solvedTemplate = solveTemplateResource("test-plan.template.jmx", tempDir);
     assertThat(new DslCodeGenerator().generateCodeFromJmx(solvedTemplate))
-        .isEqualTo(
+        .isEqualToNormalizingNewlines(
             solveTestClassTemplate(Collections.singleton(ContentType.class.getName()),
                 "SimpleTest.java"));
   }
@@ -50,7 +50,7 @@ public class DslCodeGeneratorTest {
   public void shouldGenerateExpectedCodeWhenRecordedJmxIsProvided() throws Exception {
     assertThat(new DslCodeGenerator()
         .generateCodeFromJmx(new TestResource(RESOURCES_FOLDER + "/recorded.jmx").file()))
-        .isEqualTo(solveTestClassTemplate(Collections.singleton(StandardCharsets.class.getName()),
+        .isEqualToNormalizingNewlines(solveTestClassTemplate(Collections.singleton(StandardCharsets.class.getName()),
             "RecordedTest.java"));
   }
 
@@ -58,7 +58,7 @@ public class DslCodeGeneratorTest {
   public void shouldGenerateCommentedElementsCodeWhenDisabledElementsInJmx() throws Exception {
     assertThat(new DslCodeGenerator()
         .generateCodeFromJmx(new TestResource(RESOURCES_FOLDER + "/disabled-elements.jmx").file()))
-        .isEqualTo(solveTestClassTemplate(Collections.emptySet(), "DisabledElements.java"));
+        .isEqualToNormalizingNewlines(solveTestClassTemplate(Collections.emptySet(), "DisabledElements.java"));
   }
 
 }

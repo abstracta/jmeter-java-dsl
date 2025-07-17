@@ -33,7 +33,7 @@ public class DslIncludeControllerTest {
               buildIncludeControllerJmx(includedJmx)
           ));
       assertThat(jmx2dsl(jmx, tmp))
-          .isEqualTo(buildTestPlanDsl(FRAGMENT_METHOD_CALL));
+          .isEqualToNormalizingNewlines(buildTestPlanDsl(FRAGMENT_METHOD_CALL));
     }
 
     private File buildIncludedTestPlanJmx(Path tmp) throws IOException {
@@ -69,7 +69,7 @@ public class DslIncludeControllerTest {
               buildIncludeControllerJmx(includedJmx)
           ));
       assertThat(jmx2dsl(jmx, tmp))
-          .isEqualTo(buildTestPlanDsl(FRAGMENT_METHOD_CALL, FRAGMENT_METHOD_CALL));
+          .isEqualToNormalizingNewlines(buildTestPlanDsl(FRAGMENT_METHOD_CALL, FRAGMENT_METHOD_CALL));
     }
 
   }
