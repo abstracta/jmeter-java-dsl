@@ -23,7 +23,7 @@
     <dependency>
       <groupId>com.blazemeter</groupId>
       <artifactId>jmeter-parallel</artifactId>
-      <version>0.11</version>
+      <version>0.12</version>
       <exclusions>
         <exclusion>
           <groupId>javax.servlet</groupId>
