@@ -57,7 +57,7 @@ public class DslTestFragmentControllerTest extends MethodCallFragmentBuilderTest
         @TempDir Path tmp) throws IOException {
       String testPlanJmx = buildTestPlanJmx(buildFragmentJmx());
       assertThat(jmx2dsl(testPlanJmx, tmp))
-          .isEqualTo(buildTestPlanDsl(buildFragmentMethod(), DEFAULT_FRAGMENT_METHOD_CALL));
+          .isEqualToNormalizingNewlines(buildTestPlanDsl(buildFragmentMethod(), DEFAULT_FRAGMENT_METHOD_CALL));
     }
 
     private String buildTestPlanDsl(String method, String child) {
@@ -79,7 +79,7 @@ public class DslTestFragmentControllerTest extends MethodCallFragmentBuilderTest
       String testPlanJmx = buildTestPlanJmx(buildFragmentJmx(fragmentName));
       String methodName = "myFragment";
       assertThat(jmx2dsl(testPlanJmx, tmp))
-          .isEqualTo(buildTestPlanDsl(
+          .isEqualToNormalizingNewlines(buildTestPlanDsl(
               buildFragmentMethod(methodName, fragmentName),
               methodName + "()"));
     }
@@ -91,7 +91,7 @@ public class DslTestFragmentControllerTest extends MethodCallFragmentBuilderTest
       String testPlanJmx = buildTestPlanJmx(buildFragmentJmx(fragmentName));
       String methodName = "fragment" + fragmentName;
       assertThat(jmx2dsl(testPlanJmx, tmp))
-          .isEqualTo(buildTestPlanDsl(
+          .isEqualToNormalizingNewlines(buildTestPlanDsl(
               buildFragmentMethod(methodName, fragmentName),
               methodName + "()"));
     }
@@ -103,7 +103,7 @@ public class DslTestFragmentControllerTest extends MethodCallFragmentBuilderTest
       String testPlanJmx = buildTestPlanJmx(buildFragmentJmx(fragmentName));
       String methodName = "myFragment";
       assertThat(jmx2dsl(testPlanJmx, tmp))
-          .isEqualTo(buildTestPlanDsl(
+          .isEqualToNormalizingNewlines(buildTestPlanDsl(
               buildFragmentMethod(methodName, fragmentName),
               methodName + "()"));
     }
@@ -116,7 +116,7 @@ public class DslTestFragmentControllerTest extends MethodCallFragmentBuilderTest
           buildFragmentJmx());
       String methodName2 = "testFragment2";
       assertThat(jmx2dsl(testPlanJmx, tmp))
-          .isEqualTo(buildTestPlanDsl(
+          .isEqualToNormalizingNewlines(buildTestPlanDsl(
               Arrays.asList(
                   buildFragmentMethod(),
                   buildFragmentMethod(methodName2, DEFAULT_FRAGMENT_NAME)),
@@ -130,7 +130,7 @@ public class DslTestFragmentControllerTest extends MethodCallFragmentBuilderTest
       String testPlanJmx = buildTestPlanJmx(buildFragmentDisabledJmx());
       String cacheMethodCall = "httpCache()";
       assertThat(jmx2dsl(testPlanJmx, tmp))
-          .isEqualTo(buildTestPlanDsl(Collections.singletonList(buildFragmentMethod()),
+          .isEqualToNormalizingNewlines(buildTestPlanDsl(Collections.singletonList(buildFragmentMethod()),
               Arrays.asList("httpCookies()", cacheMethodCall, "//" + DEFAULT_FRAGMENT_METHOD_CALL))
               .replace(cacheMethodCall + ",", cacheMethodCall + "//,"));
     }
