@@ -31,7 +31,7 @@ public class DslModuleControllerTest {
           buildFragmentJmx(),
           buildModuleJmx(DEFAULT_FRAGMENT_NAME));
       assertThat(jmx2dsl(jmx, tmp))
-          .isEqualTo(buildFragmentPlanDsl(
+          .isEqualToNormalizingNewlines(buildFragmentPlanDsl(
               buildThreadGroupDsl(FRAGMENT_METHOD_CALL, FRAGMENT_METHOD_CALL)));
     }
 
@@ -60,7 +60,7 @@ public class DslModuleControllerTest {
           buildModuleJmx(DEFAULT_FRAGMENT_NAME),
           buildFragmentJmx());
       assertThat(jmx2dsl(jmx, tmp))
-          .isEqualTo(buildFragmentPlanDsl(
+          .isEqualToNormalizingNewlines(buildFragmentPlanDsl(
               buildThreadGroupDsl(FRAGMENT_METHOD_CALL, FRAGMENT_METHOD_CALL)));
     }
 
@@ -72,7 +72,7 @@ public class DslModuleControllerTest {
           buildModuleJmx(DEFAULT_FRAGMENT_NAME)
       );
       assertThat(jmx2dsl(jmx, tmp))
-          .isEqualTo(buildFragmentPlanDsl(
+          .isEqualToNormalizingNewlines(buildFragmentPlanDsl(
               "httpCookies()",
               "httpCache()",
               buildThreadGroupDsl("//" + FRAGMENT_METHOD_CALL, FRAGMENT_METHOD_CALL)));
@@ -85,7 +85,7 @@ public class DslModuleControllerTest {
           buildIfControllerJmx(),
           buildModuleJmx(IF_CONTROLLER_DEFAULT_NAME));
       assertThat(jmx2dsl(jmx, tmp))
-          .isEqualTo(
+          .isEqualToNormalizingNewlines(
               buildIfControllerPlanDsl(IF_CONTROLLER_METHOD_CALL, IF_CONTROLLER_METHOD_CALL));
     }
 
@@ -109,7 +109,7 @@ public class DslModuleControllerTest {
           buildIfControllerJmx()
       );
       assertThat(jmx2dsl(jmx, tmp))
-          .isEqualTo(
+          .isEqualToNormalizingNewlines(
               buildIfControllerPlanDsl(IF_CONTROLLER_METHOD_CALL, IF_CONTROLLER_METHOD_CALL));
     }
 
