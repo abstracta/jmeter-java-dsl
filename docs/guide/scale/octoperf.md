@@ -8,14 +8,14 @@ In the same fashion as with BlazeMeter, just by including the following module a
 <dependency>
   <groupId>us.abstracta.jmeter</groupId>
   <artifactId>jmeter-java-dsl-octoperf</artifactId>
-  <version>1.29.1</version>
+  <version>1.30</version>
   <scope>test</scope>
 </dependency>
 ```
 :::
 ::: code-group-item Gradle
 ```groovy
-testImplementation 'us.abstracta.jmeter:jmeter-java-dsl-octoperf:1.29.1'
+testImplementation 'us.abstracta.jmeter:jmeter-java-dsl-octoperf:1.30'
 ```
 :::
 ::::

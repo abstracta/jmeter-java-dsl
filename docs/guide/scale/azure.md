@@ -8,14 +8,14 @@ To use [Azure Load Testing](https://azure.microsoft.com/en-us/products/load-test
 <dependency>
   <groupId>us.abstracta.jmeter</groupId>
   <artifactId>jmeter-java-dsl-azure</artifactId>
-  <version>1.29.1</version>
+  <version>1.30</version>
   <scope>test</scope>
 </dependency>
 ```
 :::
 ::: code-group-item Gradle
 ```groovy
-testImplementation 'us.abstracta.jmeter:jmeter-java-dsl-azure:1.29.1'
+testImplementation 'us.abstracta.jmeter:jmeter-java-dsl-azure:1.30'
 ```
 :::
 ::::
