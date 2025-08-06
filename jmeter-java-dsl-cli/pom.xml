@@ -201,6 +201,13 @@
                   <include>org.apache-extras.beanshell:bsh</include>
                   <!-- required for converting jsonpath -->
                   <include>com.jayway.jsonpath:json-path</include>
+                  <!-- required for kotlin support in JMeter 5.6.3+ -->
+                  <include>org.jetbrains.kotlin:kotlin-stdlib</include>
+                  <include>org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm</include>
+                  <include>org.jetbrains.kotlinx:kotlinx-coroutines-swing</include>
+                  <include>com.github.ben-manes.caffeine:caffeine</include>
+                  <include>org.jetbrains:annotations</include>
+                  <include>org.checkerframework:checker-qual</include>
                 </includes>
               </artifactSet>
               <filters>
