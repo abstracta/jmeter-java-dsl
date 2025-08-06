@@ -11,6 +11,7 @@
   </parent>
 
   <artifactId>jmeter-java-dsl-graphql</artifactId>
+  <name>${project.artifactId}</name>
   <description>Module which includes test elements to simplify generating GraphQL requests.
   </description>
 

@@ -11,6 +11,7 @@
   </parent>
 
   <artifactId>jmeter-java-dsl-jdbc</artifactId>
+  <name>${project.artifactId}</name>
   <description>Module which includes test elements to interact with SQL databases through JDBC
     drivers.
   </description>

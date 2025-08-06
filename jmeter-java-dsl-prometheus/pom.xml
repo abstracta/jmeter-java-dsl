@@ -10,6 +10,7 @@
     <relativePath>../pom.xml</relativePath>
   </parent>
   <artifactId>jmeter-java-dsl-prometheus</artifactId>
+  <name>${project.artifactId}</name>
 
   <repositories>
     <repository>
