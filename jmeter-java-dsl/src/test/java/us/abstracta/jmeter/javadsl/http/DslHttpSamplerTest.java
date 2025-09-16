@@ -450,7 +450,7 @@ public class DslHttpSamplerTest extends JmeterDslTest {
     verify(postRequestedFor(anyUrl())
         .withHeader(HTTPConstants.HEADER_CONTENT_TYPE,
             matching(ContentType.MULTIPART_FORM_DATA.withCharset((String) null) + "; boundary="
-                + MULTIPART_BOUNDARY_PATTERN))
+                + MULTIPART_BOUNDARY_PATTERN + "; charset=UTF-8"))
         .withRequestBody(matching(
             buildMultiPartBodyPattern(part1Name, part1Value, part1Encoding, part2Name, part2File,
                 part2Encoding))));

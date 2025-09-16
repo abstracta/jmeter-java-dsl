@@ -1,8 +1,8 @@
 package us.abstracta.jmeter.javadsl.core.controllers;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
+import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.Set;
 import org.apache.jmeter.testelement.TestElement;
@@ -51,7 +51,10 @@ public class FragmentMethodCall extends MethodCall {
   }
 
   private static Map<TestElement, String> getDefinedMethods(MethodCallContext context) {
-    return context.getRoot().computeEntryIfAbsent(FragmentMethodCall.class, HashMap::new);
+    // Since JMeter 5.6.3, TestElement hash calculation changed from object identity 
+    // to property-based hashing. IdentityHashMap is used here to prevent hash collisions 
+    // that occur when multiple TestElements share identical property values.
+    return context.getRoot().computeEntryIfAbsent(FragmentMethodCall.class, IdentityHashMap::new);
   }
 
   private static String buildUniqueName(String elementName, Set<String> existingNames) {
