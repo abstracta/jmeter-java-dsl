@@ -51,6 +51,9 @@ public class FragmentMethodCall extends MethodCall {
   }
 
   private static Map<TestElement, String> getDefinedMethods(MethodCallContext context) {
+    // Since JMeter 5.6.3, TestElement hash calculation changed from object identity 
+    // to property-based hashing. IdentityHashMap is used here to prevent hash collisions 
+    // that occur when multiple TestElements share identical property values.
     return context.getRoot().computeEntryIfAbsent(FragmentMethodCall.class, IdentityHashMap::new);
   }
 
