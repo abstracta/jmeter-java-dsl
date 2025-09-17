@@ -8,14 +8,14 @@ By including the following module as a dependency:
 <dependency>
   <groupId>us.abstracta.jmeter</groupId>
   <artifactId>jmeter-java-dsl-blazemeter</artifactId>
-  <version>1.30</version>
+  <version>2.0</version>
   <scope>test</scope>
 </dependency>
 ```
 :::
 ::: code-group-item Gradle
 ```groovy
-testImplementation 'us.abstracta.jmeter:jmeter-java-dsl-blazemeter:1.30'
+testImplementation 'us.abstracta.jmeter:jmeter-java-dsl-blazemeter:2.0'
 ```
 :::
 ::::

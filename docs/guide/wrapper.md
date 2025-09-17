@@ -72,14 +72,14 @@ Include the module on your project:
 <dependency>
   <groupId>us.abstracta.jmeter</groupId>
   <artifactId>jmeter-java-dsl-wrapper</artifactId>
-  <version>1.30</version>
+  <version>2.0</version>
   <scope>test</scope>
 </dependency>
 ```
 :::
 ::: code-group-item Gradle
 ```groovy
-testImplementation 'us.abstracta.jmeter:jmeter-java-dsl-wrapper:1.30'
+testImplementation 'us.abstracta.jmeter:jmeter-java-dsl-wrapper:2.0'
 ```
 :::
 ::::
