@@ -5,6 +5,7 @@ import static us.abstracta.jmeter.javadsl.JmeterDsl.jsr223PostProcessor;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.testPlan;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.threadGroup;
 import static us.abstracta.jmeter.javadsl.parallel.ParallelController.parallelController;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.concurrent.CyclicBarrier;
 import org.junit.jupiter.api.Nested;
@@ -13,6 +14,8 @@ import org.junit.jupiter.api.Timeout;
 import us.abstracta.jmeter.javadsl.JmeterDslTest;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodCallBuilderTest;
 import us.abstracta.jmeter.javadsl.core.DslTestPlan;
+import us.abstracta.jmeter.javadsl.core.TestPlanStats;
+
 
 public class ParallelControllerTest extends JmeterDslTest {
 
@@ -21,7 +24,7 @@ public class ParallelControllerTest extends JmeterDslTest {
   public void shouldExecuteRequestsInParallelWhenRequestsInsideParallelController()
       throws Exception {
     CyclicBarrier barrier = new CyclicBarrier(2);
-    testPlan(
+    TestPlanStats stats  = testPlan(
         threadGroup(1, 1,
             parallelController(
                 httpSampler(wiremockUri)
@@ -31,6 +34,7 @@ public class ParallelControllerTest extends JmeterDslTest {
             )
         )
     ).run();
+    assertThat(stats.overall().samplesCount()).isEqualTo(2);
   }
 
   @Nested
