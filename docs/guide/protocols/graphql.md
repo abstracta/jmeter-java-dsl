@@ -8,14 +8,14 @@ When you want to test a GraphQL service, having properly set each field in an HT
 <dependency>
   <groupId>us.abstracta.jmeter</groupId>
   <artifactId>jmeter-java-dsl-graphql</artifactId>
-  <version>2.0</version>
+  <version>2.1</version>
   <scope>test</scope>
 </dependency>
 ```
 :::
 ::: code-group-item Gradle
 ```groovy
-testImplementation 'us.abstracta.jmeter:jmeter-java-dsl-graphql:2.0'
+testImplementation 'us.abstracta.jmeter:jmeter-java-dsl-graphql:2.1'
 ```
 :::
 ::::
