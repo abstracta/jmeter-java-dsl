@@ -7,7 +7,7 @@
   <parent>
     <groupId>us.abstracta.jmeter</groupId>
     <artifactId>jmeter-java-dsl-parent</artifactId>
-    <version>2.1</version>
+    <version>2.2-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <artifactId>jmeter-java-dsl-elasticsearch-listener</artifactId>
