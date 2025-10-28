@@ -72,6 +72,7 @@
     <module>jmeter-java-dsl-datadog</module>
     <module>jmeter-java-dsl-bridge</module>
     <module>jmeter-java-dsl-prometheus</module>
+    <module>jmeter-java-dsl-websocket</module>
   </modules>
 
   <dependencyManagement>
