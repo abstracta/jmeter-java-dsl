@@ -7,7 +7,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.Set;
-import org.apache.http.entity.ContentType;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import us.abstracta.jmeter.javadsl.codegeneration.DslCodeGenerator;
