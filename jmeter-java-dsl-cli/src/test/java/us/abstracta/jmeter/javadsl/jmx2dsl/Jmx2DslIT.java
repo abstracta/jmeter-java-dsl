@@ -18,8 +18,8 @@ public class Jmx2DslIT {
   @Test
   public void shouldGetConvertedFileWhenConvert() throws Exception {
     Process p = startCommand("jmx2dsl", new TestResource("test-plan.jmx").filePath());
-    assertThat(getProcessOutput(p))
-        .isEqualTo(buildConvertedTestClass());
+    assertThat(getProcessOutput(p).replace("\r\n", "\n"))
+        .isEqualTo(buildConvertedTestClass().replace("\r\n", "\n"));
   }
 
   private Process startCommand(String command, String... args) throws IOException {
