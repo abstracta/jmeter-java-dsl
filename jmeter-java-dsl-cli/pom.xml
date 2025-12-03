@@ -170,6 +170,7 @@
                   <include>com.blazemeter:jmeter-plugins-random-csv-data-set</include>
                   <include>com.blazemeter:jmeter-plugins-wsc</include>
                   <include>com.blazemeter:jmeter-parallel</include>
+                  <include>net.luminis.jmeter:jmeter-websocket-samplers</include>
                   <include>info.picocli:*</include>
                   <include>com.fifesoft:rsyntaxtextarea</include>
                   <include>com.github.weisj:darklaf-extensions-rsyntaxarea</include>
