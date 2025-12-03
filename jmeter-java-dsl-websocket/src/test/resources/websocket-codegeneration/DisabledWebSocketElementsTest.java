@@ -1,6 +1,6 @@
     testPlan(
         threadGroup(1, 1,
-            DslWebsocketSampler
+            webSocketSampler()
                 .connect()
                 .server("ws.postman-echo.com")
                 .port("80")
@@ -8,19 +8,19 @@
                 .tls(false)
                 .connectionTimeout("10000")
                 .responseTimeout("5000"),
-            // DslWebsocketSampler
+            // webSocketSampler()
             //     .write()
             //     .requestData("Disabled write message")
             //     .createNewConnection(false),
-            DslWebsocketSampler
+            webSocketSampler()
                 .read()
                 .responseTimeout("5000")
                 .createNewConnection(false),
-            // DslWebsocketSampler
+            // webSocketSampler()
             //     .write()
             //     .requestData("Another disabled write")
             //     .createNewConnection(false),
-            DslWebsocketSampler
+            webSocketSampler()
                 .disconnect()
                 .responseTimeout("1000")
                 .statusCode("1000")

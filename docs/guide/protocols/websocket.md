@@ -1,38 +1,27 @@
-# WebSocket Sampler Documentation
+### WebSocket Sampler Documentation
 
-## Overview
+The `DslWebsocketSampler` class provides a Java DSL for creating WebSocket performance tests using JMeter. It supports the full WebSocket lifecycle including connection, data transmission, and disconnection operations. It is based on [WebSocket Samplers by Peter Doornbosch](https://bitbucket.org/pjtr/jmeter-websocket-samplers/src/master/) plugin.
 
-The `DslWebsocketSampler` class provides a Java DSL for creating WebSocket performance tests using JMeter. It supports the full WebSocket lifecycle including connection, data transmission, and disconnection operations.
+To use it, add the following dependency to your project:
 
-## Features
+```xml
+<dependency>
+  <groupId>us.abstracta.jmeter</groupId>
+  <artifactId>jmeter-java-dsl-websocket</artifactId>
+  <version>2.2</version>
+  <scope>test</scope>
+</dependency>
+```
 
-- **Connection Management**: Establish and close WebSocket connections
-- **Data Transmission**: Send and receive WebSocket messages
-- **URL Parsing**: Automatic parsing of WebSocket URLs (ws:// and wss://)
-- **Timeout Configuration**: Configurable connection and response timeouts
-- **TLS Support**: Secure WebSocket connections with WSS protocol
-- **Fluent API**: Method chaining for easy configuration
+#### Main Components
 
-## Main Components
+- `webSocketSampler().connect()` - Creates a WebSocket connection sampler
+- `webSocketSampler().connect(String url)` - Creates a WebSocket connection sampler with URL parsing
+- `webSocketSampler().disconnect()` - Creates a WebSocket disconnection sampler
+- `webSocketSampler().write()` - Creates a WebSocket write sampler
+- `webSocketSampler().read()` - Creates a WebSocket read sampler
 
-### 1. DslWebsocketSampler (Main Class)
-
-The main class that provides static factory methods for creating different types of WebSocket samplers.
-
-#### Static Methods
-
-- `webSocketSampler()` - Creates a basic WebSocket sampler
-- `connect()` - Creates a WebSocket connection sampler
-- `connect(String url)` - Creates a WebSocket connection sampler with URL parsing
-- `disconnect()` - Creates a WebSocket disconnection sampler
-- `write()` - Creates a WebSocket write sampler
-- `read()` - Creates a WebSocket read sampler
-
-### 2. DslConnectSampler (Connection Operations)
-
-Handles WebSocket connection establishment.
-
-#### Configuration Methods
+##### Connect configuration
 
 - `connectionTimeout(String timeout)` - Sets connection timeout in milliseconds
 - `responseTimeout(String timeout)` - Sets response timeout in milliseconds
@@ -41,7 +30,7 @@ Handles WebSocket connection establishment.
 - `path(String path)` - Sets the WebSocket path
 - `tls(boolean tls)` - Enables/disables TLS encryption
 
-#### URL Parsing
+##### URL Parsing
 
 The `connect(String url)` method automatically parses WebSocket URLs and extracts:
 - Protocol (ws:// or wss://)
@@ -55,39 +44,27 @@ The `connect(String url)` method automatically parses WebSocket URLs and extract
 - `wss://example.com:8443/chat?room=general`
 - `wss://api.example.com/ws`
 
-### 3. DslDisconnectSampler (Disconnection Operations)
-
-Handles WebSocket connection closure.
-
-#### Configuration Methods
+##### Disconnection configuration
 
 - `responseTimeout(String timeout)` - Sets response timeout in milliseconds
 - `statusCode(String statusCode)` - Sets the close status code (e.g., "1000" for normal closure)
 
-### 4. DslWriteSampler (Write Operations)
-
-Handles sending data through WebSocket connections.
-
-#### Configuration Methods
+##### Write configuration
 
 - `connectionTimeout(String timeout)` - Sets connection timeout in milliseconds
 - `requestData(String requestData)` - Sets the data to send
 - `createNewConnection(boolean createNewConnection)` - Whether to create a new connection
 - `loadDataFromFile(boolean loadDataFromFile)` - Whether to load data from a file
 
-### 5. DslReadSampler (Read Operations)
-
-Handles receiving data from WebSocket connections.
-
-#### Configuration Methods
+##### Read configuration 
 
 - `connectionTimeout(String timeout)` - Sets connection timeout in milliseconds
 - `responseTimeout(String timeout)` - Sets response timeout in milliseconds
 - `createNewConnection(boolean createNewConnection)` - Whether to create a new connection
 
-## Usage Examples
+#### Usage Examples
 
-### Basic WebSocket Test
+##### Basic WebSocket Test
 
 ```java
 import static us.abstracta.jmeter.javadsl.JmeterDsl.*;
@@ -99,19 +76,19 @@ public class Test {
         TestPlanStats stats = testPlan(
     threadGroup(1, 1,
         // Connect to WebSocket server
-        DslWebsocketSampler
+        webSocketSampler()
             .connect("wss://ws.postman-echo.com/raw")
             .connectionTimeout("10000")
             .responseTimeout("5000"),
         
         // Send a message
-        DslWebsocketSampler
+        webSocketSampler()
             .write()
             .requestData("Hello WebSocket!")
             .createNewConnection(false),
         
         // Read the response
-        DslWebsocketSampler
+        webSocketSampler()
             .read()
             .responseTimeout("5000")
             .createNewConnection(false)
@@ -121,7 +98,7 @@ public class Test {
             ),
         
         // Close the connection
-        DslWebsocketSampler
+        webSocketSampler()
             .disconnect()
             .responseTimeout("1000")
             .statusCode("1000")
@@ -131,10 +108,10 @@ public class Test {
 }
 ```
 
-### Manual Connection Configuration
+##### Manual Connection Configuration
 
 ```java
-DslWebsocketSampler
+webSocketSampler()
     .connect()
     .server("localhost")
     .port("8080")
@@ -144,10 +121,10 @@ DslWebsocketSampler
     .responseTimeout("3000")
 ```
 
-### Connection with Assertions
+##### Connection with Assertions
 
 ```java
-DslWebsocketSampler
+webSocketSampler()
     .read()
     .responseTimeout("5000")
     .createNewConnection(false)
@@ -157,13 +134,13 @@ DslWebsocketSampler
     )
 ```
 
-## Error Handling
+#### Error Handling
 
-### Invalid URL Handling
+##### Invalid URL Handling
 
 ```java
 // This will throw IllegalArgumentException
-DslWebsocketSampler.connect("http://localhost:80/test");
+webSocketSampler().connect("http://localhost:80/test");
 ```
 
 The URL parser validates:
@@ -171,18 +148,18 @@ The URL parser validates:
 - Hostname is required
 - Valid URI syntax
 
-### Connection Timeouts
+##### Connection Timeouts
 
 Configure appropriate timeouts to handle network issues:
 
 ```java
-DslWebsocketSampler
+webSocketSampler()
     .connect("wss://example.com/ws")
     .connectionTimeout("10000")  // 10 seconds
     .responseTimeout("5000")     // 5 seconds
 ```
 
-## Best Practices
+#### Best Practices
 
 1. **Connection Reuse**: Set `createNewConnection(false)` for write/read operations to reuse existing connections
 2. **Timeout Configuration**: Always set appropriate timeouts to avoid hanging tests
@@ -190,7 +167,7 @@ DslWebsocketSampler
 4. **URL Parsing**: Use the `connect(String url)` method for cleaner code when you have complete URLs
 5. **Status Codes**: Use standard WebSocket close codes (1000 for normal closure)
 
-## Integration with Test Plans
+#### Integration with Test Plans
 
 WebSocket samplers integrate seamlessly with other JMeter DSL components:
 
@@ -198,10 +175,10 @@ WebSocket samplers integrate seamlessly with other JMeter DSL components:
 testPlan(
     threadGroup(10, 100,
         // WebSocket operations
-        DslWebsocketSampler.connect("wss://api.example.com/ws"),
-        DslWebsocketSampler.write().requestData("test data"),
-        DslWebsocketSampler.read(),
-        DslWebsocketSampler.disconnect(),
+        webSocketSampler().connect("wss://api.example.com/ws"),
+        webSocketSampler().write().requestData("test data"),
+        webSocketSampler().read(),
+        webSocketSampler().disconnect(),
     ),
     // Results collection
     jtlWriter("results.jtl"),

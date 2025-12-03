@@ -1,15 +1,15 @@
 testPlan(
         threadGroup(1, 1,
-          DslWebsocketSampler.connect("ws://ws.postman-echo.com:80/raw")
+          webSocketSampler().connect("ws://ws.postman-echo.com:80/raw")
             .connectionTimeout("10000")
             .responseTimeout("5000"),
-          //DslWebsocketSampler.write()
+          //webSocketSampler().write()
           //  .requestData("Disabled write message"),
-          DslWebsocketSampler.read()
+          webSocketSampler().read()
             .responseTimeout("5000"),
-          //DslWebsocketSampler.write()
+          //webSocketSampler().write()
           //  .requestData("Another disabled write"),
-          DslWebsocketSampler.disconnect()
+          webSocketSampler().disconnect()
             .responseTimeout("1000")
             .statusCode("1000")
         )

@@ -1,17 +1,17 @@
 testPlan(
         threadGroup(1, 1,
-          DslWebsocketSampler.connect("ws://ws.postman-echo.com:80/raw")
+          webSocketSampler().connect("ws://ws.postman-echo.com:80/raw")
             .connectionTimeout("10000")
             .responseTimeout("5000"),
-          DslWebsocketSampler.write()
+          webSocketSampler().write()
             .requestData("Test message with assertions"),
-          DslWebsocketSampler.read()
+          webSocketSampler().read()
             .responseTimeout("5000")
             .children(
               responseAssertion()
                 .containsRegexes("Test message with assertions")
             ),
-          DslWebsocketSampler.disconnect()
+          webSocketSampler().disconnect()
             .responseTimeout("1000")
             .statusCode("1000")
         )

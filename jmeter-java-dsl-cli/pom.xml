@@ -66,6 +66,11 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
+      <groupId>us.abstracta.jmeter</groupId>
+      <artifactId>jmeter-java-dsl-websocket</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>jul-to-slf4j</artifactId>
       <version>${slf4j.version}</version>
@@ -201,6 +206,7 @@
                   <include>org.apache-extras.beanshell:bsh</include>
                   <!-- required for converting jsonpath -->
                   <include>com.jayway.jsonpath:json-path</include>
+                  <!-- required for kotlin support in JMeter 5.6.3+ -->
                   <include>org.jetbrains.kotlin:kotlin-stdlib</include>
                   <include>org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm</include>
                   <include>org.jetbrains.kotlinx:kotlinx-coroutines-swing</include>

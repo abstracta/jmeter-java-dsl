@@ -4,14 +4,14 @@ testPlan(
           .set("WEBSOCKET_PORT", "80")
           .set("MESSAGE", "Hello from variable"),
         threadGroup(1, 1,
-          DslWebsocketSampler.connect("ws://${WEBSOCKET_SERVER}:${WEBSOCKET_PORT}/raw")
+          webSocketSampler().connect("ws://${WEBSOCKET_SERVER}:${WEBSOCKET_PORT}/raw")
             .connectionTimeout("10000")
             .responseTimeout("5000"),
-          DslWebsocketSampler.write()
+          webSocketSampler().write()
             .requestData("${MESSAGE}"),
-          DslWebsocketSampler.read()
+          webSocketSampler().read()
             .responseTimeout("5000"),
-          DslWebsocketSampler.disconnect()
+          webSocketSampler().disconnect()
             .responseTimeout("1000")
             .statusCode("1000")
         )

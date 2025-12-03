@@ -10,7 +10,6 @@
     <relativePath>../pom.xml</relativePath>
   </parent>
 
-  <groupId>us.abstracta.jmeter.javadsl.websocket</groupId>
   <artifactId>jmeter-java-dsl-websocket</artifactId>
 
   <dependencies>

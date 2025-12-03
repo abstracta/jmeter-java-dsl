@@ -1,13 +1,13 @@
 testPlan(
         threadGroup(1, 1,
-          DslWebsocketSampler.connect("ws://echo.websocket.org:80/")
+          webSocketSampler().connect("ws://echo.websocket.org:80/")
             .connectionTimeout("15000")
             .responseTimeout("10000"),
-          DslWebsocketSampler.write()
+          webSocketSampler().write()
             .requestData("Hello from JMeter WebSocket Test"),
-          DslWebsocketSampler.read()
+          webSocketSampler().read()
             .responseTimeout("10000"),
-          DslWebsocketSampler.disconnect()
+          webSocketSampler().disconnect()
             .responseTimeout("2000")
             .statusCode("1000")
         )

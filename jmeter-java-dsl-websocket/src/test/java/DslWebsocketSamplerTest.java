@@ -1,13 +1,12 @@
-import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.responseAssertion;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.testPlan;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.threadGroup;
+import static us.abstracta.jmeter.javadsl.websocket.DslWebsocketSampler.webSocketSampler;
 
-import org.junit.jupiter.api.*;
-
+import org.junit.jupiter.api.Test;
 import us.abstracta.jmeter.javadsl.core.TestPlanStats;
-import us.abstracta.jmeter.javadsl.websocket.*;
 
 public class DslWebsocketSamplerTest {
 
@@ -16,35 +15,34 @@ public class DslWebsocketSamplerTest {
 
     TestPlanStats stats = testPlan(
         threadGroup(1, 1,
-            DslWebsocketSampler
+            webSocketSampler()
                 .connect("wss://ws.postman-echo.com/raw")
                 .connectionTimeout("10000")
                 .responseTimeout("5000"),
-            DslWebsocketSampler
+            webSocketSampler()
                 .write()
                 .requestData("Hello WebSocket Test!")
                 .createNewConnection(false),
-            DslWebsocketSampler
+            webSocketSampler()
                 .read()
                 .connectionTimeout("10000")
                 .createNewConnection(false)
                 .responseTimeout("5000")
                 .children(
                     responseAssertion()
-                        .containsSubstrings("Hello WebSocket Test!")
-                ),
-            DslWebsocketSampler
+                        .containsSubstrings("Hello WebSocket Test!")),
+            webSocketSampler()
                 .disconnect()
                 .responseTimeout("1000")
                 .statusCode("1000")))
         .run();
     assertThat(stats.overall().errorsCount()).isEqualTo(0);
   }
-  
+
   @Test
   public void shouldThrowIllegalArgumentExceptionWhenConnectWithInvalidUrl() {
     assertThrows(IllegalArgumentException.class, () -> {
-      DslWebsocketSampler.connect("http://localhost:80/test");
+      webSocketSampler().connect("http://localhost:80/test");
     });
   }
 
@@ -52,7 +50,7 @@ public class DslWebsocketSamplerTest {
   public void shouldHandleConnectionFailureWhenConnectToUnavailableServer() throws Exception {
     TestPlanStats stats = testPlan(
         threadGroup(1, 1,
-            DslWebsocketSampler
+            webSocketSampler()
                 .connect("ws://localhost:9999/nonexistent")
                 .connectionTimeout("2000")
                 .responseTimeout("1000")))
@@ -64,7 +62,7 @@ public class DslWebsocketSamplerTest {
   public void shouldHandleTimeoutWhenConnectWithVeryShortTimeout() throws Exception {
     TestPlanStats stats = testPlan(
         threadGroup(1, 1,
-            DslWebsocketSampler
+            webSocketSampler()
                 .connect("ws://localhost:8080/test")
                 .connectionTimeout("1")
                 .responseTimeout("1")))
@@ -76,11 +74,11 @@ public class DslWebsocketSamplerTest {
   public void shouldHandleWriteOperationWhenNoPreviousConnection() throws Exception {
     TestPlanStats stats = testPlan(
         threadGroup(1, 1,
-            DslWebsocketSampler
+            webSocketSampler()
                 .write()
                 .requestData("Test message")
-                .createNewConnection(false)
-        )).run();
+                .createNewConnection(false)))
+        .run();
     assertThat(stats.overall().errorsCount()).isEqualTo(1);
   }
 
@@ -88,7 +86,7 @@ public class DslWebsocketSamplerTest {
   public void shouldHandleReadOperationWhenNoPreviousConnection() throws Exception {
     TestPlanStats stats = testPlan(
         threadGroup(1, 1,
-            DslWebsocketSampler
+            webSocketSampler()
                 .read()
                 .createNewConnection(false)
                 .responseTimeout("1000")))
@@ -100,7 +98,7 @@ public class DslWebsocketSamplerTest {
   public void shouldHandleDisconnectOperationWhenNoPreviousConnection() throws Exception {
     TestPlanStats stats = testPlan(
         threadGroup(1, 1,
-            DslWebsocketSampler
+            webSocketSampler()
                 .disconnect()
                 .responseTimeout("1000")
                 .statusCode("1000")))
