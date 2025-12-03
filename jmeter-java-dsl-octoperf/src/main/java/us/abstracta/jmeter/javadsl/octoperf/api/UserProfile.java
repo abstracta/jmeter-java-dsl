@@ -6,43 +6,37 @@ import static com.fasterxml.jackson.annotation.JsonTypeInfo.Id.NAME;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import org.apache.jmeter.threads.ThreadGroup;
 import us.abstracta.jmeter.javadsl.core.threadgroups.BaseThreadGroup.SampleErrorAction;
 
-public class UserLoad {
+public class UserProfile {
 
   // we don't need getters since Jackson gets the values from fields
   private final String name = "";
   private final String virtualUserId;
   private final String providerId;
-  private final String region;
-  private final UserLoadStrategy strategy;
-  private final BandwidthSettings bandwidth = new BandwidthSettings();
-  private final BrowserSettings browser = new BrowserSettings();
-  private final DnsSettings dns = new DnsSettings();
-  private final ThinkTimeSettings thinktime = new ThinkTimeSettings();
+  private final String location;
+  private final UserLoadStrategy load;
   private final MemorySettings memory = new MemorySettings();
-  private final JtlSettings jtl = new JtlSettings();
-  private final PropertiesSettings properties = new PropertiesSettings();
-  private final SetUpTearDownSettings setUp = null;
-  private final SetUpTearDownSettings tearDown = null;
+  private final Engine engine = new Engine();
 
-  public UserLoad() {
+  public UserProfile() {
     virtualUserId = null;
     providerId = null;
-    region = null;
-    strategy = null;
+    location = null;
+    load = null;
   }
 
-  public UserLoad(String virtualUserId, String providerId, String region,
+  public UserProfile(String virtualUserId, String providerId, String location,
       UserLoadStrategy strategy) {
     this.virtualUserId = virtualUserId;
     this.providerId = providerId;
-    this.region = region;
-    this.strategy = strategy;
+    this.location = location;
+    this.load = strategy;
   }
 
   @JsonTypeInfo(use = NAME, include = PROPERTY)
@@ -53,25 +47,24 @@ public class UserLoad {
 
   }
 
-  @JsonTypeName("UserLoadRampup")
+  @JsonTypeName("UserProfileLoadRampUp")
   public static class UserLoadRampUp extends UserLoadStrategy {
 
-    private final int userload;
-    private final long rampup;
-    private final long peak;
-    private final long delay = 0;
-    private final SampleErrorAction onSampleError = SampleErrorAction.CONTINUE;
+    private final int plateauVus;
+    private final long rampUpMs;
+    private final long plateauMs;
+    private final long delayMs = 0;
 
     public UserLoadRampUp() {
-      userload = 0;
-      rampup = 0;
-      peak = 0;
+      plateauVus = 0;
+      rampUpMs = 0;
+      plateauMs = 0;
     }
 
     public UserLoadRampUp(int userLoad, long rampUpMillis, long peakMillis) {
-      this.userload = userLoad;
-      this.rampup = rampUpMillis;
-      this.peak = peakMillis;
+      this.plateauVus = userLoad;
+      this.rampUpMs = rampUpMillis;
+      this.plateauMs = peakMillis;
     }
 
     public static UserLoadRampUp fromThreadGroup(ThreadGroup threadGroup) {
@@ -82,6 +75,38 @@ public class UserLoad {
           threadGroup.getRampUp() * 1000L,
           threadGroup.getDuration() != 0 ? threadGroup.getDuration() * 1000L : 10000);
     }
+
+  }
+
+  @JsonTypeInfo(use = NAME, include = PROPERTY)
+  @JsonTypeName("JmeterUserProfileEngine")
+  public static class Engine {
+
+    private final EngineSettings settings = new EngineSettings();
+    private final BrowserSettings browser = new BrowserSettings();
+    private final BandwidthSettings bandwidth = new BandwidthSettings();
+    private final DnsSettings dns = new DnsSettings();
+    private final JtlSettings jtl = new JtlSettings();
+    private final PropertiesSettings properties = new PropertiesSettings();
+
+  }
+
+  public static class EngineSettings {
+
+    private final ExternalLiveReportingSettings externalLiveReporting = new ExternalLiveReportingSettings();
+    private final SampleErrorAction errorHandling = SampleErrorAction.CONTINUE;
+    private final ThinkTimeSettings thinkTime = new ThinkTimeSettings();
+    private final SetUpTearDownSettings setUp = null;
+    private final SetUpTearDownSettings tearDown = null;
+
+  }
+
+  @JsonTypeInfo(use = NAME, include = PROPERTY)
+  @JsonTypeName("JmeterExternalLiveReportingSettings")
+  public static class ExternalLiveReportingSettings {
+
+    private final List<String> listeners = Collections.emptyList();
+    private final int queueSize = 5000;
 
   }
 
@@ -102,6 +127,8 @@ public class UserLoad {
     private final String userAgent = "";
     private final CacheManager cache = new CacheManager();
     private final CookiesManager cookies = new CookiesManager();
+    private final Boolean downloadResources = null;
+    private final Boolean keepAlive = null;
 
   }
 

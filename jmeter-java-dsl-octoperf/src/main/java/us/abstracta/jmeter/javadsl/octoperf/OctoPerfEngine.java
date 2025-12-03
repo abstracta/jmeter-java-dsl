@@ -31,8 +31,8 @@ import us.abstracta.jmeter.javadsl.octoperf.api.Provider;
 import us.abstracta.jmeter.javadsl.octoperf.api.Scenario;
 import us.abstracta.jmeter.javadsl.octoperf.api.TableEntry;
 import us.abstracta.jmeter.javadsl.octoperf.api.User;
-import us.abstracta.jmeter.javadsl.octoperf.api.UserLoad;
-import us.abstracta.jmeter.javadsl.octoperf.api.UserLoad.UserLoadRampUp;
+import us.abstracta.jmeter.javadsl.octoperf.api.UserProfile;
+import us.abstracta.jmeter.javadsl.octoperf.api.UserProfile.UserLoadRampUp;
 import us.abstracta.jmeter.javadsl.octoperf.api.VirtualUser;
 import us.abstracta.jmeter.javadsl.octoperf.api.Workspace;
 
@@ -264,8 +264,8 @@ public class OctoPerfEngine extends BaseRemoteEngine<OctoPerfClient, OctoPerfTes
       HashTree tree) throws IOException {
     Provider provider = apiClient.findProviderByWorkspace(project.getWorkspace());
     String defaultRegion = provider.getRegions().keySet().iterator().next();
-    List<UserLoad> userLoads = vus.stream()
-        .map(vu -> new UserLoad(vu.getId(), provider.getId(), defaultRegion,
+    List<UserProfile> userLoads = vus.stream()
+        .map(vu -> new UserProfile(vu.getId(), provider.getId(), defaultRegion,
             buildUserLoadConfig(tree)))
         .collect(Collectors.toList());
     Scenario ret = apiClient.createScenario(
