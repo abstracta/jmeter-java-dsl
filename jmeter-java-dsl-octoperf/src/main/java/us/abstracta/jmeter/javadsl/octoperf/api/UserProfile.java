@@ -6,7 +6,6 @@ import static com.fasterxml.jackson.annotation.JsonTypeInfo.Id.NAME;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -93,7 +92,8 @@ public class UserProfile {
 
   public static class EngineSettings {
 
-    private final ExternalLiveReportingSettings externalLiveReporting = new ExternalLiveReportingSettings();
+    private final ExternalLiveReportingSettings externalLiveReporting = 
+          new ExternalLiveReportingSettings();
     private final SampleErrorAction errorHandling = SampleErrorAction.CONTINUE;
     private final ThinkTimeSettings thinkTime = new ThinkTimeSettings();
     private final SetUpTearDownSettings setUp = null;
