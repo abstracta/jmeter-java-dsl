@@ -23,30 +23,51 @@ import us.abstracta.jmeter.javadsl.codegeneration.TestElementParamBuilder;
 import us.abstracta.jmeter.javadsl.codegeneration.params.StringParam;
 import us.abstracta.jmeter.javadsl.core.samplers.BaseSampler;
 
-/**
- * Allows to create a WebSocket sampler to establish a connection, send a
- * message, read a response and disconnect.
- *
- * @since 2.2
- */
 public class DslWebsocketSampler extends BaseSampler<DslWebsocketSampler> {
   private static final String DEFAULT_NAME = "Websocket Sampler";
 
-  /**
-   * Creates a WebSocket sampler.
-   *
-   * @param name the name of the sampler
-   * @return the sampler for further configuration or usage
-   * @since 2.2
-   */
   private DslWebsocketSampler(String name) {
     super(name == null ? DEFAULT_NAME : name, OpenWebSocketSamplerGui.class);
   }
 
   /**
-   * Creates a WebSocket sampler.
+   * Provides factory methods to create WebSocket samplers for performance
+   * testing.
+   * <p>
+   * This class serves as the entry point for creating different types of
+   * WebSocket operations:
+   * <ul>
+   * <li>{@link #connect(String)} - Establish a WebSocket connection</li>
+   * <li>{@link #write(String)} - Send messages to the server</li>
+   * <li>{@link #read()} - Read responses from the server</li>
+   * <li>{@link #disconnect()} - Close the WebSocket connection</li>
+   * </ul>
+   * <p>
+   * Example usage:
+   * 
+   * <pre>{@code
+   *import static us.abstracta.jmeter.javadsl.JmeterDsl.*;
+   *import static us.abstracta.jmeter.javadsl.websocket.DslWebsocketSampler.webSocketSampler;
+   *import us.abstracta.jmeter.javadsl.core.TestPlanStats;
+   * 
+   *public class Test {
+   * 
+   *  public static void main(String[] args) throws Exception {
+   *    TestPlanStats stats = testPlan(
+   *      threadGroup(1, 1,
+   *        webSocketSampler().connect("wss://server.com/websocket")
+   *        webSocketSampler().write("Hello WebSocket!")
+   *        webSocketSampler().read()
+   *          .children(
+   *            responseAssertion()
+   *              .equalsToStrings("Hello WebSocket!")),
+   *        webSocketSampler().disconnect()
+   *      )
+   *    ).run();
+   *   }
+   * }
+   * }</pre>
    *
-   * @return the sampler for further configuration or usage
    * @since 2.2
    */
   public static DslWebsocketSampler webSocketSampler() {
@@ -54,30 +75,54 @@ public class DslWebsocketSampler extends BaseSampler<DslWebsocketSampler> {
   }
 
   /**
-   * Creates a WebSocket connect sampler.
+   * Creates a WebSocket connect sampler to establish a connection to the server.
+   * <p>
+   * After establishing the connection, use {@link #write(String)} and
+   * {@link #read()}
+   * samplers to send and receive messages. Remember to close the connection using
+   * {@link #disconnect()} when finished.
    *
    * @return the connect sampler for further configuration or usage
    * @since 2.2
+   * @see #link {@link DslConnectSampler#server(String)}
+   * @see #link {@link DslConnectSampler#port(int)}
+   * @see #link {@link DslConnectSampler#path(String)}
+   * @see #link {@link DslConnectSampler#tls(boolean)}
    */
   public static DslConnectSampler connect() {
     return new DslConnectSampler();
   }
 
   /**
-   * Creates a WebSocket connect sampler with URL parsing.
+   * Creates a WebSocket connect sampler to establish a connection to the server.
+   * <p>
+   * After establishing the connection, use {@link #write(String)} and
+   * {@link #read()}
+   * samplers to send and receive messages. Remember to close the connection using
+   * {@link #disconnect()} when finished.
+   * <p>
+   * It could be also used alone to test the connection to the server.
+   * <p>
+   * <b>URL Format:</b> {@code ws://host:port/path?query} or
+   * {@code wss://host:port/path?query}
+   * <p>
    *
-   * @param url the WebSocket server URL
+   * @param url the WebSocket server URL. Supported schemes: {@code ws://} (plain)
+   *            and {@code wss://} (TLS)
    * @return the connect sampler for further configuration or usage
    * @since 2.2
    */
   public static DslConnectSampler connect(String url) {
-    DslConnectSampler sampler = new DslConnectSampler();
-    sampler.parseUrl(url);
-    return sampler;
+    return new DslConnectSampler(url);
   }
 
   /**
-   * Creates a WebSocket disconnect sampler.
+   * Creates WebSocket disconnect sampler to gracefully close the connection to
+   * the
+   * <p>
+   * This sampler sends a close frame to the server and waits for the server's
+   * close frame response. It is recommended to always close connections
+   * explicitly to properly release resources.
    *
    * @return the disconnect sampler for further configuration or usage
    * @since 2.2
@@ -87,18 +132,43 @@ public class DslWebsocketSampler extends BaseSampler<DslWebsocketSampler> {
   }
 
   /**
-   * Creates a WebSocket write sampler.
-   *
+   * Creates a WebSocket write sampler to send a text message to the server.
+   * <p>
+   * Requires an active WebSocket connection established via
+   * {@link #connect(String)}.
+   * 
    * @return the write sampler for further configuration or usage
    * @since 2.2
+   * @see #link {@link DslWriteSampler#requestData(String)}
    */
   public static DslWriteSampler write() {
     return new DslWriteSampler();
   }
 
   /**
-   * Creates a WebSocket read sampler.
-   *
+   * Creates a WebSocket write sampler to send a text message to the server.
+   * <p>
+   * Requires an active WebSocket connection established via
+   * {@link #connect(String)}.
+   * 
+   * @return the write sampler for further configuration or usage
+   * @param requestData the message to send to the WebSocket server
+   * @since 2.2
+   */
+  public static DslWriteSampler write(String requestData) {
+    return new DslWriteSampler(requestData);
+  }
+
+  /**
+   * Creates a WebSocket read sampler to receive a message from the server.
+   * <p>
+   * By default, this sampler blocks execution until a response is received or
+   * the timeout is reached. This behavior can be changed using
+   * {@link DslReadSampler#waitForResponse(boolean)}.
+   * <p>
+   * Requires an active WebSocket connection established via
+   * {@link #connect(String)}.
+   * 
    * @return the read sampler for further configuration or usage
    * @since 2.2
    */
@@ -112,28 +182,20 @@ public class DslWebsocketSampler extends BaseSampler<DslWebsocketSampler> {
         "Use specific sampler types: connect(), disconnect(), write(), or read()");
   }
 
-  /**
-   * Inner class for WebSocket connect operations.
-   */
   public static class DslConnectSampler extends BaseSampler<DslConnectSampler> {
     private String connectionTimeout;
     private String responseTimeout;
     private String server;
     private String port;
     private String path;
-    private boolean tls;
+    private boolean tls = false;
 
     private DslConnectSampler() {
       super("WebSocket Open Connection", OpenWebSocketSamplerGui.class);
     }
 
-    /**
-     * Parses a WebSocket URL and sets the corresponding fields.
-     *
-     * @param url the WebSocket URL to parse
-     * @throws IllegalArgumentException if the URL is invalid
-     */
-    private void parseUrl(String url) {
+    private DslConnectSampler(String url) {
+      super("WebSocket Open Connection", OpenWebSocketSamplerGui.class);
       try {
         URI uri = new URI(url);
 
@@ -165,7 +227,7 @@ public class DslWebsocketSampler extends BaseSampler<DslWebsocketSampler> {
 
         String query = uri.getQuery();
         if (query != null && !query.isEmpty()) {
-          this.path(this.getPath() + "?" + query);
+          this.path(this.path + "?" + query);
         }
 
       } catch (URISyntaxException e) {
@@ -176,8 +238,12 @@ public class DslWebsocketSampler extends BaseSampler<DslWebsocketSampler> {
     @Override
     protected TestElement buildTestElement() {
       OpenWebSocketSampler ret = new OpenWebSocketSampler();
-      ret.setConnectTimeout(connectionTimeout);
-      ret.setReadTimeout(responseTimeout);
+      if (connectionTimeout != null) {
+        ret.setConnectTimeout(connectionTimeout);
+      }
+      if (responseTimeout != null) {
+        ret.setReadTimeout(responseTimeout);
+      }
       ret.setTLS(tls);
       ret.setServer(server);
       ret.setPort(port);
@@ -186,9 +252,12 @@ public class DslWebsocketSampler extends BaseSampler<DslWebsocketSampler> {
     }
 
     /**
-     * Sets the connection timeout for the WebSocket connection.
-     *
-     * @param timeout the connection timeout in milliseconds
+     * Same as {@link #connectionTimeout(int)} but allowing to use JMeter
+     * expressions
+     * (variables or
+     * functions) to solve the actual parameter values.
+     * 
+     * @param timeout a JMeter expression that returns timeout in milliseconds
      * @return the sampler for further configuration or usage
      * @since 2.2
      */
@@ -198,14 +267,41 @@ public class DslWebsocketSampler extends BaseSampler<DslWebsocketSampler> {
     }
 
     /**
-     * Sets the response timeout for the WebSocket operations.
+     * Sets the connection timeout for the WebSocket connection creation.
      *
-     * @param timeout the response timeout in milliseconds
+     * @param timeout the connection timeout in milliseconds
+     * @return the sampler for further configuration or usage
+     * @since 2.2
+     */
+    public DslConnectSampler connectionTimeout(int timeout) {
+      this.connectionTimeout = String.valueOf(timeout);
+      return this;
+    }
+
+    /**
+     * Same as {@link #responseTimeout(int)} but allowing to use JMeter
+     * expressions
+     * (variables or
+     * functions) to solve the actual parameter values.
+     * 
+     * @param timeout a JMeter expression that returns timeout in milliseconds
      * @return the sampler for further configuration or usage
      * @since 2.2
      */
     public DslConnectSampler responseTimeout(String timeout) {
       this.responseTimeout = timeout;
+      return this;
+    }
+
+    /**
+     * Sets the response timeout for the WebSocket negotiation.
+     *
+     * @param timeout the response timeout in milliseconds
+     * @return the sampler for further configuration or usage
+     * @since 2.2
+     */
+    public DslConnectSampler responseTimeout(int timeout) {
+      this.responseTimeout = String.valueOf(timeout);
       return this;
     }
 
@@ -222,7 +318,7 @@ public class DslWebsocketSampler extends BaseSampler<DslWebsocketSampler> {
     }
 
     /**
-     * Sets the WebSocket port to connect to.
+     * Specifies the WebSocket port to connect to.
      *
      * @param port the WebSocket port to connect to
      * @return the sampler for further configuration or usage
@@ -234,7 +330,26 @@ public class DslWebsocketSampler extends BaseSampler<DslWebsocketSampler> {
     }
 
     /**
-     * Sets the WebSocket path to connect to.
+     * Specifies the WebSocket port to connect to.
+     *
+     * @param port the WebSocket port to connect to
+     * @return the sampler for further configuration or usage
+     * @since 2.2
+     */
+    public DslConnectSampler port(int port) {
+      this.port = String.valueOf(port);
+      return this;
+    }
+
+    /**
+     * Specifies the WebSocket path to connect to. In case of need query parameters,
+     * they should be included in the path.
+     * <p>
+     * Example:
+     * 
+     * <pre>{@code
+     * path("/websocket?room=general")
+     * }</pre>
      *
      * @param path the WebSocket path to connect to
      * @return the sampler for further configuration or usage
@@ -245,12 +360,8 @@ public class DslWebsocketSampler extends BaseSampler<DslWebsocketSampler> {
       return this;
     }
 
-    private String getPath() {
-      return path;
-    }
-
     /**
-     * Sets the WebSocket TLS flag.
+     * Specifies if the WebSocket connection should be established using TLS.
      *
      * @param tls the WebSocket TLS flag
      * @return the sampler for further configuration or usage
@@ -275,45 +386,29 @@ public class DslWebsocketSampler extends BaseSampler<DslWebsocketSampler> {
         MethodParam port = paramBuilder.stringParam("port");
         MethodParam path = paramBuilder.stringParam("path");
         MethodParam tls = paramBuilder.boolParam("TLS", false);
-
-        // Try to build URL if all required parameters are available
+        MethodCall ret = null;
         if (!server.isDefault() && !port.isDefault() && !path.isDefault()) {
           String protocol = tls.isDefault() ? "ws"
               : (tls.getExpression().equals("true") ? "wss" : "ws");
           String url = protocol + "://" + server.getExpression() + ":"
               + port.getExpression() + path.getExpression();
-          MethodCall ret = new MethodCall("webSocketSampler().connect",
+          ret = new MethodCall("webSocketSampler().connect",
               DslConnectSampler.class, new StringParam(url));
-
-          // Add non-default timeout parameters
-          MethodParam connectionTimeout = paramBuilder.stringParam("connectTimeout");
-          if (!connectionTimeout.isDefault()) {
-            ret.chain("connectionTimeout", connectionTimeout);
-          }
-          MethodParam responseTimeout = paramBuilder.stringParam("readTimeout");
-          if (!responseTimeout.isDefault()) {
-            ret.chain("responseTimeout", responseTimeout);
-          }
-
-          return ret;
         } else {
-          // Fall back to individual method calls
-          return buildMethodCall()
+          ret = buildMethodCall()
               .chain("webSocketSampler().connect()")
               .chain("server", server)
               .chain("port", port)
               .chain("path", path)
-              .chain("tls", tls)
-              .chain("connectionTimeout", paramBuilder.stringParam("connectTimeout"))
-              .chain("responseTimeout", paramBuilder.stringParam("readTimeout"));
+              .chain("tls", tls);
         }
+        return ret
+            .chain("connectionTimeout", paramBuilder.stringParam("connectTimeout", ""))
+            .chain("responseTimeout", paramBuilder.stringParam("readTimeout", ""));
       }
     }
   }
 
-  /**
-   * Inner class for WebSocket disconnect operations.
-   */
   public static class DslDisconnectSampler extends BaseSampler<DslDisconnectSampler> {
     private String responseTimeout;
     private String statusCode;
@@ -325,15 +420,22 @@ public class DslWebsocketSampler extends BaseSampler<DslWebsocketSampler> {
     @Override
     protected TestElement buildTestElement() {
       CloseWebSocketSampler close = new CloseWebSocketSampler();
-      close.setReadTimeout(responseTimeout);
-      close.setStatusCode(statusCode);
+      if (responseTimeout != null) {
+        close.setReadTimeout(responseTimeout);
+      }
+      if (statusCode != null) {
+        close.setStatusCode(statusCode);
+      }
       return close;
     }
 
     /**
-     * Sets the response timeout for the WebSocket operations.
-     *
-     * @param timeout the response timeout in milliseconds
+     * Same as {@link #responseTimeout(int)} but allowing to use JMeter
+     * expressions
+     * (variables or
+     * functions) to solve the actual parameter values.
+     * 
+     * @param timeout a JMeter expression that returns timeout in milliseconds
      * @return the sampler for further configuration or usage
      * @since 2.2
      */
@@ -343,14 +445,54 @@ public class DslWebsocketSampler extends BaseSampler<DslWebsocketSampler> {
     }
 
     /**
-     * Sets the status code for the WebSocket disconnect.
+     * Sets the response timeout for the close frame from server to be received.
      *
-     * @param statusCode the status code for the WebSocket disconnect
+     * @param timeout the response timeout in milliseconds
+     * @return the sampler for further configuration or usage
+     * @since 2.2
+     */
+    public DslDisconnectSampler responseTimeout(int timeout) {
+      this.responseTimeout = String.valueOf(timeout);
+      return this;
+    }
+
+    /**
+     * Same as {@link #statusCode(int)} but allowing to use JMeter
+     * expressions
+     * (variables or
+     * functions) to solve the actual parameter values.
+     * 
+     * @param statusCode a JMeter expression that returns the status code for the
+     *                   WebSocket disconnect
      * @return the sampler for further configuration or usage
      * @since 2.2
      */
     public DslDisconnectSampler statusCode(String statusCode) {
       this.statusCode = statusCode;
+      return this;
+    }
+
+    /**
+     * Sets the status code to indicate the reason for closing the connection.
+     * <p>
+     * Common status codes:
+     * <ul>
+     * <li>1000 - Normal closure (default)</li>
+     * <li>1001 - Going away</li>
+     * <li>1002 - Protocol error</li>
+     * <li>1003 - Unsupported data</li>
+     * </ul>
+     * <p>
+     * For a complete list, see
+     * <a href="https://datatracker.ietf.org/doc/html/rfc6455#section-7.4">RFC
+     * 6455 Section 7.4</a>
+     * 
+     * @param statusCode the status code for the WebSocket disconnect
+     * @return the sampler for further configuration or usage
+     * @since 2.2
+     */
+    public DslDisconnectSampler statusCode(int statusCode) {
+      this.statusCode = String.valueOf(statusCode);
       return this;
     }
 
@@ -371,38 +513,25 @@ public class DslWebsocketSampler extends BaseSampler<DslWebsocketSampler> {
     }
   }
 
-  /**
-   * Inner class for WebSocket write operations.
-   */
   public static class DslWriteSampler extends BaseSampler<DslWriteSampler> {
-    private String connectionTimeout;
     private String requestData;
-    private boolean createNewConnection = false;
 
     private DslWriteSampler() {
       super("WebSocket Single Write", SingleWriteWebSocketSamplerGui.class);
     }
 
+    private DslWriteSampler(String requestData) {
+      super("WebSocket Single Write", SingleWriteWebSocketSamplerGui.class);
+      this.requestData = requestData;
+    }
+
     @Override
     protected TestElement buildTestElement() {
       SingleWriteWebSocketSampler write = new SingleWriteWebSocketSampler();
-      write.setConnectTimeout(connectionTimeout != null ? connectionTimeout : "20000");
       write.setType(DataPayloadType.Text);
       write.setRequestData(requestData);
-      write.setCreateNewConnection(createNewConnection);
+      write.setCreateNewConnection(false);
       return write;
-    }
-
-    /**
-     * Sets the connection timeout for the WebSocket connection.
-     *
-     * @param timeout the connection timeout in milliseconds
-     * @return the sampler for further configuration or usage
-     * @since 2.2
-     */
-    public DslWriteSampler connectionTimeout(String timeout) {
-      this.connectionTimeout = timeout;
-      return this;
     }
 
     /**
@@ -414,18 +543,6 @@ public class DslWebsocketSampler extends BaseSampler<DslWebsocketSampler> {
      */
     public DslWriteSampler requestData(String requestData) {
       this.requestData = requestData;
-      return this;
-    }
-
-    /**
-     * Sets the create new connection flag for the WebSocket write.
-     *
-     * @param createNewConnection the create new connection flag for the WebSocket write
-     * @return the sampler for further configuration or usage
-     * @since 2.2
-     */
-    public DslWriteSampler createNewConnection(boolean createNewConnection) {
-      this.createNewConnection = createNewConnection;
       return this;
     }
 
@@ -447,13 +564,9 @@ public class DslWebsocketSampler extends BaseSampler<DslWebsocketSampler> {
     }
   }
 
-  /**
-   * Inner class for WebSocket read operations.
-   */
   public static class DslReadSampler extends BaseSampler<DslReadSampler> {
-    private String connectionTimeout;
     private String responseTimeout;
-    private boolean createNewConnection = false;
+    private boolean waitForResponse = true;
 
     private DslReadSampler() {
       super("WebSocket Single Read", SingleReadWebSocketSamplerGui.class);
@@ -462,39 +575,57 @@ public class DslWebsocketSampler extends BaseSampler<DslWebsocketSampler> {
     @Override
     protected TestElement buildTestElement() {
       SingleReadWebSocketSampler read = new SingleReadWebSocketSampler();
-      read.setConnectTimeout(connectionTimeout != null ? connectionTimeout : "20000");
-      read.setReadTimeout(responseTimeout != null ? responseTimeout : "7000");
+      if (responseTimeout != null) {
+        read.setReadTimeout(responseTimeout);
+      }
       read.setDataType(DataType.Text);
-      read.setOptional(false);
-      read.setCreateNewConnection(createNewConnection);
+      read.setOptional(!waitForResponse);
+      read.setCreateNewConnection(false);
       return read;
     }
 
     /**
-     * Sets the connection timeout for the WebSocket connection.
+     * Specifies whether the sampler should block execution until a response is
+     * received.
+     * <p>
+     * When set to {@code true} (default), the sampler waits for a server response
+     * or until the timeout expires. When set to {@code false}, the sampler returns
+     * immediately if no message is available.
      *
-     * @param timeout the connection timeout in milliseconds
+     * @param waitForResponse {@code true} to block until response is received,
+     *                        {@code false} to return immediately
      * @return the sampler for further configuration or usage
      * @since 2.2
      */
-    public DslReadSampler connectionTimeout(String timeout) {
-      this.connectionTimeout = timeout;
+    public DslReadSampler waitForResponse(boolean waitForResponse) {
+      this.waitForResponse = waitForResponse;
       return this;
     }
 
     /**
-     * Sets the response timeout for the WebSocket operations.
-     *
-     * @param timeout the response timeout in milliseconds
+     * Same as {@link #responseTimeout(int)} but allowing to use JMeter
+     * expressions
+     * (variables or
+     * functions) to solve the actual parameter values.
+     * 
+     * @param timeout a JMeter expression that returns timeout in milliseconds
      * @return the sampler for further configuration or usage
+     * @since 2.2
      */
     public DslReadSampler responseTimeout(String timeout) {
       this.responseTimeout = timeout;
       return this;
     }
 
-    public DslReadSampler createNewConnection(boolean createNewConnection) {
-      this.createNewConnection = createNewConnection;
+    /**
+     * Sets the response timeout for the WebSocket response to be received.
+     *
+     * @param timeout the response timeout in milliseconds
+     * @return the sampler for further configuration or usage
+     * @since 2.2
+     */
+    public DslReadSampler responseTimeout(int timeout) {
+      this.responseTimeout = String.valueOf(timeout);
       return this;
     }
 
@@ -510,7 +641,7 @@ public class DslWebsocketSampler extends BaseSampler<DslWebsocketSampler> {
           MethodCallContext context) {
         TestElementParamBuilder paramBuilder = new TestElementParamBuilder(testElement);
         return new MethodCall("webSocketSampler().read", DslReadSampler.class)
-            .chain("responseTimeout", paramBuilder.stringParam("readTimeout"))
+            .chain("responseTimeout", paramBuilder.stringParam("readTimeout", ""))
             .chain("createNewConnection", paramBuilder.boolParam("createNewConnection", false));
       }
     }

@@ -21,12 +21,9 @@ public class DslWebsocketSamplerTest {
                 .responseTimeout("5000"),
             webSocketSampler()
                 .write()
-                .requestData("Hello WebSocket Test!")
-                .createNewConnection(false),
+                .requestData("Hello WebSocket Test!"),
             webSocketSampler()
                 .read()
-                .connectionTimeout("10000")
-                .createNewConnection(false)
                 .responseTimeout("5000")
                 .children(
                     responseAssertion()
@@ -47,7 +44,7 @@ public class DslWebsocketSamplerTest {
   }
 
   @Test
-  public void shouldHandleConnectionFailureWhenConnectToUnavailableServer() throws Exception {
+  public void shouldErrorSamplerWhenConnectToUnavailableServer() throws Exception {
     TestPlanStats stats = testPlan(
         threadGroup(1, 1,
             webSocketSampler()
@@ -59,7 +56,7 @@ public class DslWebsocketSamplerTest {
   }
 
   @Test
-  public void shouldHandleTimeoutWhenConnectWithVeryShortTimeout() throws Exception {
+  public void shouldErrorSamplerWhenConnectWithVeryShortTimeout() throws Exception {
     TestPlanStats stats = testPlan(
         threadGroup(1, 1,
             webSocketSampler()
@@ -71,31 +68,29 @@ public class DslWebsocketSamplerTest {
   }
 
   @Test
-  public void shouldHandleWriteOperationWhenNoPreviousConnection() throws Exception {
+  public void shouldErrorSamplerWhenWriteOperationWhenNoPreviousConnection() throws Exception {
     TestPlanStats stats = testPlan(
         threadGroup(1, 1,
             webSocketSampler()
                 .write()
-                .requestData("Test message")
-                .createNewConnection(false)))
+                .requestData("Test message")))
         .run();
     assertThat(stats.overall().errorsCount()).isEqualTo(1);
   }
 
   @Test
-  public void shouldHandleReadOperationWhenNoPreviousConnection() throws Exception {
+  public void shouldErrorSamplerWhenReadOperationWhenNoPreviousConnection() throws Exception {
     TestPlanStats stats = testPlan(
         threadGroup(1, 1,
             webSocketSampler()
                 .read()
-                .createNewConnection(false)
                 .responseTimeout("1000")))
         .run();
     assertThat(stats.overall().errorsCount()).isEqualTo(1);
   }
 
   @Test
-  public void shouldHandleDisconnectOperationWhenNoPreviousConnection() throws Exception {
+  public void shouldErrorSamplerWhenDisconnectOperationWhenNoPreviousConnection() throws Exception {
     TestPlanStats stats = testPlan(
         threadGroup(1, 1,
             webSocketSampler()

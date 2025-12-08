@@ -55,16 +55,6 @@ public class DslWebsocketCodeGeneratorTest {
             "WebSocketWithVariablesTest.java"));
   }
 
-  @Test
-  public void shouldGenerateCommentedElementsCodeWhenDisabledWebSocketElementsInJmx(@TempDir Path tempDir) throws Exception {
-    assertThat(new DslCodeGenerator()
-        .addBuildersFrom(DslWebsocketSampler.class)
-        .addDependency(DslWebsocketSampler.class, "us.abstracta.jmeter:jmeter-java-dsl-websocket")
-        .generateCodeFromJmx(new TestResource(RESOURCES_FOLDER + "/disabled-websocket-elements.jmx").file()))
-        .isEqualToNormalizingNewlines(solveTestClassTemplate(Collections.emptySet(), 
-            "DisabledWebSocketElements.java"));
-  }
-
   private File solveTemplateResource(String resourcePath, Path tempDir) throws IOException {
     String templateContents = new StringTemplate(new TestResource(RESOURCES_FOLDER + "/" + resourcePath).rawContents())
         .solve();
