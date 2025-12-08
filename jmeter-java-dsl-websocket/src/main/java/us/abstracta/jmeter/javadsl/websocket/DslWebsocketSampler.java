@@ -83,11 +83,11 @@ public class DslWebsocketSampler extends BaseSampler<DslWebsocketSampler> {
    * {@link #disconnect()} when finished.
    *
    * @return the connect sampler for further configuration or usage
-   * @since 2.2
    * @see #link {@link DslConnectSampler#server(String)}
    * @see #link {@link DslConnectSampler#port(int)}
    * @see #link {@link DslConnectSampler#path(String)}
    * @see #link {@link DslConnectSampler#tls(boolean)}
+   * @since 2.2
    */
   public static DslConnectSampler connect() {
     return new DslConnectSampler();
@@ -138,8 +138,8 @@ public class DslWebsocketSampler extends BaseSampler<DslWebsocketSampler> {
    * {@link #connect(String)}.
    * 
    * @return the write sampler for further configuration or usage
-   * @since 2.2
    * @see #link {@link DslWriteSampler#requestData(String)}
+   * @since 2.2
    */
   public static DslWriteSampler write() {
     return new DslWriteSampler();
@@ -151,8 +151,8 @@ public class DslWebsocketSampler extends BaseSampler<DslWebsocketSampler> {
    * Requires an active WebSocket connection established via
    * {@link #connect(String)}.
    * 
-   * @return the write sampler for further configuration or usage
    * @param requestData the message to send to the WebSocket server
+   * @return the write sampler for further configuration or usage
    * @since 2.2
    */
   public static DslWriteSampler write(String requestData) {
