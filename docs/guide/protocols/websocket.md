@@ -24,25 +24,25 @@ testImplementation 'us.abstracta.jmeter:jmeter-java-dsl-websocket:2.2'
 
 
 
-Following you can see a basic usage example of Web Socket protocol.
+Below you can see a basic usage example of WebSocket protocol.
 
 ```java
 import static us.abstracta.jmeter.javadsl.JmeterDsl.*;
-import us.abstracta.jmeter.javadsl.websocket.DslWebsocketFactory;
+import static us.abstracta.jmeter.javadsl.websocket.WebsocketJMeterDsl.*;
 import us.abstracta.jmeter.javadsl.core.TestPlanStats;
 
 public class Test {
     public static void main(String[] args) throws Exception {
         TestPlanStats stats = testPlan(
     threadGroup(1, 1,
-        DslWebsocketFactory.websocketConnect("wss://ws.postman-echo.com/raw"),
-        DslWebsocketFactory.websocketWrite("Hello WebSocket!"),
-        DslWebsocketFactory.websocketRead()
+        websocketConnect("wss://ws.postman-echo.com/raw"),
+        websocketWrite("Hello WebSocket!"),
+        websocketRead()
             .children(
                 responseAssertion()
                     .equalsToStrings("Hello WebSocket!")
             ),
-        DslWebsocketFactory.websocketDisconnect()
+        websocketDisconnect()
         )
         ).run();
     }
@@ -54,15 +54,15 @@ Only `ws://` and `wss://` protocols are supported. Using any other scheme will t
 :::
 
 ::: tip
-You can use a non blocking read if it is necessary in the following way
+You can use a non-blocking read if necessary in the following way:
 
 ```java
-DslWebsocketFactory.websocketRead().waitForResponse(false)
+websocketRead().waitForResponse(false)
 ```
 
-In this case is not recommended to add an assertion due the response could be empty
+In this case, it is not recommended to add an assertion because the response could be empty.
 :::
 
 ::: warning
-Web Socket plugin only supports one connection for threads at a time. If you want to change Web Socket server during execution you should add a disconnect sampler and then establish a new connection.
+The WebSocket plugin only supports one connection per thread at a time. If you want to change the WebSocket server during execution, you should add a disconnect sampler and then establish a new connection.
 :::

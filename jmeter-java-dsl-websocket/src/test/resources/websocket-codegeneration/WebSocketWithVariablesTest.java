@@ -1,12 +1,12 @@
 testPlan(
         threadGroup(1, 1,
-          DslWebsocketFactory.websocketConnect("ws://${WEBSOCKET_SERVER}:${WEBSOCKET_PORT}/raw")
+          websocketConnect("ws://${WEBSOCKET_SERVER}:${WEBSOCKET_PORT}/raw")
             .connectionTimeout("${timeout}")
             .responseTimeout("${timeout}"),
-          DslWebsocketFactory.websocketWrite("${MESSAGE}"),
-          DslWebsocketFactory.websocketRead()
+          websocketWrite("${MESSAGE}"),
+          websocketRead()
             .responseTimeout("${timeout}"),
-          DslWebsocketFactory.websocketDisconnect()
+          websocketDisconnect()
             .responseTimeout("${timeout}")
             .statusCode("${statusCode}")
         )

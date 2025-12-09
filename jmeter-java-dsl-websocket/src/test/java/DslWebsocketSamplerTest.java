@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.responseAssertion;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.testPlan;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.threadGroup;
-import us.abstracta.jmeter.javadsl.websocket.DslWebsocketFactory;
+import static us.abstracta.jmeter.javadsl.websocket.WebsocketJMeterDsl.*;
 
 import org.junit.jupiter.api.Test;
 import us.abstracta.jmeter.javadsl.core.TestPlanStats;
@@ -19,13 +19,13 @@ public class DslWebsocketSamplerTest {
     String wsUri = echoServer.getUri();
     TestPlanStats stats = testPlan(
         threadGroup(1, 1,
-            DslWebsocketFactory.websocketConnect(wsUri),
-            DslWebsocketFactory.websocketWrite("Hello WebSocket Test!"),
-            DslWebsocketFactory.websocketRead()
+            websocketConnect(wsUri),
+            websocketWrite("Hello WebSocket Test!"),
+            websocketRead()
                 .children(
                     responseAssertion()
                         .containsSubstrings("Hello WebSocket Test!")),
-            DslWebsocketFactory.websocketDisconnect()))
+            websocketDisconnect()))
         .run();
     assertThat(stats.overall().errorsCount()).isEqualTo(0);
   }
@@ -33,7 +33,7 @@ public class DslWebsocketSamplerTest {
   @Test
   public void shouldThrowIllegalArgumentExceptionWhenConnectWithInvalidUrl() {
     assertThrows(IllegalArgumentException.class, () -> {
-      DslWebsocketFactory.websocketConnect("http://localhost:80/test");
+      websocketConnect("http://localhost:80/test");
     });
   }
 
@@ -41,7 +41,7 @@ public class DslWebsocketSamplerTest {
   public void shouldErrorSamplerWhenConnectToUnavailableServer() throws Exception {
     TestPlanStats stats = testPlan(
         threadGroup(1, 1,
-            DslWebsocketFactory.websocketConnect("ws://localhost:9999/nonexistent")))
+            websocketConnect("ws://localhost:9999/nonexistent")))
         .run();
     assertThat(stats.overall().errorsCount()).isEqualTo(1);
   }
@@ -50,8 +50,7 @@ public class DslWebsocketSamplerTest {
   public void shouldErrorSamplerWhenConnectWithVeryShortTimeout() throws Exception {
     TestPlanStats stats = testPlan(
         threadGroup(1, 1,
-            DslWebsocketFactory
-                .websocketConnect("ws://localhost:8080/test")
+            websocketConnect("ws://localhost:8080/test")
                 .connectionTimeout(1)
                 .responseTimeout(1)))
         .run();
@@ -62,7 +61,7 @@ public class DslWebsocketSamplerTest {
   public void shouldErrorSamplerWhenWriteOperationWhenNoPreviousConnection() throws Exception {
     TestPlanStats stats = testPlan(
         threadGroup(1, 1,
-            DslWebsocketFactory.websocketWrite("Test message")))
+            websocketWrite("Test message")))
         .run();
     assertThat(stats.overall().errorsCount()).isEqualTo(1);
   }
@@ -71,8 +70,7 @@ public class DslWebsocketSamplerTest {
   public void shouldErrorSamplerWhenReadOperationWhenNoPreviousConnection() throws Exception {
     TestPlanStats stats = testPlan(
         threadGroup(1, 1,
-            DslWebsocketFactory
-                .websocketRead()))
+            websocketRead()))
         .run();
     assertThat(stats.overall().errorsCount()).isEqualTo(1);
   }
@@ -81,8 +79,7 @@ public class DslWebsocketSamplerTest {
   public void shouldErrorSamplerWhenDisconnectOperationWhenNoPreviousConnection() throws Exception {
     TestPlanStats stats = testPlan(
         threadGroup(1, 1,
-            DslWebsocketFactory
-                .websocketDisconnect()))
+            websocketDisconnect()))
         .run();
     assertThat(stats.overall().errorsCount()).isEqualTo(1);
   }

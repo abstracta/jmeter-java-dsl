@@ -13,6 +13,7 @@ import eu.luminis.jmeter.wssampler.SingleWriteWebSocketSamplerGui;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Arrays;
 import java.util.List;
 import org.apache.jmeter.testelement.TestElement;
 import us.abstracta.jmeter.javadsl.codegeneration.MethodCall;
@@ -65,9 +66,9 @@ import us.abstracta.jmeter.javadsl.core.samplers.BaseSampler;
  *
  * @since 2.2
  */
-public class DslWebsocketFactory {
+public class WebsocketJMeterDsl {
 
-  private DslWebsocketFactory() {
+  private WebsocketJMeterDsl() {
   }
 
   /**
@@ -137,29 +138,6 @@ public class DslWebsocketFactory {
    */
   public static DslReadSampler websocketRead() {
     return new DslReadSampler();
-  }
-
-  public enum StatusCode implements EnumParam.EnumPropertyValue {
-    NORMAL_CLOSURE("1000"),
-    GOING_AWAY("1001"),
-    PROTOCOL_ERROR("1002"),
-    UNSUPPORTED_DATA("1003"),
-    NO_STATUS_CODE_PRESENT("1005"),
-    MESSAGE_TYPE_ERROR("1007"),
-    POLICY_VIOLATION("1008"),
-    MESSAGE_TOO_BIG_ERROR("1009"),
-    TLS_HANDSHAKE_ERROR("1015");
-
-    private final String propertyValue;
-
-    StatusCode(String propertyValue) {
-      this.propertyValue = propertyValue;
-    }
-
-    @Override
-    public String propertyValue() {
-      return propertyValue;
-    }
   }
 
   public static class DslConnectSampler extends BaseSampler<DslConnectSampler> {
@@ -300,12 +278,41 @@ public class DslWebsocketFactory {
         String protocol = tls.getExpression().equals("true") ? "wss" : "ws";
         String url = protocol + "://" + server.getExpression() + ":" + port.getExpression()
             + path.getExpression();
-        return new MethodCall("DslWebsocketFactory.websocketConnect", DslConnectSampler.class,
+        return new MethodCall("websocketConnect", DslConnectSampler.class,
             new StringParam(url))
             .chain("connectionTimeout", paramBuilder.intParam("connectTimeout", 20000))
             .chain("responseTimeout", paramBuilder.intParam("readTimeout", 6000));
       }
     }
+  }
+
+  public enum StatusCode implements EnumParam.EnumPropertyValue {
+    NORMAL_CLOSURE("1000"),
+    GOING_AWAY("1001"),
+    PROTOCOL_ERROR("1002"),
+    UNSUPPORTED_DATA("1003"),
+    NO_STATUS_CODE_PRESENT("1005"),
+    MESSAGE_TYPE_ERROR("1007"),
+    POLICY_VIOLATION("1008"),
+    MESSAGE_TOO_BIG_ERROR("1009"),
+    TLS_HANDSHAKE_ERROR("1015");
+
+    private final String propertyValue;
+
+    StatusCode(String propertyValue) {
+      this.propertyValue = propertyValue;
+    }
+
+    @Override
+    public String propertyValue() {
+      return propertyValue;
+    }
+
+    public static boolean isValidStatusCode(String value) {
+      return Arrays.stream(StatusCode.values())
+          .anyMatch(code -> code.propertyValue().equals(value));
+    }
+
   }
 
   public static class DslDisconnectSampler extends BaseSampler<DslDisconnectSampler> {
@@ -404,13 +411,11 @@ public class DslWebsocketFactory {
       protected MethodCall buildMethodCall(CloseWebSocketSampler testElement,
           MethodCallContext context) {
         TestElementParamBuilder paramBuilder = new TestElementParamBuilder(testElement);
-        MethodParam statusCode;
-        try {
+        MethodParam statusCode = paramBuilder.stringParam("statusCode", "1000");
+        if (StatusCode.isValidStatusCode(statusCode.getExpression())) {
           statusCode = paramBuilder.enumParam("statusCode", StatusCode.NORMAL_CLOSURE);
-        } catch (UnsupportedOperationException e) {
-          statusCode = paramBuilder.stringParam("statusCode", "1000");
         }
-        return new MethodCall("DslWebsocketFactory.websocketDisconnect", DslDisconnectSampler.class)
+        return new MethodCall("websocketDisconnect", DslDisconnectSampler.class)
             .chain("responseTimeout", paramBuilder.intParam("readTimeout", 6000))
             .chain("statusCode", statusCode);
       }
@@ -446,7 +451,7 @@ public class DslWebsocketFactory {
           MethodCallContext context) {
         TestElementParamBuilder paramBuilder = new TestElementParamBuilder(testElement);
         MethodParam requestData = paramBuilder.stringParam("requestData", "");
-        return new MethodCall("DslWebsocketFactory.websocketWrite", DslWriteSampler.class,
+        return new MethodCall("websocketWrite", DslWriteSampler.class,
             new StringParam(requestData.getExpression()));
       }
     }
@@ -530,7 +535,7 @@ public class DslWebsocketFactory {
         TestElementParamBuilder paramBuilder = new TestElementParamBuilder(testElement);
         boolean optionalParam = !paramBuilder.boolParam("optional", false)
             .getExpression().equals("true");
-        return new MethodCall("DslWebsocketFactory.websocketRead", DslReadSampler.class)
+        return new MethodCall("websocketRead", DslReadSampler.class)
             .chain("responseTimeout", paramBuilder.intParam("readTimeout", 6000))
             .chain("waitForResponse", new BoolParam(optionalParam, true))
             .chain("createNewConnection", paramBuilder.boolParam("createNewConnection", false));
