@@ -28,21 +28,21 @@ Following you can see a basic usage example of Web Socket protocol.
 
 ```java
 import static us.abstracta.jmeter.javadsl.JmeterDsl.*;
-import static us.abstracta.jmeter.javadsl.websocket.DslWebsocketSampler.webSocketSampler;
+import us.abstracta.jmeter.javadsl.websocket.DslWebsocketFactory;
 import us.abstracta.jmeter.javadsl.core.TestPlanStats;
 
 public class Test {
     public static void main(String[] args) throws Exception {
         TestPlanStats stats = testPlan(
     threadGroup(1, 1,
-        webSocketSampler().connect("wss://ws.postman-echo.com/raw"),
-        webSocketSampler().write("Hello WebSocket!"),
-        webSocketSampler().read()
+        DslWebsocketFactory.websocketConnect("wss://ws.postman-echo.com/raw"),
+        DslWebsocketFactory.websocketWrite("Hello WebSocket!"),
+        DslWebsocketFactory.websocketRead()
             .children(
                 responseAssertion()
                     .equalsToStrings("Hello WebSocket!")
             ),
-        webSocketSampler().disconnect()
+        DslWebsocketFactory.websocketDisconnect()
         )
         ).run();
     }
@@ -53,16 +53,16 @@ public class Test {
 Only `ws://` and `wss://` protocols are supported. Using any other scheme will throw an `IllegalArgumentException`.
 :::
 
+::: tip
 You can use a non blocking read if it is necessary in the following way
 
 ```java
-webSocketSampler().read().waitForResponse(false)
+DslWebsocketFactory.websocketRead().waitForResponse(false)
 ```
 
-::: warning
 In this case is not recommended to add an assertion due the response could be empty
 :::
 
-::: tip
-Web Socket protocol only supports one connection at a time. If you want to change Web Socket server during execution you should add a disconnect sampler and then establish a new connection.
+::: warning
+Web Socket plugin only supports one connection for threads at a time. If you want to change Web Socket server during execution you should add a disconnect sampler and then establish a new connection.
 :::

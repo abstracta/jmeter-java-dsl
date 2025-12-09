@@ -22,29 +22,11 @@
           </elementProp>
         </collectionProp>
       </elementProp>
+      <boolProp name="TestPlan.functional_mode">false</boolProp>
+      <boolProp name="TestPlan.serialize_threadgroups">false</boolProp>
     </TestPlan>
     <hashTree>
-      <Arguments guiclass="ArgumentsPanel" testclass="Arguments" testname="User Defined Variables">
-        <collectionProp name="Arguments.arguments">
-          <elementProp name="WEBSOCKET_SERVER" elementType="Argument">
-            <stringProp name="Argument.name">WEBSOCKET_SERVER</stringProp>
-            <stringProp name="Argument.value">ws.postman-echo.com</stringProp>
-            <stringProp name="Argument.metadata">=</stringProp>
-          </elementProp>
-          <elementProp name="WEBSOCKET_PORT" elementType="Argument">
-            <stringProp name="Argument.name">WEBSOCKET_PORT</stringProp>
-            <stringProp name="Argument.value">80</stringProp>
-            <stringProp name="Argument.metadata">=</stringProp>
-          </elementProp>
-          <elementProp name="MESSAGE" elementType="Argument">
-            <stringProp name="Argument.name">MESSAGE</stringProp>
-            <stringProp name="Argument.value">Hello from variable</stringProp>
-            <stringProp name="Argument.metadata">=</stringProp>
-          </elementProp>
-        </collectionProp>
-      </Arguments>
-      <hashTree/>
-      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Thread Group">
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Thread Group" enabled="true">
         <intProp name="ThreadGroup.num_threads">1</intProp>
         <intProp name="ThreadGroup.ramp_time">1</intProp>
         <boolProp name="ThreadGroup.same_user_on_next_iteration">true</boolProp>
@@ -56,8 +38,8 @@
       </ThreadGroup>
       <hashTree>
         <eu.luminis.jmeter.wssampler.OpenWebSocketSampler guiclass="eu.luminis.jmeter.wssampler.OpenWebSocketSamplerGui" testclass="eu.luminis.jmeter.wssampler.OpenWebSocketSampler" testname="WebSocket Open Connection">
-          <stringProp name="connectTimeout">10000</stringProp>
-          <stringProp name="readTimeout">5000</stringProp>
+          <stringProp name="connectTimeout">${timeout}</stringProp>
+          <stringProp name="readTimeout">${timeout}</stringProp>
           <boolProp name="TLS">false</boolProp>
           <stringProp name="server">${WEBSOCKET_SERVER}</stringProp>
           <stringProp name="port">${WEBSOCKET_PORT}</stringProp>
@@ -79,7 +61,7 @@
         <hashTree/>
         <eu.luminis.jmeter.wssampler.SingleReadWebSocketSampler guiclass="eu.luminis.jmeter.wssampler.SingleReadWebSocketSamplerGui" testclass="eu.luminis.jmeter.wssampler.SingleReadWebSocketSampler" testname="WebSocket Single Read">
           <stringProp name="connectTimeout">20000</stringProp>
-          <stringProp name="readTimeout">5000</stringProp>
+          <stringProp name="readTimeout">${timeout}</stringProp>
           <stringProp name="dataType">Text</stringProp>
           <boolProp name="optional">false</boolProp>
           <boolProp name="createNewConnection">false</boolProp>
@@ -90,8 +72,8 @@
         </eu.luminis.jmeter.wssampler.SingleReadWebSocketSampler>
         <hashTree/>
         <eu.luminis.jmeter.wssampler.CloseWebSocketSampler guiclass="eu.luminis.jmeter.wssampler.CloseWebSocketSamplerGui" testclass="eu.luminis.jmeter.wssampler.CloseWebSocketSampler" testname="WebSocket Close">
-          <stringProp name="readTimeout">1000</stringProp>
-          <stringProp name="statusCode">1000</stringProp>
+          <stringProp name="readTimeout">${timeout}</stringProp>
+          <stringProp name="statusCode">${statusCode}</stringProp>
         </eu.luminis.jmeter.wssampler.CloseWebSocketSampler>
         <hashTree/>
       </hashTree>

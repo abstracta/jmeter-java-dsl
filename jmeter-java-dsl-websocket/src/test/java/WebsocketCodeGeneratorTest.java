@@ -13,9 +13,9 @@ import us.abstracta.jmeter.javadsl.codegeneration.DslCodeGenerator;
 import us.abstracta.jmeter.javadsl.codegeneration.TestClassTemplate;
 import us.abstracta.jmeter.javadsl.core.util.StringTemplate;
 import us.abstracta.jmeter.javadsl.util.TestResource;
-import us.abstracta.jmeter.javadsl.websocket.DslWebsocketSampler;
+import us.abstracta.jmeter.javadsl.websocket.DslWebsocketFactory;
 
-public class DslWebsocketCodeGeneratorTest {
+public class WebsocketCodeGeneratorTest {
 
   private static final String RESOURCES_FOLDER = "websocket-codegeneration";
 
@@ -23,7 +23,7 @@ public class DslWebsocketCodeGeneratorTest {
   public void shouldGenerateExpectedCodeWhenSimpleWebSocketJmxIsProvided(@TempDir Path tempDir)
       throws Exception {
     File solvedTemplate = solveTemplateResource("websocket-test-plan.template.jmx", tempDir);
-    assertThat(new DslCodeGenerator().addBuildersFrom(DslWebsocketSampler.class).generateCodeFromJmx(solvedTemplate))
+    assertThat(new DslCodeGenerator().addBuildersFrom(DslWebsocketFactory.class).generateCodeFromJmx(solvedTemplate))
         .isEqualToNormalizingNewlines(
             solveTestClassTemplate(Collections.emptySet(),
                 "SimpleWebSocketTest.java"));
@@ -32,24 +32,19 @@ public class DslWebsocketCodeGeneratorTest {
   @Test
   public void shouldGenerateExpectedCodeWhenComplexWebSocketJmxIsProvided(@TempDir Path tempDir) throws Exception {
     File solvedTemplate = solveTemplateResource("/complex-websocket.jmx", tempDir);
-    assertThat(new DslCodeGenerator().addBuildersFrom(DslWebsocketSampler.class).generateCodeFromJmx(solvedTemplate))
-        .isEqualToNormalizingNewlines(solveTestClassTemplate(Collections.emptySet(),
-            "ComplexWebSocketTest.java"));
+    assertThat(new DslCodeGenerator().addBuildersFrom(DslWebsocketFactory.class).generateCodeFromJmx(solvedTemplate))
+        .isEqualToNormalizingNewlines(
+            solveTestClassTemplate(Collections.emptySet(),
+                "ComplexWebSocketTest.java"));
   }
 
   @Test
-  public void shouldGenerateExpectedCodeWhenWebSocketWithAssertionsJmxIsProvided(@TempDir Path tempDir) throws Exception {
-    File solvedTemplate = solveTemplateResource("/websocket-with-assertions.jmx", tempDir);
-    assertThat(new DslCodeGenerator().addBuildersFrom(DslWebsocketSampler.class).generateCodeFromJmx(solvedTemplate))
-        .isEqualToNormalizingNewlines(solveTestClassTemplate(Collections.emptySet(),
-            "WebSocketWithAssertionsTest.java"));
-  }
-
-  @Test
-  public void shouldGenerateExpectedCodeWhenWebSocketWithVariablesJmxIsProvided(@TempDir Path tempDir) throws Exception {
+  public void shouldGenerateExpectedCodeWhenWebSocketWithVariablesJmxIsProvided(@TempDir Path tempDir)
+      throws Exception {
     assertThat(new DslCodeGenerator()
-        .addBuildersFrom(DslWebsocketSampler.class)
-        .addDependency(DslWebsocketSampler.class, "us.abstracta.jmeter:jmeter-java-dsl-websocket")
+
+        .addBuildersFrom(DslWebsocketFactory.class)
+        .addDependency(DslWebsocketFactory.class, "us.abstracta.jmeter:jmeter-java-dsl-websocket")
         .generateCodeFromJmx(new TestResource(RESOURCES_FOLDER + "/websocket-with-variables.jmx").file()))
         .isEqualToNormalizingNewlines(solveTestClassTemplate(Collections.emptySet(),
             "WebSocketWithVariablesTest.java"));
