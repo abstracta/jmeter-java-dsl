@@ -68,7 +68,7 @@ public abstract class MethodCallBuilderTest {
         .getMethods().stream()
         .collect(
             Collectors.toMap(NodeWithSimpleName::getNameAsString,
-                m -> m.getBody().map(Objects::toString).orElse("").replace("\r\n", "\n")));
+                m -> m.getBody().map(Objects::toString).orElse("")));
   }
 
   @ParameterizedTest(name = "{0}")

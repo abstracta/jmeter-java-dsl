@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.time.Instant;
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -16,12 +15,11 @@ public class Scenario {
   private final String projectId;
   private final String name;
   private final String description = "";
-  private final List<UserLoad> userLoads;
+  private final List<UserProfile> userProfiles;
   private final String mode = "STANDARD";
   private final Instant created = Instant.now();
   private final Instant lastModified = Instant.now();
   private final Set<String> tags;
-  private final BackendListenerSettings backendListeners = new BackendListenerSettings();
   private Project project;
 
   @JsonCreator
@@ -30,18 +28,18 @@ public class Scenario {
     this.userId = null;
     this.projectId = null;
     this.name = null;
-    this.userLoads = null;
+    this.userProfiles = null;
     this.tags = tags;
   }
 
-  public Scenario(User user, Project project, String name, List<UserLoad> userLoads,
+  public Scenario(User user, Project project, String name, List<UserProfile> userProfiles,
       Set<String> tags) {
     this.id = "";
     this.userId = user.getId();
     this.project = project;
     this.projectId = project.getId();
     this.name = name;
-    this.userLoads = userLoads;
+    this.userProfiles = userProfiles;
     this.tags = tags;
   }
 
@@ -65,17 +63,6 @@ public class Scenario {
   @JsonIgnore
   public String getUrl() {
     return project.getBaseUrl() + "/runtime/scenario/" + id;
-  }
-
-  public static class BackendListenerSettings {
-
-    private final int queueSize = 5000;
-    private final List<BackendListener> listeners = Collections.emptyList();
-
-  }
-
-  public static class BackendListener {
-
   }
 
 }
