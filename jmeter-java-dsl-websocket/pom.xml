@@ -11,6 +11,8 @@
   </parent>
 
   <artifactId>jmeter-java-dsl-websocket</artifactId>
+  <name>${project.artifactId}</name>
+  <description>Module which includes WebSocket plugin.</description>
 
   <dependencies>
     <dependency>
