@@ -11,6 +11,7 @@
   </parent>
   <artifactId>jmeter-java-dsl-prometheus</artifactId>
   <name>${project.artifactId}</name>
+  <description>Module which includes Prometheus listener plugin for exposing JMeter metrics.</description>
 
   <repositories>
     <repository>
