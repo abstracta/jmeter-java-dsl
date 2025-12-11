@@ -11,7 +11,7 @@
 
   <name>${project.artifactId}</name>
   <description>Parent project for all jmeter-java-dsl modules</description>
-  <url>https://github.com/abstracta/jmeter-dsl</url>
+  <url>https://github.com/abstracta/jmeter-java-dsl</url>
 
   <licenses>
     <license>
@@ -28,11 +28,10 @@
       <organizationUrl>https://abstracta.us/</organizationUrl>
     </developer>
   </developers>
-
   <scm>
-    <connection>scm:git:git://github.com/abstracta/jmeter-dsl.git</connection>
-    <developerConnection>scm:git:ssh://github.com:abstracta/jmeter-dsl.git</developerConnection>
-    <url>https://github.com/abstracta/jmeter-dsl/tree/master</url>
+    <connection>scm:git:git://github.com/abstracta/jmeter-java-dsl.git</connection>
+    <developerConnection>scm:git:ssh://github.com:abstracta/jmeter-java-dsl.git</developerConnection>
+    <url>https://github.com/abstracta/jmeter-java-dsl/tree/master</url>
   </scm>
 
   <properties>
