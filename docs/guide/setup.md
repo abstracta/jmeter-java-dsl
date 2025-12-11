@@ -8,14 +8,14 @@ To use the DSL just include it in your project:
 <dependency>
   <groupId>us.abstracta.jmeter</groupId>
   <artifactId>jmeter-java-dsl</artifactId>
-  <version>2.1</version>
+  <version>2.2</version>
   <scope>test</scope>
 </dependency>
 ```
 :::
 ::: code-group-item Gradle
 ```groovy
-testImplementation("us.abstracta.jmeter:jmeter-java-dsl:2.1") {
+testImplementation("us.abstracta.jmeter:jmeter-java-dsl:2.2") {
     exclude("org.apache.jmeter", "bom")
 }
 ```

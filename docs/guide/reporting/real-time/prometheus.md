@@ -10,14 +10,14 @@ To use the module, you will need to include the following dependency in your pro
 <dependency>
   <groupId>us.abstracta.jmeter</groupId>
   <artifactId>jmeter-java-dsl-prometheus</artifactId>
-  <version>2.1</version>
+  <version>2.2</version>
   <scope>test</scope>
 </dependency>
 ```
 :::
 ::: code-group-item Gradle
 ```groovy
-testImplementation 'us.abstracta.jmeter:jmeter-java-dsl-prometheus:2.1'
+testImplementation 'us.abstracta.jmeter:jmeter-java-dsl-prometheus:2.2'
 ```
 :::
 ::::
