@@ -20,8 +20,8 @@ public class DslWebsocketSamplerTest {
         threadGroup(1, 1,
           vars().set("stream_key", "1234567890"),
             websocketConnect(wsUri + "/test?stream_key=${stream_key}"),
-            websocketWrite("Hello WebSocket Test!"),
-            websocketRead()
+            websocketWrite("Hello WebSocket Test!", "text"),
+            websocketRead("text")
                 .children(
                     responseAssertion()
                         .containsSubstrings("Hello WebSocket Test!")),
@@ -61,7 +61,7 @@ public class DslWebsocketSamplerTest {
   public void shouldErrorSamplerWhenWriteOperationWhenNoPreviousConnection() throws Exception {
     TestPlanStats stats = testPlan(
         threadGroup(1, 1,
-            websocketWrite("Test message")))
+            websocketWrite("Test message", "text")))
         .run();
     assertThat(stats.overall().errorsCount()).isEqualTo(1);
   }
@@ -70,7 +70,7 @@ public class DslWebsocketSamplerTest {
   public void shouldErrorSamplerWhenReadOperationWhenNoPreviousConnection() throws Exception {
     TestPlanStats stats = testPlan(
         threadGroup(1, 1,
-            websocketRead()))
+            websocketRead("text")))
         .run();
     assertThat(stats.overall().errorsCount()).isEqualTo(1);
   }

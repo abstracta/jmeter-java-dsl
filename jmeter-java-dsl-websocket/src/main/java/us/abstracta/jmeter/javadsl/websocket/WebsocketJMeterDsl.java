@@ -118,8 +118,8 @@ public class WebsocketJMeterDsl {
    * @return the write sampler for further configuration or usage
    * @since 2.2
    */
-  public static DslWriteSampler websocketWrite(String requestData) {
-    return new DslWriteSampler(requestData);
+  public static DslWriteSampler websocketWrite(String requestData, String dataType) {
+    return new DslWriteSampler(requestData, dataType);
   }
 
   /**
@@ -132,11 +132,12 @@ public class WebsocketJMeterDsl {
    * Requires an active WebSocket connection established via
    * {@link #websocketConnect(String)}.
    * 
+   * @param type the data type to read from the server. Must be 'text' or 'binary'
    * @return the read sampler for further configuration or usage
    * @since 2.2
    */
-  public static DslReadSampler websocketRead() {
-    return new DslReadSampler();
+  public static DslReadSampler websocketRead(String type) {
+    return new DslReadSampler(type);
   }
 
   public static class DslConnectSampler extends BaseSampler<DslConnectSampler> {
@@ -426,16 +427,21 @@ public class WebsocketJMeterDsl {
 
   public static class DslWriteSampler extends BaseSampler<DslWriteSampler> {
     private String requestData;
+    private String dataType;
 
-    private DslWriteSampler(String requestData) {
+    private DslWriteSampler(String requestData, String dataType) {
       super("WebSocket Single Write", SingleWriteWebSocketSamplerGui.class);
       this.requestData = requestData;
+      this.dataType = dataType;
+      if (dataType != null && !"text".equals(dataType) && !"binary".equals(dataType)) {
+        throw new IllegalArgumentException("Invalid data type. Must be 'text' or 'binary'");
+      }
     }
 
     @Override
     protected TestElement buildTestElement() {
       SingleWriteWebSocketSampler write = new SingleWriteWebSocketSampler();
-      write.setType(DataPayloadType.Text);
+      write.setType("text".equals(dataType) ? DataPayloadType.Text : DataPayloadType.Binary);
       write.setRequestData(requestData);
       write.setCreateNewConnection(false);
       return write;
@@ -462,9 +468,14 @@ public class WebsocketJMeterDsl {
   public static class DslReadSampler extends BaseSampler<DslReadSampler> {
     private String responseTimeoutMillis;
     private boolean waitForResponse = true;
+    private String type;
 
-    private DslReadSampler() {
+    private DslReadSampler(String type) {
       super("WebSocket Single Read", SingleReadWebSocketSamplerGui.class);
+      this.type = type;
+      if (type != null && !"text".equals(type) && !"binary".equals(type)) {
+        throw new IllegalArgumentException("Invalid data type. Must be 'text' or 'binary'");
+      }
     }
 
     @Override
@@ -473,7 +484,7 @@ public class WebsocketJMeterDsl {
       if (responseTimeoutMillis != null) {
         read.setReadTimeout(responseTimeoutMillis);
       }
-      read.setDataType(DataType.Text);
+      read.setDataType("text".equals(type) ? DataType.Text : DataType.Binary);
       read.setOptional(!waitForResponse);
       read.setCreateNewConnection(false);
       return read;
