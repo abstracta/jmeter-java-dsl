@@ -1,13 +1,12 @@
 import java.util.concurrent.TimeUnit;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static us.abstracta.jmeter.javadsl.JmeterDsl.responseAssertion;
-import static us.abstracta.jmeter.javadsl.JmeterDsl.testPlan;
-import static us.abstracta.jmeter.javadsl.JmeterDsl.threadGroup;
+import static us.abstracta.jmeter.javadsl.JmeterDsl.*;
 import static us.abstracta.jmeter.javadsl.websocket.WebsocketJMeterDsl.*;
 
 import org.junit.jupiter.api.Test;
 import us.abstracta.jmeter.javadsl.core.TestPlanStats;
+import us.abstracta.jmeter.javadsl.core.samplers.DslSampler;
 
 public class DslWebsocketSamplerTest {
 
@@ -19,7 +18,8 @@ public class DslWebsocketSamplerTest {
     String wsUri = echoServer.getUri();
     TestPlanStats stats = testPlan(
         threadGroup(1, 1,
-            websocketConnect(wsUri),
+          vars().set("stream_key", "1234567890"),
+            websocketConnect(wsUri + "/test?stream_key=${stream_key}"),
             websocketWrite("Hello WebSocket Test!"),
             websocketRead()
                 .children(

@@ -11,8 +11,6 @@ import eu.luminis.jmeter.wssampler.SingleReadWebSocketSamplerGui;
 import eu.luminis.jmeter.wssampler.SingleWriteWebSocketSampler;
 import eu.luminis.jmeter.wssampler.SingleWriteWebSocketSamplerGui;
 import java.lang.reflect.Method;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.List;
 import org.apache.jmeter.testelement.TestElement;
@@ -25,6 +23,7 @@ import us.abstracta.jmeter.javadsl.codegeneration.params.BoolParam;
 import us.abstracta.jmeter.javadsl.codegeneration.params.EnumParam;
 import us.abstracta.jmeter.javadsl.codegeneration.params.StringParam;
 import us.abstracta.jmeter.javadsl.core.samplers.BaseSampler;
+import us.abstracta.jmeter.javadsl.http.JmeterUrl;
 
 /**
  * Provides factory methods to create WebSocket samplers for performance
@@ -150,43 +149,40 @@ public class WebsocketJMeterDsl {
 
     private DslConnectSampler(String url) {
       super("WebSocket Open Connection", OpenWebSocketSamplerGui.class);
-      try {
-        URI uri = new URI(url);
+      parseUrl(url);
+    }
 
-        String scheme = uri.getScheme();
-        if (scheme == null || (!"ws".equals(scheme) && !"wss".equals(scheme))) {
+    private static boolean containsJmeterExpression(String value) {
+      return value != null && value.contains("${");
+    }
+
+    private void parseUrl(String url) {
+      JmeterUrl parsed = JmeterUrl.valueOf(url);
+      String scheme = parsed.protocol();
+      if (scheme != null && !containsJmeterExpression(scheme)) {
+        if (!"ws".equals(scheme) && !"wss".equals(scheme)) {
           throw new IllegalArgumentException(
               "Invalid WebSocket URL. Must start with 'ws://' or 'wss://'");
         }
-
-        this.tls = "wss".equals(scheme);
-        this.server = uri.getHost();
-        if (this.server == null) {
-          throw new IllegalArgumentException("Invalid WebSocket URL. Host is required");
-        }
-
-        int port = uri.getPort();
-        if (port == -1) {
-          this.port = this.tls ? "443" : "80";
-        } else {
-          this.port = String.valueOf(port);
-        }
-
-        String path = uri.getPath();
-        if (path == null || path.isEmpty()) {
-          this.path = "/";
-        } else {
-          this.path = path;
-        }
-
-        String query = uri.getQuery();
-        if (query != null && !query.isEmpty()) {
-          this.path = this.path + "?" + query;
-        }
-
-      } catch (URISyntaxException e) {
-        throw new IllegalArgumentException("Invalid WebSocket URL: " + url, e);
+        tls = "wss".equals(scheme);
       }
+      server = parsed.host();
+      if ((server == null || server.isEmpty()) && scheme != null
+          && !containsJmeterExpression(scheme)) {
+        throw new IllegalArgumentException("Invalid WebSocket URL. Host is required");
+      }
+      String parsedPort = parsed.port();
+      if (parsedPort == null || parsedPort.isEmpty()) {
+        if (scheme != null && !containsJmeterExpression(scheme)) {
+          port = tls ? "443" : "80";
+        } else {
+          port = "";
+        }
+      } else {
+        port = parsedPort;
+      }
+      String parsedPath = parsed.path();
+      path = (parsedPath == null || parsedPath.isEmpty()) ? "/" : parsedPath;
     }
 
     @Override
@@ -199,9 +195,15 @@ public class WebsocketJMeterDsl {
         ret.setReadTimeout(responseTimeoutMillis);
       }
       ret.setTLS(tls);
-      ret.setServer(server);
-      ret.setPort(port);
-      ret.setPath(path);
+      if (server != null) {
+        ret.setServer(server);
+      }
+      if (port != null) {
+        ret.setPort(port);
+      }
+      if (path != null) {
+        ret.setPath(path);
+      }
       return ret;
     }
 
