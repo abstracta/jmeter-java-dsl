@@ -49,8 +49,31 @@ public class Test {
 }
 ```
 
+::: tip
+You can use JMeter variables or functions in the connect URL parts (host, port, path or query). Prefer this over putting the whole URL in a single variable:
+
+```java
+vars()
+    .set("HOST", "ws.postman-echo.com")
+    .set("PORT", "443")
+    .set("TOKEN", "abc123"),
+websocketConnect("wss://${HOST}:${PORT}/raw?token=${TOKEN}")
+```
+
+You can also use a Java variable when the full URL is known when building the test plan:
+
+```java
+String wsUrl = "wss://ws.postman-echo.com/raw";
+websocketConnect(wsUrl)
+```
+:::
+
 ::: warning
 Only `ws://` and `wss://` protocols are supported. Using any other scheme will throw an `IllegalArgumentException`.
+:::
+
+::: warning
+A full URL as a single JMeter expression (for example `websocketConnect("${URL}")`) is not supported. The underlying WebSocket plugin requires separate server, port, path and TLS fields, and the DSL parses the URL at build time to fill them. Without a literal `ws://` or `wss://` scheme in the string, those fields cannot be set correctly. Use expressions in URL parts (for example `ws://${HOST}:${PORT}/path`) instead.
 :::
 
 ::: tip
