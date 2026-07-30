@@ -52,6 +52,24 @@ testPlan(
 :::
 
 ::: tip
+In some scenarios you might want to log only samples matching a given name pattern, ignoring the rest (eg: to keep JTL files small by excluding noisy or irrelevant samplers). You can achieve this through `samplersRegex`, which applies a regular expression to sample labels:
+
+```java
+testPlan(
+    threadGroup(2, 10,
+        httpSampler("http://my.service"),
+        httpSampler("_debug", "http://my.service/health")
+    ),
+    // logs every sample except the ones whose label starts with "_"
+    jtlWriter("target/jtls")
+      .samplersRegex("^[^_].*")
+)
+```
+
+This filter is applied in addition to `logOnly` and the location of the `jtlWriter` in the test plan (which already scopes the samples it logs).
+:::
+
+::: tip
 `jtlWriter` will automatically generate `.jtl` files applying this format: `<yyyy-MM-dd HH-mm-ss> <UUID>.jtl`.
 
 If you need a specific file name, for example for later postprocessing logic (eg: using CI build ID), you can specify it by using `jtlWriter(directory, fileName)`.

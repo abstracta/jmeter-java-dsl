@@ -12,6 +12,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.regex.Pattern;
 import org.apache.jmeter.reporters.ResultCollector;
+import org.apache.jmeter.samplers.SampleEvent;
 import org.apache.jmeter.samplers.SampleSaveConfiguration;
 import org.apache.jmeter.testelement.TestElement;
 import org.apache.jmeter.util.JMeterUtils;
@@ -46,6 +47,7 @@ public class JtlWriter extends BaseListener {
 
   protected String jtlFile;
   protected SampleStatus logOnly;
+  protected String samplersRegex;
   protected boolean saveAsXml;
   protected boolean saveElapsedTime = true;
   protected boolean saveResponseMessage = true;
@@ -109,6 +111,28 @@ public class JtlWriter extends BaseListener {
 
   public enum SampleStatus {
     SUCCESS, ERROR
+  }
+
+  /**
+   * Allows specifying a regular expression used to filter which sample results are logged.
+   * <p>
+   * This regular expression is applied to sample labels, and only collected sample results matching
+   * it will be logged to the JTL file. Otherwise, they will be ignored.
+   * <p>
+   * For example {@code "^[^_].*"} - will exclude samplers which labels start with symbol "_".
+   * <p>
+   * Take into consideration that this filter is applied in addition to
+   * {@link #logOnly(SampleStatus)} and the location of the JTL writer in the test plan (it only
+   * logs samples in its scope).
+   *
+   * @param samplersRegex specifies a regular expression matched against sample labels. When set to
+   *                      null no label filtering is applied. By default, it is set to null.
+   * @return the JtlWriter for further configuration or usage.
+   * @since 2.3
+   */
+  public JtlWriter samplersRegex(String samplersRegex) {
+    this.samplersRegex = samplersRegex;
+    return this;
   }
 
   /**
@@ -652,11 +676,16 @@ public class JtlWriter extends BaseListener {
 
   @Override
   public TestElement buildTestElement() {
-    ResultCollector logger = new ResultCollector();
+    ResultCollector logger =
+        samplersRegex != null && !samplersRegex.isEmpty() ? new FilteringResultCollector()
+            : new ResultCollector();
     logger.setFilename(jtlFile);
     if (logOnly != null) {
       logger.setSuccessOnlyLogging(logOnly == SampleStatus.SUCCESS);
       logger.setErrorLogging(logOnly == SampleStatus.ERROR);
+    }
+    if (logger instanceof FilteringResultCollector) {
+      ((FilteringResultCollector) logger).setSamplersRegex(samplersRegex);
     }
     SampleSaveConfiguration config = logger.getSaveConfig();
     config.setAsXml(saveAsXml);
@@ -693,6 +722,54 @@ public class JtlWriter extends BaseListener {
     return logger;
   }
 
+  /**
+   * Custom {@link ResultCollector} that logs only sample results matching a regular expression
+   * against their label.
+   * <p>
+   * The regular expression is stored as a property (so it survives JMX serialization) and compiled
+   * on first use. The compiled {@link Pattern} is cached, since {@link ResultCollector} is shared
+   * between threads.
+   *
+   * @since 2.3
+   */
+  public static class FilteringResultCollector extends ResultCollector {
+
+    private static final String SAMPLERS_REGEX_PROP = "JtlWriter.samplersRegex";
+    private transient Pattern samplersPattern;
+
+    public FilteringResultCollector() {
+      super();
+    }
+
+    public FilteringResultCollector(String samplersRegex) {
+      this();
+      setSamplersRegex(samplersRegex);
+    }
+
+    public void setSamplersRegex(String samplersRegex) {
+      setProperty(SAMPLERS_REGEX_PROP, samplersRegex);
+    }
+
+    private Pattern samplersPattern() {
+      if (samplersPattern == null) {
+        String regex = getPropertyAsString(SAMPLERS_REGEX_PROP);
+        if (regex != null && !regex.isEmpty()) {
+          samplersPattern = Pattern.compile(regex);
+        }
+      }
+      return samplersPattern;
+    }
+
+    @Override
+    public void sampleOccurred(SampleEvent event) {
+      Pattern pattern = samplersPattern();
+      if (pattern == null || pattern.matcher(event.getResult().getSampleLabel()).find()) {
+        super.sampleOccurred(event);
+      }
+    }
+
+  }
+
   public static class CodeBuilder extends SingleTestElementCallBuilder<ResultCollector> {
 
     public CodeBuilder(List<Method> builderMethods) {
@@ -701,7 +778,12 @@ public class JtlWriter extends BaseListener {
 
     @Override
     public boolean matches(MethodCallContext context) {
-      if (!super.matches(context)) {
+      /*
+       We check with isAssignableFrom (instead of the default exact class match in
+       SingleTestElementCallBuilder) to also match FilteringResultCollector, which is a
+       ResultCollector subclass used when samplersRegex filtering is enabled.
+       */
+      if (!ResultCollector.class.isAssignableFrom(context.getTestElement().getClass())) {
         return false;
       }
       /*
@@ -721,7 +803,8 @@ public class JtlWriter extends BaseListener {
           new StringParam(fileParts[fileParts.length - 1]));
       SampleSaveConfiguration config = collector.getSaveConfig();
       if (isAllSet(config)) {
-        return ret.chain("withAllFields", new BoolParam(true, false));
+        return ret.chain("withAllFields", new BoolParam(true, false))
+            .chain("samplersRegex", paramBuilder.stringParam("JtlWriter.samplersRegex", ""));
       }
       ret.chain("logOnly", SampleStatusParam.fromParamBuilder(paramBuilder));
       return ret.chain("saveAsXml", new BoolParam(config.saveAsXml(), false))
@@ -752,7 +835,8 @@ public class JtlWriter extends BaseListener {
           .chain("withConnectTime", new BoolParam(config.saveConnectTime(), true))
           .chain("withHostname", new BoolParam(config.saveHostname(), false))
           .chain("withSamplerData", new BoolParam(config.saveSamplerData(), false))
-          .chain("withSubResults", new BoolParam(config.saveSubresults(), true));
+          .chain("withSubResults", new BoolParam(config.saveSubresults(), true))
+          .chain("samplersRegex", paramBuilder.stringParam("JtlWriter.samplersRegex", ""));
     }
 
     private boolean isAllSet(SampleSaveConfiguration config) {

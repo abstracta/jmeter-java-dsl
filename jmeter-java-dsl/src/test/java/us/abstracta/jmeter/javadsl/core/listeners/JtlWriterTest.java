@@ -159,6 +159,35 @@ public class JtlWriterTest extends JmeterDslTest {
     assertFileMatchesTemplate(resultsFilePath, "jtls/jtl-with-custom-variable.template.csv");
   }
 
+  @Test
+  public void shouldOnlyLogMatchingSamplersWhenJtlWithSamplersRegex(@TempDir Path tempDir)
+      throws IOException {
+    Path resultsFilePath = tempDir.resolve(RESULTS_JTL);
+    testPlan(
+        threadGroup(1, TEST_ITERATIONS,
+            httpSampler("keep_me", wiremockUri),
+            httpSampler("drop_me", wiremockUri),
+            buildJtlWriter(resultsFilePath).samplersRegex("keep_.*")
+        )
+    ).run();
+    assertResultsFileResultsCount(resultsFilePath, TEST_ITERATIONS);
+    assertThat(Files.readAllLines(resultsFilePath)).noneMatch(line -> line.contains("drop_me"));
+  }
+
+  @Test
+  public void shouldLogAllSamplersWhenJtlWithoutSamplersRegex(@TempDir Path tempDir)
+      throws IOException {
+    Path resultsFilePath = tempDir.resolve(RESULTS_JTL);
+    testPlan(
+        threadGroup(1, TEST_ITERATIONS,
+            httpSampler("keep_me", wiremockUri),
+            httpSampler("drop_me", wiremockUri),
+            buildJtlWriter(resultsFilePath)
+        )
+    ).run();
+    assertResultsFileResultsCount(resultsFilePath, TEST_ITERATIONS * 2);
+  }
+
   @SuppressWarnings("unused")
   @Nested
   public class CodeBuilderTest extends MethodCallBuilderTest {
@@ -169,6 +198,16 @@ public class JtlWriterTest extends JmeterDslTest {
               httpSampler("http://localhost")
           ),
           jtlWriter("", "results.jtl")
+      );
+    }
+
+    public DslTestPlan testPlanWithJtlWriterFilteringBySamplersRegex() {
+      return testPlan(
+          threadGroup(1, 1,
+              httpSampler("http://localhost")
+          ),
+          jtlWriter("", "results.jtl")
+              .samplersRegex("keep_.*")
       );
     }
 
