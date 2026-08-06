@@ -11,8 +11,6 @@ import eu.luminis.jmeter.wssampler.SingleReadWebSocketSamplerGui;
 import eu.luminis.jmeter.wssampler.SingleWriteWebSocketSampler;
 import eu.luminis.jmeter.wssampler.SingleWriteWebSocketSamplerGui;
 import java.lang.reflect.Method;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.List;
 import org.apache.jmeter.testelement.TestElement;
@@ -25,6 +23,7 @@ import us.abstracta.jmeter.javadsl.codegeneration.params.BoolParam;
 import us.abstracta.jmeter.javadsl.codegeneration.params.EnumParam;
 import us.abstracta.jmeter.javadsl.codegeneration.params.StringParam;
 import us.abstracta.jmeter.javadsl.core.samplers.BaseSampler;
+import us.abstracta.jmeter.javadsl.http.JmeterUrl;
 
 /**
  * Provides factory methods to create WebSocket samplers for performance
@@ -71,6 +70,10 @@ public class WebsocketJMeterDsl {
   private WebsocketJMeterDsl() {
   }
 
+  private static boolean containsJmeterExpression(String value) {
+    return value != null && value.contains("${");
+  }
+
   /**
    * Creates a WebSocket connect sampler to establish a connection to the server.
    * <p>
@@ -84,9 +87,26 @@ public class WebsocketJMeterDsl {
    * <b>URL Format:</b> {@code ws://host:port/path?query} or
    * {@code wss://host:port/path?query}
    * <p>
+   * The URL may be a fixed value or include JMeter expressions (variables or
+   * functions) in its parts. For example:
+   * <ul>
+   * <li>{@code ws://localhost:8080/raw} - fixed URL</li>
+   * <li>{@code ws://${HOST}:${PORT}/raw} - host and port from JMeter variables</li>
+   * <li>{@code wss://${SERVER}/chat?token=${TOKEN}} - host, path and query with
+   * expressions</li>
+   * </ul>
+   * The DSL parses the URL at build time into the WebSocket plugin fields (server,
+   * port, path and TLS). JMeter then resolves expressions in each field at
+   * runtime.
+   * <p>
+   * A full URL as a single JMeter expression (e.g. {@code ${URL}}) is not
+   * supported: without a literal {@code ws://} or {@code wss://} scheme the URL
+   * cannot be split into those fields. Prefer expressions in URL parts as shown
+   * above, or use a Java variable when the full URL is known at plan build time.
    *
    * @param url the WebSocket server URL. Supported schemes: {@code ws://} (plain)
-   *            and {@code wss://} (TLS)
+   *            and {@code wss://} (TLS). May contain JMeter expressions in host,
+   *            port, path or query.
    * @return the connect sampler for further configuration or usage
    * @since 2.2
    */
@@ -124,6 +144,31 @@ public class WebsocketJMeterDsl {
   }
 
   /**
+   * Same as {@link #websocketWrite(String)} but allowing to specify the payload data type.
+   *
+   * @param requestData the message to send to the WebSocket server
+   * @param dataType    the payload data type
+   * @return the write sampler for further configuration or usage
+   * @since 2.2
+   */
+  public static DslWriteSampler websocketWrite(String requestData, PayloadDataType dataType) {
+    return new DslWriteSampler(requestData, dataType);
+  }
+
+  /**
+   * Same as {@link #websocketWrite(String, PayloadDataType)} but allowing to use JMeter
+   * expressions (variables or functions) to solve the actual data type value.
+   *
+   * @param requestData the message to send to the WebSocket server
+   * @param dataType    a JMeter expression that returns the payload data type
+   * @return the write sampler for further configuration or usage
+   * @since 2.2
+   */
+  public static DslWriteSampler websocketWrite(String requestData, String dataType) {
+    return new DslWriteSampler(requestData, dataType);
+  }
+
+  /**
    * Creates a WebSocket read sampler to receive a message from the server.
    * <p>
    * By default, this sampler blocks execution until a response is received or
@@ -140,6 +185,56 @@ public class WebsocketJMeterDsl {
     return new DslReadSampler();
   }
 
+  /**
+   * Same as {@link #websocketRead()} but allowing to specify the data type to read from the
+   * server.
+   *
+   * @param dataType the data type to read from the server
+   * @return the read sampler for further configuration or usage
+   * @since 2.2
+   */
+  public static DslReadSampler websocketRead(PayloadDataType dataType) {
+    return new DslReadSampler(dataType);
+  }
+
+  /**
+   * Same as {@link #websocketRead(PayloadDataType)} but allowing to use JMeter expressions
+   * (variables or functions) to solve the actual data type value.
+   *
+   * @param dataType a JMeter expression that returns the data type to read from the server
+   * @return the read sampler for further configuration or usage
+   * @since 2.2
+   */
+  public static DslReadSampler websocketRead(String dataType) {
+    return new DslReadSampler(dataType);
+  }
+
+  public enum PayloadDataType implements EnumParam.EnumPropertyValue {
+    TEXT("Text"),
+    BINARY("Binary");
+
+    private final String propertyValue;
+
+    PayloadDataType(String propertyValue) {
+      this.propertyValue = propertyValue;
+    }
+
+    @Override
+    public String propertyValue() {
+      return propertyValue;
+    }
+
+    public static boolean isText(String value) {
+      return value == null || TEXT.propertyValue().equalsIgnoreCase(value)
+          || "text".equalsIgnoreCase(value);
+    }
+
+    public static boolean isValidDataType(String value) {
+      return isText(value) || BINARY.propertyValue().equalsIgnoreCase(value)
+          || "binary".equalsIgnoreCase(value);
+    }
+  }
+
   public static class DslConnectSampler extends BaseSampler<DslConnectSampler> {
     private String connectionTimeoutMillis;
     private String responseTimeoutMillis;
@@ -150,43 +245,36 @@ public class WebsocketJMeterDsl {
 
     private DslConnectSampler(String url) {
       super("WebSocket Open Connection", OpenWebSocketSamplerGui.class);
-      try {
-        URI uri = new URI(url);
+      parseUrl(url);
+    }
 
-        String scheme = uri.getScheme();
-        if (scheme == null || (!"ws".equals(scheme) && !"wss".equals(scheme))) {
+    private void parseUrl(String url) {
+      JmeterUrl parsed = JmeterUrl.valueOf(url);
+      String scheme = parsed.protocol();
+      if (scheme != null && !containsJmeterExpression(scheme)) {
+        if (!"ws".equals(scheme) && !"wss".equals(scheme)) {
           throw new IllegalArgumentException(
               "Invalid WebSocket URL. Must start with 'ws://' or 'wss://'");
         }
-
-        this.tls = "wss".equals(scheme);
-        this.server = uri.getHost();
-        if (this.server == null) {
-          throw new IllegalArgumentException("Invalid WebSocket URL. Host is required");
-        }
-
-        int port = uri.getPort();
-        if (port == -1) {
-          this.port = this.tls ? "443" : "80";
-        } else {
-          this.port = String.valueOf(port);
-        }
-
-        String path = uri.getPath();
-        if (path == null || path.isEmpty()) {
-          this.path = "/";
-        } else {
-          this.path = path;
-        }
-
-        String query = uri.getQuery();
-        if (query != null && !query.isEmpty()) {
-          this.path = this.path + "?" + query;
-        }
-
-      } catch (URISyntaxException e) {
-        throw new IllegalArgumentException("Invalid WebSocket URL: " + url, e);
+        tls = "wss".equals(scheme);
       }
+      server = parsed.host();
+      if ((server == null || server.isEmpty()) && scheme != null
+          && !containsJmeterExpression(scheme)) {
+        throw new IllegalArgumentException("Invalid WebSocket URL. Host is required");
+      }
+      String parsedPort = parsed.port();
+      if (parsedPort == null || parsedPort.isEmpty()) {
+        if (scheme != null && !containsJmeterExpression(scheme)) {
+          port = tls ? "443" : "80";
+        } else {
+          port = "";
+        }
+      } else {
+        port = parsedPort;
+      }
+      String parsedPath = parsed.path();
+      path = (parsedPath == null || parsedPath.isEmpty()) ? "/" : parsedPath;
     }
 
     @Override
@@ -199,9 +287,15 @@ public class WebsocketJMeterDsl {
         ret.setReadTimeout(responseTimeoutMillis);
       }
       ret.setTLS(tls);
-      ret.setServer(server);
-      ret.setPort(port);
-      ret.setPath(path);
+      if (server != null) {
+        ret.setServer(server);
+      }
+      if (port != null) {
+        ret.setPort(port);
+      }
+      if (path != null) {
+        ret.setPath(path);
+      }
       return ret;
     }
 
@@ -424,16 +518,44 @@ public class WebsocketJMeterDsl {
 
   public static class DslWriteSampler extends BaseSampler<DslWriteSampler> {
     private String requestData;
+    private String dataType;
 
     private DslWriteSampler(String requestData) {
+      this(requestData, PayloadDataType.TEXT);
+    }
+
+    private DslWriteSampler(String requestData, PayloadDataType dataType) {
+      this(requestData, dataType.propertyValue());
+    }
+
+    private DslWriteSampler(String requestData, String dataType) {
       super("WebSocket Single Write", SingleWriteWebSocketSamplerGui.class);
       this.requestData = requestData;
+      this.dataType = dataType;
+      validateDataType(dataType);
+    }
+
+    private static void validateDataType(String dataType) {
+      if (dataType != null && !containsJmeterExpression(dataType)
+          && !PayloadDataType.isValidDataType(dataType)) {
+        throw new IllegalArgumentException("Invalid data type. Must be 'text' or 'binary'");
+      }
+    }
+
+    private static void setWriteDataType(SingleWriteWebSocketSampler write, String dataType) {
+      if (containsJmeterExpression(dataType)) {
+        write.setProperty("payloadType", dataType);
+      } else if (PayloadDataType.isText(dataType)) {
+        write.setType(DataPayloadType.Text);
+      } else {
+        write.setType(DataPayloadType.Binary);
+      }
     }
 
     @Override
     protected TestElement buildTestElement() {
       SingleWriteWebSocketSampler write = new SingleWriteWebSocketSampler();
-      write.setType(DataPayloadType.Text);
+      setWriteDataType(write, dataType);
       write.setRequestData(requestData);
       write.setCreateNewConnection(false);
       return write;
@@ -451,8 +573,14 @@ public class WebsocketJMeterDsl {
           MethodCallContext context) {
         TestElementParamBuilder paramBuilder = new TestElementParamBuilder(testElement);
         MethodParam requestData = paramBuilder.stringParam("requestData", "");
-        return new MethodCall("websocketWrite", DslWriteSampler.class,
+        MethodParam dataTypeParam = paramBuilder.enumParam("payloadType", PayloadDataType.TEXT);
+        MethodCall ret = new MethodCall("websocketWrite", DslWriteSampler.class,
             new StringParam(requestData.getExpression()));
+        if (!dataTypeParam.isDefault()) {
+          ret = new MethodCall("websocketWrite", DslWriteSampler.class,
+              new StringParam(requestData.getExpression()), dataTypeParam);
+        }
+        return ret;
       }
     }
   }
@@ -460,9 +588,37 @@ public class WebsocketJMeterDsl {
   public static class DslReadSampler extends BaseSampler<DslReadSampler> {
     private String responseTimeoutMillis;
     private boolean waitForResponse = true;
+    private String dataType;
 
     private DslReadSampler() {
+      this(PayloadDataType.TEXT);
+    }
+
+    private DslReadSampler(PayloadDataType dataType) {
+      this(dataType.propertyValue());
+    }
+
+    private DslReadSampler(String dataType) {
       super("WebSocket Single Read", SingleReadWebSocketSamplerGui.class);
+      this.dataType = dataType;
+      validateDataType(dataType);
+    }
+
+    private static void validateDataType(String dataType) {
+      if (dataType != null && !containsJmeterExpression(dataType)
+          && !PayloadDataType.isValidDataType(dataType)) {
+        throw new IllegalArgumentException("Invalid data type. Must be 'text' or 'binary'");
+      }
+    }
+
+    private static void setReadDataType(SingleReadWebSocketSampler read, String dataType) {
+      if (containsJmeterExpression(dataType)) {
+        read.setProperty("dataType", dataType);
+      } else if (PayloadDataType.isText(dataType)) {
+        read.setDataType(DataType.Text);
+      } else {
+        read.setDataType(DataType.Binary);
+      }
     }
 
     @Override
@@ -471,7 +627,7 @@ public class WebsocketJMeterDsl {
       if (responseTimeoutMillis != null) {
         read.setReadTimeout(responseTimeoutMillis);
       }
-      read.setDataType(DataType.Text);
+      setReadDataType(read, dataType);
       read.setOptional(!waitForResponse);
       read.setCreateNewConnection(false);
       return read;
@@ -535,7 +691,12 @@ public class WebsocketJMeterDsl {
         TestElementParamBuilder paramBuilder = new TestElementParamBuilder(testElement);
         boolean optionalParam = !paramBuilder.boolParam("optional", false)
             .getExpression().equals("true");
-        return new MethodCall("websocketRead", DslReadSampler.class)
+        MethodParam dataTypeParam = paramBuilder.enumParam("dataType", PayloadDataType.TEXT);
+        MethodCall ret = new MethodCall("websocketRead", DslReadSampler.class);
+        if (!dataTypeParam.isDefault()) {
+          ret = new MethodCall("websocketRead", DslReadSampler.class, dataTypeParam);
+        }
+        return ret
             .chain("responseTimeout", paramBuilder.intParam("readTimeout", 6000))
             .chain("waitForResponse", new BoolParam(optionalParam, true))
             .chain("createNewConnection", paramBuilder.boolParam("createNewConnection", false));
