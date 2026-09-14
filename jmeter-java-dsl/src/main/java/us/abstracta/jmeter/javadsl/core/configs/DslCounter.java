@@ -117,8 +117,9 @@ public class DslCounter extends BaseConfigElement {
   protected TestElement buildTestElement() {
     if (resetOnEachIteration && !perThread) {
       throw new IllegalStateException(
-              "Invalid counter configuration: resetOnEachIteration(true) only works with perThread(true). A shared " +
-                      "counter (perThread=false) has no per-thread state, so it cannot reset on each iteration."
+              "Invalid counter configuration: resetOnEachIteration(true) " +
+              "only works with perThread(true). A shared counter (perThread=false) " +
+              "has no per-thread state, so it cannot reset on each iteration."
       );
     }
     CounterConfig ret = new CounterConfig();
