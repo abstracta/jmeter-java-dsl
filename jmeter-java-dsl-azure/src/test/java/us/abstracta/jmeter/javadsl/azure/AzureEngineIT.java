@@ -1,6 +1,7 @@
 package us.abstracta.jmeter.javadsl.azure;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.autoStop;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.csvDataSet;
@@ -10,7 +11,11 @@ import static us.abstracta.jmeter.javadsl.JmeterDsl.threadGroup;
 import static us.abstracta.jmeter.javadsl.core.listeners.AutoStopListener.AutoStopCondition.sampleTime;
 
 import java.time.Duration;
+import java.util.Collections;
+import java.util.List;
+
 import org.junit.jupiter.api.Test;
+import us.abstracta.jmeter.javadsl.azure.api.AppComponents;
 import us.abstracta.jmeter.javadsl.core.TestPlanStats;
 import us.abstracta.jmeter.javadsl.core.engines.AutoStoppedTestException;
 import us.abstracta.jmeter.javadsl.util.TestResource;
@@ -45,6 +50,13 @@ public class AzureEngineIT {
             .testName("jmeter-java-dsl")
             .testTimeout(Duration.ofMinutes(10)))
     );
+  }
+
+  @Test
+  public void shouldSupportChildResourceIds() {
+    assertDoesNotThrow(() -> new AppComponents(Collections.singletonList(
+        "/subscriptions/sub123/resourceGroups/rg1/providers/"
+        + "Microsoft.Sql/servers/orm/elasticpools/dbName")));
   }
 
 }
