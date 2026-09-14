@@ -50,6 +50,25 @@ public class DslCounterTest extends JmeterDslTest {
     verify(threads, getRequestedFor(urlEqualTo("/" + (startingValue + increment))));
   }
 
+  @Test
+  public void shouldResetCounterOnEachIterationWhenResetOptionIsEnabled() throws Exception {
+    int startingValue = 1;
+    int increment = 1;
+    int threads = 1;
+    testPlan(
+            threadGroup(threads, 2,
+            counter("MY_COUNTER")
+                    .startingValue(startingValue)
+                    .increment(increment)
+                    .perThread(true)
+                    .resetOnEachIteration(true),
+                    httpSampler(wiremockUri + "/${MY_COUNTER}")
+            )
+    ).run();
+    verify(2, getRequestedFor(urlEqualTo("/1")));
+    verify(0, getRequestedFor(urlEqualTo("/2")));
+  }
+
   @Nested
   public class CodeBuilderTest extends MethodCallBuilderTest {
 

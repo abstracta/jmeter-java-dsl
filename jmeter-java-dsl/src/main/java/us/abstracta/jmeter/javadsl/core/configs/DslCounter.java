@@ -24,6 +24,7 @@ public class DslCounter extends BaseConfigElement {
   private long increment = 1;
   private long max = Long.MAX_VALUE;
   private boolean perThread = false;
+  private boolean resetOnEachIteration = false;
 
   public DslCounter(String varName) {
     super(varName, CounterConfigGui.class);
@@ -98,14 +99,35 @@ public class DslCounter extends BaseConfigElement {
     return this;
   }
 
+  /**
+   * Specifies whether to reset the counter value at the beginning of each thread group iteration.
+   *
+   * @param resetOnEachIteration specifies to reset the counter when a new thread group iteration
+   *                             starts. When not specified (set to false), the counter persists its
+   *                             value across different iterations. By default, it is set to false.
+   * @return the counter for further configuration and usage.
+   * @since 2.3
+   */
+  public DslCounter resetOnEachIteration(boolean resetOnEachIteration) {
+    this.resetOnEachIteration = resetOnEachIteration;
+    return this;
+  }
+
   @Override
   protected TestElement buildTestElement() {
+    if (resetOnEachIteration && !perThread) {
+      throw new IllegalStateException(
+              "Invalid counter configuration: resetOnEachIteration(true) only works with perThread(true). A shared " +
+                      "counter (perThread=false) has no per-thread state, so it cannot reset on each iteration."
+      );
+    }
     CounterConfig ret = new CounterConfig();
     ret.setVarName(varName);
     ret.setStart(start);
     ret.setIncrement(increment);
     ret.setEnd(max);
     ret.setIsPerUser(perThread);
+    ret.setResetOnThreadGroupIteration(resetOnEachIteration);
     return ret;
   }
 
@@ -124,6 +146,7 @@ public class DslCounter extends BaseConfigElement {
       ret.chain("increment", paramBuilder.longParam("incr", 1L));
       ret.chain("maximumValue", paramBuilder.longParam("end", Long.MAX_VALUE));
       ret.chain("perThread", paramBuilder.boolParam("per_user", false));
+      ret.chain("resetOnEachIteration", paramBuilder.boolParam("reset_on_tg_iteration", false));
       return ret;
     }
 

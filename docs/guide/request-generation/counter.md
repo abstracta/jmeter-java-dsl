@@ -13,5 +13,5 @@ testPlan(
     )
 ).run();
 ```
-
+You can also use `.resetOnEachIteration(true)` if you need the counter to reset to its starting value at the beginning of each new Thread Group iteration.
 Check [DslCounter](/jmeter-java-dsl/src/main/java/us/abstracta/jmeter/javadsl/core/configs/DslCounter.java) for more details.
