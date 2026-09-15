@@ -5,7 +5,6 @@ import java.time.Duration;
 import java.util.List;
 import org.apache.commons.io.output.NullOutputStream;
 import org.openqa.selenium.NoSuchWindowException;
-import org.openqa.selenium.Proxy;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeDriverService;
 import org.openqa.selenium.chrome.ChromeDriverService.Builder;
@@ -39,10 +38,7 @@ public class RecordingBrowser implements AutoCloseable {
 
   private ChromeOptions buildChromeOptions(String recordingProxy, List<String> args) {
     ChromeOptions ret = new ChromeOptions();
-    Proxy proxy = new Proxy();
-    proxy.setHttpProxy(recordingProxy);
-    proxy.setSslProxy(recordingProxy);
-    ret.setProxy(proxy);
+    ret.addArguments("--proxy-server=http://" + recordingProxy);
     ret.addArguments("--incognito", "--proxy-bypass-list=<-loopback>");
     ret.addArguments(args);
     ret.setAcceptInsecureCerts(true);
