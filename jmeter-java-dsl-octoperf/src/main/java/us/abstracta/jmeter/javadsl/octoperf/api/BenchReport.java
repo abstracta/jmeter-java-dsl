@@ -69,20 +69,25 @@ public class BenchReport {
 
   public static class ReportItemMetric {
 
+    private static final List<ReportItemQueryFilter> HIT_FILTERS = Collections.singletonList(
+        ReportItemQueryFilter.singleTerm("subSampleType", "Hit"));
+
     private final String id;
-    private final String type = "HIT";
-    private final List<ReportItemQueryFilter> filters = Collections.emptyList();
+    private final String type = "BASIC";
+    private final List<ReportItemQueryFilter> filters;
     private final String benchResultId;
     private final BenchReportConfig config = null;
 
     public ReportItemMetric() {
       id = null;
       benchResultId = null;
+      filters = Collections.emptyList();
     }
 
     public ReportItemMetric(ReportMetricId id, String benchResultId) {
       this.id = id.name();
       this.benchResultId = benchResultId;
+      this.filters = HIT_FILTERS;
     }
 
     public String getBenchResultId() {
@@ -106,6 +111,27 @@ public class BenchReport {
   }
 
   public static class ReportItemQueryFilter {
+
+    @JsonProperty("@type")
+    private final String type;
+    private final String field;
+    private final String term;
+
+    public ReportItemQueryFilter() {
+      this.type = null;
+      this.field = null;
+      this.term = null;
+    }
+
+    private ReportItemQueryFilter(String type, String field, String term) {
+      this.type = type;
+      this.field = field;
+      this.term = term;
+    }
+
+    public static ReportItemQueryFilter singleTerm(String field, String term) {
+      return new ReportItemQueryFilter("SingleTermFilter", field, term);
+    }
 
   }
 

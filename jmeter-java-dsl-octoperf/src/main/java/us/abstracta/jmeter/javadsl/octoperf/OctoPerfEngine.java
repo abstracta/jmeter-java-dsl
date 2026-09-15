@@ -205,7 +205,7 @@ public class OctoPerfEngine extends BaseRemoteEngine<OctoPerfClient, OctoPerfTes
     LOG.info("Running scenario in {}", report.getUrl());
     Instant testStart = Instant.now();
     BenchResult result = awaitTestEnd(report, testStart);
-    return findTestPlanStats(report, testStart, vus, result);
+    return findTestPlanStats(report, testStart, result);
   }
 
   @Override
@@ -317,7 +317,7 @@ public class OctoPerfEngine extends BaseRemoteEngine<OctoPerfClient, OctoPerfTes
   }
 
   private OctoPerfTestPlanStats findTestPlanStats(BenchReport report, Instant testStart,
-      List<VirtualUser> vus, BenchResult result)
+      BenchResult result)
       throws IOException, TimeoutException, InterruptedException {
     List<ReportMetricId> metrics = Arrays.asList(ReportMetricId.HITS_TOTAL,
         ReportMetricId.HITS_RATE, ReportMetricId.ERRORS_TOTAL, ReportMetricId.ERRORS_RATE,
@@ -353,7 +353,7 @@ public class OctoPerfEngine extends BaseRemoteEngine<OctoPerfClient, OctoPerfTes
         report.getItems());
     setReportMetrics(tableReport, metrics);
     List<TableEntry> tableStats = apiClient.findTableStats(tableReport);
-    return new OctoPerfTestPlanStats(summaryStats, tableStats, vus, result);
+    return new OctoPerfTestPlanStats(summaryStats, tableStats, result);
   }
 
   private static <T extends BenchReportItem> T findReportItemWithType(Class<T> reportItemClass,

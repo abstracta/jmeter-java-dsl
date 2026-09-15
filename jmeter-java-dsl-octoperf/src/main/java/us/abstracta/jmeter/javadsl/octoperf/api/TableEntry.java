@@ -6,18 +6,18 @@ import java.util.List;
 
 public class TableEntry {
 
-  private final String actionId;
+  private final String actionPath;
   private final List<TableValue> values;
 
   @JsonCreator
-  public TableEntry(@JsonProperty("actionId") String actionId,
+  public TableEntry(@JsonProperty("actionPath") String actionPath,
       @JsonProperty("values") List<TableValue> values) {
-    this.actionId = actionId;
+    this.actionPath = actionPath;
     this.values = values;
   }
 
-  public String getActionId() {
-    return actionId;
+  public String getActionPath() {
+    return actionPath;
   }
 
   public List<TableValue> getValues() {

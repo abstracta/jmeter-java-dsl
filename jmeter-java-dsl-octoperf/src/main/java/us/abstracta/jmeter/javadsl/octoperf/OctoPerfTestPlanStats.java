@@ -3,7 +3,6 @@ package us.abstracta.jmeter.javadsl.octoperf;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 import org.apache.jmeter.samplers.SampleResult;
 import us.abstracta.jmeter.javadsl.core.TestPlanStats;
@@ -14,24 +13,29 @@ import us.abstracta.jmeter.javadsl.engines.RemoteEngineTimeMetricSummary;
 import us.abstracta.jmeter.javadsl.octoperf.api.BenchResult;
 import us.abstracta.jmeter.javadsl.octoperf.api.TableEntry;
 import us.abstracta.jmeter.javadsl.octoperf.api.TableEntry.TableValue;
-import us.abstracta.jmeter.javadsl.octoperf.api.VirtualUser;
-import us.abstracta.jmeter.javadsl.octoperf.api.VirtualUser.Action;
 
 public class OctoPerfTestPlanStats extends TestPlanStats {
 
+  private static final int ACTION_PATH_SEPARATOR = 0x2AFD;
+
   public OctoPerfTestPlanStats(double[] summaryStats, List<TableEntry> tableStats,
-      List<VirtualUser> vus, BenchResult result) {
+      BenchResult result) {
     super(() -> null);
     setStart(result.getCreated());
     setEnd(result.getLastModified());
     overallStats = new OctoPerfStatsSummary(result, summaryStats);
-    Map<String, String> actionsLabels = vus.stream()
-        .flatMap(vu -> vu.getChildren().stream())
-        .collect(Collectors.toMap(Action::getId, Action::getName));
     labeledStats.putAll(tableStats.stream()
-        .collect(Collectors.toMap(s -> actionsLabels.get(s.getActionId()),
+        .collect(Collectors.toMap(s -> labelFromActionPath(s.getActionPath()),
             s -> new OctoPerfStatsSummary(result, s),
             OctoPerfStatsSummary::new)));
+  }
+
+  private static String labelFromActionPath(String actionPath) {
+    if (actionPath == null) {
+      return null;
+    }
+    int sep = actionPath.lastIndexOf(ACTION_PATH_SEPARATOR);
+    return sep >= 0 ? actionPath.substring(sep + 1) : actionPath;
   }
 
   public static class OctoPerfStatsSummary implements StatsSummary {
