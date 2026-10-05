@@ -38,7 +38,7 @@ public class AppComponents {
   private static class AppComponent {
 
     private static final Pattern RESOURCE_ID_PATTERN = Pattern.compile(
-        "^/subscriptions/([^/]+)/resourceGroups/([^/]+)/providers/([^/]+)/([^/]+)/([^/?]+)$");
+        "^/subscriptions/([^/]+)/resourceGroups/([^/]+)/providers/([^/]+)/(.+)$");
 
     private final String resourceId;
     private final String subscriptionId;
@@ -59,8 +59,27 @@ public class AppComponents {
       int groupNumber = 1;
       this.subscriptionId = matcher.group(groupNumber++);
       this.resourceGroup = matcher.group(groupNumber++);
-      this.resourceType = matcher.group(groupNumber++) + "/" + matcher.group(groupNumber++);
-      this.resourceName = matcher.group(groupNumber);
+      String provider = matcher.group(groupNumber++);
+      String resourcePath = matcher.group(groupNumber);
+      String[] resourceSegments = resourcePath.split("/");
+      if (resourceSegments.length == 0 || resourceSegments.length % 2 != 0) {
+        throw new IllegalArgumentException(
+            "Provided resource id has an invalid resource path. Resource types and names "
+                + "must appear in pairs: " + resourceId);
+      }
+      StringBuilder resourceTypeBuilder = new StringBuilder(provider);
+      StringBuilder resourceNameBuilder = new StringBuilder();
+      for (int i = 0; i < resourceSegments.length; i += 2) {
+        String type = resourceSegments[i];
+        String name = resourceSegments[i + 1];
+        resourceTypeBuilder.append("/").append(type);
+        if (resourceNameBuilder.length() > 0) {
+          resourceNameBuilder.append("/");
+        }
+        resourceNameBuilder.append(name);
+      }
+      this.resourceType = resourceTypeBuilder.toString();
+      this.resourceName = resourceNameBuilder.toString();
     }
 
   }
