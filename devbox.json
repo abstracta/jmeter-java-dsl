@@ -3,7 +3,7 @@
     "maven@latest",
     "nodejs@latest",
     "nodePackages.pnpm@latest",
-    "temurin-bin-8@latest"
+    "temurin-bin-11@latest"
   ],
   "shell": {
     "init_hook": [
