@@ -197,6 +197,7 @@
         <version>3.2.1</version>
         <executions>
           <execution>
+            <?m2e ignore?>
             <id>validate</id>
             <phase>validate</phase>
             <configuration>

@@ -7,6 +7,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeoutException;
@@ -19,6 +20,7 @@ import us.abstracta.jmeter.javadsl.blazemeter.api.Project;
 import us.abstracta.jmeter.javadsl.blazemeter.api.Test;
 import us.abstracta.jmeter.javadsl.blazemeter.api.TestConfig;
 import us.abstracta.jmeter.javadsl.blazemeter.api.TestConfig.ExecutionConfig;
+import us.abstracta.jmeter.javadsl.blazemeter.api.TestConfig.NetworkEmulation;
 import us.abstracta.jmeter.javadsl.blazemeter.api.TestRun;
 import us.abstracta.jmeter.javadsl.blazemeter.api.TestRunConfig;
 import us.abstracta.jmeter.javadsl.blazemeter.api.TestRunRequestStats;
@@ -26,6 +28,7 @@ import us.abstracta.jmeter.javadsl.blazemeter.api.TestRunStatus;
 import us.abstracta.jmeter.javadsl.blazemeter.api.TestRunSummaryStats.TestRunLabeledSummary;
 import us.abstracta.jmeter.javadsl.core.BuildTreeContext;
 import us.abstracta.jmeter.javadsl.core.DslJmeterEngine;
+import us.abstracta.jmeter.javadsl.core.util.JmeterFunction;
 import us.abstracta.jmeter.javadsl.engines.BaseRemoteEngine;
 
 /**
@@ -40,6 +43,8 @@ public class BlazeMeterEngine extends BaseRemoteEngine<BlazeMeterClient, BlazeMe
 
   private static final Logger LOG = LoggerFactory.getLogger(BlazeMeterEngine.class);
   private static final Duration STATUS_POLL_PERIOD = Duration.ofSeconds(5);
+  private static final String SECRET_PROPERTY_PREFIX = "BZM_SECRET_";
+  private static final int MAX_NETWORK_LATENCY_MILLIS = 5000;
 
   private final String username;
   private final String password;
@@ -55,6 +60,11 @@ public class BlazeMeterEngine extends BaseRemoteEngine<BlazeMeterClient, BlazeMe
   private final List<File> assets = new ArrayList<>();
   private final List<WeightedLocation> locations = new ArrayList<>();
   private boolean useDebugRun;
+  private String javaVersion;
+  private BlazeMeterJmeterVersion jmeterVersion;
+  private final Map<String, String> props = new LinkedHashMap<>();
+  private NetworkEmulation networkEmulation;
+  private Boolean dedicatedIps;
 
   /**
    * @param authToken is the authentication token to be used to access BlazeMeter API.
@@ -380,6 +390,178 @@ public class BlazeMeterEngine extends BaseRemoteEngine<BlazeMeterClient, BlazeMe
     return this;
   }
 
+  /**
+   * Specifies the Java version BlazeMeter engines use to run the test plan.
+   * <p>
+   * Use one of the versions listed in the Java version drop-down of BlazeMeter test configuration
+   * (e.g.: <pre>1.8</pre>, <pre>11</pre>, <pre>17</pre> or <pre>21</pre>). Take into consideration
+   * that BlazeMeter silently falls back to <pre>1.8</pre> when an unknown version is specified.
+   * <p>
+   * When not specified, the value of the last test run will be used, or the BlazeMeter default if
+   * no previous test run exists.
+   *
+   * @param javaVersion specifies the Java version to use.
+   * @return the engine for further configuration or usage.
+   * @since 2.4
+   */
+  public BlazeMeterEngine javaVersion(String javaVersion) {
+    this.javaVersion = javaVersion;
+    return this;
+  }
+
+  /**
+   * Specifies the JMeter version BlazeMeter engines use to run the test plan.
+   * <p>
+   * BlazeMeter does not support specifying an arbitrary JMeter version (eg: 5.4.3), only the
+   * aliases defined in {@link BlazeMeterJmeterVersion}. Since JMeter DSL generates test plans with
+   * the JMeter version it depends on, you can use {@link BlazeMeterJmeterVersion#AUTO} to run them
+   * with such version, as long as JMeter version auto-detect is enabled in your BlazeMeter
+   * account.
+   * <p>
+   * When not specified, the value of the last test run will be used, or the BlazeMeter default if
+   * no previous test run exists.
+   *
+   * @param jmeterVersion specifies the JMeter version to use.
+   * @return the engine for further configuration or usage.
+   * @since 2.4
+   */
+  public BlazeMeterEngine jmeterVersion(BlazeMeterJmeterVersion jmeterVersion) {
+    this.jmeterVersion = jmeterVersion;
+    return this;
+  }
+
+  /**
+   * Allows setting a JMeter property to be used during test plan execution in BlazeMeter.
+   * <p>
+   * Test plans can access the property value with <pre>${__P(PROP_NAME)}</pre>.
+   * <p>
+   * Use this method multiple times to set several properties. When at least one property is
+   * specified, the given properties replace the ones configured in BlazeMeter test. Otherwise,
+   * properties configured in the BlazeMeter test are kept unchanged.
+   *
+   * @param name  specifies the name of the property.
+   * @param value specifies the value associated to the property.
+   * @return the engine for further configuration or usage.
+   * @since 2.4
+   */
+  public BlazeMeterEngine prop(String name, String value) {
+    props.put(name, value);
+    return this;
+  }
+
+  /**
+   * Makes BlazeMeter emulate one of its predefined network conditions while running the test plan.
+   * <p>
+   * When no network emulation is specified, the setting configured in BlazeMeter test is kept
+   * unchanged.
+   *
+   * @param preset specifies the network conditions to emulate.
+   * @return the engine for further configuration or usage.
+   * @see #networkEmulation(Duration, int, int)
+   * @since 2.4
+   */
+  public BlazeMeterEngine networkEmulation(BlazeMeterNetworkPreset preset) {
+    this.networkEmulation = NetworkEmulation.preset(preset.getName());
+    return this;
+  }
+
+  /**
+   * Same as {@link #networkEmulation(BlazeMeterNetworkPreset)} but allowing to specify custom
+   * network conditions.
+   *
+   * @param latency           specifies the network delay to emulate. Up to 5 seconds, with
+   *                          milliseconds granularity.
+   * @param bandwidthKbps     specifies the network speed to emulate, in kilobits per second.
+   * @param packetLossPercent specifies the percentage of packets to lose, between 0 and 100.
+   * @return the engine for further configuration or usage.
+   * @throws IllegalArgumentException if any of the given values is out of range.
+   * @since 2.4
+   */
+  public BlazeMeterEngine networkEmulation(Duration latency, int bandwidthKbps,
+      int packetLossPercent) {
+    long latencyMillis = latency.toMillis();
+    if (latencyMillis < 0 || latencyMillis > MAX_NETWORK_LATENCY_MILLIS) {
+      throw new IllegalArgumentException(
+          "Network latency must be between 0 and " + MAX_NETWORK_LATENCY_MILLIS
+              + " milliseconds, but got " + latencyMillis);
+    }
+    if (bandwidthKbps <= 0) {
+      throw new IllegalArgumentException(
+          "Network bandwidth must be greater than 0, but got " + bandwidthKbps);
+    }
+    if (packetLossPercent < 0 || packetLossPercent > 100) {
+      throw new IllegalArgumentException(
+          "Network packet loss must be between 0 and 100, but got " + packetLossPercent);
+    }
+    this.networkEmulation = NetworkEmulation.custom((int) latencyMillis, bandwidthKbps,
+        packetLossPercent);
+    return this;
+  }
+
+  /**
+   * Specifies to run the test plan from dedicated IPs.
+   * <p>
+   * Dedicated IPs must be available in your BlazeMeter account for all the locations used by the
+   * test, otherwise the test run will fail.
+   *
+   * @return the engine for further configuration or usage.
+   * @since 2.4
+   */
+  public BlazeMeterEngine dedicatedIps() {
+    return dedicatedIps(true);
+  }
+
+  /**
+   * Same as {@link #dedicatedIps()} but allowing to enable or disable the setting.
+   * <p>
+   * This is helpful when the resolution is taken at runtime.
+   * <p>
+   * When not specified, the setting configured in BlazeMeter test is kept unchanged.
+   *
+   * @param enable specifies to enable or disable the setting.
+   * @return the engine for further configuration or usage.
+   * @see #dedicatedIps()
+   * @since 2.4
+   */
+  public BlazeMeterEngine dedicatedIps(boolean enable) {
+    this.dedicatedIps = enable;
+    return this;
+  }
+
+  /**
+   * Builds an expression to reference an existing BlazeMeter secret from a test plan.
+   * <p>
+   * BlazeMeter detects secrets referenced in the uploaded test plan and provides their values as
+   * JMeter properties. For instance:
+   * <pre>{@code
+   *  httpSampler("https://myservice")
+   *    .header("Authorization", "Bearer " + BlazeMeterEngine.secret("myToken"))
+   * }</pre>
+   * <p>
+   * Secrets have to be created in advance in BlazeMeter workspace settings.
+   *
+   * @param name specifies the name of the secret, as defined in BlazeMeter.
+   * @return the JMeter expression that resolves to the secret value.
+   * @see #secret(String, String)
+   * @since 2.4
+   */
+  public static String secret(String name) {
+    return JmeterFunction.from("__P", SECRET_PROPERTY_PREFIX + name);
+  }
+
+  /**
+   * Same as {@link #secret(String)} but allowing to specify a value to use when the secret is not
+   * available, for example, when running the test plan locally.
+   *
+   * @param name         specifies the name of the secret, as defined in BlazeMeter.
+   * @param defaultValue specifies the value to use when the secret is not available.
+   * @return the JMeter expression that resolves to the secret value.
+   * @since 2.4
+   */
+  public static String secret(String name, String defaultValue) {
+    return JmeterFunction.from("__P", SECRET_PROPERTY_PREFIX + name, defaultValue);
+  }
+
   @Override
   protected BlazeMeterTestPlanStats run(File jmxFile, HashTree tree, BuildTreeContext context)
       throws IOException, InterruptedException, TimeoutException {
@@ -435,7 +617,12 @@ public class BlazeMeterEngine extends BaseRemoteEngine<BlazeMeterClient, BlazeMe
         .projectId(project.getId())
         .jmxFile(jmxFile)
         .execConfig(execConfig)
-        .threadsPerEngine(threadsPerEngine);
+        .threadsPerEngine(threadsPerEngine)
+        .javaVersion(javaVersion)
+        .jmeterVersion(jmeterVersion != null ? jmeterVersion.getName() : null)
+        .jmeterProperties(props)
+        .networkEmulation(networkEmulation)
+        .dedicatedIps(dedicatedIps);
   }
 
   private Map<String, Integer> buildLocationsPercents(Project project) throws IOException {

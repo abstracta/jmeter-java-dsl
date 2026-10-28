@@ -114,6 +114,44 @@ testPlan(
 :::
 
 ::: tip
+You can also change from your test some BlazeMeter test configuration options, like the Java and JMeter versions, JMeter properties, network emulation and dedicated IPs:
+
+```java
+testPlan(
+    threadGroup(300, Duration.ofMinutes(5),
+      httpSampler(SAMPLE_LABEL, "https://${__P(HOST)}")
+    )
+).runIn(new BlazeMeterEngine(System.getenv("BZ_TOKEN"))
+    .javaVersion("17")
+    .jmeterVersion(BlazeMeterJmeterVersion.LATEST)
+    .prop("HOST", "myservice") // JMeter property used in test plan with ${__P(HOST)}
+    .networkEmulation(BlazeMeterNetworkPreset.LTE) // or networkEmulation(Duration.ofMillis(100), 1000, 1) for custom latency, bandwidth (kbps) and packet loss (%)
+    .dedicatedIps() // requires dedicated IPs in your BlazeMeter account for all used locations
+    .testTimeout(Duration.ofMinutes(10)));
+```
+
+Options not specified in the test keep the value configured in the BlazeMeter test.
+
+BlazeMeter does not allow using an arbitrary JMeter version, only `STABLE`, `LATEST` or `AUTO`. `AUTO` uses the JMeter version JMeter DSL depends on, but requires enabling JMeter version auto-detect in BlazeMeter account settings (only available for accounts with private locations).
+:::
+
+::: tip
+To avoid hardcoding sensitive data (like passwords or tokens) in your test plan, you can use [BlazeMeter secrets](https://help.blazemeter.com/docs/guide/performance-advanced-secrets.htm). Create the secret in your BlazeMeter workspace settings and reference it in your test plan with `BlazeMeterEngine.secret()`:
+
+```java
+testPlan(
+    threadGroup(300, Duration.ofMinutes(5),
+      httpSampler(SAMPLE_LABEL, "https://myservice")
+        .header("Authorization", "Bearer " + BlazeMeterEngine.secret("myToken"))
+    )
+).runIn(new BlazeMeterEngine(System.getenv("BZ_TOKEN"))
+    .testTimeout(Duration.ofMinutes(10)));
+```
+
+BlazeMeter detects referenced secrets when the test plan is uploaded and masks their values in reports and logs. You can use `BlazeMeterEngine.secret("myToken", "localValue")` to specify a value to use when the secret is not available, for example, when running the test plan locally.
+:::
+
+::: tip
 In case you want to get debug logs for HTTP calls to BlazeMeter API, you can include the following setting to an existing `log4j2.xml` configuration file:
 ```xml
 <Logger name="us.abstracta.jmeter.javadsl.blazemeter.BlazeMeterClient" level="DEBUG"/>

@@ -36,6 +36,26 @@ public class BlazeMeterEngineTest {
     assertThat(extractTotalCounts(stats)).isEqualTo(buildBlazemeterExpectedCounts());
   }
 
+  @Test
+  public void shouldUsePropertiesWhenRunTestInBlazeMeterWithProperties() throws Exception {
+    String label = "propertyLabel";
+    TestPlanStats stats = testPlan(
+        threadGroup(1, 1,
+            httpSampler("${__P(LABEL)}", "https://localhost")
+        )
+    ).runIn(new BlazeMeterEngine(System.getenv("BZ_TOKEN"))
+        .testName("DSL test with settings")
+        .totalUsers(1)
+        .iterations(1)
+        .threadsPerEngine(1)
+        .javaVersion("17")
+        .jmeterVersion(BlazeMeterJmeterVersion.LATEST)
+        .prop("LABEL", label)
+        .testTimeout(Duration.ofMinutes(10))
+        .useDebugRun());
+    assertThat(stats.labels()).containsExactly(label);
+  }
+
   private Map<String, Long> extractTotalCounts(TestPlanStats stats) {
     Map<String, Long> actualStats = new HashMap<>();
     actualStats.put(OVERALL_STATS_LABEL, stats.overall().samplesCount());
