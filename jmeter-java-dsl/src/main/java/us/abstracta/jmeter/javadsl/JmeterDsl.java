@@ -934,8 +934,7 @@ public class JmeterDsl {
   }
 
   /**
-   * Builds a Cookie manager at the test plan level which allows configuring cookies settings used
-   * by HTTPRequest samplers.
+   * Builds a Cookie manager which allows configuring cookies settings and adding custom cookies.
    *
    * @return the Cookie manager instance which allows configuring cookies settings.
    * @see DslCookieManager
@@ -943,6 +942,20 @@ public class JmeterDsl {
    */
   public static DslCookieManager httpCookies() {
     return new DslCookieManager();
+  }
+
+  /**
+   * Builds an HTTP cookie to be added to {@link #httpCookies()}.
+   *
+   * @param name   specifies the cookie name.
+   * @param value  specifies the cookie value.
+   * @param domain specifies the domain (eg: myservice.com) of requests to send the cookie to. The
+   *               cookie is also sent to subdomains of the given domain.
+   * @return the cookie instance for further configuration and usage.
+   * @see DslCookieManager.Cookie
+   */
+  public static DslCookieManager.Cookie httpCookie(String name, String value, String domain) {
+    return new DslCookieManager.Cookie(name, value, domain);
   }
 
   /**

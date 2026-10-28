@@ -33,6 +33,18 @@ public abstract class AutoEnabledHttpConfigElement extends BaseConfigElement {
     return context.getOrCreateEntry(getClass().getSimpleName(), BuildContextEntry::new);
   }
 
+  protected boolean isDisabledInScope(BuildTreeContext context) {
+    BuildTreeContext scope = context.getParent();
+    while (scope != null) {
+      BuildContextEntry entry = (BuildContextEntry) scope.getEntry(getClass().getSimpleName());
+      if (entry != null && Boolean.FALSE.equals(entry.enabled)) {
+        return true;
+      }
+      scope = scope.getParent();
+    }
+    return false;
+  }
+
   private static class BuildContextEntry {
 
     private Boolean enabled;
