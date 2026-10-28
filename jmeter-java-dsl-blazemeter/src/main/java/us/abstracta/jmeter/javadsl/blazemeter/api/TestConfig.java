@@ -1,5 +1,7 @@
 package us.abstracta.jmeter.javadsl.blazemeter.api;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import java.io.File;
 import java.time.Duration;
 import java.util.ArrayList;
@@ -44,12 +46,124 @@ public class TestConfig {
     return this;
   }
 
+  public TestConfig javaVersion(String javaVersion) {
+    configuration.javaVersion = javaVersion;
+    return this;
+  }
+
+  public TestConfig jmeterVersion(String jmeterVersion) {
+    if (jmeterVersion != null) {
+      configuration.plugins().jmeter = new JmeterPlugin(jmeterVersion);
+    }
+    return this;
+  }
+
+  public TestConfig jmeterProperties(Map<String, String> properties) {
+    if (!properties.isEmpty()) {
+      configuration.enableJMeterProperties = true;
+      configuration.plugins().remoteControl = properties.entrySet().stream()
+          .map(e -> new JmeterProperty(e.getKey(), e.getValue()))
+          .collect(Collectors.toList());
+    }
+    return this;
+  }
+
+  public TestConfig networkEmulation(NetworkEmulation networkEmulation) {
+    if (networkEmulation != null) {
+      configuration.enableNetworkEmulation = true;
+      configuration.plugins().network = networkEmulation;
+    }
+    return this;
+  }
+
+  public TestConfig dedicatedIps(Boolean enabled) {
+    configuration.dedicatedIpsEnabled = enabled;
+    return this;
+  }
+
   private static class Configuration {
 
     private final String type = "taurus";
     private final String scriptType = "jmeter";
     private String filename;
     private Integer threads;
+    @JsonInclude(Include.NON_NULL)
+    private String javaVersion;
+    @JsonInclude(Include.NON_NULL)
+    private Boolean dedicatedIpsEnabled;
+    @JsonInclude(Include.NON_NULL)
+    private Boolean enableJMeterProperties;
+    @JsonInclude(Include.NON_NULL)
+    private Boolean enableNetworkEmulation;
+    @JsonInclude(Include.NON_NULL)
+    private Plugins plugins;
+
+    private Plugins plugins() {
+      if (plugins == null) {
+        plugins = new Plugins();
+      }
+      return plugins;
+    }
+
+  }
+
+  @JsonInclude(Include.NON_NULL)
+  private static class Plugins {
+
+    private JmeterPlugin jmeter;
+    private List<JmeterProperty> remoteControl;
+    private NetworkEmulation network;
+
+  }
+
+  private static class JmeterPlugin {
+
+    private final String version;
+
+    private JmeterPlugin(String version) {
+      this.version = version;
+    }
+
+  }
+
+  private static class JmeterProperty {
+
+    private final String key;
+    private final String value;
+
+    private JmeterProperty(String key, String value) {
+      this.key = key;
+      this.value = value;
+    }
+
+  }
+
+  @JsonInclude(Include.NON_NULL)
+  public static class NetworkEmulation {
+
+    private static final String CUSTOM_PRESET = "Custom";
+
+    private final String preset;
+    private final Integer latency;
+    private final Integer bandwidth;
+    private final Integer packetloss;
+
+    private NetworkEmulation(String preset, Integer latency, Integer bandwidth,
+        Integer packetloss) {
+      this.preset = preset;
+      this.latency = latency;
+      this.bandwidth = bandwidth;
+      this.packetloss = packetloss;
+    }
+
+    public static NetworkEmulation preset(String preset) {
+      return new NetworkEmulation(preset, null, null, null);
+    }
+
+    public static NetworkEmulation custom(int latencyMillis, int bandwidthKbps,
+        int packetLossPercent) {
+      return new NetworkEmulation(CUSTOM_PRESET, latencyMillis, bandwidthKbps, packetLossPercent);
+    }
 
   }
 
