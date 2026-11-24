@@ -1,5 +1,6 @@
 package us.abstracta.jmeter.javadsl.prometheus;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.dummySampler;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.testPlan;
 import static us.abstracta.jmeter.javadsl.JmeterDsl.threadGroup;
@@ -14,6 +15,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -22,6 +24,7 @@ import java.util.concurrent.TimeoutException;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import us.abstracta.jmeter.javadsl.prometheus.DslPrometheusListener.PrometheusMetric;
 
 public class DslPrometheusListenerTest {
 
@@ -34,6 +37,22 @@ public class DslPrometheusListenerTest {
         testPlanRunner(),
         collector
     );
+  }
+
+  @Test
+  public void shouldUseDotsInQuantilesWhenDefaultLocaleUsesDecimalComma() {
+    Locale defaultLocale = Locale.getDefault();
+    try {
+      Locale.setDefault(Locale.GERMANY);
+      assertThat(PrometheusMetric.responseTime("ResponseTime")
+          .quantile(0.75, 0.5)
+          .quantile(0.95, 0.1)
+          .buildCollectorConfig()
+          .getQuantileOrBucket())
+          .isEqualTo("0.750000,0.500000|0.950000,0.100000;60");
+    } finally {
+      Locale.setDefault(defaultLocale);
+    }
   }
 
   @SafeVarargs

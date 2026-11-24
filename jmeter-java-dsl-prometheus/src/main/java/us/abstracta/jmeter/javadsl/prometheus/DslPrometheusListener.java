@@ -10,6 +10,7 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 import org.apache.jmeter.testelement.TestElement;
 import org.apache.jmeter.util.JMeterUtils;
@@ -279,7 +280,7 @@ public class DslPrometheusListener extends BaseListener {
      * @return the metric instance for further configuration or usage.
      */
     public SummaryPrometheusMetric quantile(double quantile, double error) {
-      quantiles += "|" + String.format("%f,%f", quantile, error);
+      quantiles += "|" + String.format(Locale.ROOT, "%f,%f", quantile, error);
       return this;
     }
 
